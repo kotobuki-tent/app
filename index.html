@@ -452,7 +452,7 @@ function renderGantt(){
     h+=`<div class="gantt-row" data-id="${d.id}"><div class="gantt-row-label"><span class="prj-name">${esc(d.project)}</span><span class="prj-meta">${esc(d.client||'')} ${esc(d.person||'')}</span><span class="prj-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span></div><div class="gantt-bars">`;
     dates.forEach((dt,i)=>{
       const ds=dateStr(dt);const isT=ds===dateStr(today);
-      h+=`<div class="gantt-bar-cell${isT?' today'}">`;
+      h+=`<div class="gantt-bar-cell${isT?' today':''}">`;
       [{key:'load_in',s:'date_load_in',e:'date_load_in'},{key:'setup',s:'date_setup',e:'date_setup'},{key:'event',s:'date_event_start',e:'date_event_end'},{key:'teardown',s:'date_teardown',e:'date_teardown'}].forEach(p=>{
         const ps=parseD(d[p.s]),pe=parseD(d[p.e])||ps;
         if(ps&&dt>=ps&&dt<=pe)h+=`<div class="gantt-bar ${p.key}"></div>`;
