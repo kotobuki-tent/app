@@ -180,6 +180,15 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .date-rm:hover{opacity:.7}
 .date-add-btn{background:none;border:1px dashed var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:6px;cursor:pointer}
 .date-add-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* 閲覧モーダル */
+.view-row{display:flex;gap:16px;margin-bottom:10px;font-size:13px}
+.view-row .view-label{font-weight:600;color:var(--text-dim);min-width:80px;flex-shrink:0}
+.view-row .view-val{color:var(--text)}
+.view-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--border-light);font-size:13px}
+.view-section h3{font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px}
+.view-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.view-tag{font-size:11px;padding:3px 8px;border-radius:5px;background:var(--accent-dim);color:var(--accent);font-weight:600}
 .phase-grid .mo-field{flex:none}
 .phase-hd{font-size:12px;font-weight:700;color:var(--text-dim);margin:14px 0 8px;padding-top:8px;border-top:1px solid var(--surface3)}
 
@@ -283,6 +292,24 @@ tr:hover td{background:rgba(59,111,216,.03)}
 
 <div class="toast" id="toast"></div>
 
+<!-- 閲覧モーダル（生産部） -->
+<div class="mo-bg" id="prodViewBg">
+<div class="mo" style="max-width:500px">
+  <h2>案件詳細</h2>
+  <div id="prodViewContent"></div>
+  <div class="mo-foot"><button class="cancel" onclick="$('prodViewBg').classList.remove('show')">閉じる</button></div>
+</div>
+</div>
+
+<!-- 閲覧モーダル（企画制作） -->
+<div class="mo-bg" id="projViewBg">
+<div class="mo" style="max-width:540px">
+  <h2>現場詳細</h2>
+  <div id="projViewContent"></div>
+  <div class="mo-foot"><button class="cancel" onclick="$('projViewBg').classList.remove('show')">閉じる</button></div>
+</div>
+</div>
+
 <script>
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
@@ -318,6 +345,63 @@ function getDatesFromList(containerId){
   return Array.from(inputs).map(i=>i.value).filter(Boolean).join(',');
 }
 function parseDates(s){if(!s)return[];return String(s).split(',').map(x=>x.trim()).filter(Boolean).map(x=>parseD(x)).filter(Boolean)}
+
+// 閲覧モーダル（生産部）
+function viewProd(id){
+  const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;
+  const dl=parseD(d.deadline);const diff=dl?diffDays(dl,today):null;
+  const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?' ⚠ '+Math.abs(diff)+'日超過':' あと'+diff+'日'):''}`:'未定';
+  const st=parseD(d.start_date);const stStr=st?`${st.getMonth()+1}/${st.getDate()}（${dow[st.getDay()]}）`:'';
+  let h='';
+  h+=vr('物件名',d.project);
+  if(d.estimate_no)h+=vr('見積番号',d.estimate_no);
+  if(d.order_no)h+=vr('受注番号',d.order_no);
+  h+=vr('得意先',d.client);
+  h+=vr('担当者',d.person);
+  h+=vr('作業場所',d.section);
+  h+=vr('ステータス',d.status);
+  if(d.subcontractor)h+=vr('外注先',d.subcontractor);
+  if(stStr)h+=vr('作業開始',stStr);
+  h+=vr('納期',dlStr);
+  if(d.notes)h+=vr('備考',d.notes);
+  $('prodViewContent').innerHTML=h;
+  $('prodViewBg').classList.add('show');
+}
+
+// 閲覧モーダル（企画制作）
+function viewProj(id){
+  const d=projData.find(x=>String(x.id)===String(id));if(!d)return;
+  const fmtDates=s=>{if(!s)return'';return String(s).split(',').map(x=>{const dd=parseD(x.trim());return dd?`${dd.getMonth()+1}/${dd.getDate()}（${dow[dd.getDay()]}）`:''}).filter(Boolean).join('、')};
+  let h='';
+  h+=vr('物件名',d.project);
+  if(d.estimate_no)h+=vr('見積番号',d.estimate_no);
+  if(d.order_no)h+=vr('受注番号',d.order_no);
+  h+=vr('得意先',d.client);
+  h+=vr('担当者',d.person);
+  if(d.venue)h+=vr('会場',d.venue);
+  if(d.address)h+=vr('住所',d.address);
+  h+=vr('ステータス',d.status);
+  h+='<div class="view-section"><h3>日程</h3>';
+  if(d.date_load_in)h+=vr('搬入',fmtDates(d.date_load_in));
+  if(d.date_setup)h+=vr('設営',fmtDates(d.date_setup));
+  if(d.date_event)h+=vr('本番',fmtDates(d.date_event));
+  if(d.date_teardown)h+=vr('撤去',fmtDates(d.date_teardown));
+  h+='</div>';
+  if(d.people_load_in||d.people_setup||d.people_event||d.people_teardown){
+    h+='<div class="view-section"><h3>人数（予定）</h3>';
+    if(d.people_load_in)h+=vr('搬入',d.people_load_in+'人');
+    if(d.people_setup)h+=vr('設営',d.people_setup+'人');
+    if(d.people_event)h+=vr('本番',d.people_event+'人');
+    if(d.people_teardown)h+=vr('撤去',d.people_teardown+'人');
+    h+='</div>';
+  }
+  if(d.vehicles){h+='<div class="view-section"><h3>車両</h3><div class="view-tags">'+d.vehicles.split(',').map(v=>`<span class="view-tag">${esc(v.trim())}</span>`).join('')+'</div></div>'}
+  if(d.rentals)h+='<div class="view-section"><h3>レンタル品</h3><div class="view-row"><div class="view-val">'+esc(d.rentals)+'</div></div></div>';
+  if(d.notes)h+='<div class="view-section"><h3>備考</h3><div class="view-row"><div class="view-val">'+esc(d.notes)+'</div></div></div>';
+  $('projViewContent').innerHTML=h;
+  $('projViewBg').classList.add('show');
+}
+function vr(label,val){return`<div class="view-row"><div class="view-label">${label}</div><div class="view-val">${esc(val||'')}</div></div>`}
 
 // Data
 async function loadProd(){try{const r=await fetch(API+'?action=read&dept=production');const j=await r.json();if(j.success)prodData=j.data}catch(e){toast('生産部データ取得エラー',true)}}
@@ -409,7 +493,7 @@ function renderFactory(){
   });
   el.innerHTML=h;
   el.querySelectorAll('.fv-si').forEach(s=>{s.onclick=()=>{const f=s.dataset.f;prodFilter=prodFilter===f?null:f;render()}});
-  el.querySelectorAll('.fv-card').forEach(c=>{c.onclick=()=>editProd(c.dataset.id)});
+  el.querySelectorAll('.fv-card').forEach(c=>{c.onclick=()=>viewProd(c.dataset.id)});
 }
 
 // ===== 生産部：管理 =====
@@ -518,7 +602,7 @@ function renderGantt(){
   }
 
   el.innerHTML=h;
-  el.querySelectorAll('.gantt-row').forEach(r=>{r.onclick=()=>editProj(r.dataset.id)});
+  el.querySelectorAll('.gantt-row').forEach(r=>{r.onclick=()=>viewProj(r.dataset.id)});
 }
 
 // ===== 企画制作部：管理 =====
@@ -575,6 +659,8 @@ $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');
 $('projTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t)return;$('projTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProjView=t.dataset.view;render()});
 $('prodMoBg').addEventListener('click',e=>{if(e.target===$('prodMoBg'))closeProdMo()});
 $('projMoBg').addEventListener('click',e=>{if(e.target===$('projMoBg'))closeProjMo()});
+$('prodViewBg').addEventListener('click',e=>{if(e.target===$('prodViewBg'))$('prodViewBg').classList.remove('show')});
+$('projViewBg').addEventListener('click',e=>{if(e.target===$('projViewBg'))$('projViewBg').classList.remove('show')});
 
 loadAll();
 setInterval(()=>{if(curDept==='production'&&curProdView==='factory')loadAll()},3*60*1000);
