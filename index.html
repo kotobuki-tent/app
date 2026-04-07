@@ -627,17 +627,25 @@ function renderGantt(){
     if(!hasConflict){
       h+='<div class="vh-no-conflict">✓ バッティングなし</div>';
     }else{
+      h+='<div class="gantt-wrap" style="margin-top:10px"><div class="gantt">';
+      // ヘッダー行（ガントと同じ日付）
+      h+='<div class="gantt-header"><div class="gantt-label-hd" style="font-size:11px">車両</div><div class="gantt-dates">';
+      dates.forEach(d=>{const isT=dateStr(d)===dateStr(today);const dn=d.getDay();let cls='gantt-date-cell';if(isT)cls+=' today';if(dn===0)cls+=' sun';if(dn===6)cls+=' sat';h+=`<div class="${cls}"><span class="dow">${dow[dn]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`});
+      h+='</div></div>';
+      // 車両行
       VEHICLES.forEach(v=>{
         const hasC=Object.values(usage[v]).some(c=>c>=2);
         if(!hasC)return;
-        h+=`<div class="vh-row"><span class="vh-name">${v}</span><div class="vh-dates">`;
-        dates.forEach(dt=>{const ds=dateStr(dt);const c=usage[v][ds]||0;
-          if(c>=2)h+=`<div class="vh-cell conflict">${c}</div>`;
-          else if(c===1)h+=`<div class="vh-cell ok">${c}</div>`;
-          else h+=`<div class="vh-cell"></div>`;
+        h+=`<div class="gantt-row" style="cursor:default"><div class="gantt-row-label"><span class="prj-name">${v}</span></div><div class="gantt-bars">`;
+        dates.forEach(dt=>{const ds=dateStr(dt);const c=usage[v][ds]||0;const isT=dateStr(dt)===dateStr(today);
+          h+=`<div class="gantt-bar-cell${isT?' today':''}" style="display:flex;align-items:center;justify-content:center">`;
+          if(c>=2)h+=`<span style="font-size:12px;font-weight:700;color:#fff;background:var(--red);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center">${c}</span>`;
+          else if(c===1)h+=`<span style="font-size:10px;color:var(--text-faint)">${c}</span>`;
+          h+='</div>';
         });
         h+='</div></div>';
       });
+      h+='</div></div>';
     }
     h+='</div>';
   }
