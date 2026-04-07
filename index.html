@@ -111,7 +111,7 @@ function daysUntil(dl){const d=parseDate(dl);return d?Math.ceil((d-today)/864e5)
 function urg(o){if(o.status==='出荷済')return'shipped';if(o.status==='完成')return'done';if(o.status==='見送り'||o.status==='見積中')return'none';const d=daysUntil(o.deadline);if(d===null)return'none';if(d<=3)return'urgent';if(d<=7)return'warn';if(d<=14)return'ok';return'upcoming'}
 function urgL(u){return{urgent:'納期迫る',warn:'今週中',ok:'2週間以内',upcoming:'先の予定',none:'未定',done:'完成',shipped:'出荷済'}[u]}
 function dlDisp(dl){const d=parseDate(dl);if(!d)return'—';const m=d.getMonth()+1,day=d.getDate(),dow=DOW[d.getDay()],left=daysUntil(dl);let s=`${m}/${day}（${dow}）`;if(left<0)s+=` ${Math.abs(left)}日超過`;else if(left===0)s+=' 今日';else if(left===1)s+=' 明日';else s+=` あと${left}日`;return s}
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function dateJP(d){return`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${DOW[d.getDay()]}）`}
 function toast(m,err){const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(err?' err':'');setTimeout(()=>t.className='toast',2500)}
 function render(){curMode==='factory'?renderFV():renderAV()}
