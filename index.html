@@ -138,7 +138,7 @@ function renderFV(){
   const sc=s=>orders.filter(o=>o.section===s&&!['見送り','見積中'].includes(o.status)).length;
   let h=`<div class="fv-date">${dateJP(today)}</div><div class="fv-sum">
     ${si('all',totalVis,'var(--text)','すべて')}${si('urgent',uc.urgent,'var(--red)','納期迫る')}${si('warn',uc.warn,'var(--orange)','今週中')}${si('making',making,'var(--accent)','製作中')}${si('done',doneC,'var(--green)','完成')}${si('shipped',shipC,'var(--text-dim)','出荷済')}
-    ${si('2F工場',sc('2F工場'),'var(--cyan)','2F工場')}${si('1F工場',sc('1F工場'),'var(--cyan)','1F工場')}${si('外注',sc('外注'),'var(--purple)','外注')}</div>`;
+    ${si('2F工場',sc('2F工場'),'var(--cyan)','2F工場')}${si('1F工場',sc('1F工場'),'var(--cyan)','1F工場')}${si('出力関係',sc('出力関係'),'var(--orange)','出力関係')}${si('外注',sc('外注'),'var(--purple)','外注')}${si('未定',sc('未定'),'var(--text-faint)','未定')}</div>`;
   const groups={},gO=['urgent','warn','ok','upcoming','none','done','shipped'];
   const gN={urgent:'納期迫る・超過',warn:'今週中',ok:'2週間以内',upcoming:'先の予定',none:'納期未定',done:'完成',shipped:'出荷済'};
   list.forEach(o=>{if(!groups[o._u])groups[o._u]=[];groups[o._u].push(o)});
