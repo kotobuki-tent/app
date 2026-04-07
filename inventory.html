@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>在庫管理</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:15px}
+body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-height:100vh}
+
+/* Header - dark navy bar */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#1e2130;display:flex;align-items:center;height:52px;padding:0 20px;gap:12px}
+.hdr h1{font-size:16px;font-weight:900;color:#fff;letter-spacing:.04em;margin-right:auto}
+.hdr-link{color:rgba(255,255,255,.7);font:500 12px/1 'Noto Sans JP',sans-serif;text-decoration:none;padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.2);transition:.15s}
+.hdr-link:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+.tab{background:none;border:1px solid transparent;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:7px 16px;border-radius:6px;cursor:pointer;transition:.15s}
+.tab:hover{color:#fff;background:rgba(255,255,255,.08)}
+.tab.on{color:#fff;background:#3b6de7;border-color:#3b6de7}
+.ref-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:6px 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
+.ref-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+
+/* Main */
+.main{padding:68px 24px 40px}
+.hidden{display:none!important}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:none;border-radius:6px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
+.btn-primary{background:#3b6de7;color:#fff}
+.btn-primary:hover{background:#2f5ec8}
+.btn-danger{background:#fff;color:#e53e3e;border:1px solid #fed7d7}
+.btn-danger:hover{background:#fff5f5}
+.btn-ghost{background:#fff;color:#555;border:1px solid #ddd}
+.btn-ghost:hover{background:#f9f9f9;border-color:#bbb}
+.btn-sm{padding:5px 12px;font-size:11px}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:#fff;border:1px solid #e2e5f0;border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8f9fc;color:#666;font-weight:600;text-align:left;padding:10px 14px;border-bottom:2px solid #e2e5f0;white-space:nowrap;position:sticky;top:0;z-index:1}
+td{padding:10px 14px;border-bottom:1px solid #f0f1f5;white-space:nowrap}
+tr:hover td{background:#f8f9fc}
+.tbl-actions{display:flex;gap:6px}
+.tbl-actions a{font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
+.tbl-actions .edit-link{color:#3b6de7}
+.tbl-actions .edit-link:hover{text-decoration:underline}
+.tbl-actions .del-link{color:#e53e3e}
+.tbl-actions .del-link:hover{text-decoration:underline}
+
+/* Status badge */
+.st{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600}
+.st-予約{background:#ede9fe;color:#7c3aed}
+.st-貸出中{background:#dbeafe;color:#2563eb}
+.st-返却済{background:#d1fae5;color:#059669}
+.st-検品中{background:#fef9c3;color:#a16207}
+.st-メンテ待ち{background:#ffedd5;color:#c2410c}
+.st-メンテ中{background:#fee2e2;color:#dc2626}
+
+/* Modal overlay */
+.mo-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
+.mo-bg.show{opacity:1;pointer-events:auto}
+.mo{background:#fff;border-radius:12px;width:95%;max-width:560px;max-height:85vh;overflow-y:auto;padding:28px 28px;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.mo h3{font-size:17px;font-weight:700;margin-bottom:20px;color:#1a1a2e}
+.mo-row{display:flex;gap:14px;margin-bottom:16px}
+.mo-row.full{flex-direction:column}
+.mo-row label{font-size:12px;font-weight:600;color:#888;margin-bottom:4px;display:block}
+.mo-row .field{flex:1}
+.mo-row input,.mo-row select,.mo-row textarea{width:100%;padding:10px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a2e;font:400 14px/1.4 'Noto Sans JP',sans-serif;outline:none;transition:.15s}
+.mo-row input:focus,.mo-row select:focus,.mo-row textarea:focus{border-color:#3b6de7;box-shadow:0 0 0 3px rgba(59,109,231,.1)}
+.mo-row textarea{resize:vertical;min-height:60px}
+.mo-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid #f0f1f5}
+
+/* Availability bars */
+.avail-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.avail-item-name{font-size:13px;font-weight:600;min-width:180px;color:#333}
+.avail-meter{flex:1;height:22px;background:#f0f1f5;border-radius:6px;overflow:hidden}
+.avail-fill{height:100%;border-radius:6px;transition:.3s}
+.avail-fill.ok{background:#34d399}
+.avail-fill.warn{background:#fbbf24}
+.avail-fill.danger{background:#f87171}
+.avail-nums{font-size:12px;color:#888;min-width:120px;text-align:right}
+.avail-cat-hd{margin-top:18px;margin-bottom:8px;font-size:13px;font-weight:700;color:#555;padding-bottom:4px;border-bottom:1px solid #e2e5f0}
+
+/* Filter bar */
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.filter-bar select,.filter-bar input{padding:7px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#333;font:400 13px/1 'Noto Sans JP',sans-serif;outline:none}
+.filter-bar select:focus,.filter-bar input:focus{border-color:#3b6de7}
+
+/* Avail date row */
+.avail-date-row{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.avail-date-row label{font-size:12px;font-weight:600;color:#888}
+.avail-date-row input,.avail-date-row select{padding:7px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#333;font:400 13px/1 'Noto Sans JP',sans-serif;outline:none}
+
+/* Section card */
+.section{background:#fff;border:1px solid #e2e5f0;border-radius:10px;padding:20px;margin-bottom:16px}
+.section h2{font-size:14px;font-weight:700;color:#333;margin-bottom:6px}
+.section p.desc{font-size:12px;color:#999;margin-bottom:16px}
+
+/* Category tag */
+.cat-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#f0f1f5;color:#666}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;font:600 13px/1 'Noto Sans JP',sans-serif;z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.toast.show{opacity:1}
+.toast.ok{background:#059669;color:#fff}
+.toast.err{background:#dc2626;color:#fff}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:#aaa;font-size:13px}
+.empty-msg{text-align:center;color:#aaa;padding:32px;font-size:13px}
+
+/* Toolbar row */
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+
+@media(max-width:640px){
+  .hdr{padding:0 12px;gap:6px}
+  .hdr h1{font-size:14px}
+  .tab{padding:6px 10px;font-size:12px}
+  .main{padding:60px 12px 32px}
+  .mo{padding:20px 16px;width:98%}
+  .mo-row{flex-direction:column}
+  .avail-item-name{min-width:100px;font-size:12px}
+  .toolbar{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>在庫管理</h1>
+  <a class="hdr-link" href="./">← 工程管理</a>
+  <button class="tab on" data-tab="items" onclick="switchTab('items')">商品台帳</button>
+  <button class="tab" data-tab="rentals" onclick="switchTab('rentals')">貸出/予約</button>
+  <button class="tab" data-tab="avail" onclick="switchTab('avail')">在庫確認</button>
+  <button class="ref-btn" onclick="loadAll()">↻ 更新</button>
+</div>
+
+<div class="main">
+
+  <!-- ===== 商品台帳 ===== -->
+  <div id="v_items">
+    <div class="toolbar">
+      <div class="filter-bar">
+        <select id="flt_cat" onchange="renderItems()"><option value="">全カテゴリ</option></select>
+        <input id="flt_item_q" placeholder="検索..." oninput="renderItems()">
+      </div>
+      <button class="btn btn-primary" onclick="openItemMo()">＋ 商品追加</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>カテゴリ</th><th>商品名</th><th>保有数</th><th>備考</th><th>操作</th></tr></thead>
+        <tbody id="items_tbody"></tbody>
+      </table>
+    </div>
+    <div id="items_loading" class="loading">読み込み中...</div>
+  </div>
+
+  <!-- ===== 貸出/予約 ===== -->
+  <div id="v_rentals" class="hidden">
+    <div class="toolbar">
+      <div class="filter-bar">
+        <select id="flt_r_status" onchange="renderRentals()">
+          <option value="">全ステータス</option>
+          <option>予約</option><option>貸出中</option><option>返却済</option>
+          <option>検品中</option><option>メンテ待ち</option><option>メンテ中</option>
+        </select>
+        <select id="flt_r_cat" onchange="renderRentals()"><option value="">全カテゴリ</option></select>
+        <input id="flt_r_q" placeholder="検索..." oninput="renderRentals()">
+      </div>
+      <button class="btn btn-primary" onclick="openRentalMo()">＋ 貸出/予約登録</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
+        <tbody id="rentals_tbody"></tbody>
+      </table>
+    </div>
+    <div id="rentals_loading" class="loading">読み込み中...</div>
+  </div>
+
+  <!-- ===== 在庫確認 ===== -->
+  <div id="v_avail" class="hidden">
+    <div class="section">
+      <h2>在庫バッティング確認</h2>
+      <p class="desc">指定期間中に「予約」「貸出中」の数量を合計し、保有数に対する使用率を表示します。</p>
+      <div class="avail-date-row">
+        <label>開始日</label>
+        <input type="date" id="avail_start" onchange="renderAvail()">
+        <label>終了日</label>
+        <input type="date" id="avail_end" onchange="renderAvail()">
+        <select id="avail_cat" onchange="renderAvail()"><option value="">全カテゴリ</option></select>
+      </div>
+      <div id="avail_body"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== 商品モーダル ===== -->
+<div class="mo-bg" id="itemMoBg">
+  <div class="mo">
+    <h3 id="itemMoTitle">商品追加</h3>
+    <input type="hidden" id="xf_item_id">
+    <div class="mo-row">
+      <div class="field">
+        <label>カテゴリ *</label>
+        <select id="xf_item_cat"><option value="">選択してください</option></select>
+      </div>
+      <div class="field">
+        <label>新規カテゴリ（上にない場合）</label>
+        <input id="xf_item_newcat" placeholder="新しいカテゴリ名">
+      </div>
+    </div>
+    <div class="mo-row full">
+      <label>商品名 *</label>
+      <input id="xf_item_name" placeholder="例: 3m×3m">
+    </div>
+    <div class="mo-row full">
+      <label>保有数</label>
+      <input id="xf_item_qty" type="number" min="0" value="0">
+    </div>
+    <div class="mo-row full">
+      <label>備考</label>
+      <textarea id="xf_item_notes"></textarea>
+    </div>
+    <div class="mo-foot">
+      <button class="btn btn-ghost" onclick="closeItemMo()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveItem()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 貸出/予約モーダル ===== -->
+<div class="mo-bg" id="rentalMoBg">
+  <div class="mo">
+    <h3 id="rentalMoTitle">貸出/予約登録</h3>
+    <input type="hidden" id="xf_r_id">
+    <div class="mo-row">
+      <div class="field">
+        <label>カテゴリ *</label>
+        <select id="xf_r_cat" onchange="populateItemSelect()"><option value="">選択</option></select>
+      </div>
+      <div class="field">
+        <label>商品名 *</label>
+        <select id="xf_r_item"><option value="">先にカテゴリを選択</option></select>
+      </div>
+    </div>
+    <div class="mo-row">
+      <div class="field">
+        <label>数量 *</label>
+        <input id="xf_r_qty" type="number" min="1" value="1">
+      </div>
+      <div class="field">
+        <label>ステータス</label>
+        <select id="xf_r_status">
+          <option>予約</option><option>貸出中</option><option>返却済</option>
+          <option>検品中</option><option>メンテ待ち</option><option>メンテ中</option>
+        </select>
+      </div>
+    </div>
+    <div class="mo-row">
+      <div class="field">
+        <label>開始日 *</label>
+        <input id="xf_r_start" type="date">
+      </div>
+      <div class="field">
+        <label>終了日 *</label>
+        <input id="xf_r_end" type="date">
+      </div>
+    </div>
+    <div class="mo-row full">
+      <label>案件 / 顧客名</label>
+      <div style="display:flex;gap:8px">
+        <select id="xf_r_project" style="flex:1" onchange="onProjectSelect()">
+          <option value="">案件を選択（任意）</option>
+        </select>
+        <input id="xf_r_client" style="flex:1" placeholder="または顧客名を入力">
+      </div>
+    </div>
+    <div class="mo-row full">
+      <label>備考</label>
+      <textarea id="xf_r_notes"></textarea>
+    </div>
+    <div class="mo-foot">
+      <button class="btn btn-ghost" onclick="closeRentalMo()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveRental()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+const DEFAULT_CATS=['テント','横幕','テーブル','イス','備品'];
+const ACTIVE_STATUSES=['予約','貸出中'];
+
+let items=[], rentals=[], projects=[];
+
+const $=id=>document.getElementById(id);
+function toast(msg,ok=true){const t=$('toast');t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(()=>t.classList.remove('show'),2500)}
+function dateJP(d){if(!d)return'';const dt=new Date(d+'T00:00:00');return(dt.getMonth()+1)+'/'+dt.getDate()}
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// === API ===
+async function apiGet(params){
+  const url=API+'?dept=inventory&'+new URLSearchParams(params);
+  const r=await fetch(url);return r.json();
+}
+async function apiPost(body){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})});
+  return r.json();
+}
+
+// === Load ===
+async function loadAll(){
+  try{
+    $('items_loading').classList.remove('hidden');
+    $('rentals_loading').classList.remove('hidden');
+    const [inv,rnt,prj]=await Promise.all([
+      apiGet({action:'list'}),
+      apiGet({action:'rentals'}),
+      apiGet({action:'projects'}).catch(()=>[])
+    ]);
+    items=inv||[];rentals=rnt||[];projects=prj||[];
+    populateCategoryFilters();
+    populateProjectSelect();
+    renderItems();renderRentals();renderAvail();
+    $('items_loading').classList.add('hidden');
+    $('rentals_loading').classList.add('hidden');
+  }catch(e){
+    toast('データ取得に失敗: '+e.message,false);
+    $('items_loading').textContent='読み込み失敗';
+    $('rentals_loading').textContent='読み込み失敗';
+  }
+}
+
+// === Categories ===
+function getAllCategories(){
+  const cats=new Set(DEFAULT_CATS);
+  items.forEach(i=>{if(i.category)cats.add(i.category)});
+  return [...cats].sort();
+}
+function populateCategoryFilters(){
+  const cats=getAllCategories();
+  ['flt_cat','flt_r_cat','avail_cat','xf_item_cat','xf_r_cat'].forEach(id=>{
+    const sel=$(id);const val=sel.value;
+    const first=sel.options[0].outerHTML;
+    sel.innerHTML=first;
+    cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
+    sel.value=val;
+  });
+}
+
+// === Projects ===
+function populateProjectSelect(){
+  const sel=$('xf_r_project');
+  sel.innerHTML='<option value="">案件を選択（任意）</option>';
+  projects.forEach(p=>{const o=document.createElement('option');o.value=p.name;o.textContent=p.name;sel.appendChild(o)});
+}
+function onProjectSelect(){if($('xf_r_project').value)$('xf_r_client').value=$('xf_r_project').value}
+
+// === Tab ===
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  ['items','rentals','avail'].forEach(v=>$('v_'+v).classList.toggle('hidden',v!==t));
+  if(t==='avail')renderAvail();
+}
+
+// ==================== 商品台帳 ====================
+function renderItems(){
+  const cat=$('flt_cat').value;const q=$('flt_item_q').value.toLowerCase();
+  const f=items.filter(i=>{
+    if(cat&&i.category!==cat)return false;
+    if(q&&!(i.item_name||'').toLowerCase().includes(q)&&!(i.category||'').toLowerCase().includes(q))return false;
+    return true;
+  });
+  const tb=$('items_tbody');
+  if(!f.length){tb.innerHTML='<tr><td colspan="5" class="empty-msg">商品が登録されていません</td></tr>';return}
+  tb.innerHTML=f.map(i=>`<tr>
+    <td><span class="cat-tag">${esc(i.category)}</span></td>
+    <td><strong>${esc(i.item_name)}</strong></td>
+    <td>${i.total_qty}</td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${esc(i.notes)}</td>
+    <td><div class="tbl-actions">
+      <a class="edit-link" onclick="editItem('${i.id}')">編集</a>
+      <a class="del-link" onclick="deleteItem('${i.id}','${esc(i.item_name)}')">削除</a>
+    </div></td>
+  </tr>`).join('');
+}
+
+function openItemMo(data){
+  $('itemMoTitle').textContent=data?'商品編集':'商品追加';
+  $('xf_item_id').value=data?data.id:'';
+  $('xf_item_cat').value=data?data.category:'';
+  $('xf_item_newcat').value='';
+  $('xf_item_name').value=data?data.item_name:'';
+  $('xf_item_qty').value=data?data.total_qty:0;
+  $('xf_item_notes').value=data?data.notes||'':'';
+  $('itemMoBg').classList.add('show');
+}
+function closeItemMo(){$('itemMoBg').classList.remove('show')}
+function editItem(id){const d=items.find(i=>i.id===id);if(d)openItemMo(d)}
+
+async function saveItem(){
+  const cat=$('xf_item_newcat').value.trim()||$('xf_item_cat').value;
+  const name=$('xf_item_name').value.trim();
+  if(!cat||!name){toast('カテゴリと商品名は必須です',false);return}
+  try{
+    const r=await apiPost({action:'save_item',id:$('xf_item_id').value||undefined,category:cat,item_name:name,total_qty:$('xf_item_qty').value,notes:$('xf_item_notes').value.trim()});
+    if(r.ok){toast('保存しました');closeItemMo();await loadAll()}
+    else toast('保存失敗: '+(r.error||''),false);
+  }catch(e){toast('エラー: '+e.message,false)}
+}
+
+async function deleteItem(id,name){
+  if(!confirm(name+' を削除しますか？'))return;
+  try{
+    const r=await apiPost({action:'delete_item',id});
+    if(r.ok){toast('削除しました');await loadAll()}else toast('削除失敗',false);
+  }catch(e){toast('エラー: '+e.message,false)}
+}
+
+// ==================== 貸出/予約 ====================
+function renderRentals(){
+  const st=$('flt_r_status').value;const cat=$('flt_r_cat').value;const q=$('flt_r_q').value.toLowerCase();
+  const f=rentals.filter(r=>{
+    if(st&&r.status!==st)return false;
+    if(cat&&r.category!==cat)return false;
+    if(q&&![r.item_name,r.category,r.client_name,r.notes].join(' ').toLowerCase().includes(q))return false;
+    return true;
+  });
+  const tb=$('rentals_tbody');
+  if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">貸出/予約データがありません</td></tr>';return}
+  tb.innerHTML=f.map(r=>`<tr>
+    <td><span class="st st-${r.status}">${r.status}</span></td>
+    <td><span class="cat-tag">${esc(r.category)}</span></td>
+    <td><strong>${esc(r.item_name)}</strong></td>
+    <td>${r.qty}</td>
+    <td>${dateJP(r.date_start)}</td>
+    <td>${dateJP(r.date_end)}</td>
+    <td>${esc(r.client_name)}</td>
+    <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
+    <td><div class="tbl-actions">
+      <a class="edit-link" onclick="editRental('${r.id}')">編集</a>
+      <a class="del-link" onclick="deleteRental('${r.id}')">削除</a>
+    </div></td>
+  </tr>`).join('');
+}
+
+function populateItemSelect(){
+  const cat=$('xf_r_cat').value;const sel=$('xf_r_item');
+  sel.innerHTML='<option value="">商品を選択</option>';
+  if(!cat)return;
+  items.filter(i=>i.category===cat).forEach(i=>{
+    const o=document.createElement('option');o.value=i.item_name;
+    o.textContent=i.item_name+' (保有:'+i.total_qty+')';sel.appendChild(o);
+  });
+  const o=document.createElement('option');o.value='__new__';o.textContent='＋ 一覧にない商品を追加';sel.appendChild(o);
+}
+
+function openRentalMo(data){
+  $('rentalMoTitle').textContent=data?'貸出/予約編集':'貸出/予約登録';
+  $('xf_r_id').value=data?data.id:'';
+  $('xf_r_cat').value=data?data.category:'';
+  populateItemSelect();
+  if(data){
+    const sel=$('xf_r_item');let found=false;
+    for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===data.item_name){sel.selectedIndex=i;found=true;break}}
+    if(!found&&data.item_name){const o=document.createElement('option');o.value=data.item_name;o.textContent=data.item_name;sel.insertBefore(o,sel.lastElementChild);sel.value=data.item_name}
+  }
+  $('xf_r_qty').value=data?data.qty:1;
+  $('xf_r_status').value=data?data.status:'予約';
+  $('xf_r_start').value=data?data.date_start:'';
+  $('xf_r_end').value=data?data.date_end:'';
+  $('xf_r_client').value=data?data.client_name||'':'';
+  $('xf_r_project').value='';
+  if(data&&data.client_name){const sel=$('xf_r_project');for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===data.client_name){sel.selectedIndex=i;break}}}
+  $('xf_r_notes').value=data?data.notes||'':'';
+  $('rentalMoBg').classList.add('show');
+}
+function closeRentalMo(){$('rentalMoBg').classList.remove('show')}
+function editRental(id){const d=rentals.find(r=>r.id===id);if(d)openRentalMo(d)}
+
+async function saveRental(){
+  const cat=$('xf_r_cat').value;let itemName=$('xf_r_item').value;
+  const start=$('xf_r_start').value;const end=$('xf_r_end').value;
+  if(itemName==='__new__'){
+    const newName=prompt('新しい商品名を入力（カテゴリ: '+cat+'）');if(!newName)return;
+    const qty=prompt('保有数を入力','0');
+    try{
+      const r=await apiPost({action:'save_item',category:cat,item_name:newName,total_qty:Number(qty)||0,notes:''});
+      if(r.ok){itemName=newName;toast('商品「'+newName+'」を追加しました')}else{toast('商品追加失敗',false);return}
+    }catch(e){toast('エラー: '+e.message,false);return}
+  }
+  if(!cat||!itemName||!start||!end){toast('カテゴリ・商品名・開始日・終了日は必須です',false);return}
+  try{
+    const r=await apiPost({action:'save_rental',id:$('xf_r_id').value||undefined,category:cat,item_name:itemName,qty:$('xf_r_qty').value,date_start:start,date_end:end,status:$('xf_r_status').value,client_name:$('xf_r_client').value.trim(),project_id:'',notes:$('xf_r_notes').value.trim()});
+    if(r.ok){toast('保存しました');closeRentalMo();await loadAll()}else toast('保存失敗: '+(r.error||''),false);
+  }catch(e){toast('エラー: '+e.message,false)}
+}
+
+async function deleteRental(id){
+  if(!confirm('この貸出/予約を削除しますか？'))return;
+  try{
+    const r=await apiPost({action:'delete_rental',id});
+    if(r.ok){toast('削除しました');await loadAll()}else toast('削除失敗',false);
+  }catch(e){toast('エラー: '+e.message,false)}
+}
+
+// ==================== 在庫確認 ====================
+function renderAvail(){
+  const startStr=$('avail_start').value;const endStr=$('avail_end').value;
+  const cat=$('avail_cat').value;const body=$('avail_body');
+  if(!startStr||!endStr){body.innerHTML='<p style="color:#aaa;font-size:13px">開始日と終了日を指定してください。</p>';return}
+
+  const start=new Date(startStr+'T00:00:00');const end=new Date(endStr+'T00:00:00');
+  const usage={};
+  items.forEach(i=>{
+    if(cat&&i.category!==cat)return;
+    usage[i.category+'|'+i.item_name]={category:i.category,item_name:i.item_name,total:Number(i.total_qty)||0,used:0};
+  });
+
+  const dayMs=86400000;const days=[];
+  for(let d=new Date(start);d<=end;d=new Date(d.getTime()+dayMs))days.push(new Date(d));
+
+  Object.keys(usage).forEach(key=>{
+    let max=0;
+    days.forEach(day=>{
+      const ds=day.toISOString().slice(0,10);let u=0;
+      rentals.forEach(r=>{
+        if(!ACTIVE_STATUSES.includes(r.status))return;
+        if((r.category+'|'+r.item_name)!==key)return;
+        if(r.date_start<=ds&&r.date_end>=ds)u+=Number(r.qty)||0;
+      });
+      if(u>max)max=u;
+    });
+    usage[key].used=max;
+  });
+
+  const entries=Object.values(usage).sort((a,b)=>a.category.localeCompare(b.category)||a.item_name.localeCompare(b.item_name));
+  if(!entries.length){body.innerHTML='<p style="color:#aaa;font-size:13px">商品が登録されていません。</p>';return}
+
+  let html='';let lastCat='';
+  entries.forEach(e=>{
+    if(e.category!==lastCat){lastCat=e.category;html+=`<div class="avail-cat-hd">${esc(e.category)}</div>`}
+    const pct=e.total>0?Math.round((e.used/e.total)*100):0;
+    const avail=e.total-e.used;
+    let cls='ok';if(pct>=100)cls='danger';else if(pct>=70)cls='warn';
+    let numColor='#059669';if(avail<=0)numColor='#dc2626';else if(avail<=Math.ceil(e.total*0.3))numColor='#d97706';
+    html+=`<div class="avail-bar">
+      <span class="avail-item-name">${esc(e.item_name)}</span>
+      <div class="avail-meter"><div class="avail-fill ${cls}" style="width:${Math.min(pct,100)}%"></div></div>
+      <span class="avail-nums">${e.used} / ${e.total} 使用　残 <strong style="color:${numColor}">${avail}</strong></span>
+    </div>`;
+  });
+  body.innerHTML=html;
+}
+
+// === Init ===
+const today=new Date();
+$('avail_start').value=todayStr();
+const tw=new Date(today.getTime()+14*86400000);
+$('avail_end').value=tw.getFullYear()+'-'+String(tw.getMonth()+1).padStart(2,'0')+'-'+String(tw.getDate()).padStart(2,'0');
+
+$('itemMoBg').addEventListener('click',e=>{if(e.target===$('itemMoBg'))closeItemMo()});
+$('rentalMoBg').addEventListener('click',e=>{if(e.target===$('rentalMoBg'))closeRentalMo()});
+
+loadAll();
+</script>
+</body>
+</html>
