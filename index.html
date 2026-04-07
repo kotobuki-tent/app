@@ -564,7 +564,7 @@ function ganttToday(){initGanttStart();render()}
 function renderGantt(){
   if(!ganttStart)initGanttStart();
   const el=$('projGantt');
- let items=prodData.filter(d=>!['見積中','見送り','出荷済'].includes(d.status));
+let items=projData.filter(d=>d.status!=='見送り');
   if(ganttStatusFilter)items=items.filter(d=>d.status===ganttStatusFilter);
   items.sort((a,b)=>{const da=parseDates(a.date_load_in)[0]||parseDates(a.date_setup)[0]||parseDates(a.date_event)[0]||new Date('9999-12-31');const db=parseDates(b.date_load_in)[0]||parseDates(b.date_setup)[0]||parseDates(b.date_event)[0]||new Date('9999-12-31');return da-db});
 
