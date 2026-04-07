@@ -438,7 +438,7 @@ function render(){
     if(curProdView==='factory'){$('prodFactory').classList.remove('hidden');$('prodAdmin').classList.add('hidden');renderFactory()}
     else{$('prodFactory').classList.add('hidden');$('prodAdmin').classList.remove('hidden');renderProdAdmin()}
   }else{
-    $('prodSection').classList.add('hidden');$('projSection').classList.remove('hidden');
+$('prodSection').classList.add('hidden');$('prodFactory').classList.add('hidden');$('prodAdmin').classList.add('hidden');$('projSection').classList.remove('hidden');
     if(curProjView==='gantt'){$('projGantt').classList.remove('hidden');$('projAdminView').classList.add('hidden');renderGantt()}
     else{$('projGantt').classList.add('hidden');$('projAdminView').classList.remove('hidden');renderProjAdmin()}
   }
