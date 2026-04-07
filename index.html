@@ -177,8 +177,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
   <div id="prodSection">
     <div class="sub-tabs" id="prodTabs">
       <button class="sub-tab on" data-view="factory">工場ボード</button>
+      <button class="sub-tab" data-view="archive">出荷済</button>
       <button class="sub-tab" data-view="admin">管理</button>
-      <button class="sub-tab" data-view="archive">その他</button>
     </div>
     <div id="prodFactory" class="factory-view"></div>
     <div id="prodAdmin" class="admin-view hidden"></div>
@@ -342,9 +342,9 @@ function renderProdAdmin(){
   el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(prodSort.col===c)prodSort.asc=!prodSort.asc;else{prodSort.col=c;prodSort.asc=true}render()}});
 }
 function renderArchive(){
-  const el=$('prodArchive');const ARCHIVE_ST=['見積中','出荷済','見送り'];
+  const el=$('prodArchive');const ARCHIVE_ST=['出荷済'];
   let items=prodData.filter(d=>ARCHIVE_ST.includes(d.status));
-  let h='<div style="padding:10px 0 14px;font-size:13px;color:var(--text-dim)">見積中・出荷済・見送りの案件（'+items.length+'件）</div>';
+  let h='<div style="padding:10px 0 14px;font-size:13px;color:var(--text-dim)">出荷済の案件（'+items.length+'件）</div>';
   h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>見積番号</th><th>得意先</th><th>担当者</th><th>納期</th><th>ステータス</th><th>操作</th></tr></thead><tbody>';
   if(!items.length)h+='<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-faint)">該当する案件はありません</td></tr>';
   items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="editProd(\''+d.id+'\')">編集</button></td></tr>'});
