@@ -447,7 +447,7 @@ function render(){
 // ===== 生産部：工場ボード =====
 function renderFactory(){
   const el=$('prodFactory');
-  let items=prodData.filter(d=>d.status!=='見送り');
+ let items=prodData.filter(d=>!['見積中','見送り','出荷済'].includes(d.status));
   const statusCnt=s=>items.filter(d=>d.status===s).length;
   const secCnt=s=>items.filter(d=>d.section===s).length;
   items.forEach(d=>{
