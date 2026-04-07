@@ -480,11 +480,14 @@ function renderGantt(){
     h+=`<div class="gantt-row" data-id="${d.id}"><div class="gantt-row-label"><span class="prj-name">${esc(d.project)}</span><span class="prj-meta">${esc(d.client||'')} ${esc(d.person||'')}</span><span class="prj-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span></div><div class="gantt-bars">`;
     dates.forEach((dt,i)=>{
       const ds=dateStr(dt);const isT=ds===dateStr(today);
-      h+=`<div class="gantt-bar-cell${isT?' today':''}">`;
+      const hits=[];
       [{key:'load_in',f:'date_load_in'},{key:'setup',f:'date_setup'},{key:'event',f:'date_event'},{key:'teardown',f:'date_teardown'}].forEach(p=>{
         const dates_p=parseDates(d[p.f]);
-        if(dates_p.some(pd=>dateStr(pd)===ds))h+=`<div class="gantt-bar ${p.key}"></div>`;
+        if(dates_p.some(pd=>dateStr(pd)===ds))hits.push(p.key);
       });
+      h+=`<div class="gantt-bar-cell${isT?' today':''}${hits.length>1?' multi':''}">`;
+      if(hits.length===1){h+=`<div class="gantt-bar ${hits[0]}"></div>`}
+      else if(hits.length>1){hits.forEach((k,idx)=>{const pct=100/hits.length;h+=`<div class="gantt-bar ${k}" style="top:${pct*idx}%;height:${pct}%;bottom:auto"></div>`})}
       h+='</div>';
     });
     h+='</div></div>';
