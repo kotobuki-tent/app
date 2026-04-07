@@ -601,14 +601,21 @@ function renderGantt(){
   h+='</div></div>';
   h+='<div class="gantt-legend"><span><span class="dot" style="background:#64b5f6"></span>搬入</span><span><span class="dot" style="background:#81c784"></span>設営</span><span><span class="dot" style="background:#ffb74d"></span>本番</span><span><span class="dot" style="background:#e57373"></span>撤去</span></div>';
 
-  // Vehicle summary (phase-specific)
+  // Vehicle summary (per-project dedup: same project's phases don't conflict)
   const usage={};VEHICLES.forEach(v=>usage[v]={});
   items.forEach(d=>{
+    // Collect all dates per vehicle for this project (dedup within project)
+    const projVehDates={};
     [{vk:'vehicles_load_in',dk:'date_load_in'},{vk:'vehicles_setup',dk:'date_setup'},{vk:'vehicles_event',dk:'date_event'},{vk:'vehicles_teardown',dk:'date_teardown'}].forEach(p=>{
       if(!d[p.vk])return;
       const vehs=d[p.vk].split(',').map(s=>s.trim()).filter(Boolean);
       const dts=parseDates(d[p.dk]);
-      vehs.forEach(v=>{if(!usage[v])usage[v]={};dts.forEach(dt=>{const ds=dateStr(dt);usage[v][ds]=(usage[v][ds]||0)+1})});
+      vehs.forEach(v=>{if(!projVehDates[v])projVehDates[v]=new Set();dts.forEach(dt=>projVehDates[v].add(dateStr(dt)))});
+    });
+    // Add 1 per project per vehicle per date
+    Object.entries(projVehDates).forEach(([v,dates])=>{
+      if(!usage[v])usage[v]={};
+      dates.forEach(ds=>{usage[v][ds]=(usage[v][ds]||0)+1});
     });
   });
   let hasConflict=false;
