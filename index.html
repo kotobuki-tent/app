@@ -473,7 +473,7 @@ function renderFactory(){
   h+=si('thisweek',items.filter(d=>d._urgN===1).length,'今週中','var(--orange)');
   h+=si('製作中',statusCnt('製作中'),'製作中','');
   h+=si('完成',statusCnt('完成'),'完成','');
-  h+=si('出荷済',statusCnt('出荷済'),'出荷済','');
+
   h+=si('2F工場',secCnt('2F工場'),'2F工場','');
   h+=si('1F工場',secCnt('1F工場'),'1F工場','');
   h+=si('出力関係',secCnt('出力関係'),'出力関係','');
@@ -564,7 +564,7 @@ function ganttToday(){initGanttStart();render()}
 function renderGantt(){
   if(!ganttStart)initGanttStart();
   const el=$('projGantt');
-  let items=projData.filter(d=>d.status!=='見送り');
+ let items=prodData.filter(d=>!['見積中','見送り','出荷済'].includes(d.status));
   if(ganttStatusFilter)items=items.filter(d=>d.status===ganttStatusFilter);
   items.sort((a,b)=>{const da=parseDates(a.date_load_in)[0]||parseDates(a.date_setup)[0]||parseDates(a.date_event)[0]||new Date('9999-12-31');const db=parseDates(b.date_load_in)[0]||parseDates(b.date_setup)[0]||parseDates(b.date_event)[0]||new Date('9999-12-31');return da-db});
 
