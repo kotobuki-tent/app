@@ -571,7 +571,7 @@ function renderGantt(){
       });
       h+=`<div class="gantt-bar-cell${isT?' today':''}${hits.length>1?' multi':''}">`;
       if(hits.length===1){h+=`<div class="gantt-bar ${hits[0]}"></div>`}
-      else if(hits.length>1){hits.forEach((k,idx)=>{const pct=100/hits.length;h+=`<div class="gantt-bar ${k}" style="top:${pct*idx}%;height:${pct}%;bottom:auto"></div>`})}
+      else if(hits.length>1){hits.forEach((k,idx)=>{const pct=100/hits.length;h+=`<div class="gantt-bar ${k}" style="top:calc(${pct*idx}% + 1px);height:calc(${pct}% - 2px);bottom:auto;border-radius:3px"></div>`})}
       h+='</div>';
     });
     h+='</div></div>';
