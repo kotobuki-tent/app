@@ -168,6 +168,18 @@ tr:hover td{background:rgba(59,111,216,.03)}
 
 /* フェーズ人数 */
 .phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+
+/* 複数日付入力 */
+.date-phase-block{margin-bottom:12px}
+.date-phase-label{font-size:12px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px}
+.date-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.date-item{display:flex;align-items:center;gap:4px}
+.date-item input[type="date"]{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:400 13px/1.4 'Noto Sans JP',sans-serif;background:var(--surface2)}
+.date-item input[type="date"]:focus{outline:none;border-color:var(--accent)}
+.date-rm{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+.date-rm:hover{opacity:.7}
+.date-add-btn{background:none;border:1px dashed var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:6px;cursor:pointer}
+.date-add-btn:hover{border-color:var(--accent);color:var(--accent)}
 .phase-grid .mo-field{flex:none}
 .phase-hd{font-size:12px;font-weight:700;color:var(--text-dim);margin:14px 0 8px;padding-top:8px;border-top:1px solid var(--surface3)}
 
@@ -235,9 +247,10 @@ tr:hover td{background:rgba(59,111,216,.03)}
   <div class="mo-row full"><div class="mo-field"><label>住所</label><input id="xf_address" placeholder="例: 鳥取県鳥取市福部町"></div></div>
 
   <div class="phase-hd">日程</div>
-  <div class="mo-row"><div class="mo-field"><label>搬入日</label><input type="date" id="xf_date_load_in"></div><div class="mo-field"><label>設営日</label><input type="date" id="xf_date_setup"></div></div>
-  <div class="mo-row"><div class="mo-field"><label>本番開始</label><input type="date" id="xf_date_event_start"></div><div class="mo-field"><label>本番終了</label><input type="date" id="xf_date_event_end"></div></div>
-  <div class="mo-row"><div class="mo-field"><label>撤去日</label><input type="date" id="xf_date_teardown"></div><div class="mo-field"></div></div>
+  <div class="date-phase-block"><label class="date-phase-label">搬入日</label><div class="date-list" id="xf_dates_load_in"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_load_in')">＋ 日付追加</button></div>
+  <div class="date-phase-block"><label class="date-phase-label">設営日</label><div class="date-list" id="xf_dates_setup"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_setup')">＋ 日付追加</button></div>
+  <div class="date-phase-block"><label class="date-phase-label">本番</label><div class="date-list" id="xf_dates_event"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_event')">＋ 日付追加</button></div>
+  <div class="date-phase-block"><label class="date-phase-label">撤去日</label><div class="date-list" id="xf_dates_teardown"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_teardown')">＋ 日付追加</button></div>
 
   <div class="phase-hd">人数（予定）</div>
   <div class="phase-grid">
@@ -290,6 +303,21 @@ const parseD=s=>{if(!s)return null;const d=new Date(s+'T00:00:00');return isNaN(
 const diffDays=(a,b)=>Math.round((a-b)/864e5);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 function toast(msg,err){const t=$('toast');t.textContent=msg;t.className='toast show'+(err?' err':'');setTimeout(()=>t.className='toast',3000)}
+
+// 複数日付入力ヘルパー
+function addDateInput(containerId,val){
+  const wrap=document.getElementById(containerId);
+  const item=document.createElement('div');item.className='date-item';
+  const inp=document.createElement('input');inp.type='date';inp.value=val||'';
+  const rm=document.createElement('button');rm.type='button';rm.className='date-rm';rm.textContent='×';
+  rm.onclick=()=>{item.remove()};
+  item.appendChild(inp);item.appendChild(rm);wrap.appendChild(item);
+}
+function getDatesFromList(containerId){
+  const inputs=document.getElementById(containerId).querySelectorAll('input[type="date"]');
+  return Array.from(inputs).map(i=>i.value).filter(Boolean).join(',');
+}
+function parseDates(s){if(!s)return[];return String(s).split(',').map(x=>x.trim()).filter(Boolean).map(x=>parseD(x)).filter(Boolean)}
 
 // Data
 async function loadProd(){try{const r=await fetch(API+'?action=read&dept=production');const j=await r.json();if(j.success)prodData=j.data}catch(e){toast('生産部データ取得エラー',true)}}
@@ -432,7 +460,7 @@ function renderGantt(){
   const el=$('projGantt');
   let items=projData.filter(d=>d.status!=='見送り');
   if(ganttStatusFilter)items=items.filter(d=>d.status===ganttStatusFilter);
-  items.sort((a,b)=>{const da=parseD(a.date_load_in)||parseD(a.date_setup)||parseD(a.date_event_start)||new Date('9999-12-31');const db=parseD(b.date_load_in)||parseD(b.date_setup)||parseD(b.date_event_start)||new Date('9999-12-31');return da-db});
+  items.sort((a,b)=>{const da=parseDates(a.date_load_in)[0]||parseDates(a.date_setup)[0]||parseDates(a.date_event)[0]||new Date('9999-12-31');const db=parseDates(b.date_load_in)[0]||parseDates(b.date_setup)[0]||parseDates(b.date_event)[0]||new Date('9999-12-31');return da-db});
 
   const dates=[];for(let i=0;i<ganttDays;i++){const d=new Date(ganttStart);d.setDate(d.getDate()+i);dates.push(d)}
 
@@ -453,9 +481,9 @@ function renderGantt(){
     dates.forEach((dt,i)=>{
       const ds=dateStr(dt);const isT=ds===dateStr(today);
       h+=`<div class="gantt-bar-cell${isT?' today':''}">`;
-      [{key:'load_in',s:'date_load_in',e:'date_load_in'},{key:'setup',s:'date_setup',e:'date_setup'},{key:'event',s:'date_event_start',e:'date_event_end'},{key:'teardown',s:'date_teardown',e:'date_teardown'}].forEach(p=>{
-        const ps=parseD(d[p.s]),pe=parseD(d[p.e])||ps;
-        if(ps&&dt>=ps&&dt<=pe)h+=`<div class="gantt-bar ${p.key}"></div>`;
+      [{key:'load_in',f:'date_load_in'},{key:'setup',f:'date_setup'},{key:'event',f:'date_event'},{key:'teardown',f:'date_teardown'}].forEach(p=>{
+        const dates_p=parseDates(d[p.f]);
+        if(dates_p.some(pd=>dateStr(pd)===ds))h+=`<div class="gantt-bar ${p.key}"></div>`;
       });
       h+='</div>';
     });
@@ -471,10 +499,7 @@ function renderGantt(){
     if(!d.vehicles)return;
     const vehs=d.vehicles.split(',').map(s=>s.trim()).filter(Boolean);
     const allDts=new Set();
-    ['date_load_in','date_setup','date_teardown'].forEach(k=>{const dt=parseD(d[k]);if(dt)allDts.add(dateStr(dt))});
-    const es=parseD(d.date_event_start),ee=parseD(d.date_event_end);
-    if(es){allDts.add(dateStr(es));if(ee)for(let x=new Date(es);x<=ee;x.setDate(x.getDate()+1))allDts.add(dateStr(x))}
-    const ds=parseD(d.date_setup);if(ds)allDts.add(dateStr(ds));
+    ['date_load_in','date_setup','date_event','date_teardown'].forEach(k=>{parseDates(d[k]).forEach(dt=>allDts.add(dateStr(dt)))});
     vehs.forEach(v=>{if(!usage[v])usage[v]={};allDts.forEach(ds=>{usage[v][ds]=(usage[v][ds]||0)+1})});
   });
   let hasV=false;VEHICLES.forEach(v=>{if(Object.keys(usage[v]).length)hasV=true});
@@ -498,12 +523,12 @@ function renderProjAdmin(){
   const el=$('projAdminView');
   let items=[...projData];
   if(projSort.col)items.sort((a,b)=>{let va=String(a[projSort.col]||'').toLowerCase(),vb=String(b[projSort.col]||'').toLowerCase();return va<vb?(projSort.asc?-1:1):va>vb?(projSort.asc?1:-1):0});
-  const cols=[{key:'project',label:'物件名'},{key:'estimate_no',label:'見積番号'},{key:'client',label:'得意先'},{key:'person',label:'担当者'},{key:'venue',label:'会場'},{key:'date_load_in',label:'搬入'},{key:'date_event_start',label:'本番開始'},{key:'date_teardown',label:'撤去'},{key:'status',label:'ステータス'},{key:'vehicles',label:'車両'}];
+  const cols=[{key:'project',label:'物件名'},{key:'estimate_no',label:'見積番号'},{key:'client',label:'得意先'},{key:'person',label:'担当者'},{key:'venue',label:'会場'},{key:'date_load_in',label:'搬入'},{key:'date_event',label:'本番'},{key:'date_teardown',label:'撤去'},{key:'status',label:'ステータス'},{key:'vehicles',label:'車両'}];
   let h=`<div class="av-top"><button class="av-add" onclick="openProjMo()">+ 新規登録</button><input class="av-search" placeholder="検索..." oninput="projSearch(this.value)"></div>`;
   h+='<div class="tbl-wrap"><table><thead><tr>';
   cols.forEach(c=>{const a=projSort.col===c.key?(projSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
   h+='<th>操作</th></tr></thead><tbody>';
-  items.forEach(d=>{h+='<tr>';cols.forEach(c=>{let v=d[c.key]||'';if(c.key.startsWith('date_')&&v){const dd=parseD(v);v=dd?`${dd.getMonth()+1}/${dd.getDate()}`:v}h+=`<td>${esc(v)}</td>`});h+=`<td><button class="act-btn" onclick="editProj('${d.id}')">編集</button> <button class="act-btn del" onclick="delProj('${d.id}')">削除</button></td></tr>`});
+  items.forEach(d=>{h+='<tr>';cols.forEach(c=>{let v=d[c.key]||'';if(c.key.startsWith('date_')&&v){v=String(v).split(',').map(s=>{const dd=parseD(s.trim());return dd?`${dd.getMonth()+1}/${dd.getDate()}`:s}).join(', ')}h+=`<td>${esc(v)}</td>`});h+=`<td><button class="act-btn" onclick="editProj('${d.id}')">編集</button> <button class="act-btn del" onclick="delProj('${d.id}')">削除</button></td></tr>`});
   h+='</tbody></table></div>';
   el.innerHTML=h;
   el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(projSort.col===c)projSort.asc=!projSort.asc;else{projSort.col=c;projSort.asc=true}render()}});
@@ -518,10 +543,13 @@ function openProjMo(d){
   $('xf_client').value=d?d.client||'':'';$('xf_person').value=d?d.person||'':'';
   $('xf_venue').value=d?d.venue||'':'';$('xf_address').value=d?d.address||'':'';
   $('xf_status').value=d?d.status||'受注':'受注';
-  $('xf_date_load_in').value=d?d.date_load_in||'':'';$('xf_date_setup').value=d?d.date_setup||'':'';
-  $('xf_date_event_start').value=d?d.date_event_start||'':'';$('xf_date_event_end').value=d?d.date_event_end||'':'';
-  $('xf_date_teardown').value=d?d.date_teardown||'':'';
-  $('xf_people_load_in').value=d?d.people_load_in||'':'';$('xf_people_setup').value=d?d.people_setup||'':'';
+  // 複数日付復元
+  ['load_in','setup','event','teardown'].forEach(phase=>{
+    const key='date_'+phase;const el=$('xf_dates_'+phase);el.innerHTML='';
+    const vals=d&&d[key]?String(d[key]).split(',').map(s=>s.trim()).filter(Boolean):[];
+    if(vals.length)vals.forEach(v=>addDateInput('xf_dates_'+phase,v));
+    else addDateInput('xf_dates_'+phase);
+  });  $('xf_people_load_in').value=d?d.people_load_in||'':'';$('xf_people_setup').value=d?d.people_setup||'':'';
   $('xf_people_event').value=d?d.people_event||'':'';$('xf_people_teardown').value=d?d.people_teardown||'':'';
   $('xf_rentals').value=d?d.rentals||'':'';$('xf_notes').value=d?d.notes||'':'';
   const vehs=d&&d.vehicles?d.vehicles.split(',').map(s=>s.trim()):[];
@@ -533,7 +561,7 @@ function editProj(id){const d=projData.find(x=>x.id===id);if(d)openProjMo(d)}
 async function saveProj(){
   const name=$('xf_project').value.trim();if(!name){toast('物件名を入力してください',true);return}
   const vehs=[];$('xf_vehicles').querySelectorAll('input:checked').forEach(cb=>vehs.push(cb.value));
-  const body={dept:'project',action:'save',id:$('xf_id').value||undefined,project:name,estimate_no:$('xf_estimate_no').value.trim(),order_no:$('xf_order_no').value.trim(),client:$('xf_client').value.trim(),person:$('xf_person').value.trim(),venue:$('xf_venue').value.trim(),address:$('xf_address').value.trim(),status:$('xf_status').value,date_load_in:$('xf_date_load_in').value,date_setup:$('xf_date_setup').value,date_event_start:$('xf_date_event_start').value,date_event_end:$('xf_date_event_end').value,date_teardown:$('xf_date_teardown').value,people_load_in:$('xf_people_load_in').value,people_setup:$('xf_people_setup').value,people_event:$('xf_people_event').value,people_teardown:$('xf_people_teardown').value,vehicles:vehs.join(','),rentals:$('xf_rentals').value.trim(),notes:$('xf_notes').value.trim()};
+  const body={dept:'project',action:'save',id:$('xf_id').value||undefined,project:name,estimate_no:$('xf_estimate_no').value.trim(),order_no:$('xf_order_no').value.trim(),client:$('xf_client').value.trim(),person:$('xf_person').value.trim(),venue:$('xf_venue').value.trim(),address:$('xf_address').value.trim(),status:$('xf_status').value,date_load_in:getDatesFromList('xf_dates_load_in'),date_setup:getDatesFromList('xf_dates_setup'),date_event:getDatesFromList('xf_dates_event'),date_teardown:getDatesFromList('xf_dates_teardown'),people_load_in:$('xf_people_load_in').value,people_setup:$('xf_people_setup').value,people_event:$('xf_people_event').value,people_teardown:$('xf_people_teardown').value,vehicles:vehs.join(','),rentals:$('xf_rentals').value.trim(),notes:$('xf_notes').value.trim()};
   try{const r=await fetch(API,{method:'POST',body:JSON.stringify(body)});const j=await r.json();if(j.success){toast('保存しました');closeProjMo();await loadProj();render()}else toast('エラー: '+j.error,true)}catch(e){toast('通信エラー: '+e.message,true)}
 }
 async function delProj(id){if(!confirm('この現場を削除しますか？'))return;try{const r=await fetch(API+'?action=delete&dept=project&id='+id);const j=await r.json();if(j.success){toast('削除しました');await loadProj();render()}else toast('エラー: '+j.error,true)}catch(e){toast('通信エラー',true)}}
