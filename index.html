@@ -150,7 +150,7 @@ function renderFV(){
       const sub=o.subcontractor?`<div class="fc-sub">外注先: ${esc(o.subcontractor)}</div>`:'';
       const start=o.start_date?`<span><span class="ml">開始:</span> <span class="mv">${dlDisp(o.start_date)}</span></span>`:'';
       h+=`<div class="fc u-${o._u}"><div class="fc-t"><div class="fc-p">${esc(o.project)}</div><span class="badge b-${o._u}">${urgL(o._u)}</span></div>
-        <div class="fc-info">${esc(cp(o))} <span class="tag t-sec">${esc(o.section)}</span> <span class="tag st-${o.status}">${o.status}</span></div>
+        <div class="fc-info">${esc(cp(o))} ${o.order_no?'<span class="tag" style="background:var(--accent-dim);color:var(--accent)">'+esc(o.order_no)+'</span>':''} <span class="tag t-sec">${esc(o.section)}</span> <span class="tag st-${o.status}">${o.status}</span></div>
         <div class="fc-meta"><span><span class="ml">納期:</span> <span class="mv">${dlDisp(o.deadline)}</span></span>${start}</div>${sub}${note}</div>`});h+='</div>'});
   if(!has)h+='<div class="fv-empty">該当する案件がありません</div>';
   document.getElementById('fv').innerHTML=h}
