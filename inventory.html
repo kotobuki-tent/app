@@ -320,8 +320,8 @@ async function loadAll(){
     $('items_loading').classList.remove('hidden');
     $('rentals_loading').classList.remove('hidden');
     const [inv,rnt,prj]=await Promise.all([
-      apiGet({action:'list'}),
-      apiGet({action:'rentals'}),
+      apiGet({action:'list'}).catch(()=>[]),
+      apiGet({action:'rentals'}).catch(()=>[]),
       apiGet({action:'projects'}).catch(()=>[])
     ]);
     items=inv||[];rentals=rnt||[];projects=prj||[];
@@ -540,7 +540,7 @@ function renderAvail(){
     usage[key].used=max;
   });
 
-  const entries=Object.values(usage).sort((a,b)=>a.category.localeCompare(b.category)||a.item_name.localeCompare(b.item_name));
+  const entries=Object.values(usage).sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.item_name).localeCompare(String(b.item_name)));
   if(!entries.length){body.innerHTML='<p style="color:#aaa;font-size:13px">商品が登録されていません。</p>';return}
 
   let html='';let lastCat='';
