@@ -20,13 +20,13 @@
 }
 html{font-size:15px}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;height:56px;padding:0 16px;gap:8px}
-.hdr h1{font-size:17px;font-weight:900;letter-spacing:.04em;margin-right:auto}
-.hdr-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);padding:7px 14px;border-radius:8px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer}
-.hdr-btn:hover{color:var(--text);border-color:var(--accent)}
-.dept-tab{background:none;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s}
-.dept-tab:hover{color:var(--text);background:var(--surface2)}
-.dept-tab.on{color:#fff;background:var(--accent)}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#1e2130;display:flex;align-items:center;height:56px;padding:0 16px;gap:8px}
+.hdr h1{font-size:17px;font-weight:900;letter-spacing:.04em;margin-right:auto;color:#fff}
+.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:7px 14px;border-radius:8px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none}
+.hdr-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+.dept-tab{background:none;border:none;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s}
+.dept-tab:hover{color:#fff;background:rgba(255,255,255,.08)}
+.dept-tab.on{color:#fff;background:#3b6de7}
 .sub-tabs{display:flex;gap:6px;padding:10px 16px 0;background:var(--bg)}
 .sub-tab{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:7px 14px;border-radius:8px;cursor:pointer}
 .sub-tab:hover{color:var(--text);border-color:var(--accent)}
@@ -168,7 +168,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 <body>
 <div class="hdr">
   <h1>工程管理</h1>
-  <a href="inventory.html" class="hdr-btn" style="text-decoration:none;">在庫管理 →</a>
+  <a href="inventory.html" class="hdr-btn">在庫管理 →</a>
   <button class="hdr-btn" onclick="refreshData()">↻ 更新</button>
   <button class="dept-tab on" data-dept="production">生産部</button>
   <button class="dept-tab" data-dept="project">企画制作部</button>
