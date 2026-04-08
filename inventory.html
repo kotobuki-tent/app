@@ -472,7 +472,7 @@ function renderRentals(){
   if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">貸出/予約データがありません</td></tr>';return}
   const nowStr=todayStr();
   tb.innerHTML=f.map(r=>{
-    const isOverdue=r.date_end&&r.date_end<nowStr&&r.status!=='返却済';
+    const isOverdue=r.date_end&&r.date_end<nowStr&&r.status==='貸出中';
     return`<tr${isOverdue?' class="overdue"':''}>
     <td><span class="st st-${r.status}">${r.status}</span>${isOverdue?'<span class="overdue-badge">期限超過</span>':''}</td>
     <td><span class="cat-tag">${esc(r.category)}</span></td>
