@@ -520,24 +520,27 @@ function renderAvail(){
   const usage={};
   items.forEach(i=>{
     if(cat&&i.category!==cat)return;
-    usage[i.category+'|'+i.item_name]={category:i.category,item_name:i.item_name,total:Number(i.total_qty)||0,used:0};
+    usage[i.category+'|'+i.item_name]={category:i.category,item_name:i.item_name,total:Number(i.total_qty)||0,used:0,rent:0,maint:0};
   });
 
   const dayMs=86400000;const days=[];
   for(let d=new Date(start);d<=end;d=new Date(d.getTime()+dayMs))days.push(new Date(d));
 
   Object.keys(usage).forEach(key=>{
-    let max=0;
+    let max=0,maxRent=0,maxMaint=0;
     days.forEach(day=>{
-      const ds=day.toISOString().slice(0,10);let u=0;
+      const ds=day.toISOString().slice(0,10);let u=0,r2=0,m=0;
       rentals.forEach(r=>{
         if(!ACTIVE_STATUSES.includes(r.status))return;
         if((r.category+'|'+r.item_name)!==key)return;
-        if(r.date_start<=ds&&r.date_end>=ds)u+=Number(r.qty)||0;
+        if(r.date_start<=ds&&r.date_end>=ds){
+          const q=Number(r.qty)||0;u+=q;
+          if(r.status==='メンテ待ち'||r.status==='メンテ中')m+=q;else r2+=q;
+        }
       });
-      if(u>max)max=u;
+      if(u>max){max=u;maxRent=r2;maxMaint=m}
     });
-    usage[key].used=max;
+    usage[key].used=max;usage[key].rent=maxRent;usage[key].maint=maxMaint;
   });
 
   const entries=Object.values(usage).sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.item_name).localeCompare(String(b.item_name)));
@@ -550,10 +553,15 @@ function renderAvail(){
     const avail=e.total-e.used;
     let cls='ok';if(pct>=100)cls='danger';else if(pct>=70)cls='warn';
     let numColor='#059669';if(avail<=0)numColor='#dc2626';else if(avail<=Math.ceil(e.total*0.3))numColor='#d97706';
+    let detail='';
+    if(e.rent>0&&e.maint>0)detail='貸出'+e.rent+' + メンテ'+e.maint;
+    else if(e.rent>0)detail='貸出'+e.rent;
+    else if(e.maint>0)detail='メンテ'+e.maint;
+    const usedStr=detail?(detail+' = '+e.used):e.used;
     html+=`<div class="avail-bar">
       <span class="avail-item-name">${esc(e.item_name)}</span>
       <div class="avail-meter"><div class="avail-fill ${cls}" style="width:${Math.min(pct,100)}%"></div></div>
-      <span class="avail-nums">${e.used} / ${e.total} 使用　残 <strong style="color:${numColor}">${avail}</strong></span>
+      <span class="avail-nums">${usedStr} / ${e.total} 使用　残 <strong style="color:${numColor}">${avail}</strong></span>
     </div>`;
   });
   body.innerHTML=html;
