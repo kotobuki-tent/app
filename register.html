@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>台帳登録</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-height:100vh;min-height:100dvh}
+
+/* Header */
+.hdr{background:#1e2130;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.hdr h1{font-size:16px;font-weight:900;color:#fff;letter-spacing:.03em}
+.hdr-link{color:rgba(255,255,255,.6);font:500 12px/1 'Noto Sans JP',sans-serif;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px}
+.hdr-link:hover{color:#fff}
+
+/* Main */
+.main{padding:20px 16px 100px}
+
+/* Card */
+.card{background:#fff;border-radius:14px;padding:24px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:16px}
+.card h2{font-size:15px;font-weight:700;color:#333;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.card h2 .icon{font-size:20px}
+
+/* Form */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12px;font-weight:600;color:#888;margin-bottom:6px;letter-spacing:.02em}
+.field input,.field select,.field textarea{width:100%;padding:14px 16px;border:2px solid #e8e9f0;border-radius:10px;font:400 16px/1.4 'Noto Sans JP',sans-serif;color:#1a1a2e;background:#fafbfd;-webkit-appearance:none;appearance:none;transition:.2s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#3b6de7;background:#fff;box-shadow:0 0 0 4px rgba(59,109,231,.1)}
+.field textarea{min-height:80px;resize:vertical}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' fill='none' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
+.field .hint{font-size:11px;color:#aaa;margin-top:4px}
+
+/* New category input */
+.newcat-row{display:flex;gap:8px;margin-top:8px}
+.newcat-row input{flex:1}
+.newcat-toggle{font-size:12px;color:#3b6de7;font-weight:600;cursor:pointer;margin-top:6px;display:inline-block}
+.newcat-toggle:hover{text-decoration:underline}
+
+/* Buttons */
+.btn-save{width:100%;padding:16px;background:#3b6de7;color:#fff;border:none;border-radius:12px;font:700 16px/1 'Noto Sans JP',sans-serif;cursor:pointer;transition:.2s;letter-spacing:.03em}
+.btn-save:hover{background:#2f5ec8}
+.btn-save:active{transform:scale(.98)}
+.btn-save:disabled{background:#c0c8d8;cursor:not-allowed}
+
+/* Recent items */
+.recent-hd{font-size:13px;font-weight:700;color:#888;margin-bottom:10px}
+.recent-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fafbfd;border:1px solid #e8e9f0;border-radius:10px;margin-bottom:8px}
+.recent-item .ri-cat{font-size:11px;font-weight:600;color:#666;background:#eef0f5;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.recent-item .ri-name{font-size:14px;font-weight:600;color:#333;flex:1}
+.recent-item .ri-qty{font-size:13px;color:#888}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:14px 28px;border-radius:12px;font:600 14px/1 'Noto Sans JP',sans-serif;z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#059669;color:#fff}
+.toast.err{background:#dc2626;color:#fff}
+
+/* Loading */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Empty */
+.empty{text-align:center;padding:24px;color:#bbb;font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>台帳登録</h1>
+  <a class="hdr-link" href="inventory.html">在庫管理 →</a>
+</div>
+
+<div class="main">
+
+  <!-- 登録フォーム -->
+  <div class="card">
+    <h2><span class="icon">📦</span> 商品を登録</h2>
+    <div class="field">
+      <label>カテゴリ</label>
+      <select id="f_cat">
+        <option value="">選択してください</option>
+      </select>
+      <span class="newcat-toggle" onclick="toggleNewCat()">＋ 新しいカテゴリを追加</span>
+      <div class="newcat-row" id="newcatRow" style="display:none">
+        <input id="f_newcat" placeholder="新しいカテゴリ名">
+      </div>
+    </div>
+    <div class="field">
+      <label>商品名</label>
+      <input id="f_name" placeholder="例: 3m×3m">
+    </div>
+    <div class="field">
+      <label>保有数</label>
+      <input id="f_qty" type="number" inputmode="numeric" min="0" value="0">
+    </div>
+    <div class="field">
+      <label>備考（任意）</label>
+      <textarea id="f_notes" placeholder="色やサイズなど補足があれば"></textarea>
+    </div>
+    <button class="btn-save" id="btnSave" onclick="save()">登録する</button>
+  </div>
+
+  <!-- 最近の登録 -->
+  <div class="card">
+    <h2><span class="icon">🕐</span> 最近の登録</h2>
+    <div id="recentList"><div class="empty">読み込み中...</div></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+const DEFAULT_CATS=['テント','横幕','テーブル','イス','備品'];
+
+let items=[];
+const $=id=>document.getElementById(id);
+
+function toast(msg,ok=true){
+  const t=$('toast');t.textContent=msg;
+  t.className='toast show '+(ok?'ok':'err');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// API
+async function apiGet(params){
+  const url=API+'?dept=inventory&'+new URLSearchParams(params);
+  const r=await fetch(url);return r.json();
+}
+async function apiPost(body){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})});
+  return r.json();
+}
+
+// Load
+async function loadItems(){
+  try{
+    const data=await apiGet({action:'list'});
+    items=data||[];
+    populateCategories();
+    renderRecent();
+  }catch(e){
+    $('recentList').innerHTML='<div class="empty">読み込みに失敗しました</div>';
+  }
+}
+
+// Categories
+function populateCategories(){
+  const cats=new Set(DEFAULT_CATS);
+  items.forEach(i=>{if(i.category)cats.add(i.category)});
+  const sel=$('f_cat');
+  const val=sel.value;
+  sel.innerHTML='<option value="">選択してください</option>';
+  [...cats].sort().forEach(c=>{
+    const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);
+  });
+  sel.value=val;
+}
+
+// New category toggle
+function toggleNewCat(){
+  const row=$('newcatRow');
+  row.style.display=row.style.display==='none'?'flex':'none';
+  if(row.style.display==='flex')$('f_newcat').focus();
+}
+
+// Recent items
+function renderRecent(){
+  const el=$('recentList');
+  const recent=[...items].reverse().slice(0,10);
+  if(!recent.length){el.innerHTML='<div class="empty">まだ商品が登録されていません</div>';return}
+  el.innerHTML=recent.map(i=>`<div class="recent-item">
+    <span class="ri-cat">${esc(i.category)}</span>
+    <span class="ri-name">${esc(i.item_name)}</span>
+    <span class="ri-qty">${i.total_qty}個</span>
+  </div>`).join('');
+}
+
+// Save
+async function save(){
+  const cat=$('f_newcat').value.trim()||$('f_cat').value;
+  const name=$('f_name').value.trim();
+  const qty=$('f_qty').value;
+  const notes=$('f_notes').value.trim();
+
+  if(!cat){toast('カテゴリを選択してください',false);return}
+  if(!name){toast('商品名を入力してください',false);return}
+
+  const btn=$('btnSave');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>登録中...';
+
+  try{
+    const r=await apiPost({action:'save_item',category:cat,item_name:name,total_qty:qty,notes:notes});
+    if(r.ok){
+      toast('「'+name+'」を登録しました');
+      // フォームリセット
+      $('f_name').value='';
+      $('f_qty').value='0';
+      $('f_notes').value='';
+      $('f_newcat').value='';
+      $('newcatRow').style.display='none';
+      // リロード
+      await loadItems();
+    }else{
+      toast('登録失敗: '+(r.error||''),false);
+    }
+  }catch(e){
+    toast('通信エラー: '+e.message,false);
+  }finally{
+    btn.disabled=false;
+    btn.textContent='登録する';
+  }
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+loadItems();
+</script>
+</body>
+</html>
