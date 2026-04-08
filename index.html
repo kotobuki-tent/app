@@ -187,9 +187,11 @@ tr:hover td{background:rgba(59,111,216,.03)}
   <div id="projSection" class="hidden">
     <div class="sub-tabs" id="projTabs">
       <button class="sub-tab on" data-view="gantt">スケジュール</button>
+      <button class="sub-tab" data-view="projDone">完了</button>
       <button class="sub-tab" data-view="projAdmin">管理</button>
     </div>
     <div id="projGantt" class="proj-view"></div>
+    <div id="projDoneView" class="proj-admin hidden"></div>
     <div id="projAdminView" class="proj-admin hidden"></div>
   </div>
   <div class="loading" id="loader"><div class="spin"></div><br>読み込み中...</div>
@@ -300,8 +302,9 @@ function render(){
     else if(curProdView==='archive'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.remove('hidden');renderArchive()}
   }else{
     $('prodSection').classList.add('hidden');$('projSection').classList.remove('hidden');
-    if(curProjView==='gantt'){$('projGantt').classList.remove('hidden');$('projAdminView').classList.add('hidden');renderGantt()}
-    else{$('projGantt').classList.add('hidden');$('projAdminView').classList.remove('hidden');renderProjAdmin()}
+    if(curProjView==='gantt'){$('projGantt').classList.remove('hidden');$('projDoneView').classList.add('hidden');$('projAdminView').classList.add('hidden');renderGantt()}
+    else if(curProjView==='projDone'){$('projGantt').classList.add('hidden');$('projDoneView').classList.remove('hidden');$('projAdminView').classList.add('hidden');renderProjDone()}
+    else{$('projGantt').classList.add('hidden');$('projDoneView').classList.add('hidden');$('projAdminView').classList.remove('hidden');renderProjAdmin()}
   }
 }
 function renderFactory(){
@@ -362,7 +365,7 @@ function ganttMove(n){ganttStart.setDate(ganttStart.getDate()+n);render()}
 function ganttToday(){initGanttStart();render()}
 function renderGantt(){
   if(!ganttStart)initGanttStart();const el=$('projGantt');
-  let items=projData.filter(d=>d.status!=='見送り');
+  let items=projData.filter(d=>!['完了','見送り'].includes(d.status));
   if(ganttStatusFilter)items=items.filter(d=>d.status===ganttStatusFilter);
   items.sort((a,b)=>{const da=parseDates(a.date_load_in)[0]||parseDates(a.date_setup)[0]||parseDates(a.date_event)[0]||new Date('9999-12-31');const db=parseDates(b.date_load_in)[0]||parseDates(b.date_setup)[0]||parseDates(b.date_event)[0]||new Date('9999-12-31');return da-db});
   const dates=[];for(let i=0;i<ganttDays;i++){const d=new Date(ganttStart);d.setDate(d.getDate()+i);dates.push(d)}
@@ -383,8 +386,17 @@ function renderGantt(){
   if(hasV){h+='<div class="vehicle-summary"><h3>車両バッティング確認</h3><div class="vh-desc">同じ日に同じ車両を2件以上使う場合、赤く表示されます</div>';if(!hasConflict)h+='<div class="vh-no-conflict">✓ バッティングなし</div>';else{h+='<div class="gantt-wrap" style="margin-top:10px"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd" style="font-size:11px">車両</div><div class="gantt-dates">';dates.forEach(d=>{const isT=dateStr(d)===dateStr(today);const dn=d.getDay();let cls='gantt-date-cell';if(isT)cls+=' today';if(dn===0)cls+=' sun';if(dn===6)cls+=' sat';h+=`<div class="${cls}"><span class="dow">${dow[dn]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`});h+='</div></div>';VEHICLES.forEach(v=>{const hasC=Object.values(usage[v]).some(c=>c>=2);if(!hasC)return;h+=`<div class="gantt-row" style="cursor:default"><div class="gantt-row-label"><span class="prj-name">${v}</span></div><div class="gantt-bars">`;dates.forEach(dt=>{const ds=dateStr(dt);const c=usage[v][ds]||0;const isT=dateStr(dt)===dateStr(today);h+=`<div class="gantt-bar-cell${isT?' today':''}" style="display:flex;align-items:center;justify-content:center">`;if(c>=2)h+=`<span style="font-size:12px;font-weight:700;color:#fff;background:var(--red);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center">${c}</span>`;else if(c===1)h+=`<span style="font-size:10px;color:var(--text-faint)">${c}</span>`;h+='</div>'});h+='</div></div>'});h+='</div></div>'}h+='</div>'}
   el.innerHTML=h;el.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.onclick=()=>viewProj(r.dataset.id)});
 }
+function renderProjDone(){
+  const el=$('projDoneView');
+  let items=projData.filter(d=>d.status==='完了');
+  let h='<div style="padding:10px 0 14px;font-size:13px;color:var(--text-dim)">完了した現場（'+items.length+'件）</div>';
+  h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>受注番号</th><th>得意先</th><th>担当者</th><th>会場</th><th>本番</th><th>ステータス</th><th>操作</th></tr></thead><tbody>';
+  if(!items.length)h+='<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-faint)">該当する現場はありません</td></tr>';
+  items.forEach(d=>{const ev=d.date_event?String(d.date_event).split(',').map(s=>{const dd=parseD(s.trim());return dd?((dd.getMonth()+1)+'/'+dd.getDate()):s}).join(', '):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+esc(d.venue||'')+'</td><td>'+ev+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="editProj(\''+d.id+'\')">編集</button></td></tr>'});
+  h+='</tbody></table></div>';el.innerHTML=h;
+}
 function renderProjAdmin(){
-  const el=$('projAdminView');let items=[...projData];
+  const el=$('projAdminView');let items=projData.filter(d=>d.status!=='完了');
   if(projSort.col)items.sort((a,b)=>{let va=String(a[projSort.col]||'').toLowerCase(),vb=String(b[projSort.col]||'').toLowerCase();return va<vb?(projSort.asc?-1:1):va>vb?(projSort.asc?1:-1):0});
   const cols=[{key:'project',label:'物件名'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'担当者'},{key:'venue',label:'会場'},{key:'date_load_in',label:'搬入'},{key:'date_event',label:'本番'},{key:'date_teardown',label:'撤去'},{key:'status',label:'ステータス'}];
   let h=`<div class="av-top"><button class="av-add" onclick="openProjMo()">+ 新規登録</button><input class="av-search" placeholder="検索..." oninput="projSearch(this.value)"></div>`;
