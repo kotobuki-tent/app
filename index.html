@@ -333,7 +333,7 @@ function renderFactory(){
   el.querySelectorAll('.fv-card').forEach(c=>{c.onclick=()=>viewProd(c.dataset.id)});
 }
 function renderProdAdmin(){
-  const el=$('prodAdmin');let items=[...prodData];
+  const el=$('prodAdmin');let items=prodData.filter(d=>d.status!=='出荷済');
   if(prodSort.col)items.sort((a,b)=>{let va=String(a[prodSort.col]||'').toLowerCase(),vb=String(b[prodSort.col]||'').toLowerCase();return va<vb?(prodSort.asc?-1:1):va>vb?(prodSort.asc?1:-1):0});
   const cols=[{key:'project',label:'物件名'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'担当者'},{key:'section',label:'作業場所'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
   let h=`<div class="av-top"><button class="av-add" onclick="openProdMo()">+ 新規登録</button><input class="av-search" placeholder="検索..." oninput="prodSearch(this.value)"></div>`;
