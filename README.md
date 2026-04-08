@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/26561415/README.md)
+[README.md](https://github.com/user-attachments/files/26563582/README.md)
 # 寿テント 業務管理アプリ
 
 テント・イベント設営会社の工程管理と在庫管理を一元化するWebアプリ。  
@@ -8,6 +8,7 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 
 - **工程管理**: https://kotobuki-tent.github.io/app/
 - **在庫管理**: https://kotobuki-tent.github.io/app/inventory.html
+- **台帳登録**: https://kotobuki-tent.github.io/app/register.html
 
 ## 構成
 
@@ -15,6 +16,7 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 |---|---|
 | `index.html` | 工程管理アプリ（生産部 + 企画制作部） |
 | `inventory.html` | 在庫管理アプリ（商品台帳・貸出/予約・メンテ・在庫確認） |
+| `register.html` | 台帳登録アプリ（スマホ特化・商品追加専用） |
 | Apps Script（外部） | API（スプレッドシートCRUD） |
 
 ## スプレッドシート構成
