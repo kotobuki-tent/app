@@ -109,6 +109,9 @@ tr:hover td{background:#f8f9fc}
 /* Loading */
 .loading{text-align:center;padding:40px;color:#aaa;font-size:13px}
 .empty-msg{text-align:center;color:#aaa;padding:32px;font-size:13px}
+tr.overdue td{background:#fff5f5}
+tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
+.overdue-badge{font-size:10px;font-weight:600;color:#dc2626;background:#fee2e2;padding:2px 6px;border-radius:4px;margin-left:4px}
 
 /* Toolbar row */
 .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap}
@@ -467,8 +470,11 @@ function renderRentals(){
   });
   const tb=$('rentals_tbody');
   if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">貸出/予約データがありません</td></tr>';return}
-  tb.innerHTML=f.map(r=>`<tr>
-    <td><span class="st st-${r.status}">${r.status}</span></td>
+  const nowStr=todayStr();
+  tb.innerHTML=f.map(r=>{
+    const isOverdue=r.date_end&&r.date_end<nowStr&&r.status!=='返却済';
+    return`<tr${isOverdue?' class="overdue"':''}>
+    <td><span class="st st-${r.status}">${r.status}</span>${isOverdue?'<span class="overdue-badge">期限超過</span>':''}</td>
     <td><span class="cat-tag">${esc(r.category)}</span></td>
     <td><strong>${esc(r.item_name)}</strong></td>
     <td>${r.qty}</td>
@@ -480,7 +486,7 @@ function renderRentals(){
       <a class="edit-link" onclick="editRental('${r.id}')">編集</a>
       <a class="del-link" onclick="deleteRental('${r.id}')">削除</a>
     </div></td>
-  </tr>`).join('');
+  </tr>`}).join('');
 }
 
 function populateItemSelect(){
