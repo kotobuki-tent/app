@@ -132,6 +132,7 @@ tr:hover td{background:#f8f9fc}
   <a class="hdr-link" href="./">← 工程管理</a>
   <button class="tab on" data-tab="items" onclick="switchTab('items')">商品台帳</button>
   <button class="tab" data-tab="rentals" onclick="switchTab('rentals')">貸出/予約</button>
+  <button class="tab" data-tab="maint" onclick="switchTab('maint')">メンテ</button>
   <button class="tab" data-tab="avail" onclick="switchTab('avail')">在庫確認</button>
   <button class="ref-btn" onclick="loadAll()">↻ 更新</button>
 </div>
@@ -177,6 +178,16 @@ tr:hover td{background:#f8f9fc}
       </table>
     </div>
     <div id="rentals_loading" class="loading">読み込み中...</div>
+  </div>
+
+  <!-- ===== メンテ ===== -->
+  <div id="v_maint" class="hidden">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
+        <tbody id="maint_tbody"></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- ===== 在庫確認 ===== -->
@@ -327,7 +338,7 @@ async function loadAll(){
     items=inv||[];rentals=rnt||[];projects=prj||[];
     populateCategoryFilters();
     populateProjectSelect();
-    renderItems();renderRentals();renderAvail();
+    renderItems();renderRentals();renderMaint();renderAvail();
     $('items_loading').classList.add('hidden');
     $('rentals_loading').classList.add('hidden');
   }catch(e){
@@ -365,8 +376,9 @@ function onProjectSelect(){if($('xf_r_project').value)$('xf_r_client').value=$('
 // === Tab ===
 function switchTab(t){
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
-  ['items','rentals','avail'].forEach(v=>$('v_'+v).classList.toggle('hidden',v!==t));
+  ['items','rentals','maint','avail'].forEach(v=>$('v_'+v).classList.toggle('hidden',v!==t));
   if(t==='avail')renderAvail();
+  if(t==='maint')renderMaint();
 }
 
 // ==================== 商品台帳 ====================
@@ -421,6 +433,27 @@ async function deleteItem(id,name){
     const r=await apiPost({action:'delete_item',id});
     if(r.ok){toast('削除しました');await loadAll()}else toast('削除失敗',false);
   }catch(e){toast('エラー: '+e.message,false)}
+}
+
+// ==================== メンテ ====================
+function renderMaint(){
+  const MAINT_ST=['メンテ待ち','メンテ中'];
+  const f=rentals.filter(r=>MAINT_ST.includes(r.status));
+  const tb=$('maint_tbody');
+  if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">メンテ待ち・メンテ中の商品はありません</td></tr>';return}
+  tb.innerHTML=f.map(r=>`<tr>
+    <td><span class="st st-${r.status}">${r.status}</span></td>
+    <td><span class="cat-tag">${esc(r.category)}</span></td>
+    <td><strong>${esc(r.item_name)}</strong></td>
+    <td>${r.qty}</td>
+    <td>${dateJP(r.date_start)}</td>
+    <td>${dateJP(r.date_end)}</td>
+    <td>${esc(r.client_name)}</td>
+    <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
+    <td><div class="tbl-actions">
+      <a class="edit-link" onclick="editRental('${r.id}')">編集</a>
+    </div></td>
+  </tr>`).join('');
 }
 
 // ==================== 貸出/予約 ====================
