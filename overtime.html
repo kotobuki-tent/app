@@ -119,6 +119,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 </div>
 <div class="week-bar">
   <button class="week-btn" onclick="changeWeek(-1)">← 先週</button>
+  <button class="week-btn" onclick="goThisWeek()">今週</button>
   <span class="week-label" id="weekLabel"></span>
   <button class="week-btn" onclick="changeWeek(1)">来週 →</button>
 </div>
@@ -213,7 +214,8 @@ async function loadAll(){
 }
 async function refreshData(){document.getElementById('overviewGrid').innerHTML='<div class="loading">読み込み中...</div>';await loadAll();}
 
-function changeWeek(delta){const d=new Date(currentWeekStart);d.setDate(d.getDate()+7*delta);currentWeekStart=d;loadAll();}
+function changeWeek(delta){const d=new Date(currentWeekStart);d.setDate(d.getDate()+7*delta);currentWeekStart=d;entries=[];render();loadAll();}
+function goThisWeek(){currentWeekStart=getMonday(new Date());entries=[];render();loadAll();}
 function renderWeekLabel(){const dates=getWeekDates(currentWeekStart);const s=dates[0],e=dates[6];document.getElementById('weekLabel').textContent=`${s.getMonth()+1}/${s.getDate()} (月) 〜 ${e.getMonth()+1}/${e.getDate()} (日)`;}
 
 function switchTab(tab){
