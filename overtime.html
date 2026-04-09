@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>残業希望ボード</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f4f5f7;--surface:#fff;--surface2:#eef0f4;--surface3:#e2e5ec;
+  --border:#d4d8e1;--border-light:#c0c6d2;
+  --text:#1a1d27;--text-dim:#5f6477;--text-faint:#8e93a6;
+  --accent:#2563eb;--accent-light:#dbeafe;--accent-hover:#1d4ed8;
+  --green:#16a34a;--green-light:#dcfce7;
+  --orange:#ea580c;--orange-light:#ffedd5;
+  --red:#dc2626;--red-light:#fee2e2;
+  --purple:#7c3aed;--purple-light:#ede9fe;
+  --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+html{font-size:15px}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:100px}
+
+/* ===== Header ===== */
+.header{
+  background:#1e293b;color:#fff;padding:14px 20px;
+  display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;
+}
+.header h1{font-size:16px;font-weight:800;letter-spacing:.03em;flex:1}
+.header a{color:#94a3b8;text-decoration:none;font-size:12px;font-weight:500}
+.header a:hover{color:#e2e8f0}
+.nav-links{display:flex;gap:12px}
+
+/* ===== Tabs ===== */
+.tabs{
+  display:flex;gap:0;background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 16px;position:sticky;top:50px;z-index:90;
+}
+.tab{
+  padding:12px 20px;font:600 13px/1 'Noto Sans JP',sans-serif;
+  color:var(--text-dim);border:none;background:none;cursor:pointer;
+  border-bottom:2px solid transparent;transition:.15s;
+}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ===== Week Selector ===== */
+.week-bar{
+  display:flex;align-items:center;gap:12px;padding:14px 20px;
+  background:var(--surface);border-bottom:1px solid var(--border);
+}
+.week-btn{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  padding:7px 14px;border-radius:var(--radius);font:500 13px/1 'Noto Sans JP',sans-serif;
+  cursor:pointer;transition:.15s;
+}
+.week-btn:hover{background:var(--surface3)}
+.week-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.week-label{font:700 14px/1 'Noto Sans JP',sans-serif;flex:1;text-align:center}
+
+/* ===== Request Banner ===== */
+.request-banner{
+  margin:12px 16px;padding:14px 18px;background:var(--orange-light);
+  border:1px solid #fed7aa;border-radius:var(--radius);
+  font:500 13px/1.6 'Noto Sans JP',sans-serif;color:#9a3412;
+}
+.request-banner strong{font-weight:700}
+
+/* ===== Staff View ===== */
+.staff-section{padding:16px}
+.staff-select-bar{
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;
+}
+.staff-chip{
+  padding:8px 16px;border-radius:20px;font:600 13px/1 'Noto Sans JP',sans-serif;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-dim);
+  cursor:pointer;transition:.15s;
+}
+.staff-chip:hover{border-color:var(--accent);color:var(--accent)}
+.staff-chip.selected{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+.day-grid{display:flex;flex-direction:column;gap:8px}
+.day-row{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);
+}
+.day-label{
+  font:700 13px/1 'Noto Sans JP',sans-serif;width:80px;flex-shrink:0;
+}
+.day-label .date{font:400 11px/1 'Noto Sans JP',sans-serif;color:var(--text-faint);margin-top:2px}
+.day-label.today{color:var(--accent)}
+.day-label.sat{color:var(--accent)}
+.day-label.sun{color:var(--red)}
+
+.time-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.time-chip{
+  padding:6px 12px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-dim);
+  cursor:pointer;transition:.15s;min-width:56px;text-align:center;
+}
+.time-chip:hover{border-color:var(--accent);color:var(--accent)}
+.time-chip.selected{background:var(--green);color:#fff;border-color:var(--green)}
+
+.day-clear{
+  font:500 11px/1 'Noto Sans JP',sans-serif;color:var(--red);
+  background:none;border:none;cursor:pointer;padding:4px 8px;
+}
+.day-clear:hover{text-decoration:underline}
+
+/* ===== Admin View ===== */
+.admin-section{padding:16px}
+.admin-tools{
+  display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;
+}
+.admin-btn{
+  padding:8px 18px;border-radius:var(--radius);font:600 13px/1 'Noto Sans JP',sans-serif;
+  border:none;cursor:pointer;transition:.15s;
+}
+.admin-btn.primary{background:var(--accent);color:#fff}
+.admin-btn.primary:hover{background:var(--accent-hover)}
+.admin-btn.danger{background:var(--red-light);color:var(--red)}
+.admin-btn.secondary{background:var(--surface2);color:var(--text-dim);border:1px solid var(--border)}
+.admin-btn.secondary:hover{background:var(--surface3)}
+
+/* Overview Grid */
+.overview-grid{
+  display:flex;flex-direction:column;gap:2px;
+  background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;
+}
+.ov-header{
+  display:grid;grid-template-columns:100px repeat(var(--cols),1fr);
+  background:#1e293b;color:#fff;font:700 12px/1 'Noto Sans JP',sans-serif;
+}
+.ov-header .ov-cell{padding:10px 8px;text-align:center}
+.ov-header .ov-cell.today-col{background:#334155}
+.ov-row{
+  display:grid;grid-template-columns:100px repeat(var(--cols),1fr);
+  border-bottom:1px solid var(--border);
+}
+.ov-row:last-child{border-bottom:none}
+.ov-row:nth-child(even){background:#f8f9fb}
+.ov-cell{padding:8px;font:500 12px/1.4 'Noto Sans JP',sans-serif;text-align:center}
+.ov-cell.name-cell{text-align:left;font-weight:700;color:var(--text)}
+.ov-cell.today-col{background:var(--accent-light)}
+.ov-cell .ot-time{
+  display:inline-block;padding:3px 8px;border-radius:4px;
+  background:var(--green-light);color:var(--green);font-weight:600;font-size:11px;
+}
+.ov-cell .ot-none{color:var(--text-faint);font-size:11px}
+
+.ov-summary{
+  display:grid;grid-template-columns:100px repeat(var(--cols),1fr);
+  background:var(--accent-light);font:700 12px/1 'Noto Sans JP',sans-serif;
+  color:var(--accent);border-top:2px solid var(--accent);
+}
+.ov-summary .ov-cell{padding:10px 8px}
+
+/* ===== Staff Management Modal ===== */
+.modal-bg{
+  display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.4);z-index:200;justify-content:center;align-items:center;
+}
+.modal-bg.show{display:flex}
+.modal{
+  background:var(--surface);border-radius:14px;padding:24px;width:90%;max-width:420px;
+  max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);
+}
+.modal h2{font:800 17px/1 'Noto Sans JP',sans-serif;margin-bottom:16px}
+.modal-close{
+  float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-dim);
+  margin-top:-4px;
+}
+.modal input[type=text]{
+  width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;
+  font:400 14px/1 'Noto Sans JP',sans-serif;margin-bottom:10px;
+}
+.staff-list-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;border-bottom:1px solid var(--border);
+}
+.staff-list-item:last-child{border-bottom:none}
+.staff-list-item span{font:500 14px/1 'Noto Sans JP',sans-serif}
+.staff-del{
+  background:none;border:none;color:var(--red);font:500 12px/1 'Noto Sans JP',sans-serif;
+  cursor:pointer;padding:4px 8px;
+}
+.staff-del:hover{text-decoration:underline}
+
+/* ===== Request Modal ===== */
+.req-textarea{
+  width:100%;min-height:80px;padding:10px 14px;border:1px solid var(--border);
+  border-radius:8px;font:400 14px/1.5 'Noto Sans JP',sans-serif;resize:vertical;
+  margin-bottom:12px;
+}
+
+/* ===== Loading ===== */
+.loading{text-align:center;padding:40px;color:var(--text-faint);font:500 14px/1 'Noto Sans JP',sans-serif}
+
+/* ===== Responsive ===== */
+@media(max-width:600px){
+  .ov-header,.ov-row,.ov-summary{font-size:11px}
+  .ov-cell{padding:6px 4px}
+  .ov-cell.name-cell{font-size:11px}
+  .day-row{flex-direction:column;align-items:flex-start;gap:8px}
+  .day-label{width:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>残業希望ボード</h1>
+  <div class="nav-links">
+    <a href="./index.html">工程管理</a>
+    <a href="./inventory.html">在庫管理</a>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('staff')">申告する</button>
+  <button class="tab" onclick="switchTab('admin')">管理</button>
+</div>
+
+<div class="week-bar">
+  <button class="week-btn" onclick="changeWeek(-1)">← 先週</button>
+  <span class="week-label" id="weekLabel"></span>
+  <button class="week-btn" onclick="changeWeek(1)">来週 →</button>
+</div>
+
+<div id="requestBanner" class="request-banner" style="display:none"></div>
+
+<!-- Staff View -->
+<div id="staffView" class="staff-section">
+  <div class="staff-select-bar" id="staffChips">
+    <span style="font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim)">自分を選択：</span>
+  </div>
+  <div class="day-grid" id="dayGrid"></div>
+</div>
+
+<!-- Admin View -->
+<div id="adminView" class="admin-section" style="display:none">
+  <div class="admin-tools">
+    <button class="admin-btn primary" onclick="openRequestModal()">残業募集を出す</button>
+    <button class="admin-btn secondary" onclick="openStaffModal()">従業員管理</button>
+    <button class="admin-btn secondary" onclick="refreshData()">↻ 更新</button>
+  </div>
+  <div id="overviewGrid" class="loading">読み込み中...</div>
+</div>
+
+<!-- Staff Management Modal -->
+<div class="modal-bg" id="staffModalBg">
+  <div class="modal">
+    <button class="modal-close" onclick="closeStaffModal()">✕</button>
+    <h2>従業員管理</h2>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <input type="text" id="newStaffName" placeholder="名前を入力">
+      <button class="admin-btn primary" onclick="addStaff()" style="flex-shrink:0">追加</button>
+    </div>
+    <div id="staffListItems"></div>
+  </div>
+</div>
+
+<!-- Request Modal -->
+<div class="modal-bg" id="reqModalBg">
+  <div class="modal">
+    <button class="modal-close" onclick="closeReqModal()">✕</button>
+    <h2>残業募集を出す</h2>
+    <p style="font:400 13px/1.6 'Noto Sans JP',sans-serif;color:var(--text-dim);margin-bottom:12px">
+      この週に残業募集のメッセージを表示します。従業員側に表示されます。
+    </p>
+    <textarea class="req-textarea" id="reqMessage" placeholder="例：今週納期が厳しいので、少しでも残れる方はご協力お願いします"></textarea>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="admin-btn secondary" onclick="closeReqModal()">キャンセル</button>
+      <button class="admin-btn primary" onclick="submitRequest()">募集を出す</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== Config =====
+const API = 'https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+const DEPT = 'overtime';
+const END_TIME = '17:30';
+const TIME_SLOTS = ['18:00','18:30','19:00','19:30','20:00'];
+const DAY_NAMES = ['日','月','火','水','木','金','土'];
+
+// ===== State =====
+let currentWeekStart = getMonday(new Date());
+let staffList = [];
+let entries = [];
+let selectedStaff = localStorage.getItem('ot_my_name') || '';
+let currentTab = 'staff';
+let currentRequest = null;
+
+// ===== Utility =====
+function getMonday(d) {
+  const dt = new Date(d);
+  const day = dt.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  dt.setDate(dt.getDate() + diff);
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+
+function fmtDate(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function getWeekDates(mondayDate) {
+  const dates = [];
+  for (let i = 0; i < 6; i++) { // Mon-Sat
+    const d = new Date(mondayDate);
+    d.setDate(d.getDate() + i);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function todayStr() { return fmtDate(new Date()); }
+
+// ===== API =====
+async function apiGet(params) {
+  const qs = new URLSearchParams({ dept: DEPT, ...params }).toString();
+  const r = await fetch(API + '?' + qs);
+  return r.json();
+}
+
+async function apiPost(body) {
+  const r = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ dept: DEPT, ...body })
+  });
+  return r.json();
+}
+
+// ===== Data Loading =====
+async function loadAll() {
+  try {
+    const [staffRes, entryRes, reqRes] = await Promise.all([
+      apiGet({ action: 'staff' }),
+      apiGet({ action: 'entries', week_start: fmtDate(currentWeekStart) }),
+      apiGet({ action: 'request', week_start: fmtDate(currentWeekStart) })
+    ]);
+    staffList = (staffRes.data || []).map(s => s.name);
+    entries = entryRes.data || [];
+    currentRequest = reqRes.data || null;
+  } catch (e) {
+    console.error('Load error:', e);
+    staffList = [];
+    entries = [];
+    currentRequest = null;
+  }
+  render();
+}
+
+async function refreshData() {
+  document.getElementById('overviewGrid').innerHTML = '<div class="loading">読み込み中...</div>';
+  await loadAll();
+}
+
+// ===== Week Navigation =====
+function changeWeek(delta) {
+  const d = new Date(currentWeekStart);
+  d.setDate(d.getDate() + 7 * delta);
+  currentWeekStart = d;
+  loadAll();
+}
+
+function renderWeekLabel() {
+  const dates = getWeekDates(currentWeekStart);
+  const s = dates[0], e = dates[dates.length - 1];
+  const label = `${s.getMonth()+1}/${s.getDate()} (月) 〜 ${e.getMonth()+1}/${e.getDate()} (土)`;
+  document.getElementById('weekLabel').textContent = label;
+
+  // Highlight current week
+  const today = new Date();
+  const thisMonday = getMonday(today);
+  const isCurrent = fmtDate(thisMonday) === fmtDate(currentWeekStart);
+  document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
+  // No active style needed on arrows
+}
+
+// ===== Tab Switch =====
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab')[tab === 'staff' ? 0 : 1].classList.add('active');
+  document.getElementById('staffView').style.display = tab === 'staff' ? '' : 'none';
+  document.getElementById('adminView').style.display = tab === 'admin' ? '' : 'none';
+  render();
+}
+
+// ===== Render =====
+function render() {
+  renderWeekLabel();
+  renderBanner();
+  if (currentTab === 'staff') renderStaffView();
+  else renderAdminView();
+}
+
+function renderBanner() {
+  const banner = document.getElementById('requestBanner');
+  if (currentRequest && currentRequest.active) {
+    banner.style.display = '';
+    banner.innerHTML = '<strong>📢 残業募集中：</strong>' + esc(currentRequest.message);
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ===== Staff View =====
+function renderStaffView() {
+  // Staff chips
+  const container = document.getElementById('staffChips');
+  let html = '<span style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim)">自分を選択：</span>';
+  staffList.forEach(name => {
+    const sel = name === selectedStaff ? 'selected' : '';
+    html += `<button class="staff-chip ${sel}" onclick="selectStaff('${esc(name)}')">${esc(name)}</button>`;
+  });
+  container.innerHTML = html;
+
+  // Day grid
+  const grid = document.getElementById('dayGrid');
+  if (!selectedStaff) {
+    grid.innerHTML = '<div class="loading">上から自分の名前を選んでください</div>';
+    return;
+  }
+
+  const dates = getWeekDates(currentWeekStart);
+  const today = todayStr();
+  let dhtml = '';
+
+  dates.forEach(d => {
+    const ds = fmtDate(d);
+    const dow = d.getDay();
+    const dayName = DAY_NAMES[dow];
+    const isToday = ds === today;
+    const isSat = dow === 6;
+    const isSun = dow === 0;
+    const cls = isToday ? 'today' : isSat ? 'sat' : isSun ? 'sun' : '';
+
+    // Find entry for this person + date
+    const entry = entries.find(e => e.name === selectedStaff && e.date === ds);
+    const selectedTime = entry ? entry.until_time : '';
+
+    dhtml += `<div class="day-row">
+      <div class="day-label ${cls}">
+        ${dayName}曜日
+        <div class="date">${d.getMonth()+1}/${d.getDate()}${isToday ? ' (今日)' : ''}</div>
+      </div>
+      <div class="time-chips">`;
+
+    TIME_SLOTS.forEach(t => {
+      const sel = t === selectedTime ? 'selected' : '';
+      dhtml += `<button class="time-chip ${sel}" onclick="toggleTime('${ds}','${t}')">${t}</button>`;
+    });
+
+    dhtml += `</div>`;
+    if (selectedTime) {
+      dhtml += `<button class="day-clear" onclick="clearDay('${ds}')">取消</button>`;
+    }
+    dhtml += `</div>`;
+  });
+
+  grid.innerHTML = dhtml;
+}
+
+function selectStaff(name) {
+  selectedStaff = name;
+  localStorage.setItem('ot_my_name', name);
+  render();
+}
+
+async function toggleTime(date, time) {
+  // Find existing entry
+  const entry = entries.find(e => e.name === selectedStaff && e.date === date);
+  if (entry && entry.until_time === time) {
+    // Deselect = delete
+    await apiPost({ action: 'delete_entry', name: selectedStaff, date: date });
+  } else {
+    // Select or change
+    await apiPost({
+      action: 'save_entry',
+      name: selectedStaff,
+      date: date,
+      until_time: time,
+      week_start: fmtDate(currentWeekStart),
+      note: ''
+    });
+  }
+  await loadAll();
+}
+
+async function clearDay(date) {
+  await apiPost({ action: 'delete_entry', name: selectedStaff, date: date });
+  await loadAll();
+}
+
+// ===== Admin View =====
+function renderAdminView() {
+  const dates = getWeekDates(currentWeekStart);
+  const today = todayStr();
+  const cols = dates.length;
+
+  let html = `<div class="overview-grid" style="--cols:${cols}">`;
+
+  // Header
+  html += '<div class="ov-header">';
+  html += '<div class="ov-cell"></div>';
+  dates.forEach(d => {
+    const ds = fmtDate(d);
+    const isToday = ds === today;
+    const dow = DAY_NAMES[d.getDay()];
+    html += `<div class="ov-cell ${isToday ? 'today-col' : ''}">${d.getMonth()+1}/${d.getDate()}<br>${dow}</div>`;
+  });
+  html += '</div>';
+
+  // Rows per staff
+  if (staffList.length === 0) {
+    html += '<div class="loading">従業員が登録されていません</div>';
+  } else {
+    staffList.forEach(name => {
+      html += '<div class="ov-row">';
+      html += `<div class="ov-cell name-cell">${esc(name)}</div>`;
+      dates.forEach(d => {
+        const ds = fmtDate(d);
+        const isToday = ds === today;
+        const entry = entries.find(e => e.name === name && e.date === ds);
+        if (entry && entry.until_time) {
+          html += `<div class="ov-cell ${isToday ? 'today-col' : ''}"><span class="ot-time">〜${entry.until_time}</span></div>`;
+        } else {
+          html += `<div class="ov-cell ${isToday ? 'today-col' : ''}"><span class="ot-none">—</span></div>`;
+        }
+      });
+      html += '</div>';
+    });
+
+    // Summary row
+    html += '<div class="ov-summary">';
+    html += '<div class="ov-cell">残れる人数</div>';
+    dates.forEach(d => {
+      const ds = fmtDate(d);
+      const count = entries.filter(e => e.date === ds && e.until_time).length;
+      html += `<div class="ov-cell">${count > 0 ? count + '人' : '—'}</div>`;
+    });
+    html += '</div>';
+  }
+
+  html += '</div>';
+  document.getElementById('overviewGrid').innerHTML = html;
+}
+
+// ===== Staff Modal =====
+function openStaffModal() {
+  document.getElementById('staffModalBg').classList.add('show');
+  renderStaffList();
+}
+function closeStaffModal() {
+  document.getElementById('staffModalBg').classList.remove('show');
+}
+
+function renderStaffList() {
+  const container = document.getElementById('staffListItems');
+  if (staffList.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-faint);padding:12px;font-size:13px">まだ登録されていません</div>';
+    return;
+  }
+  let html = '';
+  staffList.forEach(name => {
+    html += `<div class="staff-list-item">
+      <span>${esc(name)}</span>
+      <button class="staff-del" onclick="removeStaff('${esc(name)}')">削除</button>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+async function addStaff() {
+  const input = document.getElementById('newStaffName');
+  const name = input.value.trim();
+  if (!name) return;
+  await apiPost({ action: 'save_staff', name: name, active: true });
+  input.value = '';
+  await loadAll();
+  renderStaffList();
+}
+
+async function removeStaff(name) {
+  if (!confirm(name + ' を削除しますか？')) return;
+  await apiPost({ action: 'delete_staff', name: name });
+  if (selectedStaff === name) {
+    selectedStaff = '';
+    localStorage.removeItem('ot_my_name');
+  }
+  await loadAll();
+  renderStaffList();
+}
+
+// ===== Request Modal =====
+function openRequestModal() {
+  document.getElementById('reqModalBg').classList.add('show');
+  document.getElementById('reqMessage').value = currentRequest && currentRequest.active ? currentRequest.message : '';
+}
+function closeReqModal() {
+  document.getElementById('reqModalBg').classList.remove('show');
+}
+
+async function submitRequest() {
+  const msg = document.getElementById('reqMessage').value.trim();
+  if (!msg) { alert('メッセージを入力してください'); return; }
+
+  // Close existing if any
+  if (currentRequest && currentRequest.active && currentRequest.id) {
+    await apiPost({ action: 'close_request', id: currentRequest.id });
+  }
+
+  await apiPost({
+    action: 'save_request',
+    week_start: fmtDate(currentWeekStart),
+    message: msg
+  });
+  closeReqModal();
+  await loadAll();
+}
+
+// ===== Escape =====
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// ===== Modal backdrop close =====
+document.getElementById('staffModalBg').addEventListener('click', e => {
+  if (e.target === document.getElementById('staffModalBg')) closeStaffModal();
+});
+document.getElementById('reqModalBg').addEventListener('click', e => {
+  if (e.target === document.getElementById('reqModalBg')) closeReqModal();
+});
+
+// ===== Init =====
+loadAll();
+</script>
+</body>
+</html>
