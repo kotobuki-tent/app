@@ -623,8 +623,7 @@ $('avail_start').value=todayStr();
 const tw=new Date(today.getTime()+14*86400000);
 $('avail_end').value=tw.getFullYear()+'-'+String(tw.getMonth()+1).padStart(2,'0')+'-'+String(tw.getDate()).padStart(2,'0');
 
-$('itemMoBg').addEventListener('click',e=>{if(e.target===$('itemMoBg'))closeItemMo()});
-$('rentalMoBg').addEventListener('click',e=>{if(e.target===$('rentalMoBg'))closeRentalMo()});
+/* 背景クリックで閉じない — 明示的にボタンで閉じる */
 
 loadAll();
 </script>
