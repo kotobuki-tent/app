@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>残業希望ボード</title>
+<title>時間外ボード</title>
 <link rel="icon" type="image/png" href="favicon-o-32.png">
 <link rel="apple-touch-icon" href="favicon-o-180.png">
 <style>
@@ -109,7 +109,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 </head>
 <body>
 <div class="header">
-  <h1>残業希望ボード</h1>
+  <h1>時間外ボード</h1>
   <div class="nav-links">
     <a href="./index.html">工程管理</a>
     <a href="./inventory.html">在庫管理</a>
@@ -134,7 +134,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 </div>
 <div id="adminView" class="admin-section" style="display:none">
   <div class="admin-tools">
-    <button class="admin-btn primary" onclick="openRequestModal()">残業募集を出す</button>
+    <button class="admin-btn primary" onclick="openRequestModal()">時間外募集を出す</button>
     <button class="admin-btn secondary" onclick="openStaffModal()">従業員管理</button>
     <button class="admin-btn secondary" onclick="refreshData()">↻ 更新</button>
   </div>
@@ -154,8 +154,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 <div class="modal-bg" id="reqModalBg">
   <div class="modal">
     <button class="modal-close" onclick="closeReqModal()">✕</button>
-    <h2>残業募集を出す</h2>
-    <p style="font:400 13px/1.6 'Noto Sans JP',sans-serif;color:var(--text-dim);margin-bottom:12px">この週に残業募集のメッセージを表示します。従業員側に表示されます。</p>
+    <h2>時間外募集を出す</h2>
+    <p style="font:400 13px/1.6 'Noto Sans JP',sans-serif;color:var(--text-dim);margin-bottom:12px">この週に時間外募集のメッセージを表示します。従業員側に表示されます。</p>
     <textarea class="req-textarea" id="reqMessage" placeholder="例：今週納期が厳しいので、少しでも残れる方はご協力お願いします"></textarea>
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button class="admin-btn secondary" onclick="closeReqModal()">キャンセル</button>
@@ -245,7 +245,7 @@ function render(){renderWeekLabel();renderBanner();if(currentTab==='staff')rende
 
 function renderBanner(){
   const banner=document.getElementById('requestBanner');
-  if(currentRequest&&currentRequest.active){banner.style.display='';banner.innerHTML='<strong>📢 残業募集中：</strong>'+esc(currentRequest.message);}
+  if(currentRequest&&currentRequest.active){banner.style.display='';banner.innerHTML='<strong>📢 時間外募集中：</strong>'+esc(currentRequest.message);}
   else{banner.style.display='none';}
 }
 
