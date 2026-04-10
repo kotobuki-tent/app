@@ -224,7 +224,7 @@ async function loadAll(){
       apiGet({action:'request',week_start:fmtDate(currentWeekStart)})
     ]);
     staffList=(staffRes.data||[]).map(s=>s.name);
-    staffList.sort((a,b)=>a.localeCompare(b,'ja'));
+    for(let i=staffList.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[staffList[i],staffList[j]]=[staffList[j],staffList[i]]}
     entries=entryRes.data||[];
     currentRequest=reqRes.data||null;
   }catch(e){console.error('Load error:',e);staffList=[];entries=[];currentRequest=null;}
