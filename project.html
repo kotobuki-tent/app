@@ -429,8 +429,7 @@ function deleteProjectRental(id){
 
 // ===== イベント =====
 $('projTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t)return;$('projTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProjView=t.dataset.view;render()});
-$('projMoBg').addEventListener('click',e=>{if(e.target===$('projMoBg'))closeProjMo()});
-$('projViewBg').addEventListener('click',e=>{if(e.target===$('projViewBg'))$('projViewBg').classList.remove('show')});
+/* 背景クリックで閉じない — 明示的にボタンで閉じる */
 loadAll();
 setInterval(()=>{if(curProjView==='gantt')loadAll()},3*60*1000);
 </script>
