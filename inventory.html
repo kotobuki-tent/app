@@ -18,6 +18,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-
 .nav-link{background:none;border:none;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center}
 .nav-link:hover{color:#fff;background:rgba(255,255,255,.08)}
 .nav-link.on{color:#fff;background:#3b6de7}
+.sub-tabs{display:flex;gap:6px;padding:10px 20px 0;background:#f5f6fa}
 .tab{background:none;border:1px solid transparent;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:7px 16px;border-radius:6px;cursor:pointer;transition:.15s}
 .tab:hover{color:#fff;background:rgba(255,255,255,.08)}
 .tab.on{color:#fff;background:#3b6de7;border-color:#3b6de7}
@@ -138,12 +139,14 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
   <a href="index.html" class="nav-link">生産部</a>
   <a href="project.html" class="nav-link">企画制作部</a>
   <a href="inventory.html" class="nav-link on">在庫管理</a>
-  <a href="overtime.html" class="nav-link">残業</a>
+  <a href="overtime.html" class="nav-link">時間外</a>
+  <button class="ref-btn" onclick="loadAll()">↻ 更新</button>
+</div>
+<div class="sub-tabs">
   <button class="tab on" data-tab="avail" onclick="switchTab('avail')">在庫確認</button>
   <button class="tab" data-tab="rentals" onclick="switchTab('rentals')">貸出/予約</button>
   <button class="tab" data-tab="maint" onclick="switchTab('maint')">メンテ</button>
   <button class="tab" data-tab="items" onclick="switchTab('items')">商品台帳</button>
-  <button class="ref-btn" onclick="loadAll()">↻ 更新</button>
 </div>
 
 <div class="main">
