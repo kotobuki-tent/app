@@ -375,17 +375,18 @@ function renderStaffList(){
   staffList.forEach(name=>{html+=`<div class="staff-list-item"><span>${esc(name)}</span><button class="staff-del" onclick="removeStaff('${esc(name)}')">削除</button></div>`;});
   container.innerHTML=html;
 }
-async function addStaff(){const input=document.getElementById('newStaffName');const name=input.value.trim();if(!name)return;await apiPost({action:'save_staff',name:name,active:true});input.value='';await loadAll();renderStaffList();}
-async function removeStaff(name){if(!confirm(name+' を削除しますか？'))return;await apiPost({action:'delete_staff',name:name});if(selectedStaff===name){selectedStaff='';localStorage.removeItem('ot_my_name');}await loadAll();renderStaffList();}
+function addStaff(){const input=document.getElementById('newStaffName');const name=input.value.trim();if(!name)return;if(staffList.includes(name)){toast('すでに登録されています');return;}staffList.push(name);apiPost({action:'save_staff',name:name,active:true});input.value='';renderStaffChips();renderStaffList();renderOverview();}
+function removeStaff(name){if(!confirm(name+' を削除しますか？'))return;staffList=staffList.filter(n=>n!==name);apiPost({action:'delete_staff',name:name});if(selectedStaff===name){selectedStaff='';localStorage.removeItem('ot_my_name');}renderStaffChips();renderStaffList();renderOverview();}
 
 function openRequestModal(){document.getElementById('reqModalBg').classList.add('show');document.getElementById('reqMessage').value=currentRequest&&currentRequest.active?currentRequest.message:'';}
 function closeReqModal(){document.getElementById('reqModalBg').classList.remove('show');}
-async function submitRequest(){
+function submitRequest(){
   const msg=document.getElementById('reqMessage').value.trim();
   if(!msg){alert('メッセージを入力してください');return;}
-  if(currentRequest&&currentRequest.active&&currentRequest.id){await apiPost({action:'close_request',id:currentRequest.id});}
-  await apiPost({action:'save_request',week_start:fmtDate(currentWeekStart),message:msg});
-  closeReqModal();await loadAll();
+  if(currentRequest&&currentRequest.active&&currentRequest.id){apiPost({action:'close_request',id:currentRequest.id});}
+  apiPost({action:'save_request',week_start:fmtDate(currentWeekStart),message:msg});
+  currentRequest={active:true,message:msg,id:'tmp_'+Date.now(),week_start:fmtDate(currentWeekStart)};
+  closeReqModal();renderStaffView();
 }
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
