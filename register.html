@@ -50,6 +50,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-
 /* Recent items */
 .recent-hd{font-size:13px;font-weight:700;color:#888;margin-bottom:10px}
 .recent-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fafbfd;border:1px solid #e8e9f0;border-radius:10px;margin-bottom:8px}
+.recent-item.optimistic{opacity:.7;border-style:dashed}
 .recent-item .ri-cat{font-size:11px;font-weight:600;color:#666;background:#eef0f5;padding:3px 8px;border-radius:4px;white-space:nowrap}
 .recent-item .ri-name{font-size:14px;font-weight:600;color:#333;flex:1}
 .recent-item .ri-qty{font-size:13px;color:#888}
@@ -128,14 +129,20 @@ function toast(msg,ok=true){
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-// API
+// API GET（変更なし）
 async function apiGet(params){
   const url=API+'?dept=inventory&'+new URLSearchParams(params);
   const r=await fetch(url);return r.json();
 }
-async function apiPost(body){
-  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})});
-  return r.json();
+
+// API POST — no-corsモードに変更（レスポンスは読めないが即座に完了）
+function apiPost(body){
+  fetch(API,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({dept:'inventory',...body})
+  });
 }
 
 // Load
@@ -175,15 +182,15 @@ function renderRecent(){
   const el=$('recentList');
   const recent=[...items].reverse().slice(0,10);
   if(!recent.length){el.innerHTML='<div class="empty">まだ商品が登録されていません</div>';return}
-  el.innerHTML=recent.map(i=>`<div class="recent-item">
+  el.innerHTML=recent.map(i=>`<div class="recent-item${i._optimistic?' optimistic':''}">
     <span class="ri-cat">${esc(i.category)}</span>
     <span class="ri-name">${esc(i.item_name)}</span>
     <span class="ri-qty">${i.total_qty}個</span>
   </div>`).join('');
 }
 
-// Save
-async function save(){
+// Save — 楽観的更新
+function save(){
   const cat=$('f_newcat').value.trim()||$('f_cat').value;
   const name=$('f_name').value.trim();
   const qty=$('f_qty').value;
@@ -192,31 +199,24 @@ async function save(){
   if(!cat){toast('カテゴリを選択してください',false);return}
   if(!name){toast('商品名を入力してください',false);return}
 
-  const btn=$('btnSave');
-  btn.disabled=true;
-  btn.innerHTML='<span class="spinner"></span>登録中...';
+  // 1) no-cors POSTを即発火（レスポンス待たない）
+  apiPost({action:'save_item',category:cat,item_name:name,total_qty:qty,notes:notes});
 
-  try{
-    const r=await apiPost({action:'save_item',category:cat,item_name:name,total_qty:qty,notes:notes});
-    if(r.ok){
-      toast('「'+name+'」を登録しました');
-      // フォームリセット
-      $('f_name').value='';
-      $('f_qty').value='0';
-      $('f_notes').value='';
-      $('f_newcat').value='';
-      $('newcatRow').style.display='none';
-      // リロード
-      await loadItems();
-    }else{
-      toast('登録失敗: '+(r.error||''),false);
-    }
-  }catch(e){
-    toast('通信エラー: '+e.message,false);
-  }finally{
-    btn.disabled=false;
-    btn.textContent='登録する';
-  }
+  // 2) 楽観的にローカルデータへ追加 → 即UI反映
+  items.push({category:cat,item_name:name,total_qty:qty,notes:notes,_optimistic:true});
+  populateCategories();
+  renderRecent();
+
+  // 3) トースト＆フォームリセット
+  toast('「'+name+'」を登録しました');
+  $('f_name').value='';
+  $('f_qty').value='0';
+  $('f_notes').value='';
+  $('f_newcat').value='';
+  $('newcatRow').style.display='none';
+
+  // 4) バックグラウンドで実データ同期（数秒後に反映される）
+  setTimeout(()=>loadItems(),3000);
 }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
