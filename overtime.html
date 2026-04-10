@@ -201,6 +201,18 @@ function todayStr(){return fmtDate(new Date());}
 async function apiGet(params){const qs=new URLSearchParams({dept:DEPT,...params}).toString();const r=await fetch(API+'?'+qs);return r.json();}
 async function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',body:JSON.stringify({dept:DEPT,...body})});return{success:true};}
 
+let syncTimer=null;
+function scheduleSyncFromServer(){
+  if(syncTimer)clearTimeout(syncTimer);
+  syncTimer=setTimeout(async()=>{
+    try{
+      const entryRes=await apiGet({action:'entries',week_start:fmtDate(currentWeekStart)});
+      entries=entryRes.data||[];
+      render();
+    }catch(e){}
+  },3000);
+}
+
 async function loadAll(){
   try{
     const[staffRes,entryRes,reqRes]=await Promise.all([
@@ -301,11 +313,13 @@ async function toggleTime(date,time){
     entries.push({name:selectedStaff,date:date,until_time:time,week_start:fmtDate(currentWeekStart),note:''});
     render();apiPost({action:'save_entry',name:selectedStaff,date:date,until_time:time,week_start:fmtDate(currentWeekStart),note:''});
   }
+  scheduleSyncFromServer();
 }
 
 async function clearDay(date){
   entries=entries.filter(e=>!(e.name===selectedStaff&&e.date===date));
   render();apiPost({action:'delete_entry',name:selectedStaff,date:date});
+  scheduleSyncFromServer();
 }
 
 function renderAdminView(){
