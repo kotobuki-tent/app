@@ -86,6 +86,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .gantt-date-cell{flex:1;min-width:44px;text-align:center;padding:6px 2px;font-size:11px;font-weight:500;color:var(--text-dim);border-right:1px solid var(--surface3)}
 .gantt-date-cell.today{background:var(--accent-dim);color:var(--accent);font-weight:700}
 .gantt-date-cell.sun{color:var(--red)}
+.gantt-date-cell.holiday{color:var(--red);background:rgba(217,64,64,.05)}
+.gantt-date-cell .hol-name{font-size:7px;display:block;color:var(--red);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gantt-date-cell.sat{color:var(--accent)}
 .gantt-date-cell .dow{font-size:9px;display:block}
 .gantt-date-cell .dm{font-size:12px;font-weight:700;display:block}
@@ -223,6 +225,20 @@ tr:hover td{background:rgba(59,111,216,.03)}
 <script>
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
+const HOLIDAYS={
+  '2025-01-01':'元日','2025-01-13':'成人の日','2025-02-11':'建国記念の日','2025-02-23':'天皇誕生日','2025-02-24':'振替休日',
+  '2025-03-20':'春分の日','2025-04-29':'昭和の日','2025-05-03':'憲法記念日','2025-05-04':'みどりの日','2025-05-05':'こどもの日','2025-05-06':'振替休日',
+  '2025-07-21':'海の日','2025-08-11':'山の日','2025-09-15':'敬老の日','2025-09-23':'秋分の日',
+  '2025-10-13':'スポーツの日','2025-11-03':'文化の日','2025-11-23':'勤労感謝の日','2025-11-24':'振替休日',
+  '2026-01-01':'元日','2026-01-12':'成人の日','2026-02-11':'建国記念の日','2026-02-23':'天皇誕生日',
+  '2026-03-20':'春分の日','2026-04-29':'昭和の日','2026-05-03':'憲法記念日','2026-05-04':'みどりの日','2026-05-05':'こどもの日','2026-05-06':'振替休日',
+  '2026-07-20':'海の日','2026-08-11':'山の日','2026-09-21':'敬老の日','2026-09-23':'秋分の日',
+  '2026-10-12':'スポーツの日','2026-11-03':'文化の日','2026-11-23':'勤労感謝の日',
+  '2027-01-01':'元日','2027-01-11':'成人の日','2027-02-11':'建国記念の日','2027-02-23':'天皇誕生日',
+  '2027-03-21':'春分の日','2027-04-29':'昭和の日','2027-05-03':'憲法記念日','2027-05-04':'みどりの日','2027-05-05':'こどもの日',
+  '2027-07-19':'海の日','2027-08-11':'山の日','2027-09-20':'敬老の日','2027-09-23':'秋分の日',
+  '2027-10-11':'スポーツの日','2027-11-03':'文化の日','2027-11-23':'勤労感謝の日'
+};
 let projData=[],rentalsData=[],inventoryItems=[];
 let curProjView='gantt';
 let projSort={col:null,asc:true};
@@ -245,6 +261,9 @@ function initVehicleChecks(){VH_PHASES.forEach(phase=>{const el=$('xf_vh_'+phase
 initVehicleChecks();
 function getVehiclesFromPhase(phase){const cbs=$('xf_vh_'+phase).querySelectorAll('input:checked');return Array.from(cbs).map(cb=>cb.value).join(',')}
 function setVehiclesForPhase(phase,val){const vs=val?String(val).split(',').map(s=>s.trim()):[];$('xf_vh_'+phase).querySelectorAll('input').forEach(cb=>{cb.checked=vs.includes(cb.value)})}
+
+// ===== ガント日付ヘッダー生成 =====
+function ganttDateHeaders(dates){let h='';dates.forEach(d=>{const ds=dateStr(d);const isT=ds===dateStr(today);const dn=d.getDay();const hol=HOLIDAYS[ds];let cls='gantt-date-cell';if(isT)cls+=' today';if(dn===0||hol)cls+=' holiday';else if(dn===6)cls+=' sat';h+=`<div class="${cls}"><span class="dow">${hol||dow[dn]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`});return h}
 
 // ===== Fire-and-forget (楽観的更新) =====
 function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
@@ -277,7 +296,7 @@ function renderGantt(){
   h+=`<select onchange="ganttDays=+this.value;render()"><option value="14"${ganttDays===14?' selected':''}>2週間</option><option value="21"${ganttDays===21?' selected':''}>3週間</option><option value="28"${ganttDays===28?' selected':''}>4週間</option><option value="42"${ganttDays===42?' selected':''}>6週間</option></select>`;
   h+=`<select onchange="ganttStatusFilter=this.value;render()"><option value=""${!ganttStatusFilter?' selected':''}>全ステータス</option><option value="見積中">見積中</option><option value="受注">受注</option><option value="準備中">準備中</option><option value="現場中">現場中</option><option value="完了">完了</option></select></div>`;
   h+='<div class="gantt-wrap"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd">現場名</div><div class="gantt-dates">';
-  dates.forEach(d=>{const isT=dateStr(d)===dateStr(today);const dn=d.getDay();let cls='gantt-date-cell';if(isT)cls+=' today';if(dn===0)cls+=' sun';if(dn===6)cls+=' sat';h+=`<div class="${cls}"><span class="dow">${dow[dn]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`});
+  h+=ganttDateHeaders(dates);
   h+='</div></div>';
   if(!items.length)h+='<div style="padding:40px;text-align:center;color:var(--text-dim)">現場データがありません。「管理」タブから登録してください。</div>';
   items.forEach(d=>{const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],完了:['var(--text-dim)','var(--surface3)']};const sc=stColors[d.status]||['var(--text-faint)','var(--surface3)'];h+=`<div class="gantt-row" data-id="${d.id}"><div class="gantt-row-label"><span class="prj-name">${esc(d.project)}</span><span class="prj-meta">${esc(d.client||'')} ${esc(d.our_person||'')}${d.order_no?' <span style="color:var(--accent);font-weight:600">'+esc(d.order_no)+'</span>':''}</span><span class="prj-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span></div><div class="gantt-bars">`;dates.forEach((dt,i)=>{const ds=dateStr(dt);const isT=ds===dateStr(today);const hits=[];[{key:'load_in',f:'date_load_in'},{key:'setup',f:'date_setup'},{key:'event',f:'date_event'},{key:'teardown',f:'date_teardown'}].forEach(p=>{const dates_p=parseDates(d[p.f]);if(dates_p.some(pd=>dateStr(pd)===ds))hits.push(p.key)});h+=`<div class="gantt-bar-cell${isT?' today':''}${hits.length>1?' multi':''}">`;if(hits.length===1)h+=`<div class="gantt-bar ${hits[0]}"></div>`;else if(hits.length>1)hits.forEach((k,idx)=>{const pct=100/hits.length;h+=`<div class="gantt-bar ${k}" style="top:calc(${pct*idx}% + 1px);height:calc(${pct}% - 2px);bottom:auto;border-radius:3px"></div>`});h+='</div>'});h+='</div></div>'});
@@ -288,7 +307,7 @@ function renderGantt(){
   items.forEach(d=>{const projVehDates={};[{vk:'vehicles_load_in',dk:'date_load_in'},{vk:'vehicles_setup',dk:'date_setup'},{vk:'vehicles_event',dk:'date_event'},{vk:'vehicles_teardown',dk:'date_teardown'}].forEach(p=>{if(!d[p.vk])return;const vehs=d[p.vk].split(',').map(s=>s.trim()).filter(Boolean);const dts=parseDates(d[p.dk]);vehs.forEach(v=>{if(!projVehDates[v])projVehDates[v]=new Set();dts.forEach(dt=>projVehDates[v].add(dateStr(dt)))})});Object.entries(projVehDates).forEach(([v,dates])=>{if(!usage[v])usage[v]={};dates.forEach(ds=>{usage[v][ds]=(usage[v][ds]||0)+1})})});
   let hasConflict=false;VEHICLES.forEach(v=>{Object.values(usage[v]).forEach(c=>{if(c>=2)hasConflict=true})});
   let hasV=false;VEHICLES.forEach(v=>{if(Object.keys(usage[v]).length)hasV=true});
-  if(hasV){h+='<div class="vehicle-summary"><h3>車両バッティング確認</h3><div class="vh-desc">同じ日に同じ車両を2件以上使う場合、赤く表示されます</div>';if(!hasConflict)h+='<div class="vh-no-conflict">✓ バッティングなし</div>';else{h+='<div class="gantt-wrap" style="margin-top:10px"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd" style="font-size:11px">車両</div><div class="gantt-dates">';dates.forEach(d=>{const isT=dateStr(d)===dateStr(today);const dn=d.getDay();let cls='gantt-date-cell';if(isT)cls+=' today';if(dn===0)cls+=' sun';if(dn===6)cls+=' sat';h+=`<div class="${cls}"><span class="dow">${dow[dn]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`});h+='</div></div>';VEHICLES.forEach(v=>{const hasC=Object.values(usage[v]).some(c=>c>=2);if(!hasC)return;h+=`<div class="gantt-row" style="cursor:default"><div class="gantt-row-label"><span class="prj-name">${v}</span></div><div class="gantt-bars">`;dates.forEach(dt=>{const ds=dateStr(dt);const c=usage[v][ds]||0;const isT=dateStr(dt)===dateStr(today);h+=`<div class="gantt-bar-cell${isT?' today':''}" style="display:flex;align-items:center;justify-content:center">`;if(c>=2)h+=`<span style="font-size:12px;font-weight:700;color:#fff;background:var(--red);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center">${c}</span>`;else if(c===1)h+=`<span style="font-size:10px;color:var(--text-faint)">${c}</span>`;h+='</div>'});h+='</div></div>'});h+='</div></div>'}h+='</div>'}
+  if(hasV){h+='<div class="vehicle-summary"><h3>車両バッティング確認</h3><div class="vh-desc">同じ日に同じ車両を2件以上使う場合、赤く表示されます</div>';if(!hasConflict)h+='<div class="vh-no-conflict">✓ バッティングなし</div>';else{h+='<div class="gantt-wrap" style="margin-top:10px"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd" style="font-size:11px">車両</div><div class="gantt-dates">';h+=ganttDateHeaders(dates);h+='</div></div>';VEHICLES.forEach(v=>{const hasC=Object.values(usage[v]).some(c=>c>=2);if(!hasC)return;h+=`<div class="gantt-row" style="cursor:default"><div class="gantt-row-label"><span class="prj-name">${v}</span></div><div class="gantt-bars">`;dates.forEach(dt=>{const ds=dateStr(dt);const c=usage[v][ds]||0;const isT=dateStr(dt)===dateStr(today);h+=`<div class="gantt-bar-cell${isT?' today':''}" style="display:flex;align-items:center;justify-content:center">`;if(c>=2)h+=`<span style="font-size:12px;font-weight:700;color:#fff;background:var(--red);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center">${c}</span>`;else if(c===1)h+=`<span style="font-size:10px;color:var(--text-faint)">${c}</span>`;h+='</div>'});h+='</div></div>'});h+='</div></div>'}h+='</div>'}
   el.innerHTML=h;el.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.onclick=()=>viewProj(r.dataset.id)});
 }
 
