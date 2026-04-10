@@ -1,22 +1,25 @@
-[README.md](https://github.com/user-attachments/files/26563582/README.md)
 # 寿テント 業務管理アプリ
 
-テント・イベント設営会社の工程管理と在庫管理を一元化するWebアプリ。  
+テント・イベント設営会社の工程管理・在庫管理・時間外管理を一元化するWebアプリ。  
 Google スプレッドシートをデータベースとして使い、GitHub Pages でホスティング。
 
 ## URL
 
-- **工程管理**: https://kotobuki-tent.github.io/app/
+- **生産部**: https://kotobuki-tent.github.io/app/
+- **企画制作部**: https://kotobuki-tent.github.io/app/project.html
 - **在庫管理**: https://kotobuki-tent.github.io/app/inventory.html
+- **時間外ボード**: https://kotobuki-tent.github.io/app/overtime.html
 - **台帳登録**: https://kotobuki-tent.github.io/app/register.html
 
 ## 構成
 
 | ファイル | 役割 |
 |---|---|
-| `index.html` | 工程管理アプリ（生産部 + 企画制作部） |
-| `inventory.html` | 在庫管理アプリ（商品台帳・貸出/予約・メンテ・在庫確認） |
-| `register.html` | 台帳登録アプリ（スマホ特化・商品追加専用） |
+| `index.html` | 生産部（工場ボード・出荷済・管理） |
+| `project.html` | 企画制作部（ガントチャート・車両バッティング・管理） |
+| `inventory.html` | 在庫管理（商品台帳・貸出/予約・メンテ・在庫確認） |
+| `overtime.html` | 時間外ボード（残業申告・休日出勤希望・管理） |
+| `register.html` | 台帳登録（スマホ特化・商品追加専用） |
 | Apps Script（外部） | API（スプレッドシートCRUD） |
 
 ## スプレッドシート構成
@@ -27,18 +30,21 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 | `projects` | 企画制作部の現場データ |
 | `inventory` | 商品マスタ（カテゴリ・商品名・保有数） |
 | `rentals` | 貸出/予約台帳（ステータス・期間・数量） |
+| `staff` | スタッフ名簿 |
+| `overtime` | 時間外申告データ |
+| `ot_requests` | 休日出勤希望データ |
 
 ## 機能
 
-### 工程管理（index.html）
+### 生産部（index.html）
 
-**生産部**
 - 工場ボード：受注・製作中・完成の案件を納期順にカード表示、緊急度バッジ
 - 出荷済タブ：出荷完了した案件の一覧
 - 管理タブ：全案件のテーブル表示、新規登録・編集・削除・検索・ソート
 
-**企画制作部**
-- スケジュール：ガントチャート（搬入/設営/本番/撤去を色分け表示）
+### 企画制作部（project.html）
+
+- スケジュール：ガントチャート（搬入/設営/本番/撤去を色分け表示、祝日表示対応）
 - 車両バッティング確認：同一車両の日程重複を自動検出
 - 完了タブ：完了した現場の一覧
 - 管理タブ：全現場のテーブル表示、新規登録・編集・削除
@@ -52,12 +58,18 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 - 在庫確認：期間指定で使用率バー表示、貸出/メンテの内訳表示
 - 案件連携：企画制作部の現場と紐づけて貸出登録
 
+### 時間外ボード（overtime.html）
+
+- 申告タブ：スタッフ別に曜日ごとの時間外希望を登録（平日は時刻、土日祝は午前/午後/終日）
+- 管理タブ：週間の申告状況を一覧表示
+
 ## 技術
 
 - HTML / CSS / JavaScript（フレームワークなし）
 - Google Apps Script（API）
 - Google スプレッドシート（データベース）
 - GitHub Pages（ホスティング）
+- 楽観的更新（no-cors POST + ローカル配列即時反映）
 
 ## Credit
 
