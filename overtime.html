@@ -22,12 +22,14 @@
 }
 html{font-size:15px}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:100px}
-.header{background:#1e2130;color:#fff;padding:0 20px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:100;height:52px}
-.header h1{font-size:16px;font-weight:900;letter-spacing:.04em;margin-right:auto}
+.header{background:#1e2130;color:#fff;padding:0 16px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:100;height:56px}
+.header h1{font-size:17px;font-weight:900;letter-spacing:.04em;margin-right:auto}
 .nav-link{background:none;border:none;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center}
 .nav-link:hover{color:#fff;background:rgba(255,255,255,.08)}
 .nav-link.on{color:#fff;background:#3b6de7}
-.tabs{display:flex;gap:0;background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:52px;z-index:90}
+.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:7px 14px;border-radius:8px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+.hdr-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+.tabs{display:flex;gap:0;background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:56px;z-index:90}
 .tab{padding:12px 20px;font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
 .tab:hover{color:var(--text)}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
@@ -114,6 +116,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <a href="project.html" class="nav-link">企画制作部</a>
   <a href="inventory.html" class="nav-link">在庫管理</a>
   <a href="overtime.html" class="nav-link on">時間外</a>
+  <button class="hdr-btn" onclick="loadAll()">↻ 更新</button>
 </div>
 <div class="tabs">
   <button class="tab active" onclick="switchTab('staff')">申告する</button>
