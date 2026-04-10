@@ -280,8 +280,7 @@ function delProd(id){
 
 // ===== イベント =====
 $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t)return;$('prodTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProdView=t.dataset.view;render()});
-$('prodMoBg').addEventListener('click',e=>{if(e.target===$('prodMoBg'))closeProdMo()});
-$('prodViewBg').addEventListener('click',e=>{if(e.target===$('prodViewBg'))$('prodViewBg').classList.remove('show')});
+/* 背景クリックで閉じない — 明示的にボタンで閉じる */
 loadAll();
 setInterval(()=>{if(curProdView==='factory')loadAll()},3*60*1000);
 </script>
