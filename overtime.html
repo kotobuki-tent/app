@@ -391,8 +391,7 @@ function submitRequest(){
 }
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-document.getElementById('staffModalBg').addEventListener('click',e=>{if(e.target===document.getElementById('staffModalBg'))closeStaffModal();});
-document.getElementById('reqModalBg').addEventListener('click',e=>{if(e.target===document.getElementById('reqModalBg'))closeReqModal();});
+/* 背景クリックで閉じない — 明示的にボタンで閉じる */
 loadAll();
 </script>
 </body>
