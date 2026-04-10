@@ -325,10 +325,7 @@ async function apiGet(params){
   const url=API+'?dept=inventory&'+new URLSearchParams(params);
   const r=await fetch(url);return r.json();
 }
-async function apiPost(body){
-  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})});
-  return r.json();
-}
+function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})})}
 
 // === Load ===
 async function loadAll(){
@@ -421,23 +418,23 @@ function openItemMo(data){
 function closeItemMo(){$('itemMoBg').classList.remove('show')}
 function editItem(id){const d=items.find(i=>i.id===id);if(d)openItemMo(d)}
 
-async function saveItem(){
+function saveItem(){
   const cat=$('xf_item_newcat').value.trim()||$('xf_item_cat').value;
   const name=$('xf_item_name').value.trim();
   if(!cat||!name){toast('カテゴリと商品名は必須です',false);return}
-  try{
-    const r=await apiPost({action:'save_item',id:$('xf_item_id').value||undefined,category:cat,item_name:name,total_qty:$('xf_item_qty').value,notes:$('xf_item_notes').value.trim()});
-    if(r.ok){toast('保存しました');closeItemMo();await loadAll()}
-    else toast('保存失敗: '+(r.error||''),false);
-  }catch(e){toast('エラー: '+e.message,false)}
+  const existingId=$('xf_item_id').value;const id=existingId||'tmp_'+Date.now();
+  const qty=$('xf_item_qty').value;const notes=$('xf_item_notes').value.trim();
+  fireAndForget({action:'save_item',id:existingId||undefined,category:cat,item_name:name,total_qty:qty,notes});
+  const local={id,category:cat,item_name:name,total_qty:Number(qty)||0,notes};
+  if(existingId){const idx=items.findIndex(x=>x.id===existingId);if(idx>=0)items[idx]={...items[idx],...local};else items.push(local)}else{items.push(local)}
+  toast('保存しました');closeItemMo();populateCategoryFilters();renderItems();renderAvail();
 }
 
-async function deleteItem(id,name){
+function deleteItem(id,name){
   if(!confirm(name+' を削除しますか？'))return;
-  try{
-    const r=await apiPost({action:'delete_item',id});
-    if(r.ok){toast('削除しました');await loadAll()}else toast('削除失敗',false);
-  }catch(e){toast('エラー: '+e.message,false)}
+  fireAndForget({action:'delete_item',id});
+  items=items.filter(x=>x.id!==id);
+  toast('削除しました');renderItems();renderAvail();
 }
 
 // ==================== メンテ ====================
@@ -525,30 +522,32 @@ function openRentalMo(data){
 function closeRentalMo(){$('rentalMoBg').classList.remove('show')}
 function editRental(id){const d=rentals.find(r=>r.id===id);if(d)openRentalMo(d)}
 
-async function saveRental(){
+function saveRental(){
   const cat=$('xf_r_cat').value;let itemName=$('xf_r_item').value;
   const start=$('xf_r_start').value;const end=$('xf_r_end').value;
   if(itemName==='__new__'){
     const newName=prompt('新しい商品名を入力（カテゴリ: '+cat+'）');if(!newName)return;
     const qty=prompt('保有数を入力','0');
-    try{
-      const r=await apiPost({action:'save_item',category:cat,item_name:newName,total_qty:Number(qty)||0,notes:''});
-      if(r.ok){itemName=newName;toast('商品「'+newName+'」を追加しました')}else{toast('商品追加失敗',false);return}
-    }catch(e){toast('エラー: '+e.message,false);return}
+    fireAndForget({action:'save_item',category:cat,item_name:newName,total_qty:Number(qty)||0,notes:''});
+    items.push({id:'tmp_'+Date.now(),category:cat,item_name:newName,total_qty:Number(qty)||0,notes:''});
+    itemName=newName;toast('商品「'+newName+'」を追加しました');
+    populateCategoryFilters();renderItems();
   }
   if(!cat||!itemName||!start||!end){toast('カテゴリ・商品名・開始日・終了日は必須です',false);return}
-  try{
-    const r=await apiPost({action:'save_rental',id:$('xf_r_id').value||undefined,category:cat,item_name:itemName,qty:$('xf_r_qty').value,date_start:start,date_end:end,status:$('xf_r_status').value,client_name:$('xf_r_client').value.trim(),project_id:'',notes:$('xf_r_notes').value.trim()});
-    if(r.ok){toast('保存しました');closeRentalMo();await loadAll()}else toast('保存失敗: '+(r.error||''),false);
-  }catch(e){toast('エラー: '+e.message,false)}
+  const existingId=$('xf_r_id').value;const id=existingId||'tmp_'+Date.now();
+  const qtyVal=$('xf_r_qty').value;const status=$('xf_r_status').value;
+  const clientName=$('xf_r_client').value.trim();const notes=$('xf_r_notes').value.trim();
+  fireAndForget({action:'save_rental',id:existingId||undefined,category:cat,item_name:itemName,qty:qtyVal,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes});
+  const local={id,category:cat,item_name:itemName,qty:Number(qtyVal)||1,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes};
+  if(existingId){const idx=rentals.findIndex(x=>x.id===existingId);if(idx>=0)rentals[idx]={...rentals[idx],...local};else rentals.push(local)}else{rentals.push(local)}
+  toast('保存しました');closeRentalMo();renderRentals();renderMaint();renderAvail();
 }
 
-async function deleteRental(id){
+function deleteRental(id){
   if(!confirm('この貸出/予約を削除しますか？'))return;
-  try{
-    const r=await apiPost({action:'delete_rental',id});
-    if(r.ok){toast('削除しました');await loadAll()}else toast('削除失敗',false);
-  }catch(e){toast('エラー: '+e.message,false)}
+  fireAndForget({action:'delete_rental',id});
+  rentals=rentals.filter(x=>x.id!==id);
+  toast('削除しました');renderRentals();renderMaint();renderAvail();
 }
 
 // ==================== 在庫確認 ====================
