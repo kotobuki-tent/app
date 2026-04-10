@@ -107,6 +107,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   .day-row{flex-direction:column;align-items:flex-start;gap:8px}
   .day-label{width:auto}
 }
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:14px 28px;border-radius:12px;font:600 14px/1 'Noto Sans JP',sans-serif;z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#059669;color:#fff}
+.toast.err{background:#dc2626;color:#fff}
 </style>
 </head>
 <body>
@@ -196,6 +200,7 @@ let staffShuffled=false;
 let currentRequest=null;
 
 function getMonday(d){const dt=new Date(d);const day=dt.getDay();const diff=day===0?-6:1-day;dt.setDate(dt.getDate()+diff);dt.setHours(0,0,0,0);return dt;}
+function toast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(err?'err':'ok');setTimeout(()=>t.className='toast',3000);}
 function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function getWeekDates(mon){const dates=[];for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(d.getDate()+i);dates.push(d);}return dates;}
 function isHolidayOrWeekend(ds,dow){return dow===0||dow===6||HOLIDAYS.hasOwnProperty(ds);}
@@ -213,7 +218,7 @@ function scheduleSyncFromServer(){
       const entryRes=await apiGet({action:'entries',week_start:fmtDate(currentWeekStart)});
       entries=entryRes.data||[];
       render();
-    }catch(e){}
+    }catch(e){toast('データ同期に失敗しました',true)}
   },3000);
 }
 
@@ -228,7 +233,7 @@ async function loadAll(){
     if(!staffShuffled){for(let i=staffList.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[staffList[i],staffList[j]]=[staffList[j],staffList[i]]}staffShuffled=true;}
     entries=entryRes.data||[];
     currentRequest=reqRes.data||null;
-  }catch(e){console.error('Load error:',e);staffList=[];entries=[];currentRequest=null;}
+  }catch(e){console.error('Load error:',e);staffList=[];entries=[];currentRequest=null;toast('データ取得に失敗しました',true);}
   render();
 }
 async function refreshData(){document.getElementById('overviewGrid').innerHTML='<div class="loading">読み込み中...</div>';await loadAll();}
@@ -394,5 +399,6 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 /* 背景クリックで閉じない — 明示的にボタンで閉じる */
 loadAll();
 </script>
+<div class="toast" id="toast"></div>
 </body>
 </html>
