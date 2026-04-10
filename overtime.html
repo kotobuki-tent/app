@@ -343,13 +343,6 @@ function renderAdminView(){
       });
       html+='</div>';
     });
-    html+='<div class="ov-summary"><div class="ov-cell">人数</div>';
-    dates.forEach(d=>{
-      const ds=fmtDate(d);
-      const count=entries.filter(e=>e.date===ds&&e.until_time).length;
-      html+=`<div class="ov-cell">${count>0?count+'人':'—'}</div>`;
-    });
-    html+='</div>';
   }
   html+='</div>';
   document.getElementById('overviewGrid').innerHTML=html;
