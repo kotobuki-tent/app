@@ -1,6 +1,6 @@
 # 寿テント 業務管理アプリ
 
-テント・イベント設営会社の工程管理・在庫管理・時間外管理を一元化するWebアプリ。  
+テント・イベント設営会社の工程管理・在庫管理・時間外管理・車両管理を一元化するWebアプリ。  
 Google スプレッドシートをデータベースとして使い、GitHub Pages でホスティング。
 
 ## URL
@@ -9,6 +9,7 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 - **企画制作部**: https://kotobuki-tent.github.io/app/project.html
 - **在庫管理**: https://kotobuki-tent.github.io/app/inventory.html
 - **時間外ボード**: https://kotobuki-tent.github.io/app/overtime.html
+- **車両管理**: https://kotobuki-tent.github.io/app/vehicle.html
 - **台帳登録**: https://kotobuki-tent.github.io/app/register.html
 
 ## 構成
@@ -19,6 +20,7 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 | `project.html` | 企画制作部（ガントチャート・車両バッティング・管理） |
 | `inventory.html` | 在庫管理（商品台帳・貸出/予約・メンテ・在庫確認） |
 | `overtime.html` | 時間外ボード（残業申告・休日出勤希望・管理） |
+| `vehicle.html` | 車両管理（車両台帳・期限アラート・メンテ履歴） |
 | `register.html` | 台帳登録（スマホ特化・商品追加専用） |
 | Apps Script（外部） | API（スプレッドシートCRUD） |
 
@@ -30,6 +32,7 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 | `projects` | 企画制作部の現場データ |
 | `inventory` | 商品マスタ（カテゴリ・商品名・保有数） |
 | `rentals` | 貸出/予約台帳（ステータス・期間・数量） |
+| `vehicles` | 車両台帳（車検・保険期限・メンテ履歴） |
 | `staff` | スタッフ名簿 |
 | `overtime` | 時間外申告データ |
 | `ot_requests` | 休日出勤希望データ |
@@ -62,6 +65,14 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 
 - 申告タブ：スタッフ別に曜日ごとの時間外希望を登録（平日は時刻、土日祝は午前/午後/終日）
 - 管理タブ：週間の申告状況を一覧表示
+
+### 車両管理（vehicle.html）
+
+- ダッシュボード：車検・自賠責・任意保険・オイル交換の期限アラートを要対応/注意に分類表示
+- 車両一覧：全車両をカード表示、各期限の残日数をバッジで色分け
+- 管理タブ：車両の新規登録・編集・削除・検索・ソート
+- 車両詳細モーダル：全情報＋メンテナンス履歴の閲覧・追加・削除
+- アラート設定：閾値（何日前から表示するか、オイル交換のkm/日数）をカスタマイズ
 
 ## 技術
 
