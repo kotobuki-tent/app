@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>寿テント 業務管理</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231e2130'/><text x='16' y='22' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='16' fill='white'>寿</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f5f6f8;--surface:#fff;--surface2:#f0f1f4;
+  --border:#d8dbe3;--text:#1a1d27;--text-dim:#6b7084;--text-faint:#9498ab;
+}
+html{font-size:15px}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+.logo{font-size:32px;font-weight:900;letter-spacing:.06em;margin-bottom:6px;color:var(--text)}
+.sub{font-size:14px;color:var(--text-dim);margin-bottom:40px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;width:100%;max-width:800px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 22px;text-decoration:none;color:var(--text);transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;align-items:flex-start;gap:16px}
+.card:hover{box-shadow:0 8px 24px rgba(0,0,0,.1);border-color:#aab;transform:translateY(-2px)}
+.card-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#fff;flex-shrink:0}
+.card-body{flex:1}
+.card-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.card-desc{font-size:12px;color:var(--text-dim);line-height:1.5}
+.footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
+</style>
+</head>
+<body>
+<div class="logo">寿テント</div>
+<div class="sub">業務管理システム</div>
+<div class="grid">
+  <a href="index.html" class="card">
+    <div class="card-icon" style="background:#3b6fd8">製</div>
+    <div class="card-body">
+      <div class="card-title">生産部</div>
+      <div class="card-desc">工場ボード・案件管理・出荷済</div>
+    </div>
+  </a>
+  <a href="project.html" class="card">
+    <div class="card-icon" style="background:#3b6fd8">企</div>
+    <div class="card-body">
+      <div class="card-title">企画制作部</div>
+      <div class="card-desc">ガントチャート・車両バッティング・現場管理</div>
+    </div>
+  </a>
+  <a href="inventory.html" class="card">
+    <div class="card-icon" style="background:#6366f1">庫</div>
+    <div class="card-body">
+      <div class="card-title">在庫管理</div>
+      <div class="card-desc">商品台帳・貸出/予約・メンテ・在庫確認</div>
+    </div>
+  </a>
+  <a href="overtime.html" class="card">
+    <div class="card-icon" style="background:#ea580c">時</div>
+    <div class="card-body">
+      <div class="card-title">時間外ボード</div>
+      <div class="card-desc">残業・休日出勤の申告と管理</div>
+    </div>
+  </a>
+  <a href="vehicle.html" class="card">
+    <div class="card-icon" style="background:#0d9488">車</div>
+    <div class="card-body">
+      <div class="card-title">車両管理</div>
+      <div class="card-desc">車検・保険期限アラート・メンテ履歴</div>
+    </div>
+  </a>
+  <a href="register.html" class="card">
+    <div class="card-icon" style="background:#64748b">登</div>
+    <div class="card-body">
+      <div class="card-title">台帳登録</div>
+      <div class="card-desc">スマホ特化・商品追加専用</div>
+    </div>
+  </a>
+</div>
+<div class="footer">Built by iller with Claude — 2026</div>
+</body>
+</html>
