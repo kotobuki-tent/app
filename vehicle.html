@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>車両管理</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230d9488'/><text x='16' y='23' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='20' fill='white'>V</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f5f6f8;--surface:#fff;--surface2:#f0f1f4;--surface3:#e6e8ed;
+  --border:#d8dbe3;--border-light:#c8ccd6;
+  --text:#1a1d27;--text-dim:#6b7084;--text-faint:#9498ab;
+  --accent:#0d9488;--accent-dim:rgba(13,148,136,.1);
+  --red:#d94040;--red-dim:rgba(217,64,64,.1);
+  --orange:#d48a20;--orange-dim:rgba(212,138,32,.1);
+  --green:#2a9d5a;--green-dim:rgba(42,157,90,.1);
+  --purple:#7c5cbf;--purple-dim:rgba(124,92,191,.1);
+  --cyan:#2196a8;--cyan-dim:rgba(33,150,168,.1);
+  --teal:#0d9488;--teal-dim:rgba(13,148,136,.1);
+}
+html{font-size:15px}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* Header */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#1e2130;display:flex;align-items:center;height:56px;padding:0 16px;gap:8px}
+.hdr h1{font-size:17px;font-weight:900;letter-spacing:.04em;margin-right:auto;color:#fff}
+.nav-link{background:none;border:none;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.08)}
+.nav-link.on{color:#fff;background:#3b6de7}
+.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:7px 14px;border-radius:8px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none}
+.hdr-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+
+/* Sub tabs */
+.sub-tabs{display:flex;gap:6px;padding:10px 16px 0;background:var(--bg)}
+.sub-tab{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:7px 14px;border-radius:8px;cursor:pointer}
+.sub-tab:hover{color:var(--text);border-color:var(--accent)}
+.sub-tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+
+.app{padding-top:56px}
+.hidden{display:none!important}
+
+/* Loading */
+.loading{text-align:center;padding:80px 20px;color:var(--text-dim);font-size:14px}
+.loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;margin-bottom:12px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Dashboard */
+.dash{padding:16px}
+.dash-date{font-size:14px;color:var(--text-dim);margin-bottom:14px}
+.alert-section{margin-bottom:24px}
+.alert-section-hd{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.alert-section-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+.alert-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px}
+.alert-card{background:var(--surface);border-radius:10px;padding:14px 16px;border-left:4px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;transition:.15s}
+.alert-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.alert-card.danger{border-left-color:var(--red)}
+.alert-card.warn{border-left-color:var(--orange)}
+.alert-card.info{border-left-color:var(--accent)}
+.alert-card .a-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.alert-card .a-name{font-weight:700;font-size:14px}
+.alert-card .a-plate{font-size:12px;color:var(--text-dim)}
+.alert-card .a-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.alert-card .a-badge.danger{color:var(--red);background:var(--red-dim)}
+.alert-card .a-badge.warn{color:var(--orange);background:var(--orange-dim)}
+.alert-card .a-badge.info{color:var(--accent);background:var(--accent-dim)}
+.alert-card .a-detail{font-size:12px;color:var(--text-dim);margin-top:4px}
+.no-alerts{padding:24px;text-align:center;color:var(--text-faint);font-size:13px;background:var(--surface);border-radius:10px;border:1px solid var(--border)}
+
+/* Summary bar */
+.summary-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.sum-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:100px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.sum-item .n{font-size:26px;font-weight:900;line-height:1.1}
+.sum-item .l{font-size:11px;color:var(--text-dim);margin-top:2px}
+.sum-item.danger .n{color:var(--red)}
+.sum-item.warn .n{color:var(--orange)}
+.sum-item.ok .n{color:var(--green)}
+
+/* Vehicle list */
+.vlist{padding:16px}
+.vlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.v-card{background:var(--surface);border-radius:12px;padding:16px;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;transition:.15s}
+.v-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08);border-color:var(--accent)}
+.v-card .v-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.v-card .v-name{font-weight:700;font-size:15px}
+.v-card .v-status{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px}
+.v-card .v-status.稼働中{color:var(--green);background:var(--green-dim)}
+.v-card .v-status.整備中{color:var(--orange);background:var(--orange-dim)}
+.v-card .v-status.休車{color:var(--red);background:var(--red-dim)}
+.v-card .v-plate{font-size:13px;color:var(--text-dim);margin-bottom:4px}
+.v-card .v-type{font-size:12px;color:var(--text-faint);margin-bottom:8px}
+.v-card .v-dates{display:flex;flex-wrap:wrap;gap:6px}
+.v-card .v-date{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:500}
+.v-card .v-date.ok{color:var(--green);background:var(--green-dim)}
+.v-card .v-date.warn{color:var(--orange);background:var(--orange-dim)}
+.v-card .v-date.danger{color:var(--red);background:var(--red-dim)}
+
+/* Admin table */
+.admin-view{padding:16px}
+.av-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.av-add{background:var(--accent);color:#fff;border:none;padding:9px 18px;border-radius:8px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+.av-add:hover{opacity:.85}
+.av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--surface2);font-weight:600;text-align:left;padding:10px 12px;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:var(--accent)}
+th .arrow{font-size:10px;margin-left:4px;color:var(--text-faint)}
+td{padding:10px 12px;border-top:1px solid var(--surface3);white-space:nowrap}
+tr:hover td{background:rgba(13,148,136,.03)}
+.act-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:2px 6px}
+.act-btn.del{color:var(--red)}
+.act-btn:hover{text-decoration:underline}
+
+/* Modal */
+.mo-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto}
+.mo-bg.show{display:flex}
+.mo{background:var(--surface);border-radius:14px;padding:28px;width:100%;max-width:640px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.mo h2{font-size:18px;font-weight:900;margin-bottom:20px}
+.mo-row{display:flex;gap:14px;margin-bottom:14px}
+.mo-row.full{display:block;margin-bottom:14px}
+.mo-field{flex:1;display:flex;flex-direction:column;gap:5px}
+.mo-field label{font-size:12px;font-weight:600;color:var(--text-dim)}
+.mo-field input,.mo-field select,.mo-field textarea{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.4 'Noto Sans JP',sans-serif;background:var(--surface2);width:100%}
+.mo-field textarea{min-height:70px;resize:vertical}
+.mo-field input:focus,.mo-field select:focus,.mo-field textarea:focus{outline:none;border-color:var(--accent)}
+.mo-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.mo-foot button{padding:10px 22px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:1px solid var(--border)}
+.mo-foot .cancel{background:var(--surface);color:var(--text-dim)}
+.mo-foot .save{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mo-foot .save:hover{opacity:.85}
+
+/* View modal (detail) */
+.view-row{display:flex;padding:8px 0;border-bottom:1px solid var(--surface3);font-size:13px}
+.view-row:last-child{border-bottom:none}
+.view-row .vr-label{width:120px;flex-shrink:0;font-weight:600;color:var(--text-dim)}
+.view-row .vr-value{flex:1;word-break:break-all}
+
+/* Maint log */
+.maint-section{margin-top:20px;border-top:2px solid var(--surface3);padding-top:16px}
+.maint-section h3{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.maint-section h3 button{font-size:12px;background:var(--accent);color:#fff;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-weight:600}
+.maint-list{max-height:300px;overflow-y:auto}
+.maint-item{display:flex;align-items:center;gap:12px;padding:8px 10px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-size:12px}
+.maint-item .m-date{font-weight:600;min-width:90px;color:var(--text-dim)}
+.maint-item .m-type{font-weight:600;min-width:100px;color:var(--accent)}
+.maint-item .m-km{min-width:80px;color:var(--text-dim)}
+.maint-item .m-note{flex:1;color:var(--text-dim)}
+.maint-item .m-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:2px 6px}
+.maint-empty{font-size:12px;color:var(--text-faint);padding:12px 0}
+
+/* Maint add row */
+.maint-add{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:10px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.maint-add .ma-field{display:flex;flex-direction:column;gap:3px}
+.maint-add .ma-field label{font-size:10px;font-weight:600;color:var(--text-dim)}
+.maint-add .ma-field input,.maint-add .ma-field select{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font:400 12px/1 'Noto Sans JP',sans-serif}
+.maint-add button{padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font:600 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;height:32px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s}
+.toast.show{opacity:1}
+.toast.err{background:var(--red)}
+
+/* Settings */
+.settings-view{padding:16px;max-width:600px}
+.setting-group{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.setting-group h3{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px}
+.setting-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.setting-row label{font-size:13px;min-width:160px;color:var(--text-dim)}
+.setting-row input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;width:100px;text-align:center}
+.setting-row span{font-size:12px;color:var(--text-faint)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>車両管理</h1>
+  <a href="index.html" class="nav-link">生産部</a>
+  <a href="project.html" class="nav-link">企画制作部</a>
+  <a href="inventory.html" class="nav-link">在庫管理</a>
+  <a href="overtime.html" class="nav-link">時間外</a>
+  <a href="vehicle.html" class="nav-link on">車両管理</a>
+  <button class="hdr-btn" onclick="loadAll()">↻ 更新</button>
+</div>
+
+<div class="app">
+  <div class="sub-tabs" id="vTabs">
+    <button class="sub-tab on" data-view="dash">ダッシュボード</button>
+    <button class="sub-tab" data-view="list">車両一覧</button>
+    <button class="sub-tab" data-view="admin">管理</button>
+    <button class="sub-tab" data-view="settings">アラート設定</button>
+  </div>
+  <div id="loadingEl" class="loading"><div class="spin"></div><div>読み込み中...</div></div>
+  <div id="dashView" class="dash hidden"></div>
+  <div id="listView" class="vlist hidden"></div>
+  <div id="adminView" class="admin-view hidden"></div>
+  <div id="settingsView" class="settings-view hidden"></div>
+</div>
+
+<!-- 車両 登録/編集 モーダル -->
+<div class="mo-bg" id="vMoBg">
+<div class="mo">
+  <h2 id="vMoTitle">車両登録</h2>
+  <input type="hidden" id="vf_id">
+  <div class="mo-row">
+    <div class="mo-field"><label>車両名称 *</label><input id="vf_name" placeholder="例: ハイエース①"></div>
+    <div class="mo-field"><label>ナンバー</label><input id="vf_plate" placeholder="例: 鳥取500あ1234"></div>
+  </div>
+  <div class="mo-row">
+    <div class="mo-field"><label>車種</label><input id="vf_type" placeholder="例: トヨタ ハイエース"></div>
+    <div class="mo-field"><label>用途</label><input id="vf_usage" placeholder="例: 現場搬入"></div>
+  </div>
+  <div class="mo-row">
+    <div class="mo-field"><label>ステータス</label>
+      <select id="vf_status"><option>稼働中</option><option>整備中</option><option>休車</option></select>
+    </div>
+    <div class="mo-field"><label>現在の走行距離 (km)</label><input id="vf_current_km" type="number" placeholder="例: 50000"></div>
+  </div>
+  <div class="mo-row">
+    <div class="mo-field"><label>車検満了日</label><input id="vf_shaken" type="date"></div>
+    <div class="mo-field"><label>自賠責満了日</label><input id="vf_jibaiseki" type="date"></div>
+  </div>
+  <div class="mo-row">
+    <div class="mo-field"><label>任意保険満了日</label><input id="vf_hoken" type="date"></div>
+    <div class="mo-field"><label></label><div style="padding:10px;font-size:11px;color:var(--text-faint)"></div></div>
+  </div>
+  <div class="mo-row">
+    <div class="mo-field"><label>最終オイル交換日</label><input id="vf_oil_last" type="date"></div>
+    <div class="mo-field"><label>オイル交換時走行距離 (km)</label><input id="vf_oil_km" type="number" placeholder=""></div>
+  </div>
+  <div class="mo-row">
+    <div class="mo-field"><label>最終タイヤ交換日</label><input id="vf_tire_last" type="date"></div>
+    <div class="mo-field"><label></label><div></div></div>
+  </div>
+  <div class="mo-row full">
+    <div class="mo-field"><label>備考</label><textarea id="vf_notes" rows="2"></textarea></div>
+  </div>
+  <div class="mo-foot">
+    <button class="cancel" onclick="closeVMo()">キャンセル</button>
+    <button class="save" onclick="saveVehicle()">保存</button>
+  </div>
+</div>
+</div>
+
+<!-- 車両詳細 モーダル -->
+<div class="mo-bg" id="vViewBg">
+<div class="mo" style="max-width:700px">
+  <h2 id="vViewTitle">車両詳細</h2>
+  <div id="vViewContent"></div>
+  <div class="maint-section">
+    <h3>メンテナンス履歴 <button onclick="toggleMaintAdd()">+ 追加</button></h3>
+    <div id="maintAddArea" class="maint-add hidden">
+      <div class="ma-field"><label>日付</label><input id="ma_date" type="date"></div>
+      <div class="ma-field"><label>種別</label>
+        <select id="ma_type">
+          <option>オイル交換</option><option>タイヤ交換</option><option>車検</option>
+          <option>定期点検</option><option>修理</option><option>バッテリー交換</option>
+          <option>ブレーキ</option><option>その他</option>
+        </select>
+      </div>
+      <div class="ma-field"><label>走行距離</label><input id="ma_km" type="number" placeholder="km" style="width:90px"></div>
+      <div class="ma-field"><label>メモ</label><input id="ma_note" placeholder="内容" style="width:160px"></div>
+      <button onclick="addMaintEntry()">登録</button>
+    </div>
+    <div id="maintList" class="maint-list"></div>
+  </div>
+  <div class="mo-foot" style="margin-top:16px">
+    <button class="cancel" onclick="closeVView()">閉じる</button>
+    <button class="save" onclick="editFromView()" style="background:var(--accent)">編集</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+const $=id=>document.getElementById(id);
+const esc=s=>s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const today=new Date();
+const dow=['日','月','火','水','木','金','土'];
+
+let vehicleData=[];
+let curView='dash';
+let adminSort={col:null,asc:true};
+let currentViewId=null;
+
+// アラート閾値（日数）— ローカルストレージに保存
+const DEFAULTS={shaken:60,jibaiseki:60,hoken:60,oil_km:5000,oil_days:180};
+function getThresholds(){
+  try{const s=localStorage.getItem('vehicle_thresholds');return s?{...DEFAULTS,...JSON.parse(s)}:DEFAULTS}catch(e){return DEFAULTS}
+}
+function saveThresholds(t){localStorage.setItem('vehicle_thresholds',JSON.stringify(t))}
+
+function dateJP(d){if(!d)return'';const dd=new Date(d+'T00:00:00');if(isNaN(dd))return d;return`${dd.getMonth()+1}/${dd.getDate()}（${dow[dd.getDay()]}）`}
+function diffDays(dateStr){if(!dateStr)return null;const d=new Date(dateStr+'T00:00:00');if(isNaN(d))return null;return Math.ceil((d-today)/(1000*60*60*24))}
+function fmtKm(v){if(v==null||v==='')return'';return Number(v).toLocaleString()+' km'}
+
+function toast(msg,isErr){const el=$('toastEl');el.textContent=msg;el.className='toast'+(isErr?' err':'');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
+
+function fireAndForget(body){
+  body.dept='vehicle';
+  fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)});
+}
+
+// ===== データ読み込み =====
+async function loadAll(){
+  $('loadingEl').classList.remove('hidden');
+  try{
+    const res=await fetch(API+'?dept=vehicle');
+    const json=await res.json();
+    vehicleData=json.vehicles||[];
+    // maintenance_logをパース
+    vehicleData.forEach(v=>{
+      if(typeof v.maintenance_log==='string'&&v.maintenance_log){
+        try{v._maint=JSON.parse(v.maintenance_log)}catch(e){v._maint=[]}
+      }else if(Array.isArray(v.maintenance_log)){v._maint=v.maintenance_log}
+      else{v._maint=[]}
+    });
+  }catch(e){
+    console.error('Load error:',e);
+    toast('データの読み込みに失敗しました',true);
+  }
+  $('loadingEl').classList.add('hidden');
+  render();
+}
+
+// ===== 描画 =====
+function render(){
+  ['dashView','listView','adminView','settingsView'].forEach(id=>$(id).classList.add('hidden'));
+  if(curView==='dash'){$('dashView').classList.remove('hidden');renderDash()}
+  else if(curView==='list'){$('listView').classList.remove('hidden');renderList()}
+  else if(curView==='admin'){$('adminView').classList.remove('hidden');renderAdmin()}
+  else if(curView==='settings'){$('settingsView').classList.remove('hidden');renderSettings()}
+}
+
+// ===== アラート計算 =====
+function getAlerts(){
+  const th=getThresholds();
+  const alerts=[];
+  vehicleData.forEach(v=>{
+    if(v.status==='休車')return;
+    // 車検
+    const shakenDiff=diffDays(v.shaken_date);
+    if(shakenDiff!==null){
+      if(shakenDiff<0)alerts.push({vehicle:v,type:'車検',msg:'車検が'+Math.abs(shakenDiff)+'日超過しています',level:'danger',diff:shakenDiff});
+      else if(shakenDiff<=th.shaken)alerts.push({vehicle:v,type:'車検',msg:'車検まであと'+shakenDiff+'日（'+dateJP(v.shaken_date)+'）',level:shakenDiff<=14?'danger':'warn',diff:shakenDiff});
+    }
+    // 自賠責
+    const jiDiff=diffDays(v.jibaiseki_date);
+    if(jiDiff!==null){
+      if(jiDiff<0)alerts.push({vehicle:v,type:'自賠責',msg:'自賠責が'+Math.abs(jiDiff)+'日超過しています',level:'danger',diff:jiDiff});
+      else if(jiDiff<=th.jibaiseki)alerts.push({vehicle:v,type:'自賠責',msg:'自賠責まであと'+jiDiff+'日（'+dateJP(v.jibaiseki_date)+'）',level:jiDiff<=14?'danger':'warn',diff:jiDiff});
+    }
+    // 任意保険
+    const hokenDiff=diffDays(v.hoken_date);
+    if(hokenDiff!==null){
+      if(hokenDiff<0)alerts.push({vehicle:v,type:'任意保険',msg:'任意保険が'+Math.abs(hokenDiff)+'日超過しています',level:'danger',diff:hokenDiff});
+      else if(hokenDiff<=th.hoken)alerts.push({vehicle:v,type:'任意保険',msg:'任意保険まであと'+hokenDiff+'日（'+dateJP(v.hoken_date)+'）',level:hokenDiff<=14?'danger':'warn',diff:hokenDiff});
+    }
+    // オイル交換（距離ベース）
+    if(v.oil_km&&v.current_km){
+      const kmSince=Number(v.current_km)-Number(v.oil_km);
+      if(kmSince>=th.oil_km)alerts.push({vehicle:v,type:'オイル交換',msg:'前回交換から'+kmSince.toLocaleString()+'km走行（'+th.oil_km.toLocaleString()+'km超過）',level:kmSince>=th.oil_km*1.2?'danger':'warn',diff:0});
+    }
+    // オイル交換（日数ベース）
+    const oilDaysDiff=diffDays(v.oil_last);
+    if(oilDaysDiff!==null){
+      const elapsed=-oilDaysDiff;
+      if(elapsed>=th.oil_days)alerts.push({vehicle:v,type:'オイル交換(期間)',msg:'前回交換から'+elapsed+'日経過（'+th.oil_days+'日超過）',level:elapsed>=th.oil_days*1.2?'danger':'warn',diff:0});
+    }
+  });
+  alerts.sort((a,b)=>a.diff-b.diff);
+  return alerts;
+}
+
+// ===== ダッシュボード =====
+function renderDash(){
+  const el=$('dashView');
+  const alerts=getAlerts();
+  const dangerCount=alerts.filter(a=>a.level==='danger').length;
+  const warnCount=alerts.filter(a=>a.level==='warn').length;
+  const activeCount=vehicleData.filter(v=>v.status==='稼働中').length;
+
+  let h=`<div class="dash-date">${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）</div>`;
+  h+=`<div class="summary-bar">`;
+  h+=`<div class="sum-item"><div class="n">${vehicleData.length}</div><div class="l">全車両</div></div>`;
+  h+=`<div class="sum-item ok"><div class="n">${activeCount}</div><div class="l">稼働中</div></div>`;
+  h+=`<div class="sum-item danger"><div class="n">${dangerCount}</div><div class="l">要対応</div></div>`;
+  h+=`<div class="sum-item warn"><div class="n">${warnCount}</div><div class="l">注意</div></div>`;
+  h+=`</div>`;
+
+  if(!alerts.length){
+    h+=`<div class="no-alerts">期限切れ・期限間近の項目はありません</div>`;
+  }else{
+    const dangerAlerts=alerts.filter(a=>a.level==='danger');
+    const warnAlerts=alerts.filter(a=>a.level==='warn');
+    const infoAlerts=alerts.filter(a=>a.level==='info');
+    if(dangerAlerts.length){
+      h+=`<div class="alert-section"><div class="alert-section-hd">要対応　${dangerAlerts.length}件</div><div class="alert-cards">`;
+      dangerAlerts.forEach(a=>{h+=alertCardHTML(a)});
+      h+=`</div></div>`;
+    }
+    if(warnAlerts.length){
+      h+=`<div class="alert-section"><div class="alert-section-hd">注意　${warnAlerts.length}件</div><div class="alert-cards">`;
+      warnAlerts.forEach(a=>{h+=alertCardHTML(a)});
+      h+=`</div></div>`;
+    }
+    if(infoAlerts.length){
+      h+=`<div class="alert-section"><div class="alert-section-hd">情報　${infoAlerts.length}件</div><div class="alert-cards">`;
+      infoAlerts.forEach(a=>{h+=alertCardHTML(a)});
+      h+=`</div></div>`;
+    }
+  }
+  el.innerHTML=h;
+  el.querySelectorAll('.alert-card').forEach(c=>{c.onclick=()=>viewVehicle(c.dataset.id)});
+}
+
+function alertCardHTML(a){
+  return`<div class="alert-card ${a.level}" data-id="${a.vehicle.id}">
+    <div class="a-top">
+      <div><span class="a-name">${esc(a.vehicle.name)}</span> <span class="a-plate">${esc(a.vehicle.plate||'')}</span></div>
+      <span class="a-badge ${a.level}">${esc(a.type)}</span>
+    </div>
+    <div class="a-detail">${esc(a.msg)}</div>
+  </div>`;
+}
+
+// ===== 車両一覧 =====
+function renderList(){
+  const el=$('listView');
+  const th=getThresholds();
+  if(!vehicleData.length){el.innerHTML='<div class="no-alerts">車両が登録されていません</div>';return}
+  let h='<div class="vlist-grid">';
+  vehicleData.forEach(v=>{
+    const shakenDiff=diffDays(v.shaken_date);
+    const jiDiff=diffDays(v.jibaiseki_date);
+    const hokenDiff=diffDays(v.hoken_date);
+    const dateLevel=(diff,thDays)=>{if(diff===null)return'';if(diff<0)return'danger';if(diff<=14)return'danger';if(diff<=thDays)return'warn';return'ok'};
+    h+=`<div class="v-card" data-id="${v.id}">
+      <div class="v-top"><span class="v-name">${esc(v.name)}</span><span class="v-status ${esc(v.status||'稼働中')}">${esc(v.status||'稼働中')}</span></div>
+      <div class="v-plate">${esc(v.plate||'')}</div>
+      <div class="v-type">${esc(v.type||'')} ${v.usage?'／'+esc(v.usage):''}</div>
+      <div class="v-dates">`;
+    if(v.shaken_date){const l=dateLevel(shakenDiff,th.shaken);h+=`<span class="v-date ${l}">車検 ${dateJP(v.shaken_date)}${shakenDiff!==null?' ('+shakenDiff+'日)':''}</span>`}
+    if(v.jibaiseki_date){const l=dateLevel(jiDiff,th.jibaiseki);h+=`<span class="v-date ${l}">自賠責 ${dateJP(v.jibaiseki_date)}</span>`}
+    if(v.hoken_date){const l=dateLevel(hokenDiff,th.hoken);h+=`<span class="v-date ${l}">保険 ${dateJP(v.hoken_date)}</span>`}
+    h+=`</div></div>`;
+  });
+  h+='</div>';
+  el.innerHTML=h;
+  el.querySelectorAll('.v-card').forEach(c=>{c.onclick=()=>viewVehicle(c.dataset.id)});
+}
+
+// ===== 管理テーブル =====
+function renderAdmin(){
+  const el=$('adminView');
+  let items=[...vehicleData];
+  if(adminSort.col)items.sort((a,b)=>{let va=String(a[adminSort.col]||'').toLowerCase(),vb=String(b[adminSort.col]||'').toLowerCase();return va<vb?(adminSort.asc?-1:1):va>vb?(adminSort.asc?1:-1):0});
+  const cols=[{key:'name',label:'車両名称'},{key:'plate',label:'ナンバー'},{key:'type',label:'車種'},{key:'usage',label:'用途'},{key:'status',label:'ステータス'},{key:'shaken_date',label:'車検満了'},{key:'jibaiseki_date',label:'自賠責満了'},{key:'hoken_date',label:'任意保険満了'},{key:'current_km',label:'走行距離'}];
+  let h=`<div class="av-top"><button class="av-add" onclick="openVMo()">+ 車両登録</button><input class="av-search" placeholder="検索..." oninput="adminSearch(this.value)"></div>`;
+  h+='<div class="tbl-wrap"><table><thead><tr>';
+  cols.forEach(c=>{const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
+  h+='<th>操作</th></tr></thead><tbody>';
+  items.forEach(d=>{
+    h+='<tr>';
+    cols.forEach(c=>{
+      let v=d[c.key]||'';
+      if(c.key.endsWith('_date')&&v)v=dateJP(v);
+      if(c.key==='current_km'&&v)v=fmtKm(v);
+      h+=`<td>${esc(v)}</td>`;
+    });
+    h+=`<td><button class="act-btn" onclick="editVehicle('${d.id}')">編集</button> <button class="act-btn del" onclick="delVehicle('${d.id}')">削除</button></td></tr>`;
+  });
+  h+='</tbody></table></div>';
+  el.innerHTML=h;
+  el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(adminSort.col===c)adminSort.asc=!adminSort.asc;else{adminSort.col=c;adminSort.asc=true}render()}});
+}
+function adminSearch(q){$('adminView').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'})}
+
+// ===== 車両詳細 =====
+function viewVehicle(id){
+  const v=vehicleData.find(x=>String(x.id)===String(id));if(!v)return;
+  currentViewId=id;
+  const th=getThresholds();
+  $('vViewTitle').textContent=v.name+(v.plate?' — '+v.plate:'');
+  const vr=(l,val)=>`<div class="view-row"><div class="vr-label">${l}</div><div class="vr-value">${val||'—'}</div></div>`;
+  let h='';
+  h+=vr('車両名称',esc(v.name));
+  h+=vr('ナンバー',esc(v.plate));
+  h+=vr('車種',esc(v.type));
+  h+=vr('用途',esc(v.usage));
+  h+=vr('ステータス',`<span class="v-status ${esc(v.status||'稼働中')}" style="font-size:12px">${esc(v.status||'稼働中')}</span>`);
+  h+=vr('走行距離',fmtKm(v.current_km));
+  // 期限系（残日数つき）
+  const dateFmt=(label,dateStr,thDays)=>{
+    const diff=diffDays(dateStr);
+    let extra='';
+    if(diff!==null){
+      if(diff<0)extra=` <span class="a-badge danger" style="font-size:11px">${Math.abs(diff)}日超過</span>`;
+      else if(diff<=14)extra=` <span class="a-badge danger" style="font-size:11px">あと${diff}日</span>`;
+      else if(diff<=thDays)extra=` <span class="a-badge warn" style="font-size:11px">あと${diff}日</span>`;
+      else extra=` <span style="font-size:11px;color:var(--green)">あと${diff}日</span>`;
+    }
+    return vr(label,(dateStr?dateJP(dateStr):'')+extra);
+  };
+  h+=dateFmt('車検満了',v.shaken_date,th.shaken);
+  h+=dateFmt('自賠責満了',v.jibaiseki_date,th.jibaiseki);
+  h+=dateFmt('任意保険満了',v.hoken_date,th.hoken);
+  h+=vr('最終オイル交換',v.oil_last?dateJP(v.oil_last)+(v.oil_km?' / '+fmtKm(v.oil_km):''):'');
+  h+=vr('最終タイヤ交換',v.tire_last?dateJP(v.tire_last):'');
+  if(v.notes)h+=vr('備考',esc(v.notes));
+  $('vViewContent').innerHTML=h;
+
+  // メンテ履歴
+  renderMaintList(v);
+  $('maintAddArea').classList.add('hidden');
+  $('ma_date').value=new Date().toISOString().slice(0,10);
+  $('ma_km').value=v.current_km||'';
+  $('vViewBg').classList.add('show');
+}
+
+function renderMaintList(v){
+  const el=$('maintList');
+  if(!v._maint||!v._maint.length){el.innerHTML='<div class="maint-empty">メンテナンス履歴はありません</div>';return}
+  const sorted=[...v._maint].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  el.innerHTML=sorted.map((m,i)=>`<div class="maint-item">
+    <span class="m-date">${dateJP(m.date)}</span>
+    <span class="m-type">${esc(m.type)}</span>
+    <span class="m-km">${m.km?fmtKm(m.km):''}</span>
+    <span class="m-note">${esc(m.note||'')}</span>
+    <button class="m-del" onclick="delMaintEntry(${i})">削除</button>
+  </div>`).join('');
+}
+
+function toggleMaintAdd(){$('maintAddArea').classList.toggle('hidden')}
+
+function addMaintEntry(){
+  const v=vehicleData.find(x=>String(x.id)===String(currentViewId));if(!v)return;
+  const date=$('ma_date').value;
+  const type=$('ma_type').value;
+  const km=$('ma_km').value;
+  const note=$('ma_note').value.trim();
+  if(!date){toast('日付を入力してください',true);return}
+  const entry={date,type,km:km?Number(km):null,note};
+  v._maint.push(entry);
+  // オイル/タイヤ交換の場合、車両データも更新
+  if(type==='オイル交換'){v.oil_last=date;if(km)v.oil_km=km}
+  if(type==='タイヤ交換'){v.tire_last=date}
+  if(km)v.current_km=km;
+  saveVehicleToAPI(v);
+  renderMaintList(v);
+  viewVehicle(currentViewId);
+  $('ma_note').value='';
+  toast('メンテ履歴を追加しました');
+}
+
+function delMaintEntry(idx){
+  if(!confirm('このメンテ履歴を削除しますか？'))return;
+  const v=vehicleData.find(x=>String(x.id)===String(currentViewId));if(!v)return;
+  v._maint.splice(idx,1);
+  saveVehicleToAPI(v);
+  renderMaintList(v);
+  toast('削除しました');
+}
+
+function editFromView(){
+  closeVView();
+  editVehicle(currentViewId);
+}
+function closeVView(){$('vViewBg').classList.remove('show');currentViewId=null}
+
+// ===== モーダル =====
+function openVMo(d){
+  $('vMoTitle').textContent=d?'車両編集':'車両登録';
+  $('vf_id').value=d?d.id:'';
+  $('vf_name').value=d?d.name:'';
+  $('vf_plate').value=d?d.plate||'':'';
+  $('vf_type').value=d?d.type||'':'';
+  $('vf_usage').value=d?d.usage||'':'';
+  $('vf_status').value=d?d.status||'稼働中':'稼働中';
+  $('vf_current_km').value=d?d.current_km||'':'';
+  $('vf_shaken').value=d?d.shaken_date||'':'';
+  $('vf_jibaiseki').value=d?d.jibaiseki_date||'':'';
+  $('vf_hoken').value=d?d.hoken_date||'':'';
+  $('vf_oil_last').value=d?d.oil_last||'':'';
+  $('vf_oil_km').value=d?d.oil_km||'':'';
+  $('vf_tire_last').value=d?d.tire_last||'':'';
+  $('vf_notes').value=d?d.notes||'':'';
+  $('vMoBg').classList.add('show');
+}
+function closeVMo(){$('vMoBg').classList.remove('show')}
+function editVehicle(id){const d=vehicleData.find(x=>String(x.id)===String(id));if(d)openVMo(d)}
+
+// ===== 保存 =====
+function saveVehicle(){
+  const name=$('vf_name').value.trim();
+  if(!name){toast('車両名称を入力してください',true);return}
+  const editId=$('vf_id').value;
+  const body={
+    action:'save',id:editId||undefined,
+    name,plate:$('vf_plate').value.trim(),type:$('vf_type').value.trim(),
+    usage:$('vf_usage').value.trim(),status:$('vf_status').value,
+    current_km:$('vf_current_km').value,
+    shaken_date:$('vf_shaken').value,jibaiseki_date:$('vf_jibaiseki').value,
+    hoken_date:$('vf_hoken').value,oil_last:$('vf_oil_last').value,
+    oil_km:$('vf_oil_km').value,tire_last:$('vf_tire_last').value,
+    notes:$('vf_notes').value.trim()
+  };
+  if(editId){
+    const idx=vehicleData.findIndex(x=>String(x.id)===String(editId));
+    if(idx!==-1){
+      body.maintenance_log=JSON.stringify(vehicleData[idx]._maint||[]);
+      vehicleData[idx]={...vehicleData[idx],...body,_maint:vehicleData[idx]._maint};
+    }
+  }else{
+    body.id='tmp_'+Date.now();
+    body.maintenance_log='[]';
+    body._maint=[];
+    vehicleData.push(body);
+  }
+  fireAndForget(body);
+  toast('保存しました');
+  closeVMo();
+  render();
+}
+
+function saveVehicleToAPI(v){
+  const body={action:'save',id:v.id,name:v.name,plate:v.plate,type:v.type,usage:v.usage,
+    status:v.status,current_km:v.current_km,shaken_date:v.shaken_date,
+    jibaiseki_date:v.jibaiseki_date,hoken_date:v.hoken_date,
+    oil_last:v.oil_last,oil_km:v.oil_km,tire_last:v.tire_last,
+    notes:v.notes,maintenance_log:JSON.stringify(v._maint||[])};
+  fireAndForget(body);
+}
+
+// ===== 削除 =====
+function delVehicle(id){
+  if(!confirm('この車両を削除しますか？'))return;
+  vehicleData=vehicleData.filter(x=>String(x.id)!==String(id));
+  fireAndForget({action:'delete',id});
+  toast('削除しました');
+  render();
+}
+
+// ===== アラート設定 =====
+function renderSettings(){
+  const el=$('settingsView');
+  const th=getThresholds();
+  el.innerHTML=`
+    <div class="setting-group">
+      <h3>期限アラート閾値（何日前から表示するか）</h3>
+      <div class="setting-row"><label>車検</label><input id="th_shaken" type="number" value="${th.shaken}"><span>日前</span></div>
+      <div class="setting-row"><label>自賠責</label><input id="th_jibaiseki" type="number" value="${th.jibaiseki}"><span>日前</span></div>
+      <div class="setting-row"><label>任意保険</label><input id="th_hoken" type="number" value="${th.hoken}"><span>日前</span></div>
+    </div>
+    <div class="setting-group">
+      <h3>オイル交換アラート</h3>
+      <div class="setting-row"><label>走行距離</label><input id="th_oil_km" type="number" value="${th.oil_km}"><span>km ごと</span></div>
+      <div class="setting-row"><label>経過日数</label><input id="th_oil_days" type="number" value="${th.oil_days}"><span>日 ごと</span></div>
+    </div>
+    <div style="margin-top:16px"><button class="av-add" onclick="saveSettings()">設定を保存</button></div>`;
+}
+
+function saveSettings(){
+  const th={
+    shaken:Number($('th_shaken').value)||60,
+    jibaiseki:Number($('th_jibaiseki').value)||60,
+    hoken:Number($('th_hoken').value)||60,
+    oil_km:Number($('th_oil_km').value)||5000,
+    oil_days:Number($('th_oil_days').value)||180
+  };
+  saveThresholds(th);
+  toast('設定を保存しました');
+}
+
+// ===== タブ切替 =====
+$('vTabs').addEventListener('click',e=>{
+  const t=e.target.closest('.sub-tab');if(!t)return;
+  $('vTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');
+  curView=t.dataset.view;
+  render();
+});
+
+loadAll();
+setInterval(()=>{if(curView==='dash')loadAll()},3*60*1000);
+</script>
+</body>
+</html>
