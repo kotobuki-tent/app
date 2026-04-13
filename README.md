@@ -5,6 +5,7 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 
 ## URL
 
+- **ポータル**: https://kotobuki-tent.github.io/app/portal.html
 - **生産部**: https://kotobuki-tent.github.io/app/
 - **企画制作部**: https://kotobuki-tent.github.io/app/project.html
 - **在庫管理**: https://kotobuki-tent.github.io/app/inventory.html
@@ -16,6 +17,7 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 
 | ファイル | 役割 |
 |---|---|
+| `portal.html` | ポータル（全アプリへのリンク） |
 | `index.html` | 生産部（工場ボード・出荷済・管理） |
 | `project.html` | 企画制作部（ガントチャート・車両バッティング・管理） |
 | `inventory.html` | 在庫管理（商品台帳・貸出/予約・メンテ・在庫確認） |
