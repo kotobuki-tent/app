@@ -224,7 +224,15 @@ function renderFactory(){
 // ===== 管理テーブル =====
 function renderProdAdmin(){
   const el=$('prodAdmin');let items=prodData.filter(d=>d.status!=='出荷済');
-  if(prodSort.col)items.sort((a,b)=>{let va=String(a[prodSort.col]||'').toLowerCase(),vb=String(b[prodSort.col]||'').toLowerCase();return va<vb?(prodSort.asc?-1:1):va>vb?(prodSort.asc?1:-1):0});
+  const STATUS_ORDER={'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4};
+  if(prodSort.col)items.sort((a,b)=>{
+    let va=a[prodSort.col],vb=b[prodSort.col];
+    const ea=va==null||va==='',eb=vb==null||vb==='';
+    if(ea&&eb)return 0;if(ea)return 1;if(eb)return-1;
+    if(prodSort.col==='deadline'){const da=parseD(va),db=parseD(vb);if(da&&db)return prodSort.asc?da-db:db-da;if(!da)return 1;if(!db)return-1}
+    if(prodSort.col==='status'){const sa=STATUS_ORDER[va]??99,sb=STATUS_ORDER[vb]??99;return prodSort.asc?sa-sb:sb-sa}
+    va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(prodSort.asc?-1:1):va>vb?(prodSort.asc?1:-1):0
+  });
   const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'section',label:'作業場所'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
   let h=`<div class="av-top"><button class="av-add" onclick="openProdMo()">+ 新規登録</button><input class="av-search" placeholder="検索..." oninput="prodSearch(this.value)"></div>`;
   h+='<div class="tbl-wrap"><table><thead><tr>';cols.forEach(c=>{const a=prodSort.col===c.key?(prodSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});h+='<th>操作</th></tr></thead><tbody>';
