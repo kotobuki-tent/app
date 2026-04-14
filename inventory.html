@@ -220,6 +220,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
         <label>終了日</label>
         <input type="date" id="avail_end" onchange="renderAvail()">
         <select id="avail_cat" onchange="renderAvail()"><option value="">全カテゴリ</option></select>
+        <input placeholder="検索..." oninput="availFilter(this.value)" style="padding:7px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#333;font:400 13px/1 'Noto Sans JP',sans-serif;width:160px">
       </div>
       <div id="avail_body"></div>
     </div>
@@ -580,6 +581,7 @@ function deleteRental(id){
 }
 
 // ==================== 在庫確認 ====================
+function availFilter(q){q=q.toLowerCase();document.querySelectorAll('#avail_body .avail-bar').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'});document.querySelectorAll('#avail_body .avail-cat-hd').forEach(h=>{const bars=[];let el=h.nextElementSibling;while(el&&el.classList.contains('avail-bar')){bars.push(el);el=el.nextElementSibling}h.style.display=bars.some(b=>b.style.display!=='none')?'':'none'})}
 function renderAvail(){
   const startStr=$('avail_start').value;const endStr=$('avail_end').value;
   const cat=$('avail_cat').value;const body=$('avail_body');
