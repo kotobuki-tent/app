@@ -285,10 +285,13 @@ function renderProdAdmin(){
 }
 
 // ===== 出荷済アーカイブ =====
+let archiveSearch='';
 function renderArchive(){
   const el=$('prodArchive');const ARCHIVE_ST=['出荷済'];
   let items=prodData.filter(d=>ARCHIVE_ST.includes(d.status));
-  let h='<div style="padding:10px 0 14px;font-size:13px;color:var(--text-dim)">出荷済の案件（'+items.length+'件）</div>';
+  const total=items.length;
+  if(archiveSearch){const q=archiveSearch.toLowerCase();items=items.filter(d=>[d.project,d.client,d.person,d.our_person,d.order_no].some(v=>(v||'').toLowerCase().includes(q)))}
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px"><span style="font-size:13px;color:var(--text-dim)">出荷済の案件（'+total+'件）</span><input class="av-search" placeholder="検索..." value="'+esc(archiveSearch)+'" oninput="archiveSearch=this.value;render()"></div>';
   h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>担当者</th><th>受注番号</th><th>得意先</th><th>窓口</th><th>納期</th><th>ステータス</th><th>操作</th></tr></thead><tbody>';
   if(!items.length)h+='<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-faint)">該当する案件はありません</td></tr>';
   items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="editProd(\''+d.id+'\')">編集</button></td></tr>'});

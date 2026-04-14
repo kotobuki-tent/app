@@ -317,10 +317,13 @@ function renderGantt(){
 }
 
 // ===== 完了一覧 =====
+let projDoneSearch='';
 function renderProjDone(){
   const el=$('projDoneView');
   let items=projData.filter(d=>d.status==='完了');
-  let h='<div style="padding:10px 0 14px;font-size:13px;color:var(--text-dim)">完了した現場（'+items.length+'件）</div>';
+  const total=items.length;
+  if(projDoneSearch){const q=projDoneSearch.toLowerCase();items=items.filter(d=>[d.project,d.client,d.person,d.our_person,d.order_no,d.venue].some(v=>(v||'').toLowerCase().includes(q)))}
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px"><span style="font-size:13px;color:var(--text-dim)">完了した現場（'+total+'件）</span><input class="av-search" placeholder="検索..." value="'+esc(projDoneSearch)+'" oninput="projDoneSearch=this.value;render()"></div>';
   h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>担当者</th><th>受注番号</th><th>得意先</th><th>窓口</th><th>会場</th><th>本番</th><th>ステータス</th><th>操作</th></tr></thead><tbody>';
   if(!items.length)h+='<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-faint)">該当する現場はありません</td></tr>';
   items.forEach(d=>{const ev=d.date_event?String(d.date_event).split(',').map(s=>{const dd=parseD(s.trim());return dd?((dd.getMonth()+1)+'/'+dd.getDate()):s}).join(', '):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+esc(d.venue||'')+'</td><td>'+ev+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="editProj(\''+d.id+'\')">編集</button></td></tr>'});
