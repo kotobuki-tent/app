@@ -366,7 +366,7 @@ function unlinkFile(fileId){
 // ===== モーダル操作 =====
 function openProdMo(d){$('prodMoTitle').textContent=d?'案件編集':'案件登録';$('pf_id').value=d?d.id:'';$('pf_project').value=d?d.project:'';$('pf_our_person').value=d?d.our_person||'':'';$('pf_estimate_no').value=d?d.estimate_no||'':'';$('pf_order_no').value=d?d.order_no||'':'';$('pf_client').value=d?d.client||'':'';$('pf_person').value=d?d.person||'':'';$('pf_section').value=d?d.section||'未定':'未定';$('pf_status').value=d?d.status||'受注':'受注';$('pf_subcontractor').value=d?d.subcontractor||'':'';$('pf_start_date').value=d?d.start_date||'':'';$('pf_deadline').value=d?d.deadline||'':'';$('pf_notes').value=d?d.notes||'':'';$('prodMoBg').classList.add('show')}
 function closeProdMo(){$('prodMoBg').classList.remove('show')}
-function editProd(id){const d=prodData.find(x=>x.id===id);if(d)openProdMo(d)}
+function editProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(d)openProdMo(d)}
 
 // ===== 保存（楽観的更新） =====
 function saveProd(){
@@ -375,7 +375,7 @@ function saveProd(){
   const editId=$('pf_id').value;
   const body={dept:'production',action:'save',id:editId||undefined,project:name,our_person:$('pf_our_person').value.trim(),estimate_no:$('pf_estimate_no').value.trim(),order_no:$('pf_order_no').value.trim(),client:$('pf_client').value.trim(),person:$('pf_person').value.trim(),section:$('pf_section').value,status:$('pf_status').value,subcontractor:$('pf_subcontractor').value.trim(),start_date:$('pf_start_date').value,deadline:$('pf_deadline').value,notes:$('pf_notes').value.trim()};
   if(editId){
-    const idx=prodData.findIndex(x=>x.id===editId);
+    const idx=prodData.findIndex(x=>String(x.id)===String(editId));
     if(idx!==-1)prodData[idx]={...prodData[idx],...body};
   }else{
     body.id='tmp_'+Date.now();
@@ -390,7 +390,7 @@ function saveProd(){
 // ===== 削除（楽観的更新） =====
 function delProd(id){
   if(!confirm('この案件を削除しますか？'))return;
-  prodData=prodData.filter(x=>x.id!==id);
+  prodData=prodData.filter(x=>String(x.id)!==String(id));
   fireAndForget({dept:'production',action:'delete',id:id});
   toast('削除しました');
   render();
