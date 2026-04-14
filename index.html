@@ -125,6 +125,12 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .fp-item .fp-name{flex:1;font-size:13px;font-weight:500}
 .fp-item .fp-meta{font-size:11px;color:var(--text-faint)}
 .files-empty{font-size:12px;color:var(--text-faint);padding:8px 0}
+.st-change{margin-top:18px;padding-top:16px;border-top:2px solid var(--surface3)}
+.st-change-label{font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:10px}
+.st-change-btns{display:flex;gap:8px;flex-wrap:wrap}
+.st-btn{padding:10px 20px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
+.st-btn:hover{border-color:var(--accent);color:var(--accent)}
+.st-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);cursor:default}
 </style>
 </head>
 <body>
@@ -299,7 +305,13 @@ function prodSearch(q){$('prodAdmin').querySelectorAll('tbody tr').forEach(r=>{r
 // ===== 案件詳細 =====
 let currentViewId=null;
 let driveFiles=null;
-function viewProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;currentViewId=id;const dl=parseD(d.deadline);const diff=dl?diffDays(dl,today):null;const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?' ⚠ '+Math.abs(diff)+'日超過':' あと'+diff+'日'):''}`:'未定';const st=parseD(d.start_date);const stStr=st?`${st.getMonth()+1}/${st.getDate()}（${dow[st.getDay()]}）`:'';let h='';h+=vr('物件名',d.project);if(d.our_person)h+=vr('担当者',d.our_person);if(d.estimate_no)h+=vr('見積番号',d.estimate_no);if(d.order_no)h+=vr('受注番号',d.order_no);h+=vr('得意先',d.client);h+=vr('窓口',d.person);h+=vr('作業場所',d.section);h+=vr('ステータス',d.status);if(d.subcontractor)h+=vr('外注先',d.subcontractor);if(stStr)h+=vr('作業開始',stStr);h+=vr('納期',dlStr);if(d.notes)h+=vr('備考',d.notes);$('prodViewContent').innerHTML=h;renderLinkedFiles(d);$('prodViewBg').classList.add('show')}
+function viewProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;currentViewId=id;const dl=parseD(d.deadline);const diff=dl?diffDays(dl,today):null;const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?' ⚠ '+Math.abs(diff)+'日超過':' あと'+diff+'日'):''}`:'未定';const st=parseD(d.start_date);const stStr=st?`${st.getMonth()+1}/${st.getDate()}（${dow[st.getDay()]}）`:'';let h='';h+=vr('物件名',d.project);if(d.our_person)h+=vr('担当者',d.our_person);if(d.estimate_no)h+=vr('見積番号',d.estimate_no);if(d.order_no)h+=vr('受注番号',d.order_no);h+=vr('得意先',d.client);h+=vr('窓口',d.person);h+=vr('作業場所',d.section);if(d.subcontractor)h+=vr('外注先',d.subcontractor);if(stStr)h+=vr('作業開始',stStr);h+=vr('納期',dlStr);if(d.notes)h+=vr('備考',d.notes);
+  h+='<div class="st-change"><div class="st-change-label">ステータス変更</div><div class="st-change-btns">';
+  ['受注','製作中','完成','出荷済'].forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-btn${on}" data-st="${s}">${s}</button>`});
+  h+='</div></div>';
+  $('prodViewContent').innerHTML=h;
+  $('prodViewContent').querySelectorAll('.st-btn').forEach(btn=>{btn.onclick=()=>{const newSt=btn.dataset.st;if(d.status===newSt)return;d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');viewProd(id);render()}});
+  renderLinkedFiles(d);$('prodViewBg').classList.add('show')}
 
 // ===== 製作図ファイル =====
 function getLinkedFileIds(d){if(!d.files)return[];return String(d.files).split(',').map(s=>s.trim()).filter(Boolean)}
