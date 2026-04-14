@@ -107,6 +107,24 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .view-row{display:flex;gap:16px;margin-bottom:10px;font-size:13px}
 .view-row .view-label{font-weight:600;color:var(--text-dim);min-width:80px;flex-shrink:0}
 .view-row .view-val{color:var(--text)}
+.files-section{margin-top:20px;border-top:2px solid var(--surface3);padding-top:16px}
+.files-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.files-hd span{font-size:14px;font-weight:700}
+.files-add-btn{font-size:12px;background:var(--accent);color:#fff;border:none;padding:5px 14px;border-radius:6px;cursor:pointer;font-weight:600}
+.files-add-btn:hover{opacity:.85}
+.file-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-size:12px;cursor:pointer;transition:.15s}
+.file-item:hover{background:var(--surface3)}
+.file-item .f-icon{width:32px;height:32px;border-radius:6px;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0}
+.file-item .f-name{flex:1;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item .f-date{color:var(--text-faint);font-size:11px;flex-shrink:0}
+.file-item .f-unlink{background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:2px 6px;flex-shrink:0}
+.fp-item{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--surface3);cursor:pointer;transition:.15s}
+.fp-item:hover{background:var(--accent-dim)}
+.fp-item.already{opacity:.4;pointer-events:none}
+.fp-item .fp-icon{width:36px;height:36px;border-radius:6px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:var(--text-dim);flex-shrink:0}
+.fp-item .fp-name{flex:1;font-size:13px;font-weight:500}
+.fp-item .fp-meta{font-size:11px;color:var(--text-faint)}
+.files-empty{font-size:12px;color:var(--text-faint);padding:8px 0}
 </style>
 </head>
 <body>
@@ -151,10 +169,23 @@ tr:hover td{background:rgba(59,111,216,.03)}
 </div>
 <!-- 案件詳細モーダル -->
 <div class="mo-bg" id="prodViewBg">
-<div class="mo" style="max-width:500px">
+<div class="mo" style="max-width:640px">
   <h2>案件詳細</h2>
   <div id="prodViewContent"></div>
+  <div class="files-section" id="filesSection">
+    <div class="files-hd"><span>製作図</span><button class="files-add-btn" onclick="openFilePicker()">+ ファイルを追加</button></div>
+    <div id="linkedFiles"></div>
+  </div>
   <div class="mo-foot"><button class="cancel" onclick="$('prodViewBg').classList.remove('show')">閉じる</button></div>
+</div>
+</div>
+<!-- ファイル選択モーダル -->
+<div class="mo-bg" id="filePickerBg">
+<div class="mo" style="max-width:600px">
+  <h2>ファイルを追加</h2>
+  <div id="filePickerLoading" class="loading"><div class="spin"></div><br>Driveを読み込み中...</div>
+  <div id="filePickerList" style="max-height:400px;overflow-y:auto"></div>
+  <div class="mo-foot"><button class="cancel" onclick="closeFilePicker()">閉じる</button></div>
 </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -264,7 +295,71 @@ function renderArchive(){
 function prodSearch(q){$('prodAdmin').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'})}
 
 // ===== 案件詳細 =====
-function viewProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;const dl=parseD(d.deadline);const diff=dl?diffDays(dl,today):null;const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?' ⚠ '+Math.abs(diff)+'日超過':' あと'+diff+'日'):''}`:'未定';const st=parseD(d.start_date);const stStr=st?`${st.getMonth()+1}/${st.getDate()}（${dow[st.getDay()]}）`:'';let h='';h+=vr('物件名',d.project);if(d.our_person)h+=vr('担当者',d.our_person);if(d.estimate_no)h+=vr('見積番号',d.estimate_no);if(d.order_no)h+=vr('受注番号',d.order_no);h+=vr('得意先',d.client);h+=vr('窓口',d.person);h+=vr('作業場所',d.section);h+=vr('ステータス',d.status);if(d.subcontractor)h+=vr('外注先',d.subcontractor);if(stStr)h+=vr('作業開始',stStr);h+=vr('納期',dlStr);if(d.notes)h+=vr('備考',d.notes);$('prodViewContent').innerHTML=h;$('prodViewBg').classList.add('show')}
+let currentViewId=null;
+let driveFiles=null;
+function viewProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;currentViewId=id;const dl=parseD(d.deadline);const diff=dl?diffDays(dl,today):null;const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?' ⚠ '+Math.abs(diff)+'日超過':' あと'+diff+'日'):''}`:'未定';const st=parseD(d.start_date);const stStr=st?`${st.getMonth()+1}/${st.getDate()}（${dow[st.getDay()]}）`:'';let h='';h+=vr('物件名',d.project);if(d.our_person)h+=vr('担当者',d.our_person);if(d.estimate_no)h+=vr('見積番号',d.estimate_no);if(d.order_no)h+=vr('受注番号',d.order_no);h+=vr('得意先',d.client);h+=vr('窓口',d.person);h+=vr('作業場所',d.section);h+=vr('ステータス',d.status);if(d.subcontractor)h+=vr('外注先',d.subcontractor);if(stStr)h+=vr('作業開始',stStr);h+=vr('納期',dlStr);if(d.notes)h+=vr('備考',d.notes);$('prodViewContent').innerHTML=h;renderLinkedFiles(d);$('prodViewBg').classList.add('show')}
+
+// ===== 製作図ファイル =====
+function getLinkedFileIds(d){if(!d.files)return[];return String(d.files).split(',').map(s=>s.trim()).filter(Boolean)}
+function fileIcon(type){if(type&&type.includes('pdf'))return'PDF';if(type&&type.includes('image'))return'IMG';return'FILE'}
+
+function renderLinkedFiles(d){
+  const el=$('linkedFiles');const ids=getLinkedFileIds(d);
+  if(!ids.length){el.innerHTML='<div class="files-empty">ファイルが紐づけられていません</div>';return}
+  if(!driveFiles){el.innerHTML='<div class="files-empty">読み込み中...</div>';loadDriveFiles().then(()=>renderLinkedFiles(d));return}
+  let h='';
+  ids.forEach(fid=>{
+    const f=driveFiles.find(x=>x.id===fid);
+    if(f){h+=`<div class="file-item" onclick="window.open('${f.url}','_blank')"><div class="f-icon">${fileIcon(f.type)}</div><span class="f-name">${esc(f.name)}</span><span class="f-date">${f.updated||''}</span><button class="f-unlink" onclick="event.stopPropagation();unlinkFile('${fid}')">解除</button></div>`}
+    else{h+=`<div class="file-item"><div class="f-icon">?</div><span class="f-name" style="color:var(--text-faint)">ファイルが見つかりません (${fid})</span><button class="f-unlink" onclick="event.stopPropagation();unlinkFile('${fid}')">解除</button></div>`}
+  });
+  el.innerHTML=h;
+}
+
+async function loadDriveFiles(){
+  try{const res=await fetch(API+'?dept=drive&action=list');const json=await res.json();driveFiles=json.files||[]}catch(e){console.error('Drive load error:',e);driveFiles=[]}
+}
+
+function openFilePicker(){
+  $('filePickerBg').classList.add('show');
+  $('filePickerList').innerHTML='';
+  $('filePickerLoading').classList.remove('hidden');
+  loadDriveFiles().then(()=>{
+    $('filePickerLoading').classList.add('hidden');
+    const d=prodData.find(x=>String(x.id)===String(currentViewId));
+    const linked=d?getLinkedFileIds(d):[];
+    if(!driveFiles||!driveFiles.length){$('filePickerList').innerHTML='<div style="padding:20px;text-align:center;color:var(--text-faint)">Driveフォルダにファイルがありません</div>';return}
+    let h='';
+    driveFiles.forEach(f=>{
+      const already=linked.includes(f.id);
+      const size=f.size>1048576?(Math.round(f.size/1048576)+'MB'):(Math.round(f.size/1024)+'KB');
+      h+=`<div class="fp-item${already?' already':''}" onclick="linkFile('${f.id}')"><div class="fp-icon">${fileIcon(f.type)}</div><span class="fp-name">${esc(f.name)}${already?' ✓ 追加済':''}</span><span class="fp-meta">${size}　${f.updated||''}</span></div>`;
+    });
+    $('filePickerList').innerHTML=h;
+  });
+}
+function closeFilePicker(){$('filePickerBg').classList.remove('show')}
+
+function linkFile(fileId){
+  const d=prodData.find(x=>String(x.id)===String(currentViewId));if(!d)return;
+  const ids=getLinkedFileIds(d);
+  if(ids.includes(fileId))return;
+  ids.push(fileId);
+  d.files=ids.join(',');
+  fireAndForget({dept:'production',action:'save',id:d.id,files:d.files});
+  toast('ファイルを追加しました');
+  renderLinkedFiles(d);
+  closeFilePicker();
+}
+
+function unlinkFile(fileId){
+  const d=prodData.find(x=>String(x.id)===String(currentViewId));if(!d)return;
+  const ids=getLinkedFileIds(d).filter(x=>x!==fileId);
+  d.files=ids.join(',');
+  fireAndForget({dept:'production',action:'save',id:d.id,files:d.files});
+  toast('ファイルを解除しました');
+  renderLinkedFiles(d);
+}
 
 // ===== モーダル操作 =====
 function openProdMo(d){$('prodMoTitle').textContent=d?'案件編集':'案件登録';$('pf_id').value=d?d.id:'';$('pf_project').value=d?d.project:'';$('pf_our_person').value=d?d.our_person||'':'';$('pf_estimate_no').value=d?d.estimate_no||'':'';$('pf_order_no').value=d?d.order_no||'':'';$('pf_client').value=d?d.client||'':'';$('pf_person').value=d?d.person||'':'';$('pf_section').value=d?d.section||'未定':'未定';$('pf_status').value=d?d.status||'受注':'受注';$('pf_subcontractor').value=d?d.subcontractor||'':'';$('pf_start_date').value=d?d.start_date||'':'';$('pf_deadline').value=d?d.deadline||'':'';$('pf_notes').value=d?d.notes||'':'';$('prodMoBg').classList.add('show')}
