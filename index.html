@@ -164,6 +164,7 @@ let prodData=[];
 let curProdView='factory';
 let prodSort={col:null,asc:true};
 let prodFilter=null;
+let adminStatusFilter=null;
 const $=id=>document.getElementById(id);
 const today=new Date();today.setHours(0,0,0,0);
 const pad=n=>String(n).padStart(2,'0');
@@ -225,6 +226,11 @@ function renderFactory(){
 function renderProdAdmin(){
   const el=$('prodAdmin');let items=prodData.filter(d=>d.status!=='出荷済');
   const STATUS_ORDER={'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4};
+  // ステータス別件数（フィルター前）
+  const allCount=items.length;
+  const stCounts={};items.forEach(d=>{const s=d.status||'未設定';stCounts[s]=(stCounts[s]||0)+1});
+  // フィルター適用
+  if(adminStatusFilter)items=items.filter(d=>d.status===adminStatusFilter);
   if(prodSort.col)items.sort((a,b)=>{
     let va=a[prodSort.col],vb=b[prodSort.col];
     const ea=va==null||va==='',eb=vb==null||vb==='';
@@ -234,11 +240,15 @@ function renderProdAdmin(){
     va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(prodSort.asc?-1:1):va>vb?(prodSort.asc?1:-1):0
   });
   const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'section',label:'作業場所'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
+  // フィルターボタン
+  const stBtn=(label,val)=>{const on=adminStatusFilter===val?' on':'';const cnt=val?stCounts[val]||0:allCount;return`<button class="sub-tab${on}" data-st="${val||''}">${label} (${cnt})</button>`};
   let h=`<div class="av-top"><button class="av-add" onclick="openProdMo()">+ 新規登録</button><input class="av-search" placeholder="検索..." oninput="prodSearch(this.value)"></div>`;
+  h+=`<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('製作中','製作中')}${stBtn('完成','完成')}</div>`;
   h+='<div class="tbl-wrap"><table><thead><tr>';cols.forEach(c=>{const a=prodSort.col===c.key?(prodSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});h+='<th>操作</th></tr></thead><tbody>';
   items.forEach(d=>{h+='<tr>';cols.forEach(c=>{let v=d[c.key]||'';if(c.key==='deadline'&&v){const dd=parseD(v);v=dd?`${dd.getMonth()+1}/${dd.getDate()}（${dow[dd.getDay()]}）`:v}h+=`<td>${esc(v)}</td>`});h+=`<td><button class="act-btn" onclick="editProd('${d.id}')">編集</button> <button class="act-btn del" onclick="delProd('${d.id}')">削除</button></td></tr>`});
   h+='</tbody></table></div>';el.innerHTML=h;
   el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(prodSort.col===c)prodSort.asc=!prodSort.asc;else{prodSort.col=c;prodSort.asc=true}render()}});
+  el.querySelectorAll('[data-st]').forEach(btn=>{btn.onclick=()=>{const v=btn.dataset.st;adminStatusFilter=v||null;render()}});
 }
 
 // ===== 出荷済アーカイブ =====
