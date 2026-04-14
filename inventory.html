@@ -160,7 +160,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
     <div class="toolbar">
       <div class="filter-bar">
         <select id="flt_cat" onchange="renderItems()"><option value="">全カテゴリ</option></select>
-        <input id="flt_item_q" placeholder="検索..." oninput="renderItems()">
+        <input id="flt_item_q" placeholder="検索..." oninput="itemTableFilter(this.value)">
       </div>
       <button class="btn btn-primary" onclick="openItemMo()">＋ 商品追加</button>
     </div>
@@ -430,6 +430,7 @@ function renderItems(){
     </div></td>
   </tr>`).join('');
 }
+function itemTableFilter(q){q=q.toLowerCase();$('items_tbody').querySelectorAll('tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
 
 function openItemMo(data){
   $('itemMoTitle').textContent=data?'商品編集':'商品追加';
