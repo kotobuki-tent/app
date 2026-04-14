@@ -294,10 +294,16 @@ function renderArchive(){
   const el=$('prodArchive');const ARCHIVE_ST=['出荷済'];
   let items=prodData.filter(d=>ARCHIVE_ST.includes(d.status));
   let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px"><span style="font-size:13px;color:var(--text-dim)">出荷済の案件（'+items.length+'件）</span><input class="av-search" placeholder="検索..." oninput="archiveFilter(this.value)"></div>';
-  h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>担当者</th><th>受注番号</th><th>得意先</th><th>窓口</th><th>納期</th><th>ステータス</th><th>操作</th></tr></thead><tbody>';
-  if(!items.length)h+='<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-faint)">該当する案件はありません</td></tr>';
-  items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="editProd(\''+d.id+'\')">編集</button></td></tr>'});
+  h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>担当者</th><th>見積番号</th><th>受注番号</th><th>得意先</th><th>窓口</th><th>納期</th><th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
+  if(!items.length)h+='<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-faint)">該当する案件はありません</td></tr>';
+  items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';const chk=d.invoiced==='TRUE'||d.invoiced===true;h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="toggleInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="editProd(\''+d.id+'\')">編集</button></td></tr>'});
   h+='</tbody></table></div>';el.innerHTML=h;
+}
+function toggleInvoiced(id,checked){
+  const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;
+  d.invoiced=checked?'TRUE':'FALSE';
+  fireAndForget({dept:'production',action:'save',id:id,invoiced:d.invoiced});
+  toast(checked?'伝票済みにしました':'伝票未済に戻しました');
 }
 function archiveFilter(q){q=q.toLowerCase();$('prodArchive').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
 function prodSearch(q){$('prodAdmin').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'})}
