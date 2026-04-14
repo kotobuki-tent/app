@@ -166,7 +166,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>カテゴリ</th><th>商品名</th><th>保有数</th><th>備考</th><th>操作</th></tr></thead>
+        <thead><tr><th data-col="category" onclick="sortItems('category')" style="cursor:pointer">カテゴリ <span id="item_sort_category" class="arrow"></span></th><th data-col="item_name" onclick="sortItems('item_name')" style="cursor:pointer">商品名 <span id="item_sort_item_name" class="arrow"></span></th><th data-col="total_qty" onclick="sortItems('total_qty')" style="cursor:pointer">保有数 <span id="item_sort_total_qty" class="arrow"></span></th><th>備考</th><th>操作</th></tr></thead>
         <tbody id="items_tbody"></tbody>
       </table>
     </div>
@@ -395,6 +395,8 @@ function switchTab(t){
 }
 
 // ==================== 商品台帳 ====================
+var itemSort={col:'category',asc:true};
+function sortItems(col){if(itemSort.col===col)itemSort.asc=!itemSort.asc;else{itemSort.col=col;itemSort.asc=true}renderItems()}
 function renderItems(){
   const cat=$('flt_cat').value;const q=$('flt_item_q').value.toLowerCase();
   const f=items.filter(i=>{
@@ -402,6 +404,16 @@ function renderItems(){
     if(q&&!(i.item_name||'').toLowerCase().includes(q)&&!(i.category||'').toLowerCase().includes(q))return false;
     return true;
   });
+  // ソート
+  f.sort((a,b)=>{
+    let va=a[itemSort.col],vb=b[itemSort.col];
+    if(itemSort.col==='total_qty'){va=Number(va)||0;vb=Number(vb)||0;return itemSort.asc?va-vb:vb-va}
+    va=String(va||'').toLowerCase();vb=String(vb||'').toLowerCase();
+    if(va===vb&&itemSort.col==='category'){va=String(a.item_name||'').toLowerCase();vb=String(b.item_name||'').toLowerCase()}
+    return va<vb?(itemSort.asc?-1:1):va>vb?(itemSort.asc?1:-1):0
+  });
+  // ソート矢印更新
+  ['category','item_name','total_qty'].forEach(c=>{const el=document.getElementById('item_sort_'+c);if(el)el.textContent=itemSort.col===c?(itemSort.asc?'▲':'▼'):''});
   const tb=$('items_tbody');
   if(!f.length){tb.innerHTML='<tr><td colspan="5" class="empty-msg">商品が登録されていません</td></tr>';return}
   tb.innerHTML=f.map(i=>`<tr>

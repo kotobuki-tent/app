@@ -224,6 +224,7 @@ function render(){
 }
 
 // ===== 工場ボード =====
+let factorySearch='';
 function renderFactory(){
   const el=$('prodFactory');
   let items=prodData.filter(d=>!['見積中','見送り','出荷済'].includes(d.status));
@@ -232,8 +233,9 @@ function renderFactory(){
   items.forEach(d=>{const dl=parseD(d.deadline);if(!dl){d._urgN=999;return}const diff=diffDays(dl,today);d._urgN=diff<0?-1:diff<=3?0:diff<=7?1:diff<=14?2:3});
   let filtered=items;
   if(prodFilter){if(['製作中','完成','受注'].includes(prodFilter))filtered=items.filter(d=>d.status===prodFilter);else if(['2F工場','1F工場','出力関係','外注','未定','その他'].includes(prodFilter))filtered=items.filter(d=>d.section===prodFilter);else if(prodFilter==='urgent')filtered=items.filter(d=>d._urgN<=0);else if(prodFilter==='thisweek')filtered=items.filter(d=>d._urgN===1)}
+  if(factorySearch){const q=factorySearch.toLowerCase();filtered=filtered.filter(d=>[d.project,d.client,d.person,d.our_person,d.order_no,d.estimate_no,d.subcontractor].some(v=>(v||'').toLowerCase().includes(q)))}
   const si=(f,n,l,color)=>{const on=prodFilter===f?' on':'';return`<div class="fv-si${on}" data-f="${f}" style="${color?'color:'+color:''}"><div class="n">${n}</div><div class="l">${l}</div></div>`};
-  let h=`<div class="fv-date">${dateJP(today)}</div><div class="fv-sum">`;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="fv-date">${dateJP(today)}</div><input class="av-search" placeholder="検索..." value="${esc(factorySearch)}" oninput="factorySearch=this.value;render()"></div><div class="fv-sum">`;
   h+=si('all',items.length,'すべて','');
   h+=si('urgent',items.filter(d=>d._urgN<=0).length,'納期迫る','var(--red)');
   h+=si('thisweek',items.filter(d=>d._urgN===1).length,'今週中','var(--orange)');
