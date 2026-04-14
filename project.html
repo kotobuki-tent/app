@@ -314,7 +314,6 @@ function renderGantt(){
   el.innerHTML=h;el.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.onclick=()=>viewProj(r.dataset.id)});
 }
 function ganttFilter(q){q=q.toLowerCase();document.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
-}
 
 // ===== 完了一覧 =====
 function renderProjDone(){
