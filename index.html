@@ -248,12 +248,13 @@ function renderFactory(){
   h+=si('未定',secCnt('未定'),'未定','');
   h+=si('その他',secCnt('その他'),'その他','');
   h+='</div>';
-  h+=`<div style="margin-bottom:14px"><input class="av-search" style="width:100%;max-width:300px" placeholder="物件名・得意先・担当者で検索..." value="${esc(factorySearch)}" oninput="factorySearch=this.value;render()"></div>`;
+  h+=`<div style="margin-bottom:14px"><input id="factorySearchInput" class="av-search" style="width:100%;max-width:300px" placeholder="物件名・得意先・担当者で検索..." value="${esc(factorySearch)}" oninput="factorySearch=this.value;render()"></div>`;
   const groups=[{label:'納期迫る・超過',items:filtered.filter(d=>d._urgN<=0)},{label:'今週中',items:filtered.filter(d=>d._urgN===1)},{label:'2週間以内',items:filtered.filter(d=>d._urgN===2)},{label:'それ以降',items:filtered.filter(d=>d._urgN===3)},{label:'納期未定',items:filtered.filter(d=>d._urgN===999)}];
   groups.forEach(g=>{if(!g.items.length)return;h+=`<div class="fv-grp"><div class="fv-grp-hd">${g.label}　${g.items.length}件</div><div class="fv-cards">`;g.items.forEach(d=>{const dl=parseD(d.deadline);const diff=dl?diffDays(dl,today):null;const cls=d._urgN<=0?'urgent':d._urgN===1?'thisweek':'twoweeks';let badge='';if(d._urgN<=0&&dl)badge=`<span class="badge urgent">${diff<0?Math.abs(diff)+'日超過':'納期迫る'}</span>`;else if(d._urgN===1)badge='<span class="badge thisweek">今週中</span>';else if(d._urgN===2)badge='<span class="badge twoweeks">2週間以内</span>';const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?Math.abs(diff)+'日超過':'あと'+diff+'日'):''}`:'未定';h+=`<div class="fv-card ${cls}" data-id="${d.id}"><div class="top"><span class="pname">${esc(d.project)}</span>${badge}</div>`;if(d.our_person)h+=`<div class="assignee">担当: <span class="tag person">${esc(d.our_person)}</span></div>`;h+=`<div class="meta">${esc(d.client||'')}`;if(d.order_no)h+=` <span class="tag eno">${esc(d.order_no)}</span>`;if(d.section)h+=` <span class="tag loc">${esc(d.section)}</span>`;h+=` <span class="tag st">${esc(d.status)}</span></div><div class="dl">納期: ${dlStr}</div>`;if(d.subcontractor)h+=`<div class="sub-info">外注先: ${esc(d.subcontractor)}</div>`;h+='</div>'});h+='</div></div>'});
   el.innerHTML=h;
   el.querySelectorAll('.fv-si').forEach(s=>{s.onclick=()=>{const f=s.dataset.f;prodFilter=prodFilter===f?null:f;render()}});
   el.querySelectorAll('.fv-card').forEach(c=>{c.onclick=()=>viewProd(c.dataset.id)});
+  if(factorySearch){const si=$('factorySearchInput');if(si){si.focus();si.setSelectionRange(si.value.length,si.value.length)}}
 }
 
 // ===== 管理テーブル =====
@@ -292,11 +293,12 @@ function renderArchive(){
   let items=prodData.filter(d=>ARCHIVE_ST.includes(d.status));
   const total=items.length;
   if(archiveSearch){const q=archiveSearch.toLowerCase();items=items.filter(d=>[d.project,d.client,d.person,d.our_person,d.order_no].some(v=>(v||'').toLowerCase().includes(q)))}
-  let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px"><span style="font-size:13px;color:var(--text-dim)">出荷済の案件（'+total+'件）</span><input class="av-search" placeholder="検索..." value="'+esc(archiveSearch)+'" oninput="archiveSearch=this.value;render()"></div>';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px"><span style="font-size:13px;color:var(--text-dim)">出荷済の案件（'+total+'件）</span><input id="archiveSearchInput" class="av-search" placeholder="検索..." value="'+esc(archiveSearch)+'" oninput="archiveSearch=this.value;render()"></div>';
   h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>担当者</th><th>受注番号</th><th>得意先</th><th>窓口</th><th>納期</th><th>ステータス</th><th>操作</th></tr></thead><tbody>';
   if(!items.length)h+='<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-faint)">該当する案件はありません</td></tr>';
   items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="editProd(\''+d.id+'\')">編集</button></td></tr>'});
   h+='</tbody></table></div>';el.innerHTML=h;
+  if(archiveSearch){const si=$('archiveSearchInput');if(si){si.focus();si.setSelectionRange(si.value.length,si.value.length)}}
 }
 function prodSearch(q){$('prodAdmin').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'})}
 

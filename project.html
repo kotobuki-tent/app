@@ -299,7 +299,7 @@ function renderGantt(){
   let h='<div class="gantt-controls"><div class="gantt-nav"><button onclick="ganttMove(-7)">← 1週</button><button onclick="ganttToday()">今日</button><button onclick="ganttMove(7)">1週 →</button></div>';
   h+=`<select onchange="ganttDays=+this.value;render()"><option value="14"${ganttDays===14?' selected':''}>2週間</option><option value="21"${ganttDays===21?' selected':''}>3週間</option><option value="28"${ganttDays===28?' selected':''}>4週間</option><option value="42"${ganttDays===42?' selected':''}>6週間</option></select>`;
   h+=`<select onchange="ganttStatusFilter=this.value;render()"><option value=""${!ganttStatusFilter?' selected':''}>全ステータス</option><option value="見積中">見積中</option><option value="受注">受注</option><option value="準備中">準備中</option><option value="現場中">現場中</option><option value="完了">完了</option></select>`;
-  h+=`<input style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:180px" placeholder="検索..." value="${esc(ganttSearch)}" oninput="ganttSearch=this.value;render()"></div>`;
+  h+=`<input id="ganttSearchInput" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:180px" placeholder="検索..." value="${esc(ganttSearch)}" oninput="ganttSearch=this.value;render()"></div>`;
   h+='<div class="gantt-wrap"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd">現場名</div><div class="gantt-dates">';
   h+=ganttDateHeaders(dates);
   h+='</div></div>';
@@ -314,6 +314,7 @@ function renderGantt(){
   let hasV=false;VEHICLES.forEach(v=>{if(Object.keys(usage[v]).length)hasV=true});
   if(hasV){h+='<div class="vehicle-summary"><h3>車両バッティング確認</h3><div class="vh-desc">同じ日に同じ車両を2件以上使う場合、赤く表示されます</div>';if(!hasConflict)h+='<div class="vh-no-conflict">✓ バッティングなし</div>';else{h+='<div class="gantt-wrap" style="margin-top:10px"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd" style="font-size:11px">車両</div><div class="gantt-dates">';h+=ganttDateHeaders(dates);h+='</div></div>';VEHICLES.forEach(v=>{const hasC=Object.values(usage[v]).some(c=>c>=2);if(!hasC)return;h+=`<div class="gantt-row" style="cursor:default"><div class="gantt-row-label"><span class="prj-name">${v}</span></div><div class="gantt-bars">`;dates.forEach(dt=>{const ds=dateStr(dt);const c=usage[v][ds]||0;const isT=dateStr(dt)===dateStr(today);h+=`<div class="gantt-bar-cell${isT?' today':''}" style="display:flex;align-items:center;justify-content:center">`;if(c>=2)h+=`<span style="font-size:12px;font-weight:700;color:#fff;background:var(--red);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center">${c}</span>`;else if(c===1)h+=`<span style="font-size:10px;color:var(--text-faint)">${c}</span>`;h+='</div>'});h+='</div></div>'});h+='</div></div>'}h+='</div>'}
   el.innerHTML=h;el.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.onclick=()=>viewProj(r.dataset.id)});
+  if(ganttSearch){const si=$('ganttSearchInput');if(si){si.focus();si.setSelectionRange(si.value.length,si.value.length)}}
 }
 
 // ===== 完了一覧 =====
@@ -323,11 +324,12 @@ function renderProjDone(){
   let items=projData.filter(d=>d.status==='完了');
   const total=items.length;
   if(projDoneSearch){const q=projDoneSearch.toLowerCase();items=items.filter(d=>[d.project,d.client,d.person,d.our_person,d.order_no,d.venue].some(v=>(v||'').toLowerCase().includes(q)))}
-  let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px"><span style="font-size:13px;color:var(--text-dim)">完了した現場（'+total+'件）</span><input class="av-search" placeholder="検索..." value="'+esc(projDoneSearch)+'" oninput="projDoneSearch=this.value;render()"></div>';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px"><span style="font-size:13px;color:var(--text-dim)">完了した現場（'+total+'件）</span><input id="projDoneSearchInput" class="av-search" placeholder="検索..." value="'+esc(projDoneSearch)+'" oninput="projDoneSearch=this.value;render()"></div>';
   h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>担当者</th><th>受注番号</th><th>得意先</th><th>窓口</th><th>会場</th><th>本番</th><th>ステータス</th><th>操作</th></tr></thead><tbody>';
   if(!items.length)h+='<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-faint)">該当する現場はありません</td></tr>';
   items.forEach(d=>{const ev=d.date_event?String(d.date_event).split(',').map(s=>{const dd=parseD(s.trim());return dd?((dd.getMonth()+1)+'/'+dd.getDate()):s}).join(', '):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+esc(d.venue||'')+'</td><td>'+ev+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="editProj(\''+d.id+'\')">編集</button></td></tr>'});
   h+='</tbody></table></div>';el.innerHTML=h;
+  if(projDoneSearch){const si=$('projDoneSearchInput');if(si){si.focus();si.setSelectionRange(si.value.length,si.value.length)}}
 }
 
 // ===== 管理テーブル =====
