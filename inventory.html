@@ -220,7 +220,6 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
         <label>終了日</label>
         <input type="date" id="avail_end" onchange="renderAvail()">
         <select id="avail_cat" onchange="renderAvail()"><option value="">全カテゴリ</option></select>
-        <input id="avail_q" placeholder="検索..." oninput="renderAvail()" style="padding:7px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#333;font:400 13px/1 'Noto Sans JP',sans-serif;width:160px">
       </div>
       <div id="avail_body"></div>
     </div>
@@ -583,14 +582,12 @@ function deleteRental(id){
 function renderAvail(){
   const startStr=$('avail_start').value;const endStr=$('avail_end').value;
   const cat=$('avail_cat').value;const body=$('avail_body');
-  const aq=document.getElementById('avail_q');const availQ=aq?aq.value.toLowerCase():'';
   if(!startStr||!endStr){body.innerHTML='<p style="color:#aaa;font-size:13px">開始日と終了日を指定してください。</p>';return}
 
   const start=new Date(startStr+'T00:00:00');const end=new Date(endStr+'T00:00:00');
   const usage={};
   items.forEach(i=>{
     if(cat&&i.category!==cat)return;
-    if(availQ&&!(i.item_name||'').toLowerCase().includes(availQ)&&!(i.category||'').toLowerCase().includes(availQ))return;
     usage[i.category+'|'+i.item_name]={category:i.category,item_name:i.item_name,total:Number(i.total_qty)||0,used:0,rent:0,maint:0};
   });
 
