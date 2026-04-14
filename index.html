@@ -202,6 +202,7 @@ let curProdView='factory';
 let prodSort={col:null,asc:true};
 let prodFilter=null;
 let adminStatusFilter=null;
+let archiveSort={col:'deadline',asc:false};
 const $=id=>document.getElementById(id);
 const today=new Date();today.setHours(0,0,0,0);
 const pad=n=>String(n).padStart(2,'0');
@@ -293,11 +294,23 @@ function renderProdAdmin(){
 function renderArchive(){
   const el=$('prodArchive');const ARCHIVE_ST=['出荷済'];
   let items=prodData.filter(d=>ARCHIVE_ST.includes(d.status));
+  // ソート
+  if(archiveSort.col)items.sort((a,b)=>{
+    let va=a[archiveSort.col],vb=b[archiveSort.col];
+    const ea=va==null||va==='',eb=vb==null||vb==='';
+    if(ea&&eb)return 0;if(ea)return 1;if(eb)return-1;
+    if(archiveSort.col==='deadline'){const da=parseD(va),db=parseD(vb);if(da&&db)return archiveSort.asc?da-db:db-da;if(!da)return 1;if(!db)return-1}
+    va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0
+  });
+  const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'deadline',label:'納期'}];
   let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px"><span style="font-size:13px;color:var(--text-dim)">出荷済の案件（'+items.length+'件）</span><input class="av-search" placeholder="検索..." oninput="archiveFilter(this.value)"></div>';
-  h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>担当者</th><th>見積番号</th><th>受注番号</th><th>得意先</th><th>窓口</th><th>納期</th><th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
+  h+='<div class="tbl-wrap"><table><thead><tr>';
+  cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}" style="cursor:pointer">${c.label}<span class="arrow">${a}</span></th>`});
+  h+='<th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
   if(!items.length)h+='<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-faint)">該当する案件はありません</td></tr>';
   items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';const chk=d.invoiced==='TRUE'||d.invoiced===true;h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="toggleInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="editProd(\''+d.id+'\')">編集</button></td></tr>'});
   h+='</tbody></table></div>';el.innerHTML=h;
+  el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}render()}});
 }
 function toggleInvoiced(id,checked){
   const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;
