@@ -195,12 +195,14 @@ tr:hover td{background:rgba(59,111,216,.03)}
   <div class="mo-row"><div class="mo-field"><label>会場名</label><input id="xf_venue" placeholder="例: 鳥取砂丘特設会場"></div><div class="mo-field"><label>ステータス</label><select id="xf_status"><option>見積中</option><option>受注</option><option>準備中</option><option>現場中</option><option>完了</option><option>見送り</option></select></div></div>
   <div class="mo-row full"><div class="mo-field"><label>住所</label><input id="xf_address" placeholder="例: 鳥取県鳥取市福部町"></div></div>
   <div class="phase-hd">日程</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
   <div class="date-phase-block"><label class="date-phase-label">搬入日</label><div class="date-list" id="xf_dates_load_in"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_load_in')">＋ 日付追加</button></div>
   <div class="date-phase-block"><label class="date-phase-label">設営日</label><div class="date-list" id="xf_dates_setup"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_setup')">＋ 日付追加</button></div>
   <div class="date-phase-block"><label class="date-phase-label">本番</label><div class="date-list" id="xf_dates_event"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_event')">＋ 日付追加</button></div>
   <div class="date-phase-block"><label class="date-phase-label">撤去日</label><div class="date-list" id="xf_dates_teardown"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_teardown')">＋ 日付追加</button></div>
   <div class="date-phase-block"><label class="date-phase-label">貸出日</label><div class="date-list" id="xf_dates_rental_out"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_rental_out')">＋ 日付追加</button></div>
   <div class="date-phase-block"><label class="date-phase-label">返却日</label><div class="date-list" id="xf_dates_rental_return"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_rental_return')">＋ 日付追加</button></div>
+  </div>
   <div class="phase-hd">人数（予定）</div>
   <div class="phase-grid">
     <div class="mo-field"><label>搬入</label><input type="number" id="xf_people_load_in" min="0" placeholder="0"></div>
@@ -209,12 +211,14 @@ tr:hover td{background:rgba(59,111,216,.03)}
     <div class="mo-field"><label>撤去</label><input type="number" id="xf_people_teardown" min="0" placeholder="0"></div>
   </div>
   <div class="phase-hd">車両</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
   <div class="date-phase-block"><label class="date-phase-label">搬入</label><div class="chk-list" id="xf_vh_load_in"></div></div>
   <div class="date-phase-block"><label class="date-phase-label">設営</label><div class="chk-list" id="xf_vh_setup"></div></div>
   <div class="date-phase-block"><label class="date-phase-label">本番</label><div class="chk-list" id="xf_vh_event"></div></div>
   <div class="date-phase-block"><label class="date-phase-label">撤去</label><div class="chk-list" id="xf_vh_teardown"></div></div>
   <div class="date-phase-block"><label class="date-phase-label">貸出</label><div class="chk-list" id="xf_vh_rental_out"></div></div>
   <div class="date-phase-block"><label class="date-phase-label">返却</label><div class="chk-list" id="xf_vh_rental_return"></div></div>
+  </div>
   <div class="phase-hd">レンタル品・備考</div>
   <div class="mo-row full"><div class="mo-field"><label>レンタル品</label><textarea id="xf_rentals" placeholder="例: テント3張、テーブル10台、椅子50脚"></textarea></div></div>
   <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="xf_notes" placeholder="補足事項があれば"></textarea></div></div>
