@@ -326,14 +326,25 @@ function renderGantt(){
 function ganttFilter(q){q=q.toLowerCase();document.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
 
 // ===== 完了一覧 =====
+function getEndDate(d){
+  const all=[].concat(parseDates(d.date_teardown),parseDates(d.date_rental_return)).filter(Boolean).sort((a,b)=>b-a);
+  return all[0]||null;
+}
 function renderProjDone(){
   const el=$('projDoneView');
   let items=projData.filter(d=>d.status==='完了');
+  items.sort((a,b)=>{const da=getEndDate(a),db=getEndDate(b);if(!da&&!db)return 0;if(!da)return 1;if(!db)return-1;return db-da});
   let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px"><span style="font-size:13px;color:var(--text-dim)">完了した現場（'+items.length+'件）</span><input class="av-search" placeholder="検索..." oninput="projDoneFilter(this.value)"></div>';
-  h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>担当者</th><th>受注番号</th><th>得意先</th><th>窓口</th><th>会場</th><th>本番</th><th>ステータス</th><th>操作</th></tr></thead><tbody>';
-  if(!items.length)h+='<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-faint)">該当する現場はありません</td></tr>';
-  items.forEach(d=>{const ev=d.date_event?String(d.date_event).split(',').map(s=>{const dd=parseD(s.trim());return dd?((dd.getMonth()+1)+'/'+dd.getDate()):s}).join(', '):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+esc(d.venue||'')+'</td><td>'+ev+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="editProj(\''+d.id+'\')">編集</button></td></tr>'});
+  h+='<div class="tbl-wrap"><table><thead><tr><th>物件名</th><th>担当者</th><th>見積番号</th><th>受注番号</th><th>得意先</th><th>窓口</th><th>完了日</th><th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
+  if(!items.length)h+='<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-faint)">該当する現場はありません</td></tr>';
+  items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';const chk=String(d.invoiced||'').toUpperCase()==='TRUE';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="toggleProjInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="editProj(\''+d.id+'\')">編集</button></td></tr>'});
   h+='</tbody></table></div>';el.innerHTML=h;
+}
+function toggleProjInvoiced(id,checked){
+  const d=projData.find(x=>String(x.id)===String(id));if(!d)return;
+  d.invoiced=checked?'TRUE':'FALSE';
+  fireAndForget({dept:'project',action:'save',id:id,invoiced:d.invoiced});
+  toast(checked?'伝票済みにしました':'伝票未済に戻しました');
 }
 function projDoneFilter(q){q=q.toLowerCase();$('projDoneView').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
 
@@ -341,7 +352,7 @@ function projDoneFilter(q){q=q.toLowerCase();$('projDoneView').querySelectorAll(
 function renderProjAdmin(){
   const el=$('projAdminView');let items=projData.filter(d=>d.status!=='完了');
   if(projSort.col)items.sort((a,b)=>{let va=String(a[projSort.col]||'').toLowerCase(),vb=String(b[projSort.col]||'').toLowerCase();return va<vb?(projSort.asc?-1:1):va>vb?(projSort.asc?1:-1):0});
-  const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'venue',label:'会場'},{key:'date_load_in',label:'搬入'},{key:'date_event',label:'本番'},{key:'date_teardown',label:'撤去'},{key:'status',label:'ステータス'}];
+  const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'venue',label:'会場'},{key:'date_load_in',label:'搬入'},{key:'date_event',label:'本番'},{key:'date_teardown',label:'撤去'},{key:'status',label:'ステータス'}];
   let h=`<div class="av-top"><button class="av-add" onclick="openProjMo()">+ 新規登録</button><input class="av-search" placeholder="検索..." oninput="projSearch(this.value)"></div>`;
   h+='<div class="tbl-wrap"><table><thead><tr>';cols.forEach(c=>{const a=projSort.col===c.key?(projSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});h+='<th>操作</th></tr></thead><tbody>';
   items.forEach(d=>{h+='<tr>';cols.forEach(c=>{let v=d[c.key]||'';if(c.key.startsWith('date_')&&v){v=String(v).split(',').map(s=>{const dd=parseD(s.trim());return dd?`${dd.getMonth()+1}/${dd.getDate()}`:s}).join(', ')}h+=`<td>${esc(v)}</td>`});h+=`<td><button class="act-btn" onclick="editProj('${d.id}')">編集</button> <button class="act-btn del" onclick="delProj('${d.id}')">削除</button></td></tr>`});
