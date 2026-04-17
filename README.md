@@ -17,7 +17,7 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 
 | ファイル | 役割 |
 |---|---|
-| `portal.html` | ポータル（全アプリへのリンク＋雑学309個） |
+| `portal.html` | ポータル（全アプリへのリンク集） |
 | `index.html` | 生産部（工場ボード・出荷済・管理・製作図連携） |
 | `project.html` | 企画制作部（ガントチャート・車両バッティング・貸出期間表示・管理） |
 | `inventory.html` | 在庫管理（商品台帳・貸出/予約・メンテ・在庫確認） |
@@ -44,7 +44,6 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 ### ポータル（portal.html）
 
 - 全アプリへのカード型リンク
-- 今日の雑学（309個、日替わり表示、クリックで次へ）
 
 ### 生産部（index.html）
 
@@ -95,6 +94,8 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 - Google Drive（製作図ファイル連携、フォルダID: `16iDJrBWXdbIHq-aqJVgHZpA9tRGXMUwc`）
 - GitHub Pages（ホスティング）
 - 楽観的更新（no-cors POST + ローカル配列即時反映）
+- 新規作成時のtmp_id残留対策：index.html / project.html は新規保存後3秒でloadAll自動実行（GASの実ID採番を待つ）
+- スマホ対応：index.html / overtime.html / project.html はメディアクエリ（max-width:768px / 420px）でレスポンシブ。テーブルは `:nth-of-type` + `::before` 疑似要素でカード型に変換
 - DOMフィルター方式の検索（全タブ対応）
 - favicon：インラインSVG漢字アイコン（製・企・庫・時・車・登・寿）
 
