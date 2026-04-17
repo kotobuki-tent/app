@@ -559,7 +559,7 @@ function saveProd(){
   closeProdMo();
   render();
   // 新規作成時は GAS が実IDを採番するまで待って再同期（tmp_id 残留防止）
-  if(isNew)setTimeout(loadAll,1500);
+  if(isNew)setTimeout(loadAll,3000);
 }
 
 // ===== 削除（楽観的更新） =====
