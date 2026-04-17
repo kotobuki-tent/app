@@ -546,8 +546,9 @@ function saveProj(){
   if(!name){toast('物件名を入力してください',true);return}
   const editId=$('xf_id').value;
   const body={dept:'project',action:'save',id:editId||undefined,project:name,our_person:$('xf_our_person').value.trim(),estimate_no:$('xf_estimate_no').value.trim(),order_no:$('xf_order_no').value.trim(),client:$('xf_client').value.trim(),person:$('xf_person').value.trim(),venue:$('xf_venue').value.trim(),address:$('xf_address').value.trim(),status:$('xf_status').value,date_load_in:getDatesFromList('xf_dates_load_in'),date_setup:getDatesFromList('xf_dates_setup'),date_event:getDatesFromList('xf_dates_event'),date_teardown:getDatesFromList('xf_dates_teardown'),date_rental_out:getDatesFromList('xf_dates_rental_out'),date_rental_return:getDatesFromList('xf_dates_rental_return'),people_load_in:$('xf_people_load_in').value,people_setup:$('xf_people_setup').value,people_event:$('xf_people_event').value,people_teardown:$('xf_people_teardown').value,vehicles_load_in:getVehiclesFromPhase('load_in'),vehicles_setup:getVehiclesFromPhase('setup'),vehicles_event:getVehiclesFromPhase('event'),vehicles_teardown:getVehiclesFromPhase('teardown'),vehicles_rental_out:getVehiclesFromPhase('rental_out'),vehicles_rental_return:getVehiclesFromPhase('rental_return'),rentals:$('xf_rentals').value.trim(),notes:$('xf_notes').value.trim()};
+  const isNew=!editId;
   if(editId){
-    const idx=projData.findIndex(x=>x.id===editId);
+    const idx=projData.findIndex(x=>String(x.id)===String(editId));
     if(idx!==-1)projData[idx]={...projData[idx],...body};
   }else{
     body.id='tmp_'+Date.now();
@@ -557,6 +558,8 @@ function saveProj(){
   toast('保存しました');
   closeProjMo();
   render();
+  // 新規作成時は GAS が実IDを採番するまで待って再同期（tmp_id 残留防止）
+  if(isNew)setTimeout(loadAll,1500);
 }
 
 // ===== 削除（楽観的更新） =====
