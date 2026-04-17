@@ -161,6 +161,154 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .rental-existing .re-info{flex:1}
 .rental-existing .re-del{background:none;border:none;color:var(--red);font-size:11px;cursor:pointer}
 .rental-existing .re-del:hover{text-decoration:underline}
+
+/* ========== スマホ対応 ========== */
+@media (max-width:768px){
+  html{font-size:14px}
+
+  /* ヘッダー：横スクロール */
+  .hdr{padding:0 10px;gap:4px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .hdr::-webkit-scrollbar{display:none}
+  .hdr h1{font-size:15px;margin-right:6px;flex-shrink:0;white-space:nowrap}
+  .nav-link{font-size:12px;padding:8px 10px;flex-shrink:0;white-space:nowrap}
+  .hdr-btn{font-size:11px;padding:7px 10px;flex-shrink:0;white-space:nowrap}
+
+  /* サブタブ横スクロール */
+  .sub-tabs{padding:10px 10px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs::-webkit-scrollbar{display:none}
+  .sub-tab{flex-shrink:0;padding:9px 14px;font-size:12px;min-height:38px}
+
+  /* 本体 padding 削減 */
+  .proj-view,.proj-admin{padding:12px 10px}
+
+  /* ガント：最小幅は維持、ラベル列縮小、高さ確保 */
+  .gantt-controls{gap:8px;margin-bottom:12px}
+  .gantt-controls select{padding:8px 10px;font-size:12px;min-height:38px}
+  .gantt-nav button{padding:8px 10px;min-height:36px;font-size:12px}
+  .gantt{min-width:720px}
+  .gantt-label-hd,.gantt-row-label{min-width:160px;max-width:160px;padding:8px}
+  .gantt-row-label .prj-name{font-size:12px}
+  .gantt-row-label .prj-assignee{font-size:11px}
+  .prj-meta{font-size:9px}
+  .gantt-date-cell{min-width:36px;font-size:10px}
+  .gantt-date-cell .dm{font-size:11px}
+  .gantt-date-cell .hol-name{font-size:6px}
+  .gantt-bar-cell{min-width:36px}
+  .gantt-legend{gap:10px;font-size:11px;margin-top:10px}
+  .vehicle-summary{margin-top:16px;padding:12px}
+  .vehicle-summary h3{font-size:13px}
+
+  /* 管理ビュー上部 */
+  .av-top{flex-direction:column;align-items:stretch;gap:8px}
+  .av-search{width:100%}
+  .av-add{padding:11px 18px;font-size:13px}
+
+  /* === 完了テーブル→カード化（10列） === */
+  #projDoneView .tbl-wrap{border:none;background:transparent;overflow:visible}
+  #projDoneView table,#projDoneView thead,#projDoneView tbody,#projDoneView tr,#projDoneView td{display:block;width:100%}
+  #projDoneView thead{display:none}
+  #projDoneView tr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  #projDoneView tr:hover td{background:transparent}
+  #projDoneView td{padding:5px 0;border:none;white-space:normal;font-size:13px;display:flex;align-items:center;gap:8px}
+  #projDoneView td::before{font-size:11px;font-weight:600;color:var(--text-dim);min-width:72px;flex-shrink:0}
+  #projDoneView td:nth-of-type(1){font-size:15px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--surface3);margin-bottom:6px;display:block}
+  #projDoneView td:nth-of-type(1)::before{display:none}
+  #projDoneView td:nth-of-type(2)::before{content:'担当'}
+  #projDoneView td:nth-of-type(3)::before{content:'見積'}
+  #projDoneView td:nth-of-type(4)::before{content:'受注'}
+  #projDoneView td:nth-of-type(5)::before{content:'得意先'}
+  #projDoneView td:nth-of-type(6)::before{content:'窓口'}
+  #projDoneView td:nth-of-type(7)::before{content:'完了日'}
+  #projDoneView td:nth-of-type(8)::before{content:'状態'}
+  #projDoneView td:nth-of-type(9)::before{content:'伝票'}
+  #projDoneView td:nth-of-type(10)::before{content:'操作'}
+  #projDoneView td:empty{display:none}
+  #projDoneView td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px}
+  #projDoneView td[colspan]{display:block;text-align:center;padding:30px !important}
+  #projDoneView td[colspan]::before{display:none}
+
+  /* === 管理テーブル→カード化（13列） === */
+  #projAdminView .tbl-wrap{border:none;background:transparent;overflow:visible}
+  #projAdminView table,#projAdminView thead,#projAdminView tbody,#projAdminView tr,#projAdminView td{display:block;width:100%}
+  #projAdminView thead{display:none}
+  #projAdminView tr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  #projAdminView tr:hover td{background:transparent}
+  #projAdminView td{padding:5px 0;border:none;white-space:normal;font-size:13px;display:flex;align-items:center;gap:8px}
+  #projAdminView td::before{font-size:11px;font-weight:600;color:var(--text-dim);min-width:72px;flex-shrink:0}
+  #projAdminView td:nth-of-type(1){font-size:15px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--surface3);margin-bottom:6px;display:block}
+  #projAdminView td:nth-of-type(1)::before{display:none}
+  #projAdminView td:nth-of-type(2)::before{content:'担当'}
+  #projAdminView td:nth-of-type(3)::before{content:'見積'}
+  #projAdminView td:nth-of-type(4)::before{content:'受注'}
+  #projAdminView td:nth-of-type(5)::before{content:'得意先'}
+  #projAdminView td:nth-of-type(6)::before{content:'窓口'}
+  #projAdminView td:nth-of-type(7)::before{content:'会場'}
+  #projAdminView td:nth-of-type(8)::before{content:'搬入'}
+  #projAdminView td:nth-of-type(9)::before{content:'本番'}
+  #projAdminView td:nth-of-type(10)::before{content:'撤去'}
+  #projAdminView td:nth-of-type(11)::before{content:'ステータス'}
+  #projAdminView td:nth-of-type(12)::before{content:'伝票'}
+  #projAdminView td:nth-of-type(13)::before{content:'操作'}
+  #projAdminView td:empty{display:none}
+  #projAdminView td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px;margin-right:4px}
+  #projAdminView td .act-btn.del{color:var(--red)}
+  #projAdminView td select{flex:1;padding:8px 10px !important;font-size:13px !important;min-height:38px}
+
+  /* モーダル：画面いっぱい */
+  .mo-bg{padding:0;align-items:flex-end}
+  .mo{border-radius:14px 14px 0 0;padding:18px 14px 24px;max-width:100%;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .mo h2{font-size:16px;margin-bottom:14px}
+  .mo-row{flex-direction:column;gap:12px;margin-bottom:12px}
+  .mo-field input,.mo-field select,.mo-field textarea{padding:11px 12px;font-size:16px;min-height:44px}
+  .mo-field textarea{min-height:80px}
+  .mo-foot{flex-direction:column-reverse;gap:8px;margin-top:16px}
+  .mo-foot button{width:100%;padding:13px;min-height:46px;font-size:14px}
+
+  /* モーダル内の2カラムgridを1カラムに */
+  .mo>div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;gap:0 !important}
+  .phase-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .phase-hd{font-size:11px;margin:12px 0 6px}
+
+  /* 日付追加ブロック */
+  .date-phase-block{margin-bottom:10px}
+  .date-list{gap:6px}
+  .date-item input[type="date"]{padding:10px 10px;font-size:15px;min-height:40px}
+  .date-rm{padding:0 6px;font-size:20px;min-height:40px;min-width:28px}
+  .date-add-btn{padding:8px 12px;font-size:12px;min-height:36px}
+
+  /* 車両チェックリスト */
+  .chk-list{gap:6px}
+  .chk-list label{font-size:12px;padding:8px 10px;min-height:36px}
+
+  /* 詳細ビュー */
+  .view-row{flex-direction:column;gap:2px;margin-bottom:10px}
+  .view-row .view-label{min-width:0;font-size:11px}
+  .view-row .view-val{font-size:14px}
+  .view-section{margin-top:12px;padding-top:10px}
+  .view-section h3{font-size:11px}
+
+  /* レンタル追加セクション */
+  .rental-add-row{gap:6px}
+  .rental-add-row select,.rental-add-row input{padding:9px 8px;font-size:13px;min-height:38px}
+  .rental-add-row .ra-cat{width:calc(50% - 3px)}
+  .rental-add-row .ra-item{width:calc(50% - 3px)}
+  .rental-add-row .ra-qty{width:60px}
+  .rental-add-row .ra-date{width:calc(50% - 35px)}
+  .rental-add-row .ra-rm{padding:8px;min-height:38px;font-size:18px}
+  .rental-existing{font-size:11px;padding:8px 0;flex-wrap:wrap}
+  .rental-existing .re-info{font-size:12px;line-height:1.5}
+
+  /* toast */
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
+}
+
+@media (max-width:420px){
+  .nav-link{font-size:11px;padding:7px 8px}
+  .hdr h1{font-size:14px}
+  .hdr-btn{font-size:10px;padding:6px 8px}
+  .phase-grid{grid-template-columns:1fr 1fr;gap:6px}
+  .gantt-label-hd,.gantt-row-label{min-width:140px;max-width:140px}
+}
 </style>
 </head>
 <body>

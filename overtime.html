@@ -100,12 +100,79 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .staff-del:hover{text-decoration:underline}
 .req-textarea{width:100%;min-height:80px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.5 'Noto Sans JP',sans-serif;resize:vertical;margin-bottom:12px}
 .loading{text-align:center;padding:40px;color:var(--text-faint);font:500 14px/1 'Noto Sans JP',sans-serif}
-@media(max-width:600px){
-  .ov-header,.ov-row,.ov-summary{font-size:11px}
-  .ov-cell{padding:6px 4px}
-  .ov-cell.name-cell{font-size:11px}
-  .day-row{flex-direction:column;align-items:flex-start;gap:8px}
-  .day-label{width:auto}
+@media(max-width:768px){
+  html{font-size:14px}
+  body{padding-bottom:40px}
+
+  /* ヘッダー：横スクロール */
+  .header{padding:0 10px;gap:4px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .header::-webkit-scrollbar{display:none}
+  .header h1{font-size:15px;margin-right:6px;flex-shrink:0;white-space:nowrap}
+  .nav-link{font-size:12px;padding:8px 10px;flex-shrink:0;white-space:nowrap}
+  .hdr-btn{font-size:11px;padding:7px 10px;flex-shrink:0;white-space:nowrap}
+
+  /* タブ */
+  .tabs{padding:0 10px;top:56px}
+  .tab{padding:12px 16px;font-size:13px;min-height:46px;flex:1;text-align:center}
+
+  /* 週ナビ：コンパクトに */
+  .week-bar{padding:10px 12px;gap:8px}
+  .week-btn{padding:10px 12px;font-size:12px;min-height:40px}
+  .week-label{font-size:13px}
+
+  /* リクエストバナー */
+  .request-banner{margin:10px 12px;padding:12px 14px;font-size:12px;line-height:1.5}
+
+  /* 申告ビュー */
+  .staff-section{padding:12px 10px}
+  .staff-select-bar{gap:6px;margin-bottom:14px}
+  .staff-select-bar>span{width:100%;margin-bottom:4px}
+  .staff-chip{padding:10px 14px;font-size:13px;min-height:40px}
+
+  /* day-row：縦積み、時間チップ拡大 */
+  .day-row{flex-direction:column;align-items:stretch;gap:10px;padding:12px 14px}
+  .day-row.holiday-row{background:#fffbeb}
+  .day-label{width:auto;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .day-label .date{margin-top:0;font-size:12px}
+  .day-label .holiday-name{margin-top:0;font-size:11px}
+  .time-chips{gap:6px}
+  .time-chip{padding:11px 10px;font-size:13px;min-height:44px;flex:0 1 calc(33.333% - 6px);min-width:0;text-align:center}
+  .time-chip.holiday-chip{flex-basis:calc(33.333% - 6px)}
+  .day-clear{align-self:flex-end;padding:8px 12px;font-size:12px;min-height:36px}
+
+  /* 管理ビュー：overview-grid は横スクロール */
+  .admin-section{padding:12px 10px}
+  .admin-tools{gap:8px;margin-bottom:12px}
+  .admin-btn{padding:10px 14px;font-size:12px;min-height:42px}
+  .overview-grid{overflow-x:auto;-webkit-overflow-scrolling:touch;display:block}
+  .overview-grid::-webkit-scrollbar{height:6px}
+  .overview-grid::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
+  .ov-header,.ov-row,.ov-summary{min-width:560px;font-size:11px;display:grid}
+  .ov-header{grid-template-columns:80px repeat(var(--cols),minmax(60px,1fr))}
+  .ov-row{grid-template-columns:80px repeat(var(--cols),minmax(60px,1fr))}
+  .ov-summary{grid-template-columns:80px repeat(var(--cols),minmax(60px,1fr))}
+  .ov-cell{padding:8px 4px}
+  .ov-cell.name-cell{font-size:11px;text-align:left}
+  .ov-cell .ot-time,.ov-cell .ot-holiday{font-size:10px;padding:3px 6px}
+
+  /* モーダル：ボトムシート風 */
+  .modal-bg{align-items:flex-end;padding:0}
+  .modal{width:100%;max-width:100%;border-radius:14px 14px 0 0;padding:20px 16px 24px;max-height:92vh}
+  .modal h2{font-size:16px;margin-bottom:14px}
+  .modal input[type=text]{padding:12px 14px;font-size:16px;min-height:44px}
+  .req-textarea{padding:12px 14px;font-size:16px;min-height:90px}
+  .staff-list-item{padding:12px;font-size:14px}
+  .staff-list-item span{font-size:14px}
+  .staff-del{padding:8px 12px;font-size:12px;min-height:36px}
+}
+@media(max-width:420px){
+  .nav-link{font-size:11px;padding:7px 8px}
+  .header h1{font-size:14px}
+  .hdr-btn{font-size:10px;padding:6px 8px}
+  .time-chip{flex-basis:calc(50% - 6px);font-size:12px}
+  .time-chip.holiday-chip{flex-basis:calc(50% - 6px)}
+  .week-btn{padding:9px 10px;font-size:11px}
+  .week-label{font-size:12px}
 }
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:14px 28px;border-radius:12px;font:600 14px/1 'Noto Sans JP',sans-serif;z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.15)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
