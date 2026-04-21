@@ -567,12 +567,11 @@ function renderGantt(){
   items.sort((a,b)=>{const da=parseDates(a.date_load_in)[0]||parseDates(a.date_setup)[0]||parseDates(a.date_event)[0]||parseDates(a.date_rental_out)[0]||new Date('9999-12-31');const db=parseDates(b.date_load_in)[0]||parseDates(b.date_setup)[0]||parseDates(b.date_event)[0]||parseDates(b.date_rental_out)[0]||new Date('9999-12-31');return da-db});
   const dates=[];for(let i=0;i<ganttDays;i++){const d=new Date(ganttStart);d.setDate(d.getDate()+i);dates.push(d)}
   const todayStr=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
-  let h=`<div style="font-size:14px;color:var(--text-dim);margin-bottom:14px">${todayStr}</div>`;
+  let h=`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px"><div style="font-size:14px;color:var(--text-dim)">${todayStr}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div>`;
   h+='<div class="gantt-controls"><div class="gantt-nav"><button onclick="ganttMove(-7)">← 1週</button><button onclick="ganttToday()">今日</button><button onclick="ganttMove(7)">1週 →</button></div>';
   h+=`<select onchange="ganttDays=+this.value;render()"><option value="14"${ganttDays===14?' selected':''}>2週間</option><option value="21"${ganttDays===21?' selected':''}>3週間</option><option value="28"${ganttDays===28?' selected':''}>4週間</option><option value="42"${ganttDays===42?' selected':''}>6週間</option></select>`;
   h+=`<select onchange="ganttStatusFilter=this.value;render()"><option value=""${!ganttStatusFilter?' selected':''}>全ステータス</option><option value="見積中">見積中</option><option value="受注">受注</option><option value="準備中">準備中</option><option value="現場中">現場中</option><option value="完了">完了</option></select>`;
-  h+=`<input style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:180px" placeholder="検索..." oninput="ganttFilter(this.value)">`;
-  h+=`<button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div>`;
+  h+=`<input style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:180px" placeholder="検索..." oninput="ganttFilter(this.value)"></div>`;
   h+='<div class="gantt-wrap"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd">現場名</div><div class="gantt-dates">';
   h+=ganttDateHeaders(dates);
   h+='</div></div>';
