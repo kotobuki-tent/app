@@ -132,6 +132,18 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .st-btn:hover{border-color:var(--accent);color:var(--accent)}
 .st-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);cursor:default}
 
+/* ステータスログボタン */
+.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap}
+.slog-btn:hover{border-color:var(--accent);color:var(--accent)}
+.slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
+.slog-btn.has-new .dot{display:block}
+.slog-item{padding:12px 14px;border-bottom:1px solid var(--surface3);font-size:13px;line-height:1.6;cursor:pointer;transition:.15s}
+.slog-item:hover{background:var(--accent-dim)}
+.slog-item:last-child{border-bottom:none}
+.slog-item .sl-name{font-weight:600;color:var(--text)}
+.slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
+.slog-empty{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
+
 /* ========== スマホ対応 ========== */
 @media (max-width:768px){
   html{font-size:14px}
@@ -150,6 +162,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   /* 工場ボード：padding削減 */
   .factory-view,.admin-view{padding:12px 10px}
   .fv-date{font-size:13px;margin-bottom:10px}
+  .slog-btn{font-size:11px;padding:7px 10px}
 
   /* サマリー：2〜3列grid化 */
   .fv-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:18px}
@@ -328,6 +341,14 @@ tr:hover td{background:rgba(59,111,216,.03)}
   <div class="mo-foot"><button class="cancel" onclick="closeFilePicker()">閉じる</button></div>
 </div>
 </div>
+<!-- ステータスログモーダル -->
+<div class="mo-bg" id="slogBg">
+<div class="mo" style="max-width:560px">
+  <h2>ステータスログ</h2>
+  <div id="slogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+  <div class="mo-foot"><button class="cancel" onclick="closeSlog()">閉じる</button></div>
+</div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
@@ -337,6 +358,10 @@ let prodSort={col:null,asc:true};
 let prodFilter=null;
 let adminStatusFilter=null;
 let archiveSort={col:'deadline',asc:false};
+// ステータスログ：pendingLog は [{id, project, from, to}]、新しい順
+let pendingLog=[];
+const SLOG_KEY='prod_status_snapshot';
+const SLOG_PENDING_KEY='prod_status_pending';
 const $=id=>document.getElementById(id);
 const today=new Date();today.setHours(0,0,0,0);
 const pad=n=>String(n).padStart(2,'0');
@@ -353,9 +378,65 @@ function vr(label,val){return`<div class="view-row"><div class="view-label">${la
 function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
 
 // ===== データ読み込み =====
-async function loadProd(){try{const r=await fetch(API+'?action=read&dept=production');const j=await r.json();if(j.success)prodData=j.data}catch(e){toast('生産部データ取得エラー',true)}}
+async function loadProd(){try{const r=await fetch(API+'?action=read&dept=production');const j=await r.json();if(j.success){prodData=j.data;detectStatusChanges()}}catch(e){toast('生産部データ取得エラー',true)}}
 async function loadAll(){$('loader').classList.remove('hidden');await loadProd();$('loader').classList.add('hidden');render()}
 function refreshData(){loadAll()}
+
+// ===== ステータス変更検知 =====
+function detectStatusChanges(){
+  // 現在の状態スナップショット: { id: {status, project} }
+  const curr={};
+  prodData.forEach(d=>{if(d.id&&String(d.id).indexOf('tmp_')!==0)curr[String(d.id)]={status:d.status||'',project:d.project||''}});
+  // 保存済みの pendingLog を復元
+  try{pendingLog=JSON.parse(localStorage.getItem(SLOG_PENDING_KEY)||'[]')}catch(e){pendingLog=[]}
+  // 前回のスナップショット
+  let prev=null;
+  try{prev=JSON.parse(localStorage.getItem(SLOG_KEY)||'null')}catch(e){prev=null}
+  // 初回はスナップショットを保存するだけ
+  if(!prev){localStorage.setItem(SLOG_KEY,JSON.stringify(curr));return}
+  // 差分計算：既存IDでステータスが変わったもののみ
+  const newEntries=[];
+  Object.keys(curr).forEach(id=>{
+    if(prev[id]&&prev[id].status!==curr[id].status){
+      newEntries.push({id,project:curr[id].project,from:prev[id].status,to:curr[id].status,ts:Date.now()});
+    }
+  });
+  // pendingLog に追加（同じIDの古いエントリは削除）
+  if(newEntries.length){
+    const newIds=new Set(newEntries.map(e=>e.id));
+    pendingLog=pendingLog.filter(e=>!newIds.has(e.id));
+    pendingLog=[...newEntries,...pendingLog].slice(0,100);
+    localStorage.setItem(SLOG_PENDING_KEY,JSON.stringify(pendingLog));
+  }
+  // スナップショット更新
+  localStorage.setItem(SLOG_KEY,JSON.stringify(curr));
+}
+
+// ===== ステータスログモーダル =====
+function openSlog(){
+  const el=$('slogList');
+  if(!pendingLog.length){
+    el.innerHTML='<div class="slog-empty">新しい変更はありません</div>';
+  }else{
+    let h='';
+    pendingLog.forEach(e=>{
+      h+=`<div class="slog-item" data-id="${esc(e.id)}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> になりました</div>`;
+    });
+    el.innerHTML=h;
+    el.querySelectorAll('.slog-item').forEach(it=>{
+      it.onclick=()=>{closeSlog();viewProd(it.dataset.id)};
+    });
+  }
+  $('slogBg').classList.add('show');
+}
+function closeSlog(){
+  $('slogBg').classList.remove('show');
+  // 見たとみなしてクリア
+  pendingLog=[];
+  localStorage.setItem(SLOG_PENDING_KEY,'[]');
+  // バッジを消すために再描画（工場ボード表示中の場合のみ見た目が変わる）
+  if(curProdView==='factory')renderFactory();
+}
 
 // ===== 描画 =====
 function render(){
@@ -374,7 +455,7 @@ function renderFactory(){
   let filtered=items;
   if(prodFilter){if(['製作中','完成','受注'].includes(prodFilter))filtered=items.filter(d=>d.status===prodFilter);else if(['2F工場','1F工場','出力関係','外注','未定','その他'].includes(prodFilter))filtered=items.filter(d=>d.section===prodFilter);else if(prodFilter==='urgent')filtered=items.filter(d=>d._urgN<=0);else if(prodFilter==='thisweek')filtered=items.filter(d=>d._urgN===1)}
   const si=(f,n,l,color)=>{const on=prodFilter===f?' on':'';return`<div class="fv-si${on}" data-f="${f}" style="${color?'color:'+color:''}"><div class="n">${n}</div><div class="l">${l}</div></div>`};
-  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="fv-date">${dateJP(today)}</div><input class="av-search" placeholder="検索..." oninput="factoryFilter(this.value)"></div><div class="fv-sum">`;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div class="fv-date">${dateJP(today)}</div><button class="slog-btn${pendingLog.length?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div><input class="av-search" placeholder="検索..." oninput="factoryFilter(this.value)"></div><div class="fv-sum">`;
   h+=si('all',items.length,'すべて','');
   h+=si('urgent',items.filter(d=>d._urgN<=0).length,'納期迫る','var(--red)');
   h+=si('thisweek',items.filter(d=>d._urgN===1).length,'今週中','var(--orange)');
