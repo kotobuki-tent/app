@@ -162,6 +162,21 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .rental-existing .re-del{background:none;border:none;color:var(--red);font-size:11px;cursor:pointer}
 .rental-existing .re-del:hover{text-decoration:underline}
 
+/* ステータスログボタン */
+.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap}
+.slog-btn:hover{border-color:var(--accent);color:var(--accent)}
+.slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
+.slog-btn.has-new .dot{display:block}
+.slog-item{padding:12px 14px;border-bottom:1px solid var(--surface3);font-size:13px;line-height:1.6;cursor:pointer;transition:.15s}
+.slog-item:hover{background:var(--accent-dim)}
+.slog-item.sl-del{cursor:default;color:var(--text-dim)}
+.slog-item.sl-del:hover{background:transparent}
+.slog-item.sl-del .sl-st{color:var(--red)}
+.slog-item:last-child{border-bottom:none}
+.slog-item .sl-name{font-weight:600;color:var(--text)}
+.slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
+.slog-empty{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
+
 /* ========== スマホ対応 ========== */
 @media (max-width:768px){
   html{font-size:14px}
@@ -382,6 +397,17 @@ tr:hover td{background:rgba(59,111,216,.03)}
   <div class="mo-foot"><button class="cancel" onclick="$('projViewBg').classList.remove('show')">閉じる</button></div>
 </div>
 </div>
+<!-- ステータスログモーダル -->
+<div class="mo-bg" id="slogBg">
+<div class="mo" style="max-width:560px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <h2 style="margin:0">ステータスログ</h2>
+    <button class="act-btn del" style="font-size:12px" onclick="clearSlog()">クリア</button>
+  </div>
+  <div id="slogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+  <div class="mo-foot"><button class="cancel" onclick="closeSlog()">閉じる</button></div>
+</div>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
@@ -406,6 +432,12 @@ let projSort={col:null,asc:true};
 let projDoneSort={col:'_endDate',asc:false};
 let ganttStatusFilter='';
 let ganttStart=null,ganttDays=28;
+// ステータスログ：slog は [{id, project, from, to, ts}]、新しい順、最大20件
+let slog=[];
+let slogUnread=0;
+const SLOG_KEY='proj_status_snapshot';
+const SLOG_LIST_KEY='proj_status_log';
+const SLOG_UNREAD_KEY='proj_status_unread';
 const $=id=>document.getElementById(id);
 const today=new Date();today.setHours(0,0,0,0);
 const pad=n=>String(n).padStart(2,'0');
@@ -431,11 +463,79 @@ function ganttDateHeaders(dates){let h='';dates.forEach(d=>{const ds=dateStr(d);
 function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
 
 // ===== データ読み込み =====
-async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success)projData=j.data}catch(e){toast('企画制作データ取得エラー',true)}}
+async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success){projData=j.data;detectStatusChanges()}}catch(e){toast('企画制作データ取得エラー',true)}}
 async function loadRentals(){try{const r=await fetch(API+'?dept=inventory&action=rentals');const j=await r.json();rentalsData=j||[]}catch(e){rentalsData=[]}}
 async function loadInventoryItems(){try{const r=await fetch(API+'?dept=inventory&action=list');const j=await r.json();inventoryItems=j||[]}catch(e){inventoryItems=[]}}
 async function loadAll(){$('loader').classList.remove('hidden');await Promise.all([loadProj(),loadRentals(),loadInventoryItems()]);$('loader').classList.add('hidden');render()}
 function refreshData(){loadAll()}
+
+// ===== ステータス変更検知 =====
+function detectStatusChanges(){
+  const curr={};
+  projData.forEach(d=>{if(d.id&&String(d.id).indexOf('tmp_')!==0)curr[String(d.id)]={status:d.status||'',project:d.project||''}});
+  try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
+  try{slogUnread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){slogUnread=0}
+  let prev=null;
+  try{prev=JSON.parse(localStorage.getItem(SLOG_KEY)||'null')}catch(e){prev=null}
+  if(!prev){localStorage.setItem(SLOG_KEY,JSON.stringify(curr));return}
+  const newEntries=[];
+  Object.keys(curr).forEach(id=>{
+    if(!prev[id]){
+      newEntries.push({id,project:curr[id].project,from:'',to:'新規登録',ts:Date.now(),isNew:true});
+    }else if(prev[id].status!==curr[id].status){
+      newEntries.push({id,project:curr[id].project,from:prev[id].status,to:curr[id].status,ts:Date.now()});
+    }
+  });
+  Object.keys(prev).forEach(id=>{
+    if(!curr[id]){
+      newEntries.push({id,project:prev[id].project,from:prev[id].status,to:'削除',ts:Date.now(),isDel:true});
+    }
+  });
+  if(newEntries.length){
+    slog=[...newEntries,...slog].slice(0,20);
+    slogUnread=Math.min(slogUnread+newEntries.length,20);
+    localStorage.setItem(SLOG_LIST_KEY,JSON.stringify(slog));
+    localStorage.setItem(SLOG_UNREAD_KEY,String(slogUnread));
+  }
+  localStorage.setItem(SLOG_KEY,JSON.stringify(curr));
+}
+
+// ===== ステータスログモーダル =====
+function openSlog(){
+  const el=$('slogList');
+  if(!slog.length){
+    el.innerHTML='<div class="slog-empty">変更履歴はまだありません</div>';
+  }else{
+    let h='';
+    slog.forEach(e=>{
+      const verb=(e.isNew||e.isDel)?'されました':'になりました';
+      const cls=e.isDel?' sl-del':'';
+      h+=`<div class="slog-item${cls}" data-id="${esc(e.id)}" data-del="${e.isDel?'1':'0'}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> ${verb}</div>`;
+    });
+    el.innerHTML=h;
+    el.querySelectorAll('.slog-item').forEach(it=>{
+      if(it.dataset.del==='1')return;
+      it.onclick=()=>{closeSlog();viewProj(it.dataset.id)};
+    });
+  }
+  slogUnread=0;
+  localStorage.setItem(SLOG_UNREAD_KEY,'0');
+  $('slogBg').classList.add('show');
+  if(curProjView==='gantt')renderGantt();
+}
+function closeSlog(){
+  $('slogBg').classList.remove('show');
+}
+function clearSlog(){
+  if(!slog.length)return;
+  if(!confirm('ログをすべて削除しますか？'))return;
+  slog=[];
+  slogUnread=0;
+  localStorage.setItem(SLOG_LIST_KEY,'[]');
+  localStorage.setItem(SLOG_UNREAD_KEY,'0');
+  $('slogList').innerHTML='<div class="slog-empty">変更履歴はまだありません</div>';
+  if(curProjView==='gantt')renderGantt();
+}
 
 // ===== 描画 =====
 function render(){
@@ -457,7 +557,8 @@ function renderGantt(){
   let h='<div class="gantt-controls"><div class="gantt-nav"><button onclick="ganttMove(-7)">← 1週</button><button onclick="ganttToday()">今日</button><button onclick="ganttMove(7)">1週 →</button></div>';
   h+=`<select onchange="ganttDays=+this.value;render()"><option value="14"${ganttDays===14?' selected':''}>2週間</option><option value="21"${ganttDays===21?' selected':''}>3週間</option><option value="28"${ganttDays===28?' selected':''}>4週間</option><option value="42"${ganttDays===42?' selected':''}>6週間</option></select>`;
   h+=`<select onchange="ganttStatusFilter=this.value;render()"><option value=""${!ganttStatusFilter?' selected':''}>全ステータス</option><option value="見積中">見積中</option><option value="受注">受注</option><option value="準備中">準備中</option><option value="現場中">現場中</option><option value="完了">完了</option></select>`;
-  h+=`<input style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:180px" placeholder="検索..." oninput="ganttFilter(this.value)"></div>`;
+  h+=`<input style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:180px" placeholder="検索..." oninput="ganttFilter(this.value)">`;
+  h+=`<button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div>`;
   h+='<div class="gantt-wrap"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd">現場名</div><div class="gantt-dates">';
   h+=ganttDateHeaders(dates);
   h+='</div></div>';
@@ -631,7 +732,7 @@ function deleteProjectRental(id){
 $('projTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t)return;$('projTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProjView=t.dataset.view;render()});
 /* 背景クリックで閉じない — 明示的にボタンで閉じる */
 loadAll();
-setInterval(()=>{if(curProjView==='gantt')loadAll()},3*60*1000);
+setInterval(loadAll,60*1000);
 </script>
 </body>
 </html>
