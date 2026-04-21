@@ -139,6 +139,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .slog-btn.has-new .dot{display:block}
 .slog-item{padding:12px 14px;border-bottom:1px solid var(--surface3);font-size:13px;line-height:1.6;cursor:pointer;transition:.15s}
 .slog-item:hover{background:var(--accent-dim)}
+.slog-item.sl-del{cursor:default;color:var(--text-dim)}
+.slog-item.sl-del:hover{background:transparent}
+.slog-item.sl-del .sl-st{color:var(--red)}
 .slog-item:last-child{border-bottom:none}
 .slog-item .sl-name{font-weight:600;color:var(--text)}
 .slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
@@ -401,7 +404,7 @@ function detectStatusChanges(){
   try{prev=JSON.parse(localStorage.getItem(SLOG_KEY)||'null')}catch(e){prev=null}
   // 初回はスナップショットを保存するだけ
   if(!prev){localStorage.setItem(SLOG_KEY,JSON.stringify(curr));return}
-  // 差分計算：既存IDでステータスが変わったもの、または新規追加されたもの
+  // 差分計算：新規追加、ステータス変更、削除
   const newEntries=[];
   Object.keys(curr).forEach(id=>{
     if(!prev[id]){
@@ -410,6 +413,12 @@ function detectStatusChanges(){
     }else if(prev[id].status!==curr[id].status){
       // ステータス変更
       newEntries.push({id,project:curr[id].project,from:prev[id].status,to:curr[id].status,ts:Date.now()});
+    }
+  });
+  // 削除検出：prev にあって curr にないID
+  Object.keys(prev).forEach(id=>{
+    if(!curr[id]){
+      newEntries.push({id,project:prev[id].project,from:prev[id].status,to:'削除',ts:Date.now(),isDel:true});
     }
   });
   // slog に追加（新しい順、最大20件）
@@ -431,11 +440,13 @@ function openSlog(){
   }else{
     let h='';
     slog.forEach(e=>{
-      const verb=e.isNew?'されました':'になりました';
-      h+=`<div class="slog-item" data-id="${esc(e.id)}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> ${verb}</div>`;
+      const verb=(e.isNew||e.isDel)?'されました':'になりました';
+      const cls=e.isDel?' sl-del':'';
+      h+=`<div class="slog-item${cls}" data-id="${esc(e.id)}" data-del="${e.isDel?'1':'0'}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> ${verb}</div>`;
     });
     el.innerHTML=h;
     el.querySelectorAll('.slog-item').forEach(it=>{
+      if(it.dataset.del==='1')return; // 削除済みはクリック無効
       it.onclick=()=>{closeSlog();viewProd(it.dataset.id)};
     });
   }
