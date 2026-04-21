@@ -373,7 +373,6 @@ tr:hover td{background:rgba(59,111,216,.03)}
 <div class="mo" style="max-width:680px">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
     <h2 style="margin:0">STAFF <span id="staffCountLabel" style="font-size:14px;font-weight:500;color:var(--text-dim)"></span></h2>
-    <div style="font-size:11px;color:var(--text-faint)">タップで切替</div>
   </div>
   <div id="staffGrid" class="staff-grid" style="max-height:60vh;overflow-y:auto"></div>
   <div class="mo-foot"><button class="cancel" onclick="closeStaff()">閉じる</button></div>
@@ -525,9 +524,7 @@ function renderStaffGrid(){
   let h='';
   staffList.forEach(s=>{
     const on=attendance[s.employee_no]?' on':'';
-    h+=`<div class="staff-cell${on}" data-emp="${esc(s.employee_no)}">${esc(s.name)}`;
-    if(s.position)h+=`<span class="pos">${esc(s.position)}</span>`;
-    h+=`</div>`;
+    h+=`<div class="staff-cell${on}" data-emp="${esc(s.employee_no)}">${esc(s.name)}</div>`;
   });
   el.innerHTML=h;
   el.querySelectorAll('.staff-cell').forEach(cell=>{
