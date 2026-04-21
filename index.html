@@ -152,9 +152,11 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .staff-btn:hover{border-color:var(--accent);color:var(--accent)}
 .staff-btn .count{font-weight:700;color:var(--text);margin-left:4px}
 .staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:4px}
-.staff-cell{padding:14px 10px;border:2px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-dim);font:500 14px/1.3 'Noto Sans JP',sans-serif;cursor:pointer;text-align:center;transition:.1s;user-select:none}
+.staff-cell{padding:14px 10px;border:2px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-dim);font:500 14px/1.3 'Noto Sans JP',sans-serif;cursor:pointer;text-align:center;transition:.1s;user-select:none;position:relative}
 .staff-cell:hover{border-color:var(--accent)}
-.staff-cell.on{background:var(--green);color:#fff;border-color:var(--green);font-weight:700}
+.staff-cell.f1{background:#aed581;color:#1b5e20;border-color:#8bc34a;font-weight:700}
+.staff-cell.f2{background:#81d4fa;color:#01579b;border-color:#4fc3f7;font-weight:700}
+.staff-cell .floor-badge{position:absolute;top:3px;right:6px;font-size:10px;font-weight:700;opacity:.85}
 .staff-cell .pos{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.75}
 
 /* ========== スマホ対応 ========== */
@@ -506,10 +508,25 @@ function clearSlog(){
 }
 
 // ===== STAFF（出勤者）=====
+// attendance[empNo] は "1F" | "2F" | "" | undefined
 function staffCount(){
   let present=0,total=staffList.length;
-  staffList.forEach(s=>{if(attendance[s.employee_no])present++});
+  staffList.forEach(s=>{const f=attendance[s.employee_no];if(f==='1F'||f==='2F')present++});
   return{present,total};
+}
+function nextFloor(cur){
+  if(cur==='1F')return'2F';
+  if(cur==='2F')return'';
+  return'1F';
+}
+function floorClass(f){
+  if(f==='1F')return' f1';
+  if(f==='2F')return' f2';
+  return'';
+}
+function floorBadge(f){
+  if(f==='1F'||f==='2F')return`<span class="floor-badge">${f}</span>`;
+  return'';
 }
 function openStaff(){
   renderStaffGrid();
@@ -523,8 +540,8 @@ function renderStaffGrid(){
   if(!staffList.length){el.innerHTML='<div class="slog-empty" style="grid-column:1/-1">STAFFが登録されていません</div>';return}
   let h='';
   staffList.forEach(s=>{
-    const on=attendance[s.employee_no]?' on':'';
-    h+=`<div class="staff-cell${on}" data-emp="${esc(s.employee_no)}">${esc(s.name)}</div>`;
+    const f=attendance[s.employee_no]||'';
+    h+=`<div class="staff-cell${floorClass(f)}" data-emp="${esc(s.employee_no)}">${floorBadge(f)}${esc(s.name)}</div>`;
   });
   el.innerHTML=h;
   el.querySelectorAll('.staff-cell').forEach(cell=>{
@@ -532,19 +549,33 @@ function renderStaffGrid(){
   });
 }
 function toggleStaff(empNo){
-  // 楽観的更新
-  attendance[empNo]=!attendance[empNo];
-  // 現在の cell を即座に更新
+  // ロータリー循環 "" → "1F" → "2F" → ""
+  const cur=attendance[empNo]||'';
+  const nxt=nextFloor(cur);
+  attendance[empNo]=nxt;
+  // 該当 cell のclass・バッジを即座に更新
   const cell=$('staffGrid').querySelector(`.staff-cell[data-emp="${empNo}"]`);
-  if(cell)cell.classList.toggle('on');
+  if(cell){
+    cell.classList.remove('f1','f2');
+    if(nxt==='1F')cell.classList.add('f1');
+    else if(nxt==='2F')cell.classList.add('f2');
+    // バッジ更新
+    const oldBadge=cell.querySelector('.floor-badge');
+    if(oldBadge)oldBadge.remove();
+    if(nxt){
+      const b=document.createElement('span');
+      b.className='floor-badge';
+      b.textContent=nxt;
+      cell.insertBefore(b,cell.firstChild);
+    }
+  }
   // カウンタ更新
   const c=staffCount();
   $('staffCountLabel').textContent=`${c.present}/${c.total}`;
-  // ボタン側のカウンタも更新
   if(curProdView==='factory')updateStaffBtnCount();
   // サーバーに投げる
   const d=new Date();const todayStr=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  fireAndForget({dept:'attendance',action:'toggle',employee_no:empNo,date:todayStr});
+  fireAndForget({dept:'attendance',action:'cycle',employee_no:empNo,date:todayStr});
 }
 function updateStaffBtnCount(){
   const btn=document.querySelector('.staff-btn .count');
