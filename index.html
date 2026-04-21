@@ -358,10 +358,13 @@ let prodSort={col:null,asc:true};
 let prodFilter=null;
 let adminStatusFilter=null;
 let archiveSort={col:'deadline',asc:false};
-// ステータスログ：pendingLog は [{id, project, from, to}]、新しい順
-let pendingLog=[];
+// ステータスログ：slog は [{id, project, from, to, ts}]、新しい順、最大20件
+// slogUnread は未読バッジ件数（実際は1以上なら赤丸表示）
+let slog=[];
+let slogUnread=0;
 const SLOG_KEY='prod_status_snapshot';
-const SLOG_PENDING_KEY='prod_status_pending';
+const SLOG_LIST_KEY='prod_status_log';
+const SLOG_UNREAD_KEY='prod_status_unread';
 const $=id=>document.getElementById(id);
 const today=new Date();today.setHours(0,0,0,0);
 const pad=n=>String(n).padStart(2,'0');
@@ -387,8 +390,9 @@ function detectStatusChanges(){
   // 現在の状態スナップショット: { id: {status, project} }
   const curr={};
   prodData.forEach(d=>{if(d.id&&String(d.id).indexOf('tmp_')!==0)curr[String(d.id)]={status:d.status||'',project:d.project||''}});
-  // 保存済みの pendingLog を復元
-  try{pendingLog=JSON.parse(localStorage.getItem(SLOG_PENDING_KEY)||'[]')}catch(e){pendingLog=[]}
+  // 保存済みの slog（全ログ）と unreadCount を復元
+  try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
+  try{slogUnread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){slogUnread=0}
   // 前回のスナップショット
   let prev=null;
   try{prev=JSON.parse(localStorage.getItem(SLOG_KEY)||'null')}catch(e){prev=null}
@@ -401,12 +405,12 @@ function detectStatusChanges(){
       newEntries.push({id,project:curr[id].project,from:prev[id].status,to:curr[id].status,ts:Date.now()});
     }
   });
-  // pendingLog に追加（同じIDの古いエントリは削除）
+  // slog に追加（新しい順、最大20件）
   if(newEntries.length){
-    const newIds=new Set(newEntries.map(e=>e.id));
-    pendingLog=pendingLog.filter(e=>!newIds.has(e.id));
-    pendingLog=[...newEntries,...pendingLog].slice(0,100);
-    localStorage.setItem(SLOG_PENDING_KEY,JSON.stringify(pendingLog));
+    slog=[...newEntries,...slog].slice(0,20);
+    slogUnread=Math.min(slogUnread+newEntries.length,20);
+    localStorage.setItem(SLOG_LIST_KEY,JSON.stringify(slog));
+    localStorage.setItem(SLOG_UNREAD_KEY,String(slogUnread));
   }
   // スナップショット更新
   localStorage.setItem(SLOG_KEY,JSON.stringify(curr));
@@ -415,11 +419,11 @@ function detectStatusChanges(){
 // ===== ステータスログモーダル =====
 function openSlog(){
   const el=$('slogList');
-  if(!pendingLog.length){
-    el.innerHTML='<div class="slog-empty">新しい変更はありません</div>';
+  if(!slog.length){
+    el.innerHTML='<div class="slog-empty">変更履歴はまだありません</div>';
   }else{
     let h='';
-    pendingLog.forEach(e=>{
+    slog.forEach(e=>{
       h+=`<div class="slog-item" data-id="${esc(e.id)}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> になりました</div>`;
     });
     el.innerHTML=h;
@@ -427,15 +431,14 @@ function openSlog(){
       it.onclick=()=>{closeSlog();viewProd(it.dataset.id)};
     });
   }
+  // 開いた時点で既読化（赤丸だけ消す。ログ本体は残す）
+  slogUnread=0;
+  localStorage.setItem(SLOG_UNREAD_KEY,'0');
   $('slogBg').classList.add('show');
+  if(curProdView==='factory')renderFactory();
 }
 function closeSlog(){
   $('slogBg').classList.remove('show');
-  // 見たとみなしてクリア
-  pendingLog=[];
-  localStorage.setItem(SLOG_PENDING_KEY,'[]');
-  // バッジを消すために再描画（工場ボード表示中の場合のみ見た目が変わる）
-  if(curProdView==='factory')renderFactory();
 }
 
 // ===== 描画 =====
@@ -455,7 +458,7 @@ function renderFactory(){
   let filtered=items;
   if(prodFilter){if(['製作中','完成','受注'].includes(prodFilter))filtered=items.filter(d=>d.status===prodFilter);else if(['2F工場','1F工場','出力関係','外注','未定','その他'].includes(prodFilter))filtered=items.filter(d=>d.section===prodFilter);else if(prodFilter==='urgent')filtered=items.filter(d=>d._urgN<=0);else if(prodFilter==='thisweek')filtered=items.filter(d=>d._urgN===1)}
   const si=(f,n,l,color)=>{const on=prodFilter===f?' on':'';return`<div class="fv-si${on}" data-f="${f}" style="${color?'color:'+color:''}"><div class="n">${n}</div><div class="l">${l}</div></div>`};
-  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div class="fv-date">${dateJP(today)}</div><button class="slog-btn${pendingLog.length?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div><input class="av-search" placeholder="検索..." oninput="factoryFilter(this.value)"></div><div class="fv-sum">`;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div class="fv-date">${dateJP(today)}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div><input class="av-search" placeholder="検索..." oninput="factoryFilter(this.value)"></div><div class="fv-sum">`;
   h+=si('all',items.length,'すべて','');
   h+=si('urgent',items.filter(d=>d._urgN<=0).length,'納期迫る','var(--red)');
   h+=si('thisweek',items.filter(d=>d._urgN===1).length,'今週中','var(--orange)');
