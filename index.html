@@ -344,7 +344,10 @@ tr:hover td{background:rgba(59,111,216,.03)}
 <!-- ステータスログモーダル -->
 <div class="mo-bg" id="slogBg">
 <div class="mo" style="max-width:560px">
-  <h2>ステータスログ</h2>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <h2 style="margin:0">ステータスログ</h2>
+    <button class="act-btn del" style="font-size:12px" onclick="clearSlog()">クリア</button>
+  </div>
   <div id="slogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
   <div class="mo-foot"><button class="cancel" onclick="closeSlog()">閉じる</button></div>
 </div>
@@ -398,10 +401,14 @@ function detectStatusChanges(){
   try{prev=JSON.parse(localStorage.getItem(SLOG_KEY)||'null')}catch(e){prev=null}
   // 初回はスナップショットを保存するだけ
   if(!prev){localStorage.setItem(SLOG_KEY,JSON.stringify(curr));return}
-  // 差分計算：既存IDでステータスが変わったもののみ
+  // 差分計算：既存IDでステータスが変わったもの、または新規追加されたもの
   const newEntries=[];
   Object.keys(curr).forEach(id=>{
-    if(prev[id]&&prev[id].status!==curr[id].status){
+    if(!prev[id]){
+      // 新規登録
+      newEntries.push({id,project:curr[id].project,from:'',to:'新規登録',ts:Date.now(),isNew:true});
+    }else if(prev[id].status!==curr[id].status){
+      // ステータス変更
       newEntries.push({id,project:curr[id].project,from:prev[id].status,to:curr[id].status,ts:Date.now()});
     }
   });
@@ -424,7 +431,8 @@ function openSlog(){
   }else{
     let h='';
     slog.forEach(e=>{
-      h+=`<div class="slog-item" data-id="${esc(e.id)}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> になりました</div>`;
+      const verb=e.isNew?'されました':'になりました';
+      h+=`<div class="slog-item" data-id="${esc(e.id)}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> ${verb}</div>`;
     });
     el.innerHTML=h;
     el.querySelectorAll('.slog-item').forEach(it=>{
@@ -439,6 +447,17 @@ function openSlog(){
 }
 function closeSlog(){
   $('slogBg').classList.remove('show');
+}
+function clearSlog(){
+  if(!slog.length)return;
+  if(!confirm('ログをすべて削除しますか？'))return;
+  slog=[];
+  slogUnread=0;
+  localStorage.setItem(SLOG_LIST_KEY,'[]');
+  localStorage.setItem(SLOG_UNREAD_KEY,'0');
+  // モーダル内容を空表示に更新
+  $('slogList').innerHTML='<div class="slog-empty">変更履歴はまだありません</div>';
+  if(curProdView==='factory')renderFactory();
 }
 
 // ===== 描画 =====
