@@ -187,13 +187,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
 <div class="app">
   <div class="sub-tabs" id="vTabs">
     <button class="sub-tab on" data-view="dash">ダッシュボード</button>
-    <button class="sub-tab" data-view="list">車両一覧</button>
     <button class="sub-tab" data-view="admin">管理</button>
     <button class="sub-tab" data-view="settings">アラート設定</button>
   </div>
   <div id="loadingEl" class="loading"><div class="spin"></div><div>読み込み中...</div></div>
   <div id="dashView" class="dash hidden"></div>
-  <div id="listView" class="vlist hidden"></div>
   <div id="adminView" class="admin-view hidden"></div>
   <div id="settingsView" class="settings-view hidden"></div>
 </div>
@@ -328,9 +326,8 @@ async function loadAll(){
 
 // ===== 描画 =====
 function render(){
-  ['dashView','listView','adminView','settingsView'].forEach(id=>$(id).classList.add('hidden'));
+  ['dashView','adminView','settingsView'].forEach(id=>$(id).classList.add('hidden'));
   if(curView==='dash'){$('dashView').classList.remove('hidden');renderDash()}
-  else if(curView==='list'){$('listView').classList.remove('hidden');renderList()}
   else if(curView==='admin'){$('adminView').classList.remove('hidden');renderAdmin()}
   else if(curView==='settings'){$('settingsView').classList.remove('hidden');renderSettings()}
 }
@@ -413,8 +410,32 @@ function renderDash(){
       h+=`</div></div>`;
     }
   }
+
+  // 車両一覧を統合
+  if(vehicleData.length){
+    const th=getThresholds();
+    const dateLevel=(diff,thDays)=>{if(diff===null)return'';if(diff<0)return'danger';if(diff<=14)return'danger';if(diff<=thDays)return'warn';return'ok'};
+    h+=`<div class="alert-section"><div class="alert-section-hd">車両一覧　${vehicleData.length}件</div><div class="vlist-grid">`;
+    vehicleData.forEach(v=>{
+      const shakenDiff=diffDays(v.shaken_date);
+      const jiDiff=diffDays(v.jibaiseki_date);
+      const hokenDiff=diffDays(v.hoken_date);
+      h+=`<div class="v-card" data-id="${v.id}">
+        <div class="v-top"><span class="v-name">${esc(v.name)}</span><span class="v-status ${esc(v.status||'稼働中')}">${esc(v.status||'稼働中')}</span></div>
+        <div class="v-plate">${esc(v.plate||'')}</div>
+        <div class="v-type">${esc(v.type||'')} ${v.usage?'／'+esc(v.usage):''}</div>
+        <div class="v-dates">`;
+      if(v.shaken_date){const l=dateLevel(shakenDiff,th.shaken);h+=`<span class="v-date ${l}">車検 ${dateJP(v.shaken_date)}${shakenDiff!==null?' ('+shakenDiff+'日)':''}</span>`}
+      if(v.jibaiseki_date){const l=dateLevel(jiDiff,th.jibaiseki);h+=`<span class="v-date ${l}">自賠責 ${dateJP(v.jibaiseki_date)}</span>`}
+      if(v.hoken_date){const l=dateLevel(hokenDiff,th.hoken);h+=`<span class="v-date ${l}">保険 ${dateJP(v.hoken_date)}</span>`}
+      h+=`</div></div>`;
+    });
+    h+=`</div></div>`;
+  }
+
   el.innerHTML=h;
   el.querySelectorAll('.alert-card').forEach(c=>{c.onclick=()=>viewVehicle(c.dataset.id)});
+  el.querySelectorAll('.v-card').forEach(c=>{c.onclick=()=>viewVehicle(c.dataset.id)});
 }
 
 function alertCardHTML(a){
@@ -428,31 +449,6 @@ function alertCardHTML(a){
 }
 
 // ===== 車両一覧 =====
-function renderList(){
-  const el=$('listView');
-  const th=getThresholds();
-  if(!vehicleData.length){el.innerHTML='<div class="no-alerts">車両が登録されていません</div>';return}
-  let h='<div class="vlist-grid">';
-  vehicleData.forEach(v=>{
-    const shakenDiff=diffDays(v.shaken_date);
-    const jiDiff=diffDays(v.jibaiseki_date);
-    const hokenDiff=diffDays(v.hoken_date);
-    const dateLevel=(diff,thDays)=>{if(diff===null)return'';if(diff<0)return'danger';if(diff<=14)return'danger';if(diff<=thDays)return'warn';return'ok'};
-    h+=`<div class="v-card" data-id="${v.id}">
-      <div class="v-top"><span class="v-name">${esc(v.name)}</span><span class="v-status ${esc(v.status||'稼働中')}">${esc(v.status||'稼働中')}</span></div>
-      <div class="v-plate">${esc(v.plate||'')}</div>
-      <div class="v-type">${esc(v.type||'')} ${v.usage?'／'+esc(v.usage):''}</div>
-      <div class="v-dates">`;
-    if(v.shaken_date){const l=dateLevel(shakenDiff,th.shaken);h+=`<span class="v-date ${l}">車検 ${dateJP(v.shaken_date)}${shakenDiff!==null?' ('+shakenDiff+'日)':''}</span>`}
-    if(v.jibaiseki_date){const l=dateLevel(jiDiff,th.jibaiseki);h+=`<span class="v-date ${l}">自賠責 ${dateJP(v.jibaiseki_date)}</span>`}
-    if(v.hoken_date){const l=dateLevel(hokenDiff,th.hoken);h+=`<span class="v-date ${l}">保険 ${dateJP(v.hoken_date)}</span>`}
-    h+=`</div></div>`;
-  });
-  h+='</div>';
-  el.innerHTML=h;
-  el.querySelectorAll('.v-card').forEach(c=>{c.onclick=()=>viewVehicle(c.dataset.id)});
-}
-
 // ===== 管理テーブル =====
 function renderAdmin(){
   const el=$('adminView');
@@ -685,7 +681,7 @@ $('vTabs').addEventListener('click',e=>{
 });
 
 loadAll();
-setInterval(()=>{if(curView==='dash')loadAll()},3*60*1000);
+setInterval(loadAll,60*1000);
 </script>
 </body>
 </html>
