@@ -689,7 +689,7 @@ function delProd(id){
 $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t)return;$('prodTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProdView=t.dataset.view;render()});
 /* 背景クリックで閉じない — 明示的にボタンで閉じる */
 loadAll();
-setInterval(loadAll,3*60*1000);
+setInterval(loadAll,60*1000);
 </script>
 </body>
 </html>
