@@ -68,6 +68,20 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .mo-foot .cancel{background:var(--surface);color:var(--text-dim)}
 .mo-foot .save{background:var(--accent);color:#fff;border-color:var(--accent)}
 .mo-foot .save:hover{opacity:.85}
+
+/* レンタルチェック */
+.type-toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;cursor:pointer;user-select:none}
+.type-toggle:hover{border-color:var(--accent)}
+.type-toggle input{width:18px;height:18px;cursor:pointer}
+.type-toggle label{font-size:13px;font-weight:600;color:var(--text);cursor:pointer;margin:0}
+.type-toggle .hint{font-size:11px;color:var(--text-dim);margin-left:8px}
+/* レンタル選択時：設営関連フィールドをグレーアウト */
+.rental-disabled{opacity:.4;pointer-events:none}
+.rental-disabled input,.rental-disabled select,.rental-disabled textarea,.rental-disabled button{background:var(--surface3)!important;cursor:not-allowed!important}
+/* ガントのセクション見出し */
+.gantt-section-hd{font-size:13px;font-weight:700;color:var(--text-dim);padding:14px 4px 8px;margin-top:8px;border-top:1px solid var(--border)}
+.gantt-section-hd:first-of-type{border-top:none;margin-top:0;padding-top:4px}
+.gantt-section-hd .count{font-weight:500;color:var(--text-faint);margin-left:6px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s}
 .toast.show{opacity:1}
 .toast.err{background:var(--red)}
@@ -365,6 +379,11 @@ tr:hover td{background:rgba(59,111,216,.03)}
   <h2 id="projMoTitle">現場登録</h2>
   <input type="hidden" id="xf_id">
   <div class="mo-row full"><div class="mo-field"><label>物件名 *</label><input id="xf_project" placeholder="例: 鳥取砂丘音楽フェス2026"></div></div>
+  <div class="type-toggle" onclick="toggleProjType()">
+    <input type="checkbox" id="xf_is_rental" onclick="event.stopPropagation();toggleProjType()">
+    <label for="xf_is_rental">レンタル（貸出・返却のみ）</label>
+    <span class="hint">チェックすると設営関連の項目が無効になります</span>
+  </div>
   <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="xf_our_person" placeholder="自社の担当者"></div></div>
   <div class="mo-row"><div class="mo-field"><label>見積番号</label><input id="xf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="xf_order_no"></div></div>
   <div class="mo-row"><div class="mo-field"><label>得意先</label><input id="xf_client" placeholder="例: 鳥取県観光局"></div><div class="mo-field"><label>窓口</label><input id="xf_person" placeholder="例: 纐纈"></div></div>
@@ -372,15 +391,15 @@ tr:hover td{background:rgba(59,111,216,.03)}
   <div class="mo-row full"><div class="mo-field"><label>住所</label><input id="xf_address" placeholder="例: 鳥取県鳥取市福部町"></div></div>
   <div class="phase-hd">日程</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
-  <div class="date-phase-block"><label class="date-phase-label">搬入日</label><div class="date-list" id="xf_dates_load_in"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_load_in')">＋ 日付追加</button></div>
-  <div class="date-phase-block"><label class="date-phase-label">設営日</label><div class="date-list" id="xf_dates_setup"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_setup')">＋ 日付追加</button></div>
-  <div class="date-phase-block"><label class="date-phase-label">本番</label><div class="date-list" id="xf_dates_event"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_event')">＋ 日付追加</button></div>
-  <div class="date-phase-block"><label class="date-phase-label">撤去日</label><div class="date-list" id="xf_dates_teardown"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_teardown')">＋ 日付追加</button></div>
+  <div class="date-phase-block setup-only"><label class="date-phase-label">搬入日</label><div class="date-list" id="xf_dates_load_in"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_load_in')">＋ 日付追加</button></div>
+  <div class="date-phase-block setup-only"><label class="date-phase-label">設営日</label><div class="date-list" id="xf_dates_setup"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_setup')">＋ 日付追加</button></div>
+  <div class="date-phase-block setup-only"><label class="date-phase-label">本番</label><div class="date-list" id="xf_dates_event"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_event')">＋ 日付追加</button></div>
+  <div class="date-phase-block setup-only"><label class="date-phase-label">撤去日</label><div class="date-list" id="xf_dates_teardown"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_teardown')">＋ 日付追加</button></div>
   <div class="date-phase-block"><label class="date-phase-label">貸出日</label><div class="date-list" id="xf_dates_rental_out"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_rental_out')">＋ 日付追加</button></div>
   <div class="date-phase-block"><label class="date-phase-label">返却日</label><div class="date-list" id="xf_dates_rental_return"></div><button type="button" class="date-add-btn" onclick="addDateInput('xf_dates_rental_return')">＋ 日付追加</button></div>
   </div>
-  <div class="phase-hd">人数（予定）</div>
-  <div class="phase-grid">
+  <div class="phase-hd setup-only-hd">人数（予定）</div>
+  <div class="phase-grid setup-only">
     <div class="mo-field"><label>搬入</label><input type="number" id="xf_people_load_in" min="0" placeholder="0"></div>
     <div class="mo-field"><label>設営</label><input type="number" id="xf_people_setup" min="0" placeholder="0"></div>
     <div class="mo-field"><label>本番</label><input type="number" id="xf_people_event" min="0" placeholder="0"></div>
@@ -388,10 +407,10 @@ tr:hover td{background:rgba(59,111,216,.03)}
   </div>
   <div class="phase-hd">車両</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
-  <div class="date-phase-block"><label class="date-phase-label">搬入</label><div class="chk-list" id="xf_vh_load_in"></div></div>
-  <div class="date-phase-block"><label class="date-phase-label">設営</label><div class="chk-list" id="xf_vh_setup"></div></div>
-  <div class="date-phase-block"><label class="date-phase-label">本番</label><div class="chk-list" id="xf_vh_event"></div></div>
-  <div class="date-phase-block"><label class="date-phase-label">撤去</label><div class="chk-list" id="xf_vh_teardown"></div></div>
+  <div class="date-phase-block setup-only"><label class="date-phase-label">搬入</label><div class="chk-list" id="xf_vh_load_in"></div></div>
+  <div class="date-phase-block setup-only"><label class="date-phase-label">設営</label><div class="chk-list" id="xf_vh_setup"></div></div>
+  <div class="date-phase-block setup-only"><label class="date-phase-label">本番</label><div class="chk-list" id="xf_vh_event"></div></div>
+  <div class="date-phase-block setup-only"><label class="date-phase-label">撤去</label><div class="chk-list" id="xf_vh_teardown"></div></div>
   <div class="date-phase-block"><label class="date-phase-label">貸出</label><div class="chk-list" id="xf_vh_rental_out"></div></div>
   <div class="date-phase-block"><label class="date-phase-label">返却</label><div class="chk-list" id="xf_vh_rental_return"></div></div>
   </div>
@@ -562,9 +581,12 @@ function ganttMove(n){ganttStart.setDate(ganttStart.getDate()+n);render()}
 function ganttToday(){initGanttStart();render()}
 function renderGantt(){
   if(!ganttStart)initGanttStart();const el=$('projGantt');
-  let items=projData.filter(d=>!['完了','見送り'].includes(d.status));
-  if(ganttStatusFilter)items=items.filter(d=>d.status===ganttStatusFilter);
-  items.sort((a,b)=>{const da=parseDates(a.date_load_in)[0]||parseDates(a.date_setup)[0]||parseDates(a.date_event)[0]||parseDates(a.date_rental_out)[0]||new Date('9999-12-31');const db=parseDates(b.date_load_in)[0]||parseDates(b.date_setup)[0]||parseDates(b.date_event)[0]||parseDates(b.date_rental_out)[0]||new Date('9999-12-31');return da-db});
+  let allItems=projData.filter(d=>!['完了','見送り'].includes(d.status));
+  if(ganttStatusFilter)allItems=allItems.filter(d=>d.status===ganttStatusFilter);
+  const sortFn=(a,b)=>{const da=parseDates(a.date_load_in)[0]||parseDates(a.date_setup)[0]||parseDates(a.date_event)[0]||parseDates(a.date_rental_out)[0]||new Date('9999-12-31');const db=parseDates(b.date_load_in)[0]||parseDates(b.date_setup)[0]||parseDates(b.date_event)[0]||parseDates(b.date_rental_out)[0]||new Date('9999-12-31');return da-db};
+  // type で分離。type が空 or 未設定は「現場」扱い
+  const siteItems=allItems.filter(d=>d.type!=='レンタル').sort(sortFn);
+  const rentalItems=allItems.filter(d=>d.type==='レンタル').sort(sortFn);
   const dates=[];for(let i=0;i<ganttDays;i++){const d=new Date(ganttStart);d.setDate(d.getDate()+i);dates.push(d)}
   const todayStr=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
   let h=`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px"><div style="font-size:14px;color:var(--text-dim)">${todayStr}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div>`;
@@ -572,23 +594,50 @@ function renderGantt(){
   h+=`<select onchange="ganttDays=+this.value;render()"><option value="14"${ganttDays===14?' selected':''}>2週間</option><option value="21"${ganttDays===21?' selected':''}>3週間</option><option value="28"${ganttDays===28?' selected':''}>4週間</option><option value="42"${ganttDays===42?' selected':''}>6週間</option></select>`;
   h+=`<select onchange="ganttStatusFilter=this.value;render()"><option value=""${!ganttStatusFilter?' selected':''}>全ステータス</option><option value="見積中">見積中</option><option value="受注">受注</option><option value="準備中">準備中</option><option value="現場中">現場中</option><option value="完了">完了</option></select>`;
   h+=`<input style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:180px" placeholder="検索..." oninput="ganttFilter(this.value)"></div>`;
-  h+='<div class="gantt-wrap"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd">現場名</div><div class="gantt-dates">';
-  h+=ganttDateHeaders(dates);
-  h+='</div></div>';
-  if(!items.length)h+='<div style="padding:40px;text-align:center;color:var(--text-dim)">現場データがありません。「管理」タブから登録してください。</div>';
-  items.forEach(d=>{const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],完了:['var(--text-dim)','var(--surface3)']};const sc=stColors[d.status]||['var(--text-faint)','var(--surface3)'];const allDates=[].concat(parseDates(d.date_load_in),parseDates(d.date_setup),parseDates(d.date_event),parseDates(d.date_teardown),parseDates(d.date_rental_out),parseDates(d.date_rental_return)).filter(Boolean).sort((a,b)=>a-b);const dateRange=allDates.length?`${allDates[0].getMonth()+1}/${allDates[0].getDate()}〜${allDates[allDates.length-1].getMonth()+1}/${allDates[allDates.length-1].getDate()}`:'日程未定';h+=`<div class="gantt-row" data-id="${d.id}"><div class="gantt-row-label"><span class="prj-name">${esc(d.project)}</span>`;if(d.our_person)h+=`<span class="prj-assignee">担当: <span style="color:var(--green);background:rgba(42,157,90,.1);font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px">${esc(d.our_person)}</span></span>`;h+=`<span class="prj-meta">${esc(d.client||'')}${d.order_no?' <span style="color:var(--accent);font-weight:600">'+esc(d.order_no)+'</span>':''}</span><span style="font-size:10px;color:var(--text-dim);margin-top:1px">${dateRange}</span><span class="prj-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span></div><div class="gantt-bars">`;dates.forEach((dt,i)=>{const ds=dateStr(dt);const isT=ds===dateStr(today);const hits=[];[{key:'load_in',f:'date_load_in'},{key:'setup',f:'date_setup'},{key:'event',f:'date_event'},{key:'teardown',f:'date_teardown'},{key:'rental_out',f:'date_rental_out'},{key:'rental_return',f:'date_rental_return'}].forEach(p=>{const dates_p=parseDates(d[p.f]);if(dates_p.some(pd=>dateStr(pd)===ds))hits.push(p.key)});
-    // 貸出期間中（貸出日〜返却日の間）をrentalバーで表示
-    if(!hits.includes('rental_out')&&!hits.includes('rental_return')){const rOut=parseDates(d.date_rental_out);const rRet=parseDates(d.date_rental_return);if(rOut.length&&rRet.length){const minOut=new Date(Math.min(...rOut));const maxRet=new Date(Math.max(...rRet));if(dt>=minOut&&dt<=maxRet)hits.push('rental_period')}}
-    h+=`<div class="gantt-bar-cell${isT?' today':''}${hits.length>1?' multi':''}">`;if(hits.length===1)h+=`<div class="gantt-bar ${hits[0]}"></div>`;else if(hits.length>1)hits.forEach((k,idx)=>{const pct=100/hits.length;h+=`<div class="gantt-bar ${k}" style="top:calc(${pct*idx}% + 1px);height:calc(${pct}% - 2px);bottom:auto;border-radius:3px"></div>`});h+='</div>'});h+='</div></div>'});
-  h+='</div></div>';
+  // 現場セクション
+  h+=`<div class="gantt-section-hd">現場<span class="count">${siteItems.length}件</span></div>`;
+  h+=buildGanttTable(siteItems,dates,'現場データがありません');
+  // レンタルセクション
+  h+=`<div class="gantt-section-hd">レンタル<span class="count">${rentalItems.length}件</span></div>`;
+  h+=buildGanttTable(rentalItems,dates,'レンタル案件はありません');
   h+='<div class="gantt-legend"><span><span class="dot" style="background:#64b5f6"></span>搬入</span><span><span class="dot" style="background:#81c784"></span>設営</span><span><span class="dot" style="background:#ffb74d"></span>本番</span><span><span class="dot" style="background:#e57373"></span>撤去</span><span><span class="dot" style="background:#ab47bc"></span>貸出</span><span><span class="dot" style="background:#78909c"></span>返却</span><span><span class="dot" style="background:#ce93d8;opacity:.5"></span>貸出中</span></div>';
-  // 車両バッティング
+  // 車両バッティング（両方含めて判定）
+  const allForVh=[...siteItems,...rentalItems];
   const usage={};VEHICLES.forEach(v=>usage[v]={});
-  items.forEach(d=>{const projVehDates={};[{vk:'vehicles_load_in',dk:'date_load_in'},{vk:'vehicles_setup',dk:'date_setup'},{vk:'vehicles_event',dk:'date_event'},{vk:'vehicles_teardown',dk:'date_teardown'},{vk:'vehicles_rental_out',dk:'date_rental_out'},{vk:'vehicles_rental_return',dk:'date_rental_return'}].forEach(p=>{if(!d[p.vk])return;const vehs=d[p.vk].split(',').map(s=>s.trim()).filter(Boolean);const dts=parseDates(d[p.dk]);vehs.forEach(v=>{if(!projVehDates[v])projVehDates[v]=new Set();dts.forEach(dt=>projVehDates[v].add(dateStr(dt)))})});Object.entries(projVehDates).forEach(([v,dates])=>{if(!usage[v])usage[v]={};dates.forEach(ds=>{usage[v][ds]=(usage[v][ds]||0)+1})})});
+  allForVh.forEach(d=>{const projVehDates={};[{vk:'vehicles_load_in',dk:'date_load_in'},{vk:'vehicles_setup',dk:'date_setup'},{vk:'vehicles_event',dk:'date_event'},{vk:'vehicles_teardown',dk:'date_teardown'},{vk:'vehicles_rental_out',dk:'date_rental_out'},{vk:'vehicles_rental_return',dk:'date_rental_return'}].forEach(p=>{if(!d[p.vk])return;const vehs=d[p.vk].split(',').map(s=>s.trim()).filter(Boolean);const dts=parseDates(d[p.dk]);vehs.forEach(v=>{if(!projVehDates[v])projVehDates[v]=new Set();dts.forEach(dt=>projVehDates[v].add(dateStr(dt)))})});Object.entries(projVehDates).forEach(([v,dates])=>{if(!usage[v])usage[v]={};dates.forEach(ds=>{usage[v][ds]=(usage[v][ds]||0)+1})})});
   let hasConflict=false;VEHICLES.forEach(v=>{Object.values(usage[v]).forEach(c=>{if(c>=2)hasConflict=true})});
   let hasV=false;VEHICLES.forEach(v=>{if(Object.keys(usage[v]).length)hasV=true});
   if(hasV){h+='<div class="vehicle-summary"><h3>車両バッティング確認</h3><div class="vh-desc">同じ日に同じ車両を2件以上使う場合、赤く表示されます</div>';if(!hasConflict)h+='<div class="vh-no-conflict">✓ バッティングなし</div>';else{h+='<div class="gantt-wrap" style="margin-top:10px"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd" style="font-size:11px">車両</div><div class="gantt-dates">';h+=ganttDateHeaders(dates);h+='</div></div>';VEHICLES.forEach(v=>{const hasC=Object.values(usage[v]).some(c=>c>=2);if(!hasC)return;h+=`<div class="gantt-row" style="cursor:default"><div class="gantt-row-label"><span class="prj-name">${v}</span></div><div class="gantt-bars">`;dates.forEach(dt=>{const ds=dateStr(dt);const c=usage[v][ds]||0;const isT=dateStr(dt)===dateStr(today);h+=`<div class="gantt-bar-cell${isT?' today':''}" style="display:flex;align-items:center;justify-content:center">`;if(c>=2)h+=`<span style="font-size:12px;font-weight:700;color:#fff;background:var(--red);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center">${c}</span>`;else if(c===1)h+=`<span style="font-size:10px;color:var(--text-faint)">${c}</span>`;h+='</div>'});h+='</div></div>'});h+='</div></div>'}h+='</div>'}
   el.innerHTML=h;el.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.onclick=()=>viewProj(r.dataset.id)});
+}
+
+// ガント表の構築（現場/レンタル共用）
+function buildGanttTable(items,dates,emptyMsg){
+  let h='<div class="gantt-wrap"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd">現場名</div><div class="gantt-dates">';
+  h+=ganttDateHeaders(dates);
+  h+='</div></div>';
+  if(!items.length){h+=`<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px">${emptyMsg}</div>`;h+='</div></div>';return h}
+  items.forEach(d=>{
+    const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],完了:['var(--text-dim)','var(--surface3)']};
+    const sc=stColors[d.status]||['var(--text-faint)','var(--surface3)'];
+    const allDates=[].concat(parseDates(d.date_load_in),parseDates(d.date_setup),parseDates(d.date_event),parseDates(d.date_teardown),parseDates(d.date_rental_out),parseDates(d.date_rental_return)).filter(Boolean).sort((a,b)=>a-b);
+    const dateRange=allDates.length?`${allDates[0].getMonth()+1}/${allDates[0].getDate()}〜${allDates[allDates.length-1].getMonth()+1}/${allDates[allDates.length-1].getDate()}`:'日程未定';
+    h+=`<div class="gantt-row" data-id="${d.id}"><div class="gantt-row-label"><span class="prj-name">${esc(d.project)}</span>`;
+    if(d.our_person)h+=`<span class="prj-assignee">担当: <span style="color:var(--green);background:rgba(42,157,90,.1);font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px">${esc(d.our_person)}</span></span>`;
+    h+=`<span class="prj-meta">${esc(d.client||'')}${d.order_no?' <span style="color:var(--accent);font-weight:600">'+esc(d.order_no)+'</span>':''}</span><span style="font-size:10px;color:var(--text-dim);margin-top:1px">${dateRange}</span><span class="prj-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span></div><div class="gantt-bars">`;
+    dates.forEach((dt,i)=>{
+      const ds=dateStr(dt);const isT=ds===dateStr(today);const hits=[];
+      [{key:'load_in',f:'date_load_in'},{key:'setup',f:'date_setup'},{key:'event',f:'date_event'},{key:'teardown',f:'date_teardown'},{key:'rental_out',f:'date_rental_out'},{key:'rental_return',f:'date_rental_return'}].forEach(p=>{const dates_p=parseDates(d[p.f]);if(dates_p.some(pd=>dateStr(pd)===ds))hits.push(p.key)});
+      if(!hits.includes('rental_out')&&!hits.includes('rental_return')){const rOut=parseDates(d.date_rental_out);const rRet=parseDates(d.date_rental_return);if(rOut.length&&rRet.length){const minOut=new Date(Math.min(...rOut));const maxRet=new Date(Math.max(...rRet));if(dt>=minOut&&dt<=maxRet)hits.push('rental_period')}}
+      h+=`<div class="gantt-bar-cell${isT?' today':''}${hits.length>1?' multi':''}">`;
+      if(hits.length===1)h+=`<div class="gantt-bar ${hits[0]}"></div>`;
+      else if(hits.length>1)hits.forEach((k,idx)=>{const pct=100/hits.length;h+=`<div class="gantt-bar ${k}" style="top:calc(${pct*idx}% + 1px);height:calc(${pct}% - 2px);bottom:auto;border-radius:3px"></div>`});
+      h+='</div>';
+    });
+    h+='</div></div>';
+  });
+  h+='</div></div>';
+  return h;
 }
 function ganttFilter(q){q=q.toLowerCase();document.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
 
@@ -656,7 +705,19 @@ function viewProj(id){const d=projData.find(x=>String(x.id)===String(id));if(!d)
   $('projViewBg').classList.add('show')}
 
 // ===== モーダル操作 =====
-function openProjMo(d){$('projMoTitle').textContent=d?'現場編集':'現場登録';$('xf_id').value=d?d.id:'';$('xf_project').value=d?d.project:'';$('xf_our_person').value=d?d.our_person||'':'';$('xf_estimate_no').value=d?d.estimate_no||'':'';$('xf_order_no').value=d?d.order_no||'':'';$('xf_client').value=d?d.client||'':'';$('xf_person').value=d?d.person||'':'';$('xf_venue').value=d?d.venue||'':'';$('xf_address').value=d?d.address||'':'';$('xf_status').value=d?d.status||'受注':'受注';['load_in','setup','event','teardown','rental_out','rental_return'].forEach(phase=>{const key='date_'+phase;const el=$('xf_dates_'+phase);el.innerHTML='';const vals=d&&d[key]?String(d[key]).split(',').map(s=>s.trim()).filter(Boolean):[];if(vals.length)vals.forEach(v=>addDateInput('xf_dates_'+phase,v));else addDateInput('xf_dates_'+phase)});$('xf_people_load_in').value=d?d.people_load_in||'':'';$('xf_people_setup').value=d?d.people_setup||'':'';$('xf_people_event').value=d?d.people_event||'':'';$('xf_people_teardown').value=d?d.people_teardown||'':'';$('xf_rentals').value=d?d.rentals||'':'';$('xf_notes').value=d?d.notes||'':'';VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));$('projMoBg').classList.add('show')}
+function openProjMo(d){$('projMoTitle').textContent=d?'現場編集':'現場登録';$('xf_id').value=d?d.id:'';$('xf_project').value=d?d.project:'';$('xf_our_person').value=d?d.our_person||'':'';$('xf_estimate_no').value=d?d.estimate_no||'':'';$('xf_order_no').value=d?d.order_no||'':'';$('xf_client').value=d?d.client||'':'';$('xf_person').value=d?d.person||'':'';$('xf_venue').value=d?d.venue||'':'';$('xf_address').value=d?d.address||'':'';$('xf_status').value=d?d.status||'受注':'受注';['load_in','setup','event','teardown','rental_out','rental_return'].forEach(phase=>{const key='date_'+phase;const el=$('xf_dates_'+phase);el.innerHTML='';const vals=d&&d[key]?String(d[key]).split(',').map(s=>s.trim()).filter(Boolean):[];if(vals.length)vals.forEach(v=>addDateInput('xf_dates_'+phase,v));else addDateInput('xf_dates_'+phase)});$('xf_people_load_in').value=d?d.people_load_in||'':'';$('xf_people_setup').value=d?d.people_setup||'':'';$('xf_people_event').value=d?d.people_event||'':'';$('xf_people_teardown').value=d?d.people_teardown||'':'';$('xf_rentals').value=d?d.rentals||'':'';$('xf_notes').value=d?d.notes||'':'';VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));$('xf_is_rental').checked=(d&&d.type==='レンタル');applyProjTypeUI();$('projMoBg').classList.add('show')}
+function toggleProjType(){
+  const cb=$('xf_is_rental');
+  cb.checked=!cb.checked;
+  applyProjTypeUI();
+}
+function applyProjTypeUI(){
+  const isRental=$('xf_is_rental').checked;
+  document.querySelectorAll('#projMoBg .setup-only, #projMoBg .setup-only-hd').forEach(el=>{
+    if(isRental)el.classList.add('rental-disabled');
+    else el.classList.remove('rental-disabled');
+  });
+}
 function closeProjMo(){$('projMoBg').classList.remove('show')}
 function editProj(id){const d=projData.find(x=>x.id===id);if(d)openProjMo(d)}
 
@@ -665,7 +726,9 @@ function saveProj(){
   const name=$('xf_project').value.trim();
   if(!name){toast('物件名を入力してください',true);return}
   const editId=$('xf_id').value;
-  const body={dept:'project',action:'save',id:editId||undefined,project:name,our_person:$('xf_our_person').value.trim(),estimate_no:$('xf_estimate_no').value.trim(),order_no:$('xf_order_no').value.trim(),client:$('xf_client').value.trim(),person:$('xf_person').value.trim(),venue:$('xf_venue').value.trim(),address:$('xf_address').value.trim(),status:$('xf_status').value,date_load_in:getDatesFromList('xf_dates_load_in'),date_setup:getDatesFromList('xf_dates_setup'),date_event:getDatesFromList('xf_dates_event'),date_teardown:getDatesFromList('xf_dates_teardown'),date_rental_out:getDatesFromList('xf_dates_rental_out'),date_rental_return:getDatesFromList('xf_dates_rental_return'),people_load_in:$('xf_people_load_in').value,people_setup:$('xf_people_setup').value,people_event:$('xf_people_event').value,people_teardown:$('xf_people_teardown').value,vehicles_load_in:getVehiclesFromPhase('load_in'),vehicles_setup:getVehiclesFromPhase('setup'),vehicles_event:getVehiclesFromPhase('event'),vehicles_teardown:getVehiclesFromPhase('teardown'),vehicles_rental_out:getVehiclesFromPhase('rental_out'),vehicles_rental_return:getVehiclesFromPhase('rental_return'),rentals:$('xf_rentals').value.trim(),notes:$('xf_notes').value.trim()};
+  const isRental=$('xf_is_rental').checked;
+  const type=isRental?'レンタル':'現場';
+  const body={dept:'project',action:'save',id:editId||undefined,project:name,type:type,our_person:$('xf_our_person').value.trim(),estimate_no:$('xf_estimate_no').value.trim(),order_no:$('xf_order_no').value.trim(),client:$('xf_client').value.trim(),person:$('xf_person').value.trim(),venue:$('xf_venue').value.trim(),address:$('xf_address').value.trim(),status:$('xf_status').value,date_load_in:isRental?'':getDatesFromList('xf_dates_load_in'),date_setup:isRental?'':getDatesFromList('xf_dates_setup'),date_event:isRental?'':getDatesFromList('xf_dates_event'),date_teardown:isRental?'':getDatesFromList('xf_dates_teardown'),date_rental_out:getDatesFromList('xf_dates_rental_out'),date_rental_return:getDatesFromList('xf_dates_rental_return'),people_load_in:isRental?'':$('xf_people_load_in').value,people_setup:isRental?'':$('xf_people_setup').value,people_event:isRental?'':$('xf_people_event').value,people_teardown:isRental?'':$('xf_people_teardown').value,vehicles_load_in:isRental?'':getVehiclesFromPhase('load_in'),vehicles_setup:isRental?'':getVehiclesFromPhase('setup'),vehicles_event:isRental?'':getVehiclesFromPhase('event'),vehicles_teardown:isRental?'':getVehiclesFromPhase('teardown'),vehicles_rental_out:getVehiclesFromPhase('rental_out'),vehicles_rental_return:getVehiclesFromPhase('rental_return'),rentals:$('xf_rentals').value.trim(),notes:$('xf_notes').value.trim()};
   const isNew=!editId;
   if(editId){
     const idx=projData.findIndex(x=>String(x.id)===String(editId));
