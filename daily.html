@@ -52,7 +52,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 
 /* 日報エントリ */
 .entries-wrap{margin-top:16px}
-.entry-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;align-items:start}
+.entry-row{display:grid;grid-template-columns:2fr 2fr 1fr auto;gap:10px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;align-items:start}
 .entry-row .entry-field{display:flex;flex-direction:column;gap:4px}
 .entry-row .entry-field label{font-size:10px;color:var(--text-faint);font-weight:600}
 .entry-row .entry-field select,.entry-row .entry-field input{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font:400 13px/1.3 'Noto Sans JP',sans-serif;background:#fff}
@@ -308,6 +308,10 @@ function addEntryRow(){
       <label>作業内容</label>
       <input type="text" class="ef-action" placeholder="例: 裁断、作図、設営...">
     </div>
+    <div class="entry-field">
+      <label>時間（分）</label>
+      <input type="number" class="ef-minutes" min="0" step="5" placeholder="例: 120">
+    </div>
     <button class="entry-rm" onclick="this.parentElement.remove()" title="削除">×</button>
   `;
   wrap.appendChild(row);
@@ -322,6 +326,7 @@ function saveEntries(){
   rows.forEach(row=>{
     const projVal=row.querySelector('.ef-proj').value;
     const work=row.querySelector('.ef-action').value.trim();
+    const minutes=parseInt(row.querySelector('.ef-minutes').value,10)||0;
     if(!projVal||!work)return;
     const [type,id]=projVal.split(':');
     const list=type==='prod'?prodProjects:projProjects;
@@ -334,6 +339,7 @@ function saveEntries(){
       project_id:id,
       project_name:pr?pr.project:'',
       work:work,
+      minutes:minutes,
       note:''
     };
     // 楽観的更新：ローカルにも追加
@@ -358,10 +364,12 @@ function renderSavedEntries(){
   }
   let h='<h3>今日の記録（'+myEntries.length+'件）</h3>';
   myEntries.forEach(e=>{
+    const mins=parseInt(e.minutes,10)||0;
+    const minsLabel=mins?`<span style="color:var(--text-dim);font-size:12px;margin-left:8px">${mins}分</span>`:'';
     h+=`<div class="saved-entry">
       <div class="se-main">
         <div class="se-proj">${esc(e.project_name||'(案件不明)')}</div>
-        <div class="se-action">${esc(e.work||e.action||'')}</div>
+        <div class="se-action">${esc(e.work||e.action||'')}${minsLabel}</div>
       </div>
       <button class="se-del" onclick="delEntry('${esc(e.id)}')">削除</button>
     </div>`;
@@ -409,11 +417,15 @@ function renderViewContent(){
     if(!entries||!entries.length)return;
     const st=staffList.find(s=>String(s.employee_no)===String(empNo));
     const name=st?st.name:('社員'+empNo);
-    h+=`<div class="member-group"><h3>${esc(name)}<span class="mb-count">${entries.length}件</span></h3>`;
+    const totalMins=entries.reduce((sum,e)=>sum+(parseInt(e.minutes,10)||0),0);
+    const totalLabel=totalMins?`<span style="color:var(--text-dim);font-weight:500;margin-left:8px">合計 ${totalMins}分</span>`:'';
+    h+=`<div class="member-group"><h3>${esc(name)}<span class="mb-count">${entries.length}件</span>${totalLabel}</h3>`;
     entries.forEach(e=>{
+      const mins=parseInt(e.minutes,10)||0;
+      const minsLabel=mins?`<span style="color:var(--text-faint);font-size:11px;margin-left:6px">${mins}分</span>`:'';
       h+=`<div class="member-entry">
         <div class="me-proj">${esc(e.project_name||'(案件不明)')}</div>
-        <div class="me-action">${esc(e.work||e.action||'')}</div>
+        <div class="me-action">${esc(e.work||e.action||'')}${minsLabel}</div>
         <div class="me-note">${esc(e.note||'')}</div>
       </div>`;
     });
