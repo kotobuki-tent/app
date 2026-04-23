@@ -359,9 +359,11 @@ function addOneEntry(){
   if(!w){toast('氏名を選んでください',true);return}
   const projVal=$('afProj').value;
   const work=$('afWork').value.trim();
-  const minutes=parseInt($('afMinutes').value,10)||0;
+  const minutesStr=$('afMinutes').value.trim();
+  const minutes=parseInt(minutesStr,10);
   if(!projVal){toast('案件を選んでください',true);return}
   if(!work){toast('作業内容を入力してください',true);return}
+  if(!minutesStr||isNaN(minutes)||minutes<=0){toast('時間（分）を入力してください',true);return}
   const [type,id]=projVal.split(':');
   const list=type==='prod'?prodProjects:projProjects;
   const pr=list.find(x=>String(x.id)===String(id));
