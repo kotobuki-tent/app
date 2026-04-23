@@ -313,6 +313,7 @@ async function onWhoChange(){
   else localStorage.removeItem('daily_who');
   renderSavedEntries();
   closeAddForm();
+  if(w&&curView==='write'){openAddForm(true)}
 }
 
 function render(){
@@ -327,6 +328,10 @@ function renderWrite(){
   $('todayLabel').textContent=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
   renderSavedEntries();
   buildAfProjOptions();
+  // 氏名が選ばれてたらフォームをデフォで開く
+  if(getWho()&&$('addForm').classList.contains('hidden')){
+    openAddForm(true);
+  }
 }
 function buildAfProjOptions(){
   const sel=$('afProj');
@@ -339,7 +344,7 @@ function buildAfProjOptions(){
   h+='</optgroup>';
   sel.innerHTML=h;
 }
-function openAddForm(){
+function openAddForm(auto){
   const w=getWho();
   if(!w){toast('先に氏名を選んでください',true);return}
   $('addForm').classList.remove('hidden');
@@ -348,7 +353,9 @@ function openAddForm(){
   $('afProj').value='';
   $('afWork').value='';
   $('afMinutes').value='';
-  setTimeout(()=>$('afProj').focus(),50);
+  if(auto!==true){
+    setTimeout(()=>$('afProj').focus(),50);
+  }
 }
 function closeAddForm(){
   $('addForm').classList.add('hidden');
