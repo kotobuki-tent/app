@@ -276,10 +276,9 @@ async function onWhoChange(){
   const w=getWho();
   if(w)localStorage.setItem('daily_who',w);
   else localStorage.removeItem('daily_who');
-  // ローカルデータから表示更新
   renderSavedEntries();
-  // 新規入力欄をリセット
   $('entriesWrap').innerHTML='';
+  ensureDefaultRows();
 }
 
 function render(){
@@ -292,7 +291,15 @@ function render(){
 function renderWrite(){
   const today=new Date();
   $('todayLabel').textContent=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
+  ensureDefaultRows();
   renderSavedEntries();
+}
+function ensureDefaultRows(){
+  const wrap=$('entriesWrap');
+  const existing=wrap.querySelectorAll('.entry-row').length;
+  if(existing===0){
+    for(let i=0;i<3;i++)addEntryRow();
+  }
 }
 function addEntryRow(){
   const wrap=$('entriesWrap');
@@ -356,6 +363,7 @@ function saveEntries(){
   if(!saved){toast('案件と作業内容を入力してください',true);return}
   toast(`${saved}件保存しました`);
   $('entriesWrap').innerHTML='';
+  ensureDefaultRows();
   renderSavedEntries();
 }
 function renderSavedEntries(){
