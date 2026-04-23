@@ -58,19 +58,33 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .entry-row .entry-field select,.entry-row .entry-field input{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font:400 13px/1.3 'Noto Sans JP',sans-serif;background:#fff}
 .entry-row .entry-rm{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:4px 8px;align-self:center}
 .entry-row .entry-rm:hover{opacity:.7}
-.entry-add-btn{background:var(--surface2);border:1px dashed var(--border);color:var(--text-dim);font:500 13px/1 'Noto Sans JP',sans-serif;padding:12px;border-radius:8px;cursor:pointer;width:100%;margin-top:4px}
+.entry-add-btn{background:var(--surface2);border:1px dashed var(--border);color:var(--text-dim);font:500 13px/1 'Noto Sans JP',sans-serif;padding:14px;border-radius:8px;cursor:pointer;width:100%;margin-top:4px}
 .entry-add-btn:hover{border-color:var(--accent);color:var(--accent)}
 
+/* 入力フォーム（展開式） */
+.add-form{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:12px}
+.add-form.hidden{display:none}
+.af-field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.af-field label{font-size:11px;color:var(--text-faint);font-weight:600}
+.af-field input,.af-field select{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Noto Sans JP',sans-serif;background:#fff;width:100%}
+.af-field input:focus,.af-field select:focus{outline:none;border-color:var(--accent)}
+.af-row{display:flex;gap:10px}
+.af-row .af-field{flex:1;margin-bottom:10px}
+.af-btns{display:flex;gap:8px;margin-top:6px}
+.af-cancel{flex:1;background:#fff;border:1px solid var(--border);color:var(--text-dim);padding:11px;border-radius:8px;font:500 14px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+.af-save{flex:2;background:var(--accent);color:#fff;border:none;padding:11px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+.af-save:hover{opacity:.9}
+
 /* 保存済エントリ */
-.saved-entries{margin-top:16px;border-top:1px solid var(--border);padding-top:14px}
+.saved-entries{margin-top:4px}
 .saved-entries h3{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px}
-.saved-entry{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--surface2);border:1px solid var(--border-light);border-radius:8px;margin-bottom:6px;gap:10px}
+.saved-entry{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--surface2);border:1px solid var(--border-light);border-radius:10px;margin-bottom:8px;gap:10px}
 .saved-entry .se-main{flex:1;min-width:0}
-.saved-entry .se-proj{font-size:13px;font-weight:600;color:var(--text)}
+.saved-entry .se-proj{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
 .saved-entry .se-meta{font-size:11px;color:var(--text-dim);margin-top:2px}
-.saved-entry .se-action{font-size:14px;color:var(--accent);font-weight:600;margin:4px 0 0}
+.saved-entry .se-action{font-size:14px;color:var(--accent);font-weight:600}
 .saved-entry .se-note{font-size:12px;color:var(--text-dim);margin-top:2px;font-style:italic}
-.saved-entry .se-del{background:none;border:none;color:var(--red);font-size:11px;cursor:pointer;padding:4px 8px;border-radius:4px;white-space:nowrap}
+.saved-entry .se-del{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:4px 10px;border-radius:4px;white-space:nowrap;line-height:1}
 .saved-entry .se-del:hover{background:var(--red-dim)}
 
 .save-btn{background:var(--accent);color:#fff;border:none;padding:11px 24px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;margin-top:8px}
@@ -155,13 +169,34 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
         </div>
       </div>
 
-      <div class="entries-wrap" id="entriesWrap"></div>
-      <button class="entry-add-btn" onclick="addEntryRow()">＋ 行を追加</button>
-      <div style="margin-top:14px">
-        <button class="save-btn" onclick="saveEntries()">保存</button>
+      <div class="saved-entries" id="savedEntries"></div>
+
+      <!-- 入力フォーム（デフォは閉じてる） -->
+      <div id="addForm" class="add-form hidden">
+        <div class="af-field">
+          <label>案件</label>
+          <select id="afProj">
+            <option value="">-- 案件を選ぶ --</option>
+          </select>
+        </div>
+        <div class="af-row">
+          <div class="af-field" style="flex:2">
+            <label>作業内容</label>
+            <input type="text" id="afWork" placeholder="例: 裁断、作図、設営...">
+          </div>
+          <div class="af-field" style="flex:1">
+            <label>時間（分）</label>
+            <input type="number" id="afMinutes" min="0" step="5" placeholder="例: 120">
+          </div>
+        </div>
+        <div class="af-btns">
+          <button class="af-cancel" onclick="closeAddForm()">キャンセル</button>
+          <button class="af-save" onclick="addOneEntry()">追加</button>
+        </div>
       </div>
 
-      <div class="saved-entries" id="savedEntries"></div>
+      <!-- ＋ボタン -->
+      <button id="openAddBtn" class="entry-add-btn" onclick="openAddForm()">＋ 作業を記録</button>
     </div>
   </div>
 
@@ -277,8 +312,7 @@ async function onWhoChange(){
   if(w)localStorage.setItem('daily_who',w);
   else localStorage.removeItem('daily_who');
   renderSavedEntries();
-  $('entriesWrap').innerHTML='';
-  ensureDefaultRows();
+  closeAddForm();
 }
 
 function render(){
@@ -291,79 +325,62 @@ function render(){
 function renderWrite(){
   const today=new Date();
   $('todayLabel').textContent=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
-  ensureDefaultRows();
   renderSavedEntries();
+  buildAfProjOptions();
 }
-function ensureDefaultRows(){
-  const wrap=$('entriesWrap');
-  const existing=wrap.querySelectorAll('.entry-row').length;
-  if(existing===0){
-    for(let i=0;i<3;i++)addEntryRow();
-  }
+function buildAfProjOptions(){
+  const sel=$('afProj');
+  let h='<option value="">-- 案件を選ぶ --</option>';
+  h+='<optgroup label="生産部">';
+  prodProjects.forEach(p=>{h+=`<option value="prod:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});
+  h+='</optgroup>';
+  h+='<optgroup label="企画制作部">';
+  projProjects.forEach(p=>{h+=`<option value="proj:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});
+  h+='</optgroup>';
+  sel.innerHTML=h;
 }
-function addEntryRow(){
-  const wrap=$('entriesWrap');
-  const row=document.createElement('div');
-  row.className='entry-row';
-  row.innerHTML=`
-    <div class="entry-field">
-      <label>案件</label>
-      <select class="ef-proj">
-        <option value="">-- 案件を選ぶ --</option>
-        <optgroup label="生産部">
-          ${prodProjects.map(p=>`<option value="prod:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`).join('')}
-        </optgroup>
-        <optgroup label="企画制作部">
-          ${projProjects.map(p=>`<option value="proj:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`).join('')}
-        </optgroup>
-      </select>
-    </div>
-    <div class="entry-field">
-      <label>作業内容</label>
-      <input type="text" class="ef-action" placeholder="例: 裁断、作図、設営...">
-    </div>
-    <div class="entry-field">
-      <label>時間（分）</label>
-      <input type="number" class="ef-minutes" min="0" step="5" placeholder="例: 120">
-    </div>
-    <button class="entry-rm" onclick="this.parentElement.remove()" title="削除">×</button>
-  `;
-  wrap.appendChild(row);
+function openAddForm(){
+  const w=getWho();
+  if(!w){toast('先に氏名を選んでください',true);return}
+  $('addForm').classList.remove('hidden');
+  $('openAddBtn').classList.add('hidden');
+  // クリアしてフォーカス
+  $('afProj').value='';
+  $('afWork').value='';
+  $('afMinutes').value='';
+  setTimeout(()=>$('afProj').focus(),50);
 }
-function saveEntries(){
+function closeAddForm(){
+  $('addForm').classList.add('hidden');
+  $('openAddBtn').classList.remove('hidden');
+}
+function addOneEntry(){
   const w=getWho();
   if(!w){toast('氏名を選んでください',true);return}
-  const rows=$('entriesWrap').querySelectorAll('.entry-row');
-  if(!rows.length){toast('入力された行がありません',true);return}
-  let saved=0;
-  rows.forEach(row=>{
-    const projVal=row.querySelector('.ef-proj').value;
-    const work=row.querySelector('.ef-action').value.trim();
-    const minutes=parseInt(row.querySelector('.ef-minutes').value,10)||0;
-    if(!projVal||!work)return;
-    const [type,id]=projVal.split(':');
-    const list=type==='prod'?prodProjects:projProjects;
-    const pr=list.find(x=>String(x.id)===String(id));
-    const body={
-      dept:'daily',action:'save',
-      date:dateStr(today),
-      employee_no:w,
-      project_type:type==='prod'?'production':'project',
-      project_id:id,
-      project_name:pr?pr.project:'',
-      work:work,
-      minutes:minutes,
-      note:''
-    };
-    // 楽観的更新：allReports に直接追加
-    allReports.push({...body,id:'tmp_'+Date.now()+'_'+saved});
-    fireAndForget(body);
-    saved++;
-  });
-  if(!saved){toast('案件と作業内容を入力してください',true);return}
-  toast(`${saved}件保存しました`);
-  $('entriesWrap').innerHTML='';
-  ensureDefaultRows();
+  const projVal=$('afProj').value;
+  const work=$('afWork').value.trim();
+  const minutes=parseInt($('afMinutes').value,10)||0;
+  if(!projVal){toast('案件を選んでください',true);return}
+  if(!work){toast('作業内容を入力してください',true);return}
+  const [type,id]=projVal.split(':');
+  const list=type==='prod'?prodProjects:projProjects;
+  const pr=list.find(x=>String(x.id)===String(id));
+  const body={
+    dept:'daily',action:'save',
+    date:dateStr(today),
+    employee_no:w,
+    project_type:type==='prod'?'production':'project',
+    project_id:id,
+    project_name:pr?pr.project:'',
+    work:work,
+    minutes:minutes,
+    note:''
+  };
+  // 楽観的更新：allReports に直接追加
+  allReports.push({...body,id:'tmp_'+Date.now()});
+  fireAndForget(body);
+  toast('追加しました');
+  closeAddForm();
   renderSavedEntries();
 }
 function renderSavedEntries(){
@@ -384,7 +401,7 @@ function renderSavedEntries(){
         <div class="se-proj">${esc(e.project_name||'(案件不明)')}</div>
         <div class="se-action">${esc(e.work||e.action||'')}${minsLabel}</div>
       </div>
-      <button class="se-del" onclick="delEntry('${esc(e.id)}')">削除</button>
+      <button class="se-del" onclick="delEntry('${esc(e.id)}')" title="削除">×</button>
     </div>`;
   });
   el.innerHTML=h;
