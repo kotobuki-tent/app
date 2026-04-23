@@ -137,8 +137,8 @@ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 
 let allJobs=[];
 
-// ステータスの表示順（生産部アプリと同じ）
-const stOrder={'見積中':1,'受注':2,'製作中':3,'完成':4,'出荷済':5,'見送り':6};
+// ステータスの表示順（工数集計では出荷済を上、振り返り目的）
+const stOrder={'出荷済':1,'完成':2,'製作中':3,'受注':4,'見積中':5,'見送り':6};
 
 function fmtMin(min){
   if(!min)return '0分';
@@ -176,13 +176,16 @@ function renderTable(){
     }
     return true;
   });
-  // ソート：ステータス順 → 納期（近い順、空欄は後ろ）
+  // ソート：ステータス順 → 納期（新しい順＝直近出荷分が上、空欄は後ろ）
   list.sort((a,b)=>{
     const so=(stOrder[a.status]||99)-(stOrder[b.status]||99);
     if(so)return so;
-    const ad=a.deadline||'9999';
-    const bd=b.deadline||'9999';
-    return ad.localeCompare(bd);
+    const ad=a.deadline||'';
+    const bd=b.deadline||'';
+    if(!ad&&!bd)return 0;
+    if(!ad)return 1;
+    if(!bd)return -1;
+    return bd.localeCompare(ad);  // 降順
   });
 
   $('countLabel').textContent=list.length+'件';
