@@ -192,8 +192,7 @@ let curView='write';
 let staffList=[];       // [{employee_no, name, dept, position}]
 let prodProjects=[];    // 生産部の進行中案件
 let projProjects=[];    // 企画制作部の進行中案件
-let myEntries=[];       // 今日の自分の日報（既存分）
-let allReports=[];      // みんなの日報（表示中の日付）
+let allReports=[];      // 全員分の日報（最近30日分などを保持）
 let viewingDate=new Date();
 const today=new Date();
 today.setHours(0,0,0,0);
@@ -215,35 +214,43 @@ async function loadProjects(){
     if(j.success){prodProjects=j.production||[];projProjects=j.projects||[]}
   }catch(e){toast('案件データ取得エラー',true)}
 }
-async function loadMyEntries(){
-  const w=getWho();if(!w){myEntries=[];renderSavedEntries();return}
+// 最近30日分の日報を一気に取得
+async function loadReports(){
   try{
-    const d=dateStr(today);
-    const r=await fetch(API+'?dept=daily&action=read&date='+d);
-    const j=await r.json();
-    if(j.success){
-      myEntries=(j.data||[]).filter(x=>String(x.employee_no)===String(w));
-    }
-  }catch(e){myEntries=[]}
-  renderSavedEntries();
-}
-async function loadAllReports(dateStr_){
-  try{
-    const r=await fetch(API+'?dept=daily&action=read&date='+dateStr_);
+    const to=new Date();
+    const from=new Date();from.setDate(from.getDate()-30);
+    const r=await fetch(API+'?dept=daily&action=read&date_from='+dateStr(from)+'&date_to='+dateStr(to));
     const j=await r.json();
     if(j.success)allReports=j.data||[];
-  }catch(e){allReports=[]}
-  renderViewContent();
+  }catch(e){/* 静かに失敗 */}
 }
 async function loadAll(){
   $('loader').classList.remove('hidden');
-  await Promise.all([loadStaff(),loadProjects()]);
+  await Promise.all([loadStaff(),loadProjects(),loadReports()]);
   initWhoSelect();
-  await loadMyEntries();
   $('loader').classList.add('hidden');
   render();
 }
+// バックグラウンド更新（60秒ごと、UI ブロックしない）
+async function bgRefresh(){
+  await loadReports();
+  // 表示中の内容だけ再描画
+  if(curView==='write')renderSavedEntries();
+  else renderViewContent();
+}
 function refreshData(){loadAll()}
+
+// 現在の氏名に紐づく「今日の自分の日報」をローカルから取り出す
+function getMyEntries(){
+  const w=getWho();if(!w)return[];
+  const d=dateStr(today);
+  return allReports.filter(r=>String(r.employee_no)===String(w)&&String(r.date)===d);
+}
+// 表示中の日付の全員の日報をローカルから取り出す
+function getDateReports(){
+  const d=dateStr(viewingDate);
+  return allReports.filter(r=>String(r.date)===d);
+}
 
 function initWhoSelect(){
   const sel=$('whoSelect');
@@ -269,8 +276,8 @@ async function onWhoChange(){
   const w=getWho();
   if(w)localStorage.setItem('daily_who',w);
   else localStorage.removeItem('daily_who');
-  // その人の既存日報を読みこむ
-  await loadMyEntries();
+  // ローカルデータから表示更新
+  renderSavedEntries();
   // 新規入力欄をリセット
   $('entriesWrap').innerHTML='';
 }
@@ -319,7 +326,6 @@ function addEntryRow(){
 function saveEntries(){
   const w=getWho();
   if(!w){toast('氏名を選んでください',true);return}
-  const wname=getWhoName();
   const rows=$('entriesWrap').querySelectorAll('.entry-row');
   if(!rows.length){toast('入力された行がありません',true);return}
   let saved=0;
@@ -342,8 +348,8 @@ function saveEntries(){
       minutes:minutes,
       note:''
     };
-    // 楽観的更新：ローカルにも追加
-    myEntries.push({...body,id:'tmp_'+Date.now()+'_'+saved,employee_no:w});
+    // 楽観的更新：allReports に直接追加
+    allReports.push({...body,id:'tmp_'+Date.now()+'_'+saved});
     fireAndForget(body);
     saved++;
   });
@@ -351,19 +357,18 @@ function saveEntries(){
   toast(`${saved}件保存しました`);
   $('entriesWrap').innerHTML='';
   renderSavedEntries();
-  // 3秒後にサーバー同期
-  setTimeout(loadMyEntries,3000);
 }
 function renderSavedEntries(){
   const el=$('savedEntries');
   const w=getWho();
   if(!w){el.innerHTML='';return}
-  if(!myEntries.length){
+  const entries=getMyEntries();
+  if(!entries.length){
     el.innerHTML='<h3>今日の記録</h3><div class="empty-msg" style="padding:20px">まだ今日の記録はありません</div>';
     return;
   }
-  let h='<h3>今日の記録（'+myEntries.length+'件）</h3>';
-  myEntries.forEach(e=>{
+  let h='<h3>今日の記録（'+entries.length+'件）</h3>';
+  entries.forEach(e=>{
     const mins=parseInt(e.minutes,10)||0;
     const minsLabel=mins?`<span style="color:var(--text-dim);font-size:12px;margin-left:8px">${mins}分</span>`:'';
     h+=`<div class="saved-entry">
@@ -378,11 +383,11 @@ function renderSavedEntries(){
 }
 function delEntry(id){
   if(!confirm('この記録を削除しますか？'))return;
-  myEntries=myEntries.filter(x=>String(x.id)!==String(id));
+  // 楽観的更新：allReports から削除
+  allReports=allReports.filter(x=>String(x.id)!==String(id));
   fireAndForget({dept:'daily',action:'delete',id:id});
   toast('削除しました');
   renderSavedEntries();
-  setTimeout(loadMyEntries,3000);
 }
 
 // ====== みんなの日報 ======
@@ -390,20 +395,21 @@ function renderView(){
   $('viewDate').value=dateStr(viewingDate);
   const d=viewingDate;
   $('viewDateLabel').textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
-  loadAllReports(dateStr(viewingDate));
+  renderViewContent();
 }
 function viewDateMove(n){viewingDate.setDate(viewingDate.getDate()+n);renderView()}
 function viewDateToday(){viewingDate=new Date();viewingDate.setHours(0,0,0,0);renderView()}
 function loadViewDate(){const v=$('viewDate').value;if(!v)return;viewingDate=new Date(v+'T00:00:00');renderView()}
 function renderViewContent(){
   const el=$('viewContent');
-  if(!allReports.length){
+  const reports=getDateReports();
+  if(!reports.length){
     el.innerHTML='<div class="card"><div class="empty-msg">この日の日報はまだ登録されていません</div></div>';
     return;
   }
   // 社員別にまとめる
   const byEmp={};
-  allReports.forEach(r=>{
+  reports.forEach(r=>{
     const e=String(r.employee_no||'');
     if(!byEmp[e])byEmp[e]=[];
     byEmp[e].push(r);
@@ -444,7 +450,7 @@ $('dailyTabs').addEventListener('click',e=>{
 });
 
 loadAll();
-setInterval(()=>{if(curView==='view')loadAllReports(dateStr(viewingDate))},60*1000);
+setInterval(bgRefresh,60*1000);
 </script>
 </body>
 </html>
