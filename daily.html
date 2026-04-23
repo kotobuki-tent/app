@@ -321,8 +321,8 @@ function saveEntries(){
   let saved=0;
   rows.forEach(row=>{
     const projVal=row.querySelector('.ef-proj').value;
-    const action=row.querySelector('.ef-action').value.trim();
-    if(!projVal||!action)return;
+    const work=row.querySelector('.ef-action').value.trim();
+    if(!projVal||!work)return;
     const [type,id]=projVal.split(':');
     const list=type==='prod'?prodProjects:projProjects;
     const pr=list.find(x=>String(x.id)===String(id));
@@ -333,7 +333,7 @@ function saveEntries(){
       project_type:type==='prod'?'production':'project',
       project_id:id,
       project_name:pr?pr.project:'',
-      action:action,
+      work:work,
       note:''
     };
     // 楽観的更新：ローカルにも追加
@@ -361,7 +361,7 @@ function renderSavedEntries(){
     h+=`<div class="saved-entry">
       <div class="se-main">
         <div class="se-proj">${esc(e.project_name||'(案件不明)')}</div>
-        <div class="se-action">${esc(e.action)}</div>
+        <div class="se-action">${esc(e.work||e.action||'')}</div>
       </div>
       <button class="se-del" onclick="delEntry('${esc(e.id)}')">削除</button>
     </div>`;
@@ -413,7 +413,7 @@ function renderViewContent(){
     entries.forEach(e=>{
       h+=`<div class="member-entry">
         <div class="me-proj">${esc(e.project_name||'(案件不明)')}</div>
-        <div class="me-action">${esc(e.action||'')}</div>
+        <div class="me-action">${esc(e.work||e.action||'')}</div>
         <div class="me-note">${esc(e.note||'')}</div>
       </div>`;
     });
