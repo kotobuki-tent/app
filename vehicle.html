@@ -29,6 +29,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .nav-link{background:none;border:none;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center}
 .nav-link:hover{color:#fff;background:rgba(255,255,255,.08)}
 .nav-link.on{color:#fff;background:#3b6de7}
+.nav-spacer{flex:1;min-width:20px}
 .hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:7px 14px;border-radius:8px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none}
 .hdr-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
 
@@ -176,10 +177,14 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
 <div class="hdr">
   <h1>車両管理</h1>
+  <a href="portal.html" class="nav-link">ポータル</a>
+  <a href="daily.html" class="nav-link">日報</a>
+  <a href="overtime.html" class="nav-link">時間外</a>
+  <a href="labor.html" class="nav-link">工数</a>
+  <div class="nav-spacer"></div>
   <a href="index.html" class="nav-link">生産部</a>
   <a href="project.html" class="nav-link">企画制作部</a>
   <a href="inventory.html" class="nav-link">在庫管理</a>
-  <a href="overtime.html" class="nav-link">時間外</a>
   <a href="vehicle.html" class="nav-link on">車両管理</a>
   <button class="hdr-btn" onclick="loadAll()">↻ 更新</button>
 </div>

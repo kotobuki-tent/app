@@ -19,10 +19,11 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text);background:var(--bg);min-height:100vh}
 .hdr{background:#1a1d27;color:#fff;padding:0 24px;height:54px;display:flex;align-items:center;gap:18px}
-.hdr h1{font-size:16px;font-weight:900;margin-right:auto}
+.hdr h1{font-size:16px;font-weight:900}
 .nav-link{color:#aeb5c3;text-decoration:none;font-size:13px;font-weight:500;padding:8px 12px;border-radius:6px;transition:.15s}
 .nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
 .nav-link.on{background:var(--accent);color:#fff}
+.nav-spacer{flex:1;min-width:20px}
 .hdr-btn{background:rgba(255,255,255,.08);color:#aeb5c3;border:none;padding:7px 12px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer}
 .hdr-btn:hover{background:rgba(255,255,255,.15);color:#fff}
 .app{padding:24px}
@@ -138,12 +139,15 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 
 <div class="hdr">
   <h1>日報</h1>
+  <a href="portal.html" class="nav-link">ポータル</a>
+  <a href="daily.html" class="nav-link on">日報</a>
+  <a href="overtime.html" class="nav-link">時間外</a>
+  <a href="labor.html" class="nav-link">工数</a>
+  <div class="nav-spacer"></div>
   <a href="index.html" class="nav-link">生産部</a>
   <a href="project.html" class="nav-link">企画制作部</a>
   <a href="inventory.html" class="nav-link">在庫管理</a>
-  <a href="overtime.html" class="nav-link">時間外</a>
   <a href="vehicle.html" class="nav-link">車両管理</a>
-  <a href="daily.html" class="nav-link on">日報</a>
   <button class="hdr-btn" onclick="refreshData()">↻ 更新</button>
 </div>
 
