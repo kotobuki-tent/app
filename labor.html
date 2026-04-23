@@ -99,7 +99,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
 <div class="app">
   <div class="toolbar">
-    <input type="search" id="searchBox" placeholder="案件名・伝票番号で検索" oninput="renderTable()">
+    <input type="search" id="searchBox" placeholder="案件名・見積/受注番号で検索" oninput="renderTable()">
     <select id="stFilter" onchange="renderTable()">
       <option value="">全ステータス</option>
       <option value="見積中">見積中</option>
@@ -171,7 +171,7 @@ function renderTable(){
   let list=allJobs.filter(j=>{
     if(stFilter&&j.status!==stFilter)return false;
     if(kw){
-      const target=(j.project+' '+j.order_no).toLowerCase();
+      const target=(j.project+' '+j.order_no+' '+j.estimate_no).toLowerCase();
       if(!target.includes(kw))return false;
     }
     return true;
@@ -196,10 +196,11 @@ function renderTable(){
   }
 
   let h='<table class="jobs"><thead><tr>';
-  h+='<th>伝票</th><th>案件名</th><th>ステータス</th><th>納期</th><th class="num">延べ工数</th><th class="num">人数</th>';
+  h+='<th>見積番号</th><th>受注番号</th><th>案件名</th><th>ステータス</th><th>納期</th><th class="num">延べ工数</th><th class="num">人数</th>';
   h+='</tr></thead><tbody>';
   list.forEach(j=>{
     h+=`<tr onclick="showDetail('${esc(j.id)}')">
+      <td>${esc(j.estimate_no||'')}</td>
       <td>${esc(j.order_no||'')}</td>
       <td>${esc(j.project||'')}</td>
       <td><span class="st-badge st-${esc(j.status)}">${esc(j.status)}</span></td>
@@ -215,7 +216,8 @@ function renderTable(){
 function showDetail(id){
   const job=allJobs.find(x=>String(x.id)===String(id));
   if(!job)return;
-  $('dmTitle').textContent=(job.order_no?'#'+job.order_no+' ':'')+job.project;
+  const no=job.order_no||job.estimate_no;
+  $('dmTitle').textContent=(no?'#'+no+' ':'')+job.project;
   $('dmSub').innerHTML=`<span class="st-badge st-${esc(job.status)}">${esc(job.status)}</span>${job.deadline?' 　納期 '+esc(job.deadline):''}`;
   let h=`<div class="mb-total">
     <div class="tt-label">延べ工数</div>
