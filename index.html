@@ -426,17 +426,35 @@ tr:hover td{background:rgba(59,111,216,.03)}
 </div>
 <div class="toast" id="toast"></div>
 <script>
-// nav-right を body 直下に移動（祖先のoverflow影響回避）
+// モバイル時のみ nav-right を body 直下に移動（祖先のoverflow影響回避）
 (function(){
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',moveNavRight);
-  }else{
-    moveNavRight();
-  }
-  function moveNavRight(){
+  let originalParent=null, originalNextSibling=null;
+  function syncNavRight(){
     const nr=document.querySelector('.nav-right');
-    if(nr&&nr.parentElement!==document.body){document.body.appendChild(nr);}
+    if(!nr)return;
+    const isMobile=window.matchMedia('(max-width:768px)').matches;
+    if(isMobile){
+      if(nr.parentElement!==document.body){
+        originalParent=nr.parentElement;
+        originalNextSibling=nr.nextSibling;
+        document.body.appendChild(nr);
+      }
+    } else {
+      if(nr.parentElement===document.body&&originalParent){
+        if(originalNextSibling&&originalNextSibling.parentElement===originalParent){
+          originalParent.insertBefore(nr,originalNextSibling);
+        } else {
+          originalParent.appendChild(nr);
+        }
+      }
+    }
   }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',syncNavRight);
+  }else{
+    syncNavRight();
+  }
+  window.addEventListener('resize',syncNavRight);
 })();
 function toggleNavMenu(){
   const el=document.querySelector('.nav-right');
