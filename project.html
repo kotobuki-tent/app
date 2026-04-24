@@ -26,7 +26,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .sub-tab{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:7px 14px;border-radius:8px;cursor:pointer}
 .sub-tab:hover{color:var(--text);border-color:var(--accent)}
 .sub-tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
-.app{padding-top:56px}
+.app{padding-top:48px}
 .hidden{display:none!important}
 .loading{text-align:center;padding:80px 20px;color:var(--text-dim);font-size:14px}
 .loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;margin-bottom:12px}
@@ -193,13 +193,33 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .st-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);cursor:default}
 
 /* ========== スマホ対応 ========== */
-.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#1e2130;display:flex;align-items:center;height:56px;padding:0 16px;gap:8px}
-.hdr h1{font-size:17px;font-weight:900;letter-spacing:.04em;margin-right:auto;color:#fff}
-.nav-link{background:none;border:none;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center}
-.nav-link:hover{color:#fff;background:rgba(255,255,255,.08)}
-.nav-link.on{color:#fff;background:#3b6de7}
-.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:7px 14px;border-radius:8px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#1e2130;display:flex;align-items:stretch;height:48px;padding:0;gap:0}
+.hdr-inner{display:flex;align-items:stretch;width:100%;padding:6px 8px 0 8px;gap:2px}
+.nav-link{background:rgba(255,255,255,.04);border:none;color:rgba(255,255,255,.55);font:500 13px/1 'Noto Sans JP',sans-serif;padding:0 14px;border-radius:8px 8px 0 0;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;margin-bottom:0;position:relative;white-space:nowrap}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nav-link.on{background:var(--bg,#f5f6fa);color:#1a1d27;font-weight:700}
+.nav-link.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--bg,#f5f6fa)}
+.home-link{font-weight:700}
+.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.75);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
 .hdr-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+.nav-menu-btn{background:rgba(255,255,255,.08);border:none;color:#fff;font-size:20px;line-height:1;padding:0 12px;border-radius:6px;cursor:pointer;height:32px;align-self:center;display:none}
+.nav-menu-btn:hover{background:rgba(255,255,255,.18)}
+.home-link{display:inline-flex;align-items:center}
+.nav-right{display:contents}
+@media(max-width:768px){
+  .nav-right{display:none;position:fixed;top:48px;right:10px;background:#1e2130;border-radius:10px;padding:6px;flex-direction:column;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:999;min-width:160px}
+  .nav-right.open{display:flex}
+  .nav-right .nav-link{padding:10px 14px;border-radius:6px;font-size:14px;text-align:left;background:transparent;color:rgba(255,255,255,.8)}
+  .nav-right .nav-link.on{background:var(--bg,#f5f6fa);color:#1a1d27}
+  .nav-right .nav-link.on::after{display:none}
+  .nav-menu-btn{display:inline-flex;align-items:center;justify-content:center}
+  .nav-spacer{flex:1}
+  .hdr{padding:0}
+  .hdr-inner{padding:6px 8px 0 8px;overflow-x:auto;scrollbar-width:none}
+  .hdr-inner::-webkit-scrollbar{display:none}
+  .nav-link{flex-shrink:0;font-size:12px;padding:0 10px}
+}
+
 @media (max-width:768px){
   html{font-size:14px}
 
@@ -351,12 +371,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .gantt-label-hd,.gantt-row-label{min-width:140px;max-width:140px}
 }
 
-.home-link{display:inline-flex;align-items:center}
-.nav-right{display:contents}
-.nav-menu-btn{display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;line-height:1;padding:4px 12px;border-radius:8px;cursor:pointer;flex-shrink:0}
-.nav-menu-btn:hover{background:rgba(255,255,255,.2)}
 @media(max-width:768px){
-  .nav-right{display:none;position:fixed;top:56px;right:10px;background:#1e2130;border-radius:10px;padding:6px;flex-direction:column;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:999;min-width:160px}
+  .nav-right{display:none;position:fixed;top:48px;right:10px;background:#1e2130;border-radius:10px;padding:6px;flex-direction:column;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:999;min-width:160px}
   .nav-right.open{display:flex}
   .nav-right .nav-link{padding:10px 14px;border-radius:6px;font-size:14px;text-align:left}
   .nav-menu-btn{display:inline-flex;align-items:center;justify-content:center}
@@ -366,13 +382,22 @@ tr:hover td{background:rgba(59,111,216,.03)}
 </head>
 <body>
 <div class="hdr">
-  <h1>工程管理</h1>
-  <a href="portal.html" class="nav-link home-link"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</a>
-  <a href="daily.html" class="nav-link">日報</a>
-  <a href="overtime.html" class="nav-link">時間外</a>
-  <a href="labor.html" class="nav-link">工数</a>
-  <div class="nav-spacer"></div>
-  <div class="nav-right">
+  <div class="hdr-inner">
+    <a href="portal.html" class="nav-link home-link"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</a>
+    <a href="daily.html" class="nav-link">日報</a>
+    <a href="overtime.html" class="nav-link">時間外</a>
+    <a href="labor.html" class="nav-link">工数</a>
+    <div class="nav-spacer"></div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-link">生産部</a>
+      <a href="project.html" class="nav-link on">企画制作部</a>
+      <a href="inventory.html" class="nav-link">在庫管理</a>
+      <a href="vehicle.html" class="nav-link">車両管理</a>
+    </div>
+    <button class="nav-menu-btn" onclick="toggleNavMenu()" aria-label="メニュー">≡</button>
+    <button class="hdr-btn" onclick="refreshData()">↻ 更新</button>
+  </div>
+</div><div class="nav-right">
     <a href="index.html" class="nav-link">生産部</a>
     <a href="project.html" class="nav-link on">企画制作部</a>
     <a href="inventory.html" class="nav-link">在庫管理</a>
