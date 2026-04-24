@@ -707,6 +707,12 @@ function addOneEntry(){
   }
   closeAddForm();
   renderSavedEntries();
+  // 2.5秒後にバックグラウンドで再取得（tmp_IDを実IDに置換）
+  setTimeout(async()=>{
+    await loadReports();
+    renderSavedEntries();
+    if(curView==='view')renderViewContent();
+  },2500);
 }
 function renderSavedEntries(){
   const el=$('savedEntries');
