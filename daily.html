@@ -397,6 +397,7 @@ async function onWhoChange(){
   const w=getWho();
   if(w)localStorage.setItem('daily_who',w);
   else localStorage.removeItem('daily_who');
+  buildAfProjOptions(); // 氏名変更時に案件順を部署優先に再構築
   renderSavedEntries();
   closeAddForm();
   if(w&&curView==='write'){openAddForm(true)}
@@ -423,12 +424,30 @@ function buildAfProjOptions(){
   const sel=$('afProj');
   let h='<option value="">-- 案件を選ぶ --</option>';
   h+='<option value="other">その他(自由記述)</option>';
-  h+='<optgroup label="生産部">';
-  prodProjects.forEach(p=>{h+=`<option value="prod:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});
-  h+='</optgroup>';
-  h+='<optgroup label="企画制作部">';
-  projProjects.forEach(p=>{h+=`<option value="proj:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});
-  h+='</optgroup>';
+  // 選択中の氏名の部署を取得
+  const w=getWho();
+  const me=staffList.find(s=>String(s.employee_no)===String(w));
+  const myDept=me?me.dept:'';
+  
+  const prodGroup=()=>{
+    let s='<optgroup label="生産部">';
+    prodProjects.forEach(p=>{s+=`<option value="prod:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});
+    s+='</optgroup>';
+    return s;
+  };
+  const projGroup=()=>{
+    let s='<optgroup label="企画制作部">';
+    projProjects.forEach(p=>{s+=`<option value="proj:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});
+    s+='</optgroup>';
+    return s;
+  };
+  // 自部署を上に
+  if(myDept==='企画制作部'){
+    h+=projGroup()+prodGroup();
+  } else {
+    // 生産部 or その他 → 生産部を上（従来順）
+    h+=prodGroup()+projGroup();
+  }
   sel.innerHTML=h;
 }
 
