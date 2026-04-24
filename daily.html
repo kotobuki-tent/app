@@ -220,12 +220,18 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
         <div class="af-row">
           <div class="af-field" style="flex:2">
             <label>作業内容</label>
-            <input type="text" id="afWork" placeholder="例: 裁断、作図、設営...">
+            <select id="afWork" onchange="onAfWorkChange()">
+              <option value="">-- 作業を選ぶ --</option>
+            </select>
           </div>
           <div class="af-field" style="flex:1">
             <label>時間（分）</label>
             <input type="number" id="afMinutes" min="0" step="5" placeholder="例: 120">
           </div>
+        </div>
+        <div class="af-field hidden" id="afWorkCustomWrap">
+          <label>作業内容（自由記述）</label>
+          <input type="text" id="afWorkCustom" placeholder="例: 研修、会議、その他の作業...">
         </div>
         <div class="af-btns">
           <button class="af-cancel" onclick="closeAddForm()">キャンセル</button>
@@ -425,14 +431,70 @@ function buildAfProjOptions(){
   h+='</optgroup>';
   sel.innerHTML=h;
 }
+
+// 作業マスタ
+const WORK_PRODUCTION=['裁断','溶着','縫製','製作','検査','出荷','印刷','図面','修理'];
+const WORK_PROJECT=['設営','撤去','施工','メンテナンス','準備','下見','積み込み','運搬'];
+const WORK_COMMON=['事務','打ち合わせ','清掃','車両運行'];
+
+function buildAfWorkOptions(projType){
+  const sel=$('afWork');
+  let h='<option value="">-- 作業を選ぶ --</option>';
+  h+='<option value="__other__">その他（自由記述）</option>';
+  if(projType==='prod'){
+    h+='<optgroup label="生産部作業">';
+    WORK_PRODUCTION.forEach(w=>h+=`<option value="${esc(w)}">${esc(w)}</option>`);
+    h+='</optgroup>';
+    h+='<optgroup label="共通">';
+    WORK_COMMON.forEach(w=>h+=`<option value="${esc(w)}">${esc(w)}</option>`);
+    h+='</optgroup>';
+    h+='<optgroup label="企画制作部作業">';
+    WORK_PROJECT.forEach(w=>h+=`<option value="${esc(w)}">${esc(w)}</option>`);
+    h+='</optgroup>';
+  } else if(projType==='proj'){
+    h+='<optgroup label="企画制作部作業">';
+    WORK_PROJECT.forEach(w=>h+=`<option value="${esc(w)}">${esc(w)}</option>`);
+    h+='</optgroup>';
+    h+='<optgroup label="共通">';
+    WORK_COMMON.forEach(w=>h+=`<option value="${esc(w)}">${esc(w)}</option>`);
+    h+='</optgroup>';
+    h+='<optgroup label="生産部作業">';
+    WORK_PRODUCTION.forEach(w=>h+=`<option value="${esc(w)}">${esc(w)}</option>`);
+    h+='</optgroup>';
+  } else {
+    // その他案件：全作業フラット表示
+    [...WORK_PRODUCTION,...WORK_PROJECT,...WORK_COMMON].forEach(w=>h+=`<option value="${esc(w)}">${esc(w)}</option>`);
+  }
+  sel.innerHTML=h;
+}
+
 function onAfProjChange(){
   const wrap=$('afProjCustomWrap');
-  if($('afProj').value==='other'){
+  const projVal=$('afProj').value;
+  if(projVal==='other'){
     wrap.classList.remove('hidden');
     setTimeout(()=>$('afProjCustom').focus(),50);
+    buildAfWorkOptions('other');
+  } else if(projVal){
+    wrap.classList.add('hidden');
+    $('afProjCustom').value='';
+    const [type]=projVal.split(':');
+    buildAfWorkOptions(type);
   } else {
     wrap.classList.add('hidden');
     $('afProjCustom').value='';
+    buildAfWorkOptions(null);
+  }
+}
+
+function onAfWorkChange(){
+  const wrap=$('afWorkCustomWrap');
+  if($('afWork').value==='__other__'){
+    wrap.classList.remove('hidden');
+    setTimeout(()=>$('afWorkCustom').focus(),50);
+  } else {
+    wrap.classList.add('hidden');
+    $('afWorkCustom').value='';
   }
 }
 function openAddForm(auto){
@@ -444,7 +506,10 @@ function openAddForm(auto){
   $('afProj').value='';
   $('afProjCustom').value='';
   $('afProjCustomWrap').classList.add('hidden');
+  buildAfWorkOptions(null);
   $('afWork').value='';
+  $('afWorkCustom').value='';
+  $('afWorkCustomWrap').classList.add('hidden');
   $('afMinutes').value='';
   if(auto!==true){
     setTimeout(()=>$('afProj').focus(),50);
@@ -458,11 +523,17 @@ function addOneEntry(){
   const w=getWho();
   if(!w){toast('氏名を選んでください',true);return}
   const projVal=$('afProj').value;
-  const work=$('afWork').value.trim();
+  let work=$('afWork').value;
   const minutesStr=$('afMinutes').value.trim();
   const minutes=parseInt(minutesStr,10);
   if(!projVal){toast('案件を選んでください',true);return}
-  if(!work){toast('作業内容を入力してください',true);return}
+  if(!work){toast('作業内容を選んでください',true);return}
+  // その他（自由記述）なら入力テキストを使う
+  if(work==='__other__'){
+    const customWork=$('afWorkCustom').value.trim();
+    if(!customWork){toast('作業内容を入力してください',true);return}
+    work=customWork;
+  }
   if(!minutesStr||isNaN(minutes)||minutes<=0){toast('時間（分）を入力してください',true);return}
   let body;
   if(projVal==='other'){
