@@ -79,6 +79,11 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .saved-entry .se-note{font-size:12px;color:var(--text-dim);margin-top:2px;font-style:italic}
 .saved-entry .se-del{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:4px 10px;border-radius:4px;white-space:nowrap;line-height:1}
 .saved-entry .se-del:hover{background:var(--red-dim)}
+.saved-entry .se-actions{display:flex;gap:6px;flex-shrink:0}
+.saved-entry .act-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap}
+.saved-entry .act-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.saved-entry .act-btn.del{color:var(--red)}
+.saved-entry .act-btn.del:hover{background:var(--red);color:#fff;border-color:var(--red)}
 
 .save-btn{background:var(--accent);color:#fff;border:none;padding:11px 24px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;margin-top:8px}
 .save-btn:hover{opacity:.9}
@@ -700,13 +705,15 @@ function renderSavedEntries(){
     const mins=parseInt(e.minutes,10)||0;
     const minsLabel=mins?`<span style="color:var(--text-dim);font-size:12px;margin-left:8px">${mins}分</span>`:'';
     const isTmp=String(e.id).startsWith('tmp_');
-    const editAttr=isTmp?'':`onclick="editEntry('${esc(e.id)}')"`;
-    h+=`<div class="saved-entry" ${editAttr} style="${isTmp?'':'cursor:pointer'}">
+    const actions=isTmp
+      ? '<span style="color:var(--text-faint);font-size:11px">保存中...</span>'
+      : `<button class="act-btn" onclick="editEntry('${esc(e.id)}')">編集</button> <button class="act-btn del" onclick="delEntry('${esc(e.id)}')">削除</button>`;
+    h+=`<div class="saved-entry">
       <div class="se-main">
         <div class="se-proj">${esc(e.project_name||'(案件不明)')}</div>
         <div class="se-action">${esc(e.work||e.action||'')}${minsLabel}</div>
       </div>
-      <button class="se-del" onclick="event.stopPropagation();delEntry('${esc(e.id)}')" title="削除">×</button>
+      <div class="se-actions">${actions}</div>
     </div>`;
   });
   el.innerHTML=h;
@@ -763,11 +770,12 @@ function renderViewContent(){
       const minsLabel=mins?`<span style="color:var(--text-faint);font-size:11px;margin-left:6px">${mins}分</span>`:'';
       const isTmp=String(e.id).startsWith('tmp_');
       const editable=isMe&&!isTmp;
-      const clickAttr=editable?`onclick="gotoEditFromView('${esc(e.id)}','${esc(e.date||'')}')" style="cursor:pointer"`:'';
-      h+=`<div class="member-entry" ${clickAttr}>
+      const editBtn=editable?`<button class="act-btn" onclick="gotoEditFromView('${esc(e.id)}','${esc(e.date||'')}')" style="margin-top:6px">編集</button>`:'';
+      h+=`<div class="member-entry">
         <div class="me-proj">${esc(e.project_name||'(案件不明)')}</div>
         <div class="me-action">${esc(e.work||e.action||'')}${minsLabel}</div>
         <div class="me-note">${esc(e.note||'')}</div>
+        ${editBtn}
       </div>`;
     });
     h+='</div>';
