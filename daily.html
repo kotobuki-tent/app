@@ -193,9 +193,13 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
   <div id="writeView" class="hidden">
     <div class="card">
       <div class="card-head">
-        <div>
+        <div style="flex:1">
           <div class="today-date" id="todayLabel"></div>
-          <div class="today-hint">今日の日報を記入</div>
+          <div class="today-hint" style="display:flex;align-items:center;gap:10px;margin-top:8px">
+            <span>日付：</span>
+            <input type="date" id="writeDate" onchange="onWriteDateChange()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:500 13px/1 'Noto Sans JP',sans-serif">
+            <button onclick="setWriteDateToday()" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer">今日</button>
+          </div>
         </div>
         <div class="field" style="max-width:240px">
           <label>氏名</label>
@@ -315,8 +319,10 @@ let prodProjects=[];    // 生産部の進行中案件
 let projProjects=[];    // 企画制作部の進行中案件
 let allReports=[];      // 全員分の日報（最近30日分などを保持）
 let viewingDate=new Date();
+let writeDate=new Date();  // 「自分で書く」で選択中の日付
 const today=new Date();
 today.setHours(0,0,0,0);
+writeDate.setHours(0,0,0,0);
 
 function toast(msg,err){const t=$('toast');t.textContent=msg;t.className='toast show'+(err?' err':'');setTimeout(()=>t.className='toast',2500)}
 function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
@@ -364,7 +370,7 @@ function refreshData(){loadAll()}
 // 現在の氏名に紐づく「今日の自分の日報」をローカルから取り出す
 function getMyEntries(){
   const w=getWho();if(!w)return[];
-  const d=dateStr(today);
+  const d=dateStr(writeDate);
   return allReports.filter(r=>String(r.employee_no)===String(w)&&String(r.date)===d);
 }
 // 表示中の日付の全員の日報をローカルから取り出す
@@ -411,14 +417,35 @@ function render(){
 
 // ====== 自分で書く ======
 function renderWrite(){
-  const today=new Date();
-  $('todayLabel').textContent=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
+  const d=writeDate;
+  $('todayLabel').textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
+  // 日付ピッカーを設定（過去3日〜今日）
+  const datePicker=$('writeDate');
+  datePicker.value=dateStr(d);
+  datePicker.max=dateStr(today);
+  const minDate=new Date(today);
+  minDate.setDate(minDate.getDate()-3);
+  datePicker.min=dateStr(minDate);
   renderSavedEntries();
   buildAfProjOptions();
   // 氏名が選ばれてたらフォームをデフォで開く
   if(getWho()&&$('addForm').classList.contains('hidden')){
     openAddForm(true);
   }
+}
+function onWriteDateChange(){
+  const v=$('writeDate').value;
+  if(!v)return;
+  writeDate=new Date(v);
+  writeDate.setHours(0,0,0,0);
+  renderWrite();
+  closeAddForm();
+}
+function setWriteDateToday(){
+  writeDate=new Date();
+  writeDate.setHours(0,0,0,0);
+  renderWrite();
+  closeAddForm();
 }
 function buildAfProjOptions(){
   const sel=$('afProj');
@@ -523,11 +550,16 @@ function onAfWorkChange(){
     $('afWorkCustom').value='';
   }
 }
+let editingId=null;  // 編集中のentry id（null=新規追加モード）
 function openAddForm(auto){
   const w=getWho();
   if(!w){toast('先に氏名を選んでください',true);return}
+  editingId=null;
   $('addForm').classList.remove('hidden');
   $('openAddBtn').classList.add('hidden');
+  // 保存ボタンのラベルを「追加」に戻す
+  const saveBtn=document.querySelector('.af-save');
+  if(saveBtn)saveBtn.textContent='追加';
   // クリアしてフォーカス
   $('afProj').value='';
   $('afProjCustom').value='';
@@ -542,8 +574,48 @@ function openAddForm(auto){
   }
 }
 function closeAddForm(){
+  editingId=null;
   $('addForm').classList.add('hidden');
   $('openAddBtn').classList.remove('hidden');
+}
+
+function editEntry(id){
+  const entry=allReports.find(e=>String(e.id)===String(id));
+  if(!entry){toast('記録が見つかりません',true);return}
+  editingId=id;
+  $('addForm').classList.remove('hidden');
+  $('openAddBtn').classList.add('hidden');
+  // 保存ボタンのラベルを「保存」に変更
+  const saveBtn=document.querySelector('.af-save');
+  if(saveBtn)saveBtn.textContent='保存';
+  // 案件復元
+  if(entry.project_type==='other'){
+    $('afProj').value='other';
+    $('afProjCustomWrap').classList.remove('hidden');
+    $('afProjCustom').value=entry.project_name||'';
+    buildAfWorkOptions('other');
+  } else {
+    const prefix=entry.project_type==='production'?'prod':'proj';
+    $('afProj').value=`${prefix}:${entry.project_id}`;
+    $('afProjCustomWrap').classList.add('hidden');
+    $('afProjCustom').value='';
+    buildAfWorkOptions(prefix);
+  }
+  // 作業内容復元
+  const work=entry.work||entry.action||'';
+  const sel=$('afWork');
+  // プルダウン内に一致するoptionがあれば選択、なければ「その他」扱い
+  const hasMatch=Array.from(sel.options).some(o=>o.value===work);
+  if(hasMatch){
+    sel.value=work;
+    $('afWorkCustomWrap').classList.add('hidden');
+    $('afWorkCustom').value='';
+  } else {
+    sel.value='__other__';
+    $('afWorkCustomWrap').classList.remove('hidden');
+    $('afWorkCustom').value=work;
+  }
+  $('afMinutes').value=entry.minutes||'';
 }
 function addOneEntry(){
   const w=getWho();
@@ -567,7 +639,7 @@ function addOneEntry(){
     if(!customName){toast('案件名を入力してください',true);return}
     body={
       dept:'daily',action:'save',
-      date:dateStr(today),
+      date:dateStr(writeDate),
       employee_no:w,
       project_type:'other',
       project_id:'other',
@@ -582,7 +654,7 @@ function addOneEntry(){
     const pr=list.find(x=>String(x.id)===String(id));
     body={
       dept:'daily',action:'save',
-      date:dateStr(today),
+      date:dateStr(writeDate),
       employee_no:w,
       project_type:type==='prod'?'production':'project',
       project_id:id,
@@ -592,10 +664,23 @@ function addOneEntry(){
       note:''
     };
   }
-  // 楽観的更新：allReports に直接追加
-  allReports.push({...body,id:'tmp_'+Date.now()});
-  fireAndForget(body);
-  toast('追加しました');
+  // 編集モードか新規追加モードかで分岐
+  if(editingId){
+    // 編集モード：既存のidを使って更新
+    body.id=editingId;
+    // 楽観的更新：allReportsの該当エントリを差し替え
+    const idx=allReports.findIndex(e=>String(e.id)===String(editingId));
+    if(idx>=0){
+      allReports[idx]={...allReports[idx],...body};
+    }
+    fireAndForget(body);
+    toast('更新しました');
+  } else {
+    // 新規追加モード
+    allReports.push({...body,id:'tmp_'+Date.now()});
+    fireAndForget(body);
+    toast('追加しました');
+  }
   closeAddForm();
   renderSavedEntries();
 }
@@ -604,20 +689,24 @@ function renderSavedEntries(){
   const w=getWho();
   if(!w){el.innerHTML='';return}
   const entries=getMyEntries();
+  const isToday=dateStr(writeDate)===dateStr(today);
+  const dateLabel=isToday?'今日':'この日';
   if(!entries.length){
-    el.innerHTML='<h3>今日の記録</h3><div class="empty-msg" style="padding:20px">まだ今日の記録はありません</div>';
+    el.innerHTML=`<h3>${dateLabel}の記録</h3><div class="empty-msg" style="padding:20px">まだ${dateLabel}の記録はありません</div>`;
     return;
   }
-  let h='<h3>今日の記録（'+entries.length+'件）</h3>';
+  let h=`<h3>${dateLabel}の記録（${entries.length}件）</h3>`;
   entries.forEach(e=>{
     const mins=parseInt(e.minutes,10)||0;
     const minsLabel=mins?`<span style="color:var(--text-dim);font-size:12px;margin-left:8px">${mins}分</span>`:'';
-    h+=`<div class="saved-entry">
+    const isTmp=String(e.id).startsWith('tmp_');
+    const editAttr=isTmp?'':`onclick="editEntry('${esc(e.id)}')"`;
+    h+=`<div class="saved-entry" ${editAttr} style="${isTmp?'':'cursor:pointer'}">
       <div class="se-main">
         <div class="se-proj">${esc(e.project_name||'(案件不明)')}</div>
         <div class="se-action">${esc(e.work||e.action||'')}${minsLabel}</div>
       </div>
-      <button class="se-del" onclick="delEntry('${esc(e.id)}')" title="削除">×</button>
+      <button class="se-del" onclick="event.stopPropagation();delEntry('${esc(e.id)}')" title="削除">×</button>
     </div>`;
   });
   el.innerHTML=h;
@@ -658,6 +747,7 @@ function renderViewContent(){
   // 社員順（staffListの順）で表示
   const empOrder=staffList.map(s=>String(s.employee_no));
   Object.keys(byEmp).forEach(e=>{if(!empOrder.includes(e))empOrder.push(e)});
+  const me=getWho();
   let h='';
   empOrder.forEach(empNo=>{
     const entries=byEmp[empNo];
@@ -666,11 +756,15 @@ function renderViewContent(){
     const name=st?st.name:('社員'+empNo);
     const totalMins=entries.reduce((sum,e)=>sum+(parseInt(e.minutes,10)||0),0);
     const totalLabel=totalMins?`<span style="color:var(--text-dim);font-weight:500;margin-left:8px">合計 ${totalMins}分</span>`:'';
-    h+=`<div class="member-group"><h3>${esc(name)}<span class="mb-count">${entries.length}件</span>${totalLabel}</h3>`;
+    const isMe=String(empNo)===String(me);
+    h+=`<div class="member-group"><h3>${esc(name)}${isMe?' <span style="color:var(--accent);font-size:11px;font-weight:500;margin-left:4px">（自分）</span>':''}<span class="mb-count">${entries.length}件</span>${totalLabel}</h3>`;
     entries.forEach(e=>{
       const mins=parseInt(e.minutes,10)||0;
       const minsLabel=mins?`<span style="color:var(--text-faint);font-size:11px;margin-left:6px">${mins}分</span>`:'';
-      h+=`<div class="member-entry">
+      const isTmp=String(e.id).startsWith('tmp_');
+      const editable=isMe&&!isTmp;
+      const clickAttr=editable?`onclick="gotoEditFromView('${esc(e.id)}','${esc(e.date||'')}')" style="cursor:pointer"`:'';
+      h+=`<div class="member-entry" ${clickAttr}>
         <div class="me-proj">${esc(e.project_name||'(案件不明)')}</div>
         <div class="me-action">${esc(e.work||e.action||'')}${minsLabel}</div>
         <div class="me-note">${esc(e.note||'')}</div>
@@ -679,6 +773,31 @@ function renderViewContent(){
     h+='</div>';
   });
   el.innerHTML=h;
+}
+
+// みんなの日報から自分のエントリを編集する時、自分で書くタブに切り替える
+function gotoEditFromView(id,dateStr2){
+  // writeDateをそのエントリの日付に変更
+  if(dateStr2){
+    const d=new Date(dateStr2+'T00:00:00');
+    // 過去3日より古いと編集不可（writeDateの制限）
+    const minDate=new Date(today);
+    minDate.setDate(minDate.getDate()-3);
+    if(d<minDate){
+      toast('古すぎる記録は編集できません（過去3日まで）',true);
+      return;
+    }
+    writeDate=d;
+    writeDate.setHours(0,0,0,0);
+  }
+  // タブ切り替え
+  curView='write';
+  $('dailyTabs').querySelectorAll('.sub-tab').forEach(t=>{
+    t.classList.toggle('on',t.dataset.view==='write');
+  });
+  render();
+  // 編集モードで開く
+  setTimeout(()=>editEntry(id),100);
 }
 
 // タブ切替
