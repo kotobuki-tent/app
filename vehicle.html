@@ -29,7 +29,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .nav-link{background:none;border:none;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center}
 .nav-link:hover{color:#fff;background:rgba(255,255,255,.08)}
 .nav-link.on{color:#fff;background:#3b6de7}
-.nav-spacer{flex:1;min-width:20px}
 .hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:7px 14px;border-radius:8px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none}
 .hdr-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
 
@@ -171,21 +170,36 @@ tr:hover td{background:rgba(13,148,136,.03)}
 .setting-row label{font-size:13px;min-width:160px;color:var(--text-dim)}
 .setting-row input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;width:100px;text-align:center}
 .setting-row span{font-size:12px;color:var(--text-faint)}
+
+.home-link{display:inline-flex;align-items:center}
+.nav-right{display:contents}
+.nav-menu-btn{display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;line-height:1;padding:4px 12px;border-radius:8px;cursor:pointer;flex-shrink:0}
+.nav-menu-btn:hover{background:rgba(255,255,255,.2)}
+@media(max-width:768px){
+  .nav-right{display:none;position:absolute;top:56px;right:10px;background:#1e2130;border-radius:10px;padding:6px;flex-direction:column;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:200;min-width:160px}
+  .nav-right.open{display:flex}
+  .nav-right .nav-link{padding:10px 14px;border-radius:6px;font-size:14px;text-align:left}
+  .nav-menu-btn{display:inline-flex;align-items:center;justify-content:center}
+  .nav-spacer{flex:1}
+}
 </style>
 </head>
 <body>
 
 <div class="hdr">
   <h1>車両管理</h1>
-  <a href="portal.html" class="nav-link">ポータル</a>
+  <a href="portal.html" class="nav-link home-link"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</a>
   <a href="daily.html" class="nav-link">日報</a>
   <a href="overtime.html" class="nav-link">時間外</a>
   <a href="labor.html" class="nav-link">工数</a>
   <div class="nav-spacer"></div>
-  <a href="index.html" class="nav-link">生産部</a>
-  <a href="project.html" class="nav-link">企画制作部</a>
-  <a href="inventory.html" class="nav-link">在庫管理</a>
-  <a href="vehicle.html" class="nav-link on">車両管理</a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-link">生産部</a>
+    <a href="project.html" class="nav-link">企画制作部</a>
+    <a href="inventory.html" class="nav-link">在庫管理</a>
+    <a href="vehicle.html" class="nav-link on">車両管理</a>
+  </div>
+  <button class="nav-menu-btn" onclick="toggleNavMenu()" aria-label="メニュー">≡</button>
   <button class="hdr-btn" onclick="loadAll()">↻ 更新</button>
 </div>
 
