@@ -1,15 +1,17 @@
 # 寿テント 業務管理アプリ
 
-テント・イベント設営会社の工程管理・在庫管理・時間外管理・車両管理を一元化するWebアプリ。  
+テント・イベント設営会社の工程管理・在庫管理・時間外管理・車両管理・日報・工数管理を一元化するWebアプリ（**SEQUENCE LAB**）。  
 Google スプレッドシートをデータベースとして使い、GitHub Pages でホスティング。
 
 ## URL
 
-- **ポータル**: https://kotobuki-tent.github.io/app/portal.html
+- **HOME**: https://kotobuki-tent.github.io/app/portal.html
+- **日報**: https://kotobuki-tent.github.io/app/daily.html
+- **時間外ボード**: https://kotobuki-tent.github.io/app/overtime.html
 - **生産部**: https://kotobuki-tent.github.io/app/
 - **企画制作部**: https://kotobuki-tent.github.io/app/project.html
+- **工数管理**: https://kotobuki-tent.github.io/app/labor.html
 - **在庫管理**: https://kotobuki-tent.github.io/app/inventory.html
-- **時間外ボード**: https://kotobuki-tent.github.io/app/overtime.html
 - **車両管理**: https://kotobuki-tent.github.io/app/vehicle.html
 - **台帳登録**: https://kotobuki-tent.github.io/app/register.html
 
@@ -17,14 +19,18 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 
 | ファイル | 役割 |
 |---|---|
-| `portal.html` | ポータル（全アプリへのリンク集） |
+| `portal.html` | HOME（全アプリへのカード型リンク集） |
+| `daily.html` | 日報（作業時間の記録・みんなの日報閲覧・編集） |
+| `overtime.html` | 時間外ボード（残業申告・休日出勤希望・出勤管理） |
 | `index.html` | 生産部（工場ボード・出荷済・管理・製作図連携） |
 | `project.html` | 企画制作部（ガントチャート・車両バッティング・貸出期間表示・管理） |
+| `labor.html` | 工数管理（案件ごとの延べ作業時間・人別内訳） |
 | `inventory.html` | 在庫管理（商品台帳・貸出/予約・メンテ・在庫確認） |
-| `overtime.html` | 時間外ボード（残業申告・休日出勤希望・管理） |
 | `vehicle.html` | 車両管理（車両台帳・期限アラート・メンテ履歴） |
 | `register.html` | 台帳登録（スマホ特化・商品追加専用） |
 | Apps Script（外部） | API（スプレッドシートCRUD・Driveファイル一覧） |
+
+全アプリ共通のChromeタブ風ヘッダー：`HOME｜日報｜時間外  [spacer]  生産部｜企画制作部｜工数管理｜在庫管理｜車両管理  [≡]  [↻更新]`
 
 ## スプレッドシート構成
 
@@ -35,15 +41,34 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 | `inventory` | 商品マスタ（カテゴリ・商品名・保有数） |
 | `rentals` | 貸出/予約台帳（ステータス・期間・数量） |
 | `vehicles` | 車両台帳（車検・保険期限・メンテ履歴） |
-| `staff` | スタッフ名簿 |
+| `staff` | スタッフ名簿（employee_no・name・dept・position） |
 | `overtime` | 時間外申告データ |
 | `ot_requests` | 休日出勤希望データ |
+| `daily_reports` | 日報データ（date・employee_no・project・work・minutes） |
+| `attendance` | 出勤管理データ |
 
 ## 機能
 
-### ポータル（portal.html）
+### HOME（portal.html）
 
 - 全アプリへのカード型リンク
+
+### 日報（daily.html）
+
+- 自分で書くタブ：案件と作業内容を選んで分単位で記録
+- 案件プルダウンは選択中の氏名の部署に応じて並び替え（生産部の人なら生産部案件が上）
+- 作業内容は固定リスト（22項目＋自由記述）を案件の部署に応じて並び替え
+- 日付ピッカーで過去3日まで遡って記入可能
+- カードタップで編集モード／削除ボタン
+- みんなの日報タブ：日付別に全員の日報を閲覧、自分のエントリは編集ボタン付き
+
+### 時間外ボード（overtime.html）
+
+- 申告タブ：週次グリッドで曜日ごとの時間外希望を登録
+  - 平日：18:00〜20:00の30分刻みで終了時刻を申告
+  - 土日祝：午前/午後/終日の3択
+  - 日本の祝日2025〜2027年を内蔵
+- 管理タブ：週間の申告状況を一覧表示、管理者から社員への一括メッセージ機能
 
 ### 生産部（index.html）
 
@@ -65,6 +90,13 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 - 現場詳細モーダル：日程・人数・車両・在庫管理連携レンタル品を表示
 - 編集モーダル：日程6フェーズ（搬入/設営/本番/撤去/貸出/返却）を2列グリッド表示
 
+### 工数管理（labor.html）
+
+- 工場ボードタブ：進行中の案件ごとの延べ作業時間、人別内訳
+- 出荷済タブ：完了案件の工数集計
+- ステータスフィルター、納期順ソート
+- 日報データ（daily_reports）から集計
+
 ### 在庫管理（inventory.html）
 
 - 商品台帳：カテゴリ別に商品を管理、ヘッダークリックソート（カテゴリ・商品名・保有数）、検索
@@ -72,11 +104,6 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 - メンテタブ：メンテ待ち・メンテ中の商品だけ表示、検索
 - 在庫確認：期間指定で使用率バー表示、貸出/メンテの内訳表示、カテゴリフィルター
 - 案件連携：企画制作部の現場と紐づけて貸出登録
-
-### 時間外ボード（overtime.html）
-
-- 申告タブ：スタッフ別に曜日ごとの時間外希望を登録（平日は時刻、土日祝は午前/午後/終日）
-- 管理タブ：週間の申告状況を一覧表示
 
 ### 車両管理（vehicle.html）
 
@@ -89,15 +116,17 @@ Google スプレッドシートをデータベースとして使い、GitHub Pag
 ## 技術
 
 - HTML / CSS / JavaScript（フレームワークなし、各アプリ1ファイル完結）
-- Google Apps Script（API・v5、deptパラメータで部門振り分け）
+- Google Apps Script（API・v6、deptパラメータで部門振り分け：production / project / inventory / overtime / vehicle / daily / labor / attendance / drive）
 - Google スプレッドシート（データベース）
 - Google Drive（製作図ファイル連携、フォルダID: `16iDJrBWXdbIHq-aqJVgHZpA9tRGXMUwc`）
 - GitHub Pages（ホスティング）
 - 楽観的更新（no-cors POST + ローカル配列即時反映）
-- 新規作成時のtmp_id残留対策：index.html / project.html は新規保存後3秒でloadAll自動実行（GASの実ID採番を待つ）
-- スマホ対応：index.html / overtime.html / project.html はメディアクエリ（max-width:768px / 420px）でレスポンシブ。テーブルは `:nth-of-type` + `::before` 疑似要素でカード型に変換
-- DOMフィルター方式の検索（全タブ対応）
-- favicon：インラインSVG漢字アイコン（製・企・庫・時・車・登・寿）
+- 新規作成時のtmp_id残留対策：新規保存後にloadAll自動実行（GASの実ID採番を待つ）
+- 並行実行競合対策：attendanceはLockServiceでシリアライズ、cleanupはclearContent + setValues一括書き込みで高速化
+- スマホ対応：全アプリでメディアクエリ（max-width:768px）対応、Chromeタブ風ヘッダーは≡メニューで右グループを折り畳み、テーブルは `:nth-of-type` + `::before` 疑似要素でカード型に変換
+- iOS Safari対策：nav-rightをモバイル時のみbody直下にJSで移動（祖先overflow影響回避）
+- DOMフィルター方式の検索（全タブ対応、input focus維持）
+- favicon：インラインSVG漢字アイコン（寿・日・時・製・企・工・庫・車・登）
 
 ## Credit
 
