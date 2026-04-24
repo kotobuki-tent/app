@@ -295,6 +295,19 @@ function closeDetail(){$('detailModal').classList.add('hidden')}
 
 loadData();
 setInterval(loadData,60*1000);
+
+function toggleNavMenu(){
+  const el=document.querySelector('.nav-right');
+  if(el)el.classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.nav-menu-btn');
+  const menu=e.target.closest('.nav-right');
+  if(!btn&&!menu){
+    const nr=document.querySelector('.nav-right');
+    if(nr)nr.classList.remove('open');
+  }
+});
 </script>
 </body>
 </html>
