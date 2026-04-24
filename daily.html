@@ -17,14 +17,7 @@
   --red:#dc2626;--red-dim:rgba(220,38,38,.1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text);background:var(--bg);min-height:100vh}
-.hdr{background:#1a1d27;color:#fff;padding:0 24px;height:54px;display:flex;align-items:center;gap:18px}
-.hdr h1{font-size:16px;font-weight:900}
-.nav-link{color:#aeb5c3;text-decoration:none;font-size:13px;font-weight:500;padding:8px 12px;border-radius:6px;transition:.15s}
-.nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
-.nav-link.on{background:var(--accent);color:#fff}
-.hdr-btn{background:rgba(255,255,255,.08);color:#aeb5c3;border:none;padding:7px 12px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer}
-.hdr-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text);background:var(--bg);min-height:100vh;padding-top:56px}
 .app{padding:24px}
 .sub-tabs{display:flex;gap:8px;margin-bottom:20px}
 .sub-tab{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font:500 14px/1 'Noto Sans JP',sans-serif;padding:10px 18px;border-radius:8px;cursor:pointer}
@@ -113,6 +106,13 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .toast.err{background:var(--red)}
 
 /* スマホ対応 */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#1e2130;display:flex;align-items:center;height:56px;padding:0 16px;gap:8px}
+.hdr h1{font-size:17px;font-weight:900;letter-spacing:.04em;margin-right:auto;color:#fff}
+.nav-link{background:none;border:none;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center}
+.nav-link:hover{color:#fff;background:rgba(255,255,255,.08)}
+.nav-link.on{color:#fff;background:#3b6de7}
+.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:7px 14px;border-radius:8px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none}
+.hdr-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
 @media (max-width:768px){
   html{font-size:14px}
   .hdr{padding:0 10px;gap:4px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
