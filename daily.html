@@ -439,6 +439,13 @@ const WORK_COMMON=['事務','打ち合わせ','清掃','車両運行'];
 
 function buildAfWorkOptions(projType){
   const sel=$('afWork');
+  // 案件未選択時はプルダウン無効化
+  if(!projType){
+    sel.innerHTML='<option value="">-- まず案件を選んでください --</option>';
+    sel.disabled=true;
+    return;
+  }
+  sel.disabled=false;
   let h='<option value="">-- 作業を選ぶ --</option>';
   h+='<option value="__other__">その他（自由記述）</option>';
   if(projType==='prod'){
