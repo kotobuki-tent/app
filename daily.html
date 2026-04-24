@@ -179,9 +179,13 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
       <div id="addForm" class="add-form hidden">
         <div class="af-field">
           <label>案件</label>
-          <select id="afProj">
+          <select id="afProj" onchange="onAfProjChange()">
             <option value="">-- 案件を選ぶ --</option>
           </select>
+        </div>
+        <div class="af-field hidden" id="afProjCustomWrap">
+          <label>案件名（自由記述）</label>
+          <input type="text" id="afProjCustom" placeholder="例: 清掃、研修、社内雑務...">
         </div>
         <div class="af-row">
           <div class="af-field" style="flex:2">
@@ -340,6 +344,7 @@ function renderWrite(){
 function buildAfProjOptions(){
   const sel=$('afProj');
   let h='<option value="">-- 案件を選ぶ --</option>';
+  h+='<option value="other">その他(自由記述)</option>';
   h+='<optgroup label="生産部">';
   prodProjects.forEach(p=>{h+=`<option value="prod:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});
   h+='</optgroup>';
@@ -348,6 +353,16 @@ function buildAfProjOptions(){
   h+='</optgroup>';
   sel.innerHTML=h;
 }
+function onAfProjChange(){
+  const wrap=$('afProjCustomWrap');
+  if($('afProj').value==='other'){
+    wrap.classList.remove('hidden');
+    setTimeout(()=>$('afProjCustom').focus(),50);
+  } else {
+    wrap.classList.add('hidden');
+    $('afProjCustom').value='';
+  }
+}
 function openAddForm(auto){
   const w=getWho();
   if(!w){toast('先に氏名を選んでください',true);return}
@@ -355,6 +370,8 @@ function openAddForm(auto){
   $('openAddBtn').classList.add('hidden');
   // クリアしてフォーカス
   $('afProj').value='';
+  $('afProjCustom').value='';
+  $('afProjCustomWrap').classList.add('hidden');
   $('afWork').value='';
   $('afMinutes').value='';
   if(auto!==true){
@@ -375,20 +392,37 @@ function addOneEntry(){
   if(!projVal){toast('案件を選んでください',true);return}
   if(!work){toast('作業内容を入力してください',true);return}
   if(!minutesStr||isNaN(minutes)||minutes<=0){toast('時間（分）を入力してください',true);return}
-  const [type,id]=projVal.split(':');
-  const list=type==='prod'?prodProjects:projProjects;
-  const pr=list.find(x=>String(x.id)===String(id));
-  const body={
-    dept:'daily',action:'save',
-    date:dateStr(today),
-    employee_no:w,
-    project_type:type==='prod'?'production':'project',
-    project_id:id,
-    project_name:pr?pr.project:'',
-    work:work,
-    minutes:minutes,
-    note:''
-  };
+  let body;
+  if(projVal==='other'){
+    const customName=$('afProjCustom').value.trim();
+    if(!customName){toast('案件名を入力してください',true);return}
+    body={
+      dept:'daily',action:'save',
+      date:dateStr(today),
+      employee_no:w,
+      project_type:'other',
+      project_id:'other',
+      project_name:customName,
+      work:work,
+      minutes:minutes,
+      note:''
+    };
+  } else {
+    const [type,id]=projVal.split(':');
+    const list=type==='prod'?prodProjects:projProjects;
+    const pr=list.find(x=>String(x.id)===String(id));
+    body={
+      dept:'daily',action:'save',
+      date:dateStr(today),
+      employee_no:w,
+      project_type:type==='prod'?'production':'project',
+      project_id:id,
+      project_name:pr?pr.project:'',
+      work:work,
+      minutes:minutes,
+      note:''
+    };
+  }
   // 楽観的更新：allReports に直接追加
   allReports.push({...body,id:'tmp_'+Date.now()});
   fireAndForget(body);
