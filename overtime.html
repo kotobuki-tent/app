@@ -126,7 +126,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   body{padding-bottom:40px}
 
   /* ヘッダー：横スクロール */
-  .hdr{padding:0 10px;gap:4px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .hdr::-webkit-scrollbar{display:none}
   .hdr h1{font-size:15px;margin-right:6px;flex-shrink:0;white-space:nowrap}
   .nav-link{font-size:12px;padding:8px 10px;flex-shrink:0;white-space:nowrap}
@@ -282,6 +281,18 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 <script>
+// nav-right を body 直下に移動（祖先のoverflow影響回避）
+(function(){
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',moveNavRight);
+  }else{
+    moveNavRight();
+  }
+  function moveNavRight(){
+    const nr=document.querySelector('.nav-right');
+    if(nr&&nr.parentElement!==document.body){document.body.appendChild(nr);}
+  }
+})();
 function toggleNavMenu(){
   const el=document.querySelector('.nav-right');
   if(el)el.classList.toggle('open');
