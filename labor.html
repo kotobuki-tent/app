@@ -82,6 +82,11 @@ table.jobs tr:last-child td{border-bottom:none}
   .toolbar input[type="search"]{min-width:auto;width:100%}
   table.jobs{display:block;overflow-x:auto;white-space:nowrap}
 }
+
+.sub-tabs{display:flex;gap:6px;margin-bottom:14px}
+.sub-tab{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:7px 14px;border-radius:8px;cursor:pointer}
+.sub-tab:hover{color:var(--text);border-color:var(--accent)}
+.sub-tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -101,6 +106,10 @@ table.jobs tr:last-child td{border-bottom:none}
 </div>
 
 <div class="app">
+  <div class="sub-tabs">
+    <button class="sub-tab on" data-view="active" onclick="setView('active')">工場ボード</button>
+    <button class="sub-tab" data-view="archive" onclick="setView('archive')">出荷済</button>
+  </div>
   <div class="toolbar">
     <input type="search" id="searchBox" placeholder="案件名・見積/受注番号で検索" oninput="renderTable()">
     <select id="stFilter" onchange="renderTable()">
@@ -109,7 +118,6 @@ table.jobs tr:last-child td{border-bottom:none}
       <option value="受注">受注</option>
       <option value="製作中">製作中</option>
       <option value="完成">完成</option>
-      <option value="出荷済">出荷済</option>
       <option value="見送り">見送り</option>
     </select>
     <span class="count" id="countLabel"></span>
@@ -139,9 +147,29 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 let allJobs=[];
+let currentView='active';  // 'active' or 'archive'
 
-// ステータスの表示順（工数集計では出荷済を上、振り返り目的）
-const stOrder={'出荷済':1,'完成':2,'製作中':3,'受注':4,'見積中':5,'見送り':6};
+// ステータスの表示順
+// - active（工場ボード）：製作中→完成→受注→見積中→見送り
+// - archive（出荷済）：出荷済のみ
+const stOrderActive={'完成':1,'製作中':2,'受注':3,'見積中':4,'見送り':5};
+const stOrderArchive={'出荷済':1};
+
+function setView(v){
+  currentView=v;
+  document.querySelectorAll('.sub-tab').forEach(b=>{
+    b.classList.toggle('on',b.dataset.view===v);
+  });
+  // archiveのときはステータスフィルタ無効化（出荷済のみなので）
+  const sf=$('stFilter');
+  if(v==='archive'){
+    sf.value='';
+    sf.disabled=true;
+  } else {
+    sf.disabled=false;
+  }
+  renderTable();
+}
 
 function fmtMin(min){
   if(!min)return '0分';
@@ -171,15 +199,23 @@ async function loadData(){
 function renderTable(){
   const kw=$('searchBox').value.trim().toLowerCase();
   const stFilter=$('stFilter').value;
+  const isArchive=currentView==='archive';
   let list=allJobs.filter(j=>{
-    if(stFilter&&j.status!==stFilter)return false;
+    // ビューによる振り分け
+    if(isArchive){
+      if(j.status!=='出荷済')return false;
+    } else {
+      if(j.status==='出荷済')return false;
+      if(stFilter&&j.status!==stFilter)return false;
+    }
     if(kw){
       const target=(j.project+' '+j.order_no+' '+j.estimate_no).toLowerCase();
       if(!target.includes(kw))return false;
     }
     return true;
   });
-  // ソート：ステータス順 → 納期（新しい順＝直近出荷分が上、空欄は後ろ）
+  // ソート：ビューごとに異なる順序 → 納期（新しい順＝直近が上、空欄は後ろ）
+  const stOrder=isArchive?stOrderArchive:stOrderActive;
   list.sort((a,b)=>{
     const so=(stOrder[a.status]||99)-(stOrder[b.status]||99);
     if(so)return so;
