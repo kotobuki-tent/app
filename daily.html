@@ -97,6 +97,14 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .date-nav input[type="date"]{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface)}
 
 .member-group{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.status-section{padding:14px 16px;margin-bottom:10px}
+.status-section.status-notwritten{border-left:4px solid var(--red)}
+.status-section.status-absent{border-left:4px solid var(--text-dim);background:var(--surface2)}
+.status-list{display:flex;flex-direction:column;gap:6px}
+.status-item{display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border-light);border-radius:8px}
+.status-item .si-name{font-weight:600;font-size:13px;color:var(--text)}
+.status-item .si-dept{font-size:11px;color:var(--text-dim);flex:1}
+.status-section.status-absent .status-item{background:transparent}
 .member-group h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border-light)}
 .member-group .mb-count{font-size:11px;color:var(--text-faint);font-weight:500;margin-left:8px}
 .member-entry{display:flex;gap:14px;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:13px;align-items:flex-start}
@@ -323,6 +331,7 @@ let staffList=[];       // [{employee_no, name, dept, position}]
 let prodProjects=[];    // 生産部の進行中案件
 let projProjects=[];    // 企画制作部の進行中案件
 let allReports=[];      // 全員分の日報（最近30日分などを保持）
+let absenceList=[];     // 表示中の日付の欠勤者リスト
 let viewingDate=new Date();
 let writeDate=new Date();  // 「自分で書く」で選択中の日付
 const today=new Date();
@@ -355,6 +364,15 @@ async function loadReports(){
     const j=await r.json();
     if(j.success)allReports=j.data||[];
   }catch(e){/* 静かに失敗 */}
+}
+// 指定日の欠勤者リスト取得
+async function loadAbsenceList(date){
+  try{
+    const r=await fetch(API+'?dept=daily&action=read_absence&date='+date);
+    const j=await r.json();
+    if(j.success)absenceList=j.data||[];
+    else absenceList=[];
+  }catch(e){absenceList=[]}
 }
 async function loadAll(){
   $('loader').classList.remove('hidden');
@@ -728,10 +746,11 @@ function delEntry(id){
 }
 
 // ====== みんなの日報 ======
-function renderView(){
+async function renderView(){
   $('viewDate').value=dateStr(viewingDate);
   const d=viewingDate;
   $('viewDateLabel').textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
+  await loadAbsenceList(dateStr(viewingDate));
   renderViewContent();
 }
 function viewDateMove(n){viewingDate.setDate(viewingDate.getDate()+n);renderView()}
@@ -740,10 +759,6 @@ function loadViewDate(){const v=$('viewDate').value;if(!v)return;viewingDate=new
 function renderViewContent(){
   const el=$('viewContent');
   const reports=getDateReports();
-  if(!reports.length){
-    el.innerHTML='<div class="card"><div class="empty-msg">この日の日報はまだ登録されていません</div></div>';
-    return;
-  }
   // 社員別にまとめる
   const byEmp={};
   reports.forEach(r=>{
@@ -751,11 +766,62 @@ function renderViewContent(){
     if(!byEmp[e])byEmp[e]=[];
     byEmp[e].push(r);
   });
+  // 欠勤者のemployee_no集合
+  const absenceEmpSet=new Set(absenceList.map(a=>String(a.employee_no)));
+  // 未記入判定：staffList (in_daily=TRUE) のうち、reports にも absence にもない人
+  const writtenSet=new Set(Object.keys(byEmp));
+  const notWritten=staffList.filter(s=>{
+    const no=String(s.employee_no);
+    return !writtenSet.has(no)&&!absenceEmpSet.has(no);
+  });
   // 社員順（staffListの順）で表示
   const empOrder=staffList.map(s=>String(s.employee_no));
   Object.keys(byEmp).forEach(e=>{if(!empOrder.includes(e))empOrder.push(e)});
   const me=getWho();
   let h='';
+  // === 未記入セクション ===
+  if(notWritten.length>0){
+    h+=`<div class="card status-section status-notwritten">
+      <h3 style="margin:0 0 10px 0;color:var(--red);font-size:15px;display:flex;align-items:center;gap:8px">
+        <span>未記入</span>
+        <span style="background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px">${notWritten.length}人</span>
+      </h3>
+      <div class="status-list">`;
+    notWritten.forEach(s=>{
+      h+=`<div class="status-item">
+        <span class="si-name">${esc(s.name)}</span>
+        <span class="si-dept">${esc(s.dept||'')}</span>
+        <button class="act-btn" onclick="markAbsent('${esc(s.employee_no)}','${esc(s.name)}')">欠勤にする</button>
+      </div>`;
+    });
+    h+=`</div></div>`;
+  }
+  // === 休みセクション ===
+  if(absenceList.length>0){
+    h+=`<div class="card status-section status-absent">
+      <h3 style="margin:0 0 10px 0;color:var(--text-dim);font-size:15px;display:flex;align-items:center;gap:8px">
+        <span>休み</span>
+        <span style="background:var(--text-dim);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px">${absenceList.length}人</span>
+      </h3>
+      <div class="status-list">`;
+    absenceList.forEach(a=>{
+      const s=staffList.find(x=>String(x.employee_no)===String(a.employee_no));
+      const name=s?s.name:('社員'+a.employee_no);
+      const dept=s?s.dept:'';
+      h+=`<div class="status-item">
+        <span class="si-name">${esc(name)}</span>
+        <span class="si-dept">${esc(dept)}</span>
+        <button class="act-btn" onclick="unmarkAbsent('${esc(a.id)}')">取消</button>
+      </div>`;
+    });
+    h+=`</div></div>`;
+  }
+  // === 日報データがない＆未記入も欠勤もない場合 ===
+  if(!reports.length&&notWritten.length===0&&absenceList.length===0){
+    el.innerHTML='<div class="card"><div class="empty-msg">この日の日報はまだ登録されていません</div></div>';
+    return;
+  }
+  // === 日報一覧 ===
   empOrder.forEach(empNo=>{
     const entries=byEmp[empNo];
     if(!entries||!entries.length)return;
@@ -781,6 +847,34 @@ function renderViewContent(){
     h+='</div>';
   });
   el.innerHTML=h;
+}
+
+// 欠勤マーク
+async function markAbsent(empNo,name){
+  if(!confirm(`${name}さんを休み（欠勤）にしますか？`))return;
+  const date=dateStr(viewingDate);
+  const tmpId='abs_tmp_'+Date.now();
+  // 楽観的更新
+  absenceList.push({id:tmpId,date:date,employee_no:empNo});
+  renderViewContent();
+  fireAndForget({dept:'daily',action:'save_absence',date:date,employee_no:empNo});
+  toast('休みに設定しました');
+  // 2秒後に最新取得
+  setTimeout(async()=>{await loadAbsenceList(date);renderViewContent();},2500);
+}
+// 欠勤取消
+async function unmarkAbsent(absId){
+  if(!confirm('休み設定を取り消しますか？'))return;
+  // 楽観的更新
+  absenceList=absenceList.filter(a=>String(a.id)!==String(absId));
+  renderViewContent();
+  if(!String(absId).startsWith('abs_tmp_')){
+    fireAndForget({dept:'daily',action:'delete_absence',id:absId});
+  }
+  toast('取消しました');
+  // 2秒後に最新取得
+  const date=dateStr(viewingDate);
+  setTimeout(async()=>{await loadAbsenceList(date);renderViewContent();},2500);
 }
 
 // みんなの日報から自分のエントリを編集する時、自分で書くタブに切り替える
