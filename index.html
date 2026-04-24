@@ -401,6 +401,18 @@ tr:hover td{background:rgba(59,111,216,.03)}
 </div>
 <div class="toast" id="toast"></div>
 <script>
+function toggleNavMenu(){
+  const el=document.querySelector('.nav-right');
+  if(el)el.classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.nav-menu-btn');
+  const menu=e.target.closest('.nav-right');
+  if(!btn&&!menu){
+    const nr=document.querySelector('.nav-right');
+    if(nr)nr.classList.remove('open');
+  }
+});
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 let prodData=[];
 let curProdView='factory';
@@ -820,19 +832,6 @@ $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');
 /* 背景クリックで閉じない — 明示的にボタンで閉じる */
 loadAll();
 setInterval(loadAll,60*1000);
-
-function toggleNavMenu(){
-  const el=document.querySelector('.nav-right');
-  if(el)el.classList.toggle('open');
-}
-document.addEventListener('click',function(e){
-  const btn=e.target.closest('.nav-menu-btn');
-  const menu=e.target.closest('.nav-right');
-  if(!btn&&!menu){
-    const nr=document.querySelector('.nav-right');
-    if(nr)nr.classList.remove('open');
-  }
-});
 </script>
 </body>
 </html>

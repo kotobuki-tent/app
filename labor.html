@@ -156,6 +156,18 @@ table.jobs tr:last-child td{border-bottom:none}
 </div>
 
 <script>
+function toggleNavMenu(){
+  const el=document.querySelector('.nav-right');
+  if(el)el.classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.nav-menu-btn');
+  const menu=e.target.closest('.nav-right');
+  if(!btn&&!menu){
+    const nr=document.querySelector('.nav-right');
+    if(nr)nr.classList.remove('open');
+  }
+});
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -295,19 +307,6 @@ function closeDetail(){$('detailModal').classList.add('hidden')}
 
 loadData();
 setInterval(loadData,60*1000);
-
-function toggleNavMenu(){
-  const el=document.querySelector('.nav-right');
-  if(el)el.classList.toggle('open');
-}
-document.addEventListener('click',function(e){
-  const btn=e.target.closest('.nav-menu-btn');
-  const menu=e.target.closest('.nav-right');
-  if(!btn&&!menu){
-    const nr=document.querySelector('.nav-right');
-    if(nr)nr.classList.remove('open');
-  }
-});
 </script>
 </body>
 </html>

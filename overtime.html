@@ -258,6 +258,18 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 <script>
+function toggleNavMenu(){
+  const el=document.querySelector('.nav-right');
+  if(el)el.classList.toggle('open');
+}
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.nav-menu-btn');
+  const menu=e.target.closest('.nav-right');
+  if(!btn&&!menu){
+    const nr=document.querySelector('.nav-right');
+    if(nr)nr.classList.remove('open');
+  }
+});
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const DEPT='overtime';
 const TIME_SLOTS=['18:00','18:30','19:00','19:30','20:00'];
@@ -489,19 +501,6 @@ function submitRequest(){
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 /* 背景クリックで閉じない — 明示的にボタンで閉じる */
 loadAll();
-
-function toggleNavMenu(){
-  const el=document.querySelector('.nav-right');
-  if(el)el.classList.toggle('open');
-}
-document.addEventListener('click',function(e){
-  const btn=e.target.closest('.nav-menu-btn');
-  const menu=e.target.closest('.nav-right');
-  if(!btn&&!menu){
-    const nr=document.querySelector('.nav-right');
-    if(nr)nr.classList.remove('open');
-  }
-});
 </script>
 <div class="toast" id="toast"></div>
 </body>
