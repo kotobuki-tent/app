@@ -221,9 +221,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 </div>
 <div id="requestBanner" class="request-banner" style="display:none"></div>
 <div id="staffView" class="staff-section">
-  <div class="staff-select-bar" id="staffChips">
-    <span style="font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim)">自分を選択：</span>
-  </div>
+  <div class="staff-select-bar" id="staffChips"></div>
   <div class="day-grid" id="dayGrid"></div>
 </div>
 <div id="adminView" class="admin-section" style="display:none">
@@ -332,7 +330,7 @@ async function loadAll(){
       apiGet({action:'entries',week_start:fmtDate(currentWeekStart)}),
       apiGet({action:'request',week_start:fmtDate(currentWeekStart)})
     ]);
-    staffList=(staffRes.data||[]).map(s=>s.name);
+    staffList=staffRes.data||[];
     if(!staffShuffled){for(let i=staffList.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[staffList[i],staffList[j]]=[staffList[j],staffList[i]]}staffShuffled=true;}
     entries=entryRes.data||[];
     currentRequest=reqRes.data||null;
@@ -364,11 +362,25 @@ function renderBanner(){
 
 function renderStaffView(){
   const container=document.getElementById('staffChips');
-  let html='<span style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim)">自分を選択：</span>';
-  staffList.forEach(name=>{
-    const sel=name===selectedStaff?'selected':'';
-    html+=`<button class="staff-chip ${sel}" onclick="selectStaff('${esc(name)}')">${esc(name)}</button>`;
+  let html='<label style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%">自分を選択：';
+  html+='<select id="staffSelect" onchange="onStaffSelectChange()" style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 \'Noto Sans JP\',sans-serif;background:var(--surface)">';
+  html+='<option value="">-- 氏名を選んでください --</option>';
+  // dept別にまとめる
+  const byDept={};
+  staffList.forEach(s=>{
+    const d=s.dept||'その他';
+    if(!byDept[d])byDept[d]=[];
+    byDept[d].push(s);
   });
+  Object.keys(byDept).forEach(dept=>{
+    html+=`<optgroup label="${esc(dept)}">`;
+    byDept[dept].forEach(s=>{
+      const sel=s.name===selectedStaff?' selected':'';
+      html+=`<option value="${esc(s.name)}"${sel}>${esc(s.name)}</option>`;
+    });
+    html+='</optgroup>';
+  });
+  html+='</select></label>';
   container.innerHTML=html;
 
   const grid=document.getElementById('dayGrid');
@@ -413,6 +425,7 @@ function renderStaffView(){
 }
 
 function selectStaff(name){selectedStaff=name;localStorage.setItem('ot_my_name',name);render();}
+function onStaffSelectChange(){const v=document.getElementById('staffSelect').value;selectStaff(v);}
 
 async function toggleTime(date,time){
   const entry=entries.find(e=>e.name===selectedStaff&&e.date===date);
@@ -451,7 +464,8 @@ function renderAdminView(){
 
   if(staffList.length===0){html+='<div class="loading">従業員が登録されていません</div>';}
   else{
-    staffList.forEach(name=>{
+    staffList.forEach(s=>{
+      const name=s.name;
       html+='<div class="ov-row">';
       html+=`<div class="ov-cell name-cell">${esc(name)}</div>`;
       dates.forEach(d=>{
@@ -481,11 +495,11 @@ function renderStaffList(){
   const container=document.getElementById('staffListItems');
   if(staffList.length===0){container.innerHTML='<div style="color:var(--text-faint);padding:12px;font-size:13px">まだ登録されていません</div>';return;}
   let html='';
-  staffList.forEach(name=>{html+=`<div class="staff-list-item"><span>${esc(name)}</span><button class="staff-del" onclick="removeStaff('${esc(name)}')">削除</button></div>`;});
+  staffList.forEach(s=>{const name=s.name;html+=`<div class="staff-list-item"><span>${esc(name)}</span><button class="staff-del" onclick="removeStaff('${esc(name)}')">削除</button></div>`;});
   container.innerHTML=html;
 }
-function addStaff(){const input=document.getElementById('newStaffName');const name=input.value.trim();if(!name)return;if(staffList.includes(name)){toast('すでに登録されています');return;}staffList.push(name);apiPost({action:'save_staff',name:name,active:true});input.value='';renderStaffChips();renderStaffList();renderOverview();}
-function removeStaff(name){if(!confirm(name+' を削除しますか？'))return;staffList=staffList.filter(n=>n!==name);apiPost({action:'delete_staff',name:name});if(selectedStaff===name){selectedStaff='';localStorage.removeItem('ot_my_name');}renderStaffChips();renderStaffList();renderOverview();}
+function addStaff(){const input=document.getElementById('newStaffName');const name=input.value.trim();if(!name)return;if(staffList.some(s=>s.name===name)){toast('すでに登録されています');return;}staffList.push({name:name,dept:'',employee_no:''});apiPost({action:'save_staff',name:name,active:true});input.value='';renderStaffView();renderStaffList();renderOverview();}
+function removeStaff(name){if(!confirm(name+' を削除しますか？'))return;staffList=staffList.filter(s=>s.name!==name);apiPost({action:'delete_staff',name:name});if(selectedStaff===name){selectedStaff='';localStorage.removeItem('ot_my_name');}renderStaffView();renderStaffList();renderOverview();}
 
 function openRequestModal(){document.getElementById('reqModalBg').classList.add('show');document.getElementById('reqMessage').value=currentRequest&&currentRequest.active?currentRequest.message:'';}
 function closeReqModal(){document.getElementById('reqModalBg').classList.remove('show');}
