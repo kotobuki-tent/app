@@ -216,7 +216,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
           </div>
         </div>
         <div class="field" style="max-width:240px">
-          <label>氏名</label>
+          <label>氏名（50音順）</label>
           <select id="whoSelect" onchange="onWhoChange()"></select>
         </div>
       </div>
@@ -421,13 +421,9 @@ function getDateReports(){
 function initWhoSelect(){
   const sel=$('whoSelect');
   let h='<option value="">-- 氏名を選んでください --</option>';
-  // dept別にまとめる
-  const byDept={};
-  staffList.forEach(s=>{if(!byDept[s.dept])byDept[s.dept]=[];byDept[s.dept].push(s)});
-  Object.keys(byDept).forEach(dept=>{
-    h+=`<optgroup label="${esc(dept)}">`;
-    byDept[dept].forEach(s=>{h+=`<option value="${esc(s.employee_no)}">${esc(s.name)}</option>`});
-    h+='</optgroup>';
+  // フラットな50音順（GAS側でソート済み）
+  staffList.forEach(s=>{
+    h+=`<option value="${esc(s.employee_no)}">${esc(s.name)}</option>`;
   });
   sel.innerHTML=h;
   // localStorage から復元
@@ -811,6 +807,7 @@ function renderViewContent(){
       <h3 style="margin:0 0 10px 0;color:var(--red);font-size:15px;display:flex;align-items:center;gap:8px">
         <span>未記入</span>
         <span style="background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px">${notWritten.length}人</span>
+        <span style="color:var(--text-faint);font-size:11px;font-weight:400">（50音順）</span>
       </h3>
       <div class="status-list">`;
     notWritten.forEach(s=>{

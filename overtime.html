@@ -409,23 +409,13 @@ function renderBanner(){
 
 function renderStaffView(){
   const container=document.getElementById('staffChips');
-  let html='<label style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%">自分を選択：';
+  let html='<label style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%">自分を選択（50音順）：';
   html+='<select id="staffSelect" onchange="onStaffSelectChange()" style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 \'Noto Sans JP\',sans-serif;background:var(--surface)">';
   html+='<option value="">-- 氏名を選んでください --</option>';
-  // dept別にまとめる
-  const byDept={};
+  // フラットな50音順（GAS側でソート済み）
   staffList.forEach(s=>{
-    const d=s.dept||'その他';
-    if(!byDept[d])byDept[d]=[];
-    byDept[d].push(s);
-  });
-  Object.keys(byDept).forEach(dept=>{
-    html+=`<optgroup label="${esc(dept)}">`;
-    byDept[dept].forEach(s=>{
-      const sel=s.name===selectedStaff?' selected':'';
-      html+=`<option value="${esc(s.name)}"${sel}>${esc(s.name)}</option>`;
-    });
-    html+='</optgroup>';
+    const sel=s.name===selectedStaff?' selected':'';
+    html+=`<option value="${esc(s.name)}"${sel}>${esc(s.name)}</option>`;
   });
   html+='</select></label>';
   container.innerHTML=html;
