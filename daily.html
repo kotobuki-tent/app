@@ -458,12 +458,12 @@ function render(){
 function renderWrite(){
   const d=writeDate;
   $('todayLabel').textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
-  // 日付ピッカーを設定（過去3日〜今日）
+  // 日付ピッカーを設定（過去7日〜今日）
   const datePicker=$('writeDate');
   datePicker.value=dateStr(d);
   datePicker.max=dateStr(today);
   const minDate=new Date(today);
-  minDate.setDate(minDate.getDate()-3);
+  minDate.setDate(minDate.getDate()-7);
   datePicker.min=dateStr(minDate);
   renderSavedEntries();
   buildAfProjOptions();
@@ -914,9 +914,9 @@ function gotoEditFromView(id,dateStr2){
     const d=new Date(dateStr2+'T00:00:00');
     // 過去3日より古いと編集不可（writeDateの制限）
     const minDate=new Date(today);
-    minDate.setDate(minDate.getDate()-3);
+    minDate.setDate(minDate.getDate()-7);
     if(d<minDate){
-      toast('古すぎる記録は編集できません（過去3日まで）',true);
+      toast('古すぎる記録は編集できません（過去7日まで）',true);
       return;
     }
     writeDate=d;
