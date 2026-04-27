@@ -326,6 +326,21 @@ const pad=n=>String(n).padStart(2,'0');
 const dateStr=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const dow='日月火水木金土';
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const HOLIDAYS={
+  '2025-01-01':'元日','2025-01-13':'成人の日','2025-02-11':'建国記念の日','2025-02-23':'天皇誕生日','2025-02-24':'振替休日',
+  '2025-03-20':'春分の日','2025-04-29':'昭和の日','2025-05-03':'憲法記念日','2025-05-04':'みどりの日','2025-05-05':'こどもの日','2025-05-06':'振替休日',
+  '2025-07-21':'海の日','2025-08-11':'山の日','2025-09-15':'敬老の日','2025-09-23':'秋分の日',
+  '2025-10-13':'スポーツの日','2025-11-03':'文化の日','2025-11-23':'勤労感謝の日','2025-11-24':'振替休日',
+  '2026-01-01':'元日','2026-01-12':'成人の日','2026-02-11':'建国記念の日','2026-02-23':'天皇誕生日',
+  '2026-03-20':'春分の日','2026-04-29':'昭和の日','2026-05-03':'憲法記念日','2026-05-04':'みどりの日','2026-05-05':'こどもの日','2026-05-06':'振替休日',
+  '2026-07-20':'海の日','2026-08-11':'山の日','2026-09-21':'敬老の日','2026-09-23':'秋分の日',
+  '2026-10-12':'スポーツの日','2026-11-03':'文化の日','2026-11-23':'勤労感謝の日',
+  '2027-01-01':'元日','2027-01-11':'成人の日','2027-02-11':'建国記念の日','2027-02-23':'天皇誕生日',
+  '2027-03-21':'春分の日','2027-04-29':'昭和の日','2027-05-03':'憲法記念日','2027-05-04':'みどりの日','2027-05-05':'こどもの日',
+  '2027-07-19':'海の日','2027-08-11':'山の日','2027-09-20':'敬老の日','2027-09-23':'秋分の日',
+  '2027-10-11':'スポーツの日','2027-11-03':'文化の日','2027-11-23':'勤労感謝の日'
+};
+function isOffDay(d){const dw=d.getDay();return dw===0||dw===6||HOLIDAYS.hasOwnProperty(dateStr(d));}
 
 let curView='write';
 let staffList=[];       // [{employee_no, name, dept, position}]
@@ -785,9 +800,11 @@ function renderViewContent(){
   const empOrder=staffList.map(s=>String(s.employee_no));
   Object.keys(byEmp).forEach(e=>{if(!empOrder.includes(e))empOrder.push(e)});
   const me=getWho();
+  // 表示中の日付が土日祝かどうか
+  const viewIsOffDay=isOffDay(viewingDate);
   let h='';
-  // === 未記入セクション ===
-  if(notWritten.length>0){
+  // === 未記入セクション（土日祝は表示しない） ===
+  if(notWritten.length>0&&!viewIsOffDay){
     h+=`<div class="card status-section status-notwritten">
       <h3 style="margin:0 0 10px 0;color:var(--red);font-size:15px;display:flex;align-items:center;gap:8px">
         <span>未記入</span>
@@ -825,7 +842,13 @@ function renderViewContent(){
   }
   // === 日報データがない＆未記入も欠勤もない場合 ===
   if(!reports.length&&notWritten.length===0&&absenceList.length===0){
-    el.innerHTML='<div class="card"><div class="empty-msg">この日の日報はまだ登録されていません</div></div>';
+    const msg=viewIsOffDay?'この日は休日のため、出勤した人だけが記録します':'この日の日報はまだ登録されていません';
+    el.innerHTML=`<div class="card"><div class="empty-msg">${msg}</div></div>`;
+    return;
+  }
+  // 土日祝で出勤者がいない場合（reports は0件、未記入はスキップされてる）
+  if(viewIsOffDay&&!reports.length&&absenceList.length===0){
+    el.innerHTML='<div class="card"><div class="empty-msg">この日は休日のため、出勤した人だけが記録します</div></div>';
     return;
   }
   // === 日報一覧 ===
