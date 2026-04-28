@@ -184,14 +184,16 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
     <a href="daily.html" class="nav-link">日報</a>
     <a href="overtime.html" class="nav-link">時間外</a>
     <div class="nav-spacer"></div>
-</div><div class="nav-right">
-    <a href="index.html" class="nav-link">生産部</a>
-    <a href="project.html" class="nav-link">企画制作部</a>
-    <a href="inventory.html" class="nav-link on">在庫管理</a>
-    <a href="vehicle.html" class="nav-link">車両管理</a>
+    <div class="nav-right">
+      <a href="index.html" class="nav-link">生産部</a>
+      <a href="project.html" class="nav-link">企画制作部</a>
+      <a href="labor.html" class="nav-link">工数管理</a>
+      <a href="inventory.html" class="nav-link on">在庫管理</a>
+      <a href="vehicle.html" class="nav-link">車両管理</a>
+    </div>
+    <button class="nav-menu-btn" onclick="toggleNavMenu()" aria-label="メニュー">≡</button>
+    <button class="ref-btn" onclick="loadAll()">↻ 更新</button>
   </div>
-  <button class="nav-menu-btn" onclick="toggleNavMenu()" aria-label="メニュー">≡</button>
-  <button class="ref-btn" onclick="loadAll()">↻ 更新</button>
 </div>
 <div class="sub-tabs">
   <button class="tab on" data-tab="avail" onclick="switchTab('avail')">在庫確認</button>
