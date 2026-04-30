@@ -197,7 +197,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 /* 現場詳細モーダル内のステータス変更ボタン */
 .st-change{margin-top:18px;padding-top:16px;border-top:2px solid var(--surface3)}
 .st-change-label{font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:10px}
-.st-change-btns{display:flex;gap:8px;flex-wrap:wrap}
+.st-change-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .st-btn{padding:10px 16px;border-radius:8px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
 .st-btn:hover{border-color:var(--accent);color:var(--accent)}
 .st-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);cursor:default}
