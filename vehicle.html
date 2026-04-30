@@ -227,7 +227,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
       <a href="vehicle.html" class="nav-link on">車両管理</a>
     </div>
     <button class="nav-menu-btn" onclick="toggleNavMenu()" aria-label="メニュー">≡</button>
-    <button class="hdr-btn" onclick="refreshData()">↻ 更新</button>
+    <button class="hdr-btn" onclick="safeRefresh(this, refreshData)">↻ 更新</button>
   </div>
 </div>
 <div class="app">
@@ -777,6 +777,23 @@ setInterval(()=>{
   _bgBusy=true;
   Promise.resolve(loadAll()).finally(()=>{_bgBusy=false});
 },5*60*1000);
+
+// 「↻ 更新」ボタン共通：連打防止＋進行表示
+async function safeRefresh(btn, fn){
+  if(!btn || btn.disabled) return;
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '↻ 更新中...';
+  try{
+    await Promise.resolve(fn());
+    btn.innerHTML = '✓ 完了';
+  }catch(e){
+    btn.innerHTML = '⚠ 失敗';
+  }finally{
+    setTimeout(()=>{ btn.innerHTML = orig; btn.disabled = false; }, 1000);
+  }
+}
+
 </script>
 </body>
 </html>

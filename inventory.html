@@ -192,7 +192,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
       <a href="vehicle.html" class="nav-link">車両管理</a>
     </div>
     <button class="nav-menu-btn" onclick="toggleNavMenu()" aria-label="メニュー">≡</button>
-    <button class="ref-btn" onclick="loadAll()">↻ 更新</button>
+    <button class="ref-btn" onclick="safeRefresh(this, loadAll)">↻ 更新</button>
   </div>
 </div>
 <div class="sub-tabs">
@@ -738,6 +738,23 @@ $('avail_end').value=tw.getFullYear()+'-'+String(tw.getMonth()+1).padStart(2,'0'
 /* 背景クリックで閉じない — 明示的にボタンで閉じる */
 
 loadAll();
+
+// 「↻ 更新」ボタン共通：連打防止＋進行表示
+async function safeRefresh(btn, fn){
+  if(!btn || btn.disabled) return;
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '↻ 更新中...';
+  try{
+    await Promise.resolve(fn());
+    btn.innerHTML = '✓ 完了';
+  }catch(e){
+    btn.innerHTML = '⚠ 失敗';
+  }finally{
+    setTimeout(()=>{ btn.innerHTML = orig; btn.disabled = false; }, 1000);
+  }
+}
+
 </script>
 </body>
 </html>

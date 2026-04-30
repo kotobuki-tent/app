@@ -233,7 +233,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
       <a href="vehicle.html" class="nav-link">車両管理</a>
     </div>
     <button class="nav-menu-btn" onclick="toggleNavMenu()" aria-label="メニュー">≡</button>
-    <button class="hdr-btn" onclick="refreshData()">↻ 更新</button>
+    <button class="hdr-btn" onclick="safeRefresh(this, refreshData)">↻ 更新</button>
   </div>
 </div>
 <div class="tabs">
@@ -255,7 +255,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <div class="admin-tools">
     <button class="admin-btn primary" onclick="openRequestModal()">時間外募集を出す</button>
     <button class="admin-btn secondary" onclick="openStaffModal()">従業員管理</button>
-    <button class="admin-btn secondary" onclick="refreshData()">↻ 更新</button>
+    <button class="admin-btn secondary" onclick="safeRefresh(this, refreshData)">↻ 更新</button>
   </div>
   <div id="overviewGrid" class="loading">読み込み中...</div>
 </div>
@@ -560,6 +560,23 @@ function submitRequest(){
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 /* 背景クリックで閉じない — 明示的にボタンで閉じる */
 loadAll();
+
+// 「↻ 更新」ボタン共通：連打防止＋進行表示
+async function safeRefresh(btn, fn){
+  if(!btn || btn.disabled) return;
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '↻ 更新中...';
+  try{
+    await Promise.resolve(fn());
+    btn.innerHTML = '✓ 完了';
+  }catch(e){
+    btn.innerHTML = '⚠ 失敗';
+  }finally{
+    setTimeout(()=>{ btn.innerHTML = orig; btn.disabled = false; }, 1000);
+  }
+}
+
 </script>
 <div class="toast" id="toast"></div>
 </body>
