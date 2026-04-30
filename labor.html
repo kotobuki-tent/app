@@ -362,7 +362,14 @@ function showDetail(id){
 function closeDetail(){$('detailModal').classList.add('hidden')}
 
 loadData();
-setInterval(loadData,60*1000);
+// 自動更新：5分間隔、タブが見えてる時だけ、前回が走り切ってから
+let _bgBusy=false;
+setInterval(()=>{
+  if(document.visibilityState!=='visible')return;
+  if(_bgBusy)return;
+  _bgBusy=true;
+  Promise.resolve(loadData()).finally(()=>{_bgBusy=false});
+},5*60*1000);
 </script>
 </body>
 </html>

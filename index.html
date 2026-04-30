@@ -888,7 +888,14 @@ function delProd(id){
 $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t)return;$('prodTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProdView=t.dataset.view;render()});
 /* 背景クリックで閉じない — 明示的にボタンで閉じる */
 loadAll();
-setInterval(loadAll,60*1000);
+// 自動更新：5分間隔、タブが見えてる時だけ、前回が走り切ってから
+let _bgBusy=false;
+setInterval(()=>{
+  if(document.visibilityState!=='visible')return;
+  if(_bgBusy)return;
+  _bgBusy=true;
+  Promise.resolve(loadAll()).finally(()=>{_bgBusy=false});
+},5*60*1000);
 </script>
 </body>
 </html>
