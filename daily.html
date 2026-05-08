@@ -464,13 +464,11 @@ function render(){
 function renderWrite(){
   const d=writeDate;
   $('todayLabel').textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
-  // 日付ピッカーを設定（過去7日〜今日）
+  // 日付ピッカーを設定（過去無制限〜今日）
   const datePicker=$('writeDate');
   datePicker.value=dateStr(d);
   datePicker.max=dateStr(today);
-  const minDate=new Date(today);
-  minDate.setDate(minDate.getDate()-7);
-  datePicker.min=dateStr(minDate);
+  datePicker.removeAttribute('min');
   renderSavedEntries();
   buildAfProjOptions();
   // 氏名が選ばれてたらフォームをデフォで開く
@@ -918,16 +916,9 @@ async function unmarkAbsent(absId){
 
 // みんなの日報から自分のエントリを編集する時、自分で書くタブに切り替える
 function gotoEditFromView(id,dateStr2){
-  // writeDateをそのエントリの日付に変更
+  // writeDateをそのエントリの日付に変更（過去はいつでもOK）
   if(dateStr2){
     const d=new Date(dateStr2+'T00:00:00');
-    // 過去3日より古いと編集不可（writeDateの制限）
-    const minDate=new Date(today);
-    minDate.setDate(minDate.getDate()-7);
-    if(d<minDate){
-      toast('古すぎる記録は編集できません（過去7日まで）',true);
-      return;
-    }
     writeDate=d;
     writeDate.setHours(0,0,0,0);
   }
