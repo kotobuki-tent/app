@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>企画制作部 – 工程管理</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='56' fill='%23a3e635'/><text x='90' y='130' text-anchor='middle' font-family='serif' font-weight='900' font-size='110' fill='%23365314'>企</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='10' fill='%23a3e635'/><text x='16' y='24' text-anchor='middle' font-family='serif' font-weight='900' font-size='20' fill='%23365314'>企</text></svg>">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#e94d6a">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23e94d6a'/><text x='16' y='23' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='18' fill='white'>企</text></svg>">
+<rect width='32' height='32' rx='8' fill='%23e94d6a'/><text x='16' y='23' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='18' fill='white'>企</text></svg>">
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
@@ -204,14 +205,14 @@ tr:hover td{background:rgba(59,111,216,.03)}
 /* ========== スマホ対応 ========== */
 .hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#e94d6a;display:flex;align-items:stretch;height:48px;padding:0;gap:0}
 .hdr-inner{display:flex;align-items:stretch;width:100%;padding:6px 8px 0 8px;gap:2px}
-.nav-link{background:rgba(255,255,255,.04);border:none;color:rgba(255,255,255,.55);font:500 13px/1 'Noto Sans JP',sans-serif;padding:0 14px;border-radius:8px 8px 0 0;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;margin-bottom:0;position:relative;white-space:nowrap}
-.nav-link:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nav-link{background:rgba(255,255,255,.04);border:none;color:rgba(74,14,31,.85);font:500 13px/1 'Noto Sans JP',sans-serif;padding:0 14px;border-radius:8px 8px 0 0;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;margin-bottom:0;position:relative;white-space:nowrap}
+.nav-link:hover{color:#4a0e1f;background:rgba(255,255,255,.1)}
 .nav-link.on{background:var(--bg,#f5f6fa);color:#1a1d27;font-weight:700}
 .nav-link.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--bg,#f5f6fa)}
 .home-link{font-weight:700}
-.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.75);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
-.hdr-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
-.nav-menu-btn{background:rgba(255,255,255,.08);border:none;color:#fff;font-size:20px;line-height:1;padding:0 12px;border-radius:6px;cursor:pointer;height:32px;align-self:center;display:none}
+.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(74,14,31,.9);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
+.hdr-btn:hover{color:#4a0e1f;border-color:rgba(255,255,255,.5)}
+.nav-menu-btn{background:rgba(255,255,255,.08);border:none;color:#4a0e1f;font-size:20px;line-height:1;padding:0 12px;border-radius:6px;cursor:pointer;height:32px;align-self:center;display:none}
 .nav-menu-btn:hover{background:rgba(255,255,255,.18)}
 .home-link{display:inline-flex;align-items:center}
 .nav-spacer{flex:1}
@@ -219,7 +220,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 @media(max-width:768px){
   .nav-right{display:none;position:fixed;top:48px;right:10px;background:#e94d6a;border-radius:10px;padding:6px;flex-direction:column;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:999;min-width:160px}
   .nav-right.open{display:flex}
-  .nav-right .nav-link{padding:10px 14px;border-radius:6px;font-size:14px;text-align:left;background:transparent;color:rgba(255,255,255,.8)}
+  .nav-right .nav-link{padding:10px 14px;border-radius:6px;font-size:14px;text-align:left;background:transparent;color:rgba(74,14,31,.85)}
   .nav-right .nav-link.on{background:var(--bg,#f5f6fa);color:#1a1d27}
   .nav-right .nav-link.on::after{display:none}
   .nav-menu-btn{display:inline-flex;align-items:center;justify-content:center}
