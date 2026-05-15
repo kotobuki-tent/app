@@ -5,7 +5,7 @@
 // HTML/CSS/JS を変更したら必ずこの数字をインクリメントすること。
 // 例: "v1" → "v2" → "v3" ...
 // ============================================================
-const CACHE_VERSION = 'v19';
+const CACHE_VERSION = 'v20';
 const CACHE_NAME = `sequence-lab-${CACHE_VERSION}`;
 
 // プリキャッシュ対象（アプリシェル）
