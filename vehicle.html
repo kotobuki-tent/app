@@ -22,7 +22,7 @@ if('serviceWorker' in navigator){
   --bg:#f5f6f8;--surface:#fff;--surface2:#f0f1f4;--surface3:#e6e8ed;
   --border:#d8dbe3;--border-light:#c8ccd6;
   --text:#1a1d27;--text-dim:#6b7084;--text-faint:#9498ab;
-  --accent:#0d9488;--accent-dim:rgba(13,148,136,.1);
+  --accent:#10b981;--accent-dim:rgba(13,148,136,.1);
   --red:#d94040;--red-dim:rgba(217,64,64,.1);
   --orange:#d48a20;--orange-dim:rgba(212,138,32,.1);
   --green:#2a9d5a;--green-dim:rgba(42,157,90,.1);
@@ -36,10 +36,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* Header */
 
 /* Sub tabs */
-.sub-tabs{display:flex;gap:6px;padding:10px 16px 0;background:var(--bg)}
-.sub-tab{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:7px 14px;border-radius:8px;cursor:pointer}
-.sub-tab:hover{color:var(--text);border-color:var(--accent)}
-.sub-tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+.sub-tabs{display:flex;gap:6px;padding:14px 24px;background:#f5f6fa}
+.sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 12px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
+.sub-tab:hover{color:var(--text);background:#e2e5f0}
+.sub-tab.on{background:#d1fae5;color:#065f46}
 
 .app{padding-top:48px}
 .hidden{display:none!important}

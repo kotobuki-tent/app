@@ -21,7 +21,7 @@ if('serviceWorker' in navigator){
   --bg:#f5f6fa;--surface:#fff;--surface2:#fafbfc;--surface3:#f0f1f5;
   --text:#1a1d27;--text-dim:#5a6270;--text-faint:#8a92a0;
   --border:#e0e2e8;--border-light:#ecedf0;
-  --accent:#3366ff;--accent-dim:rgba(51,102,255,.1);
+  --accent:#06b6d4;--accent-dim:rgba(51,102,255,.1);
   --green:#2a9d5a;--green-dim:rgba(42,157,90,.1);
   --orange:#f59e0b;--orange-dim:rgba(245,158,11,.1);
   --red:#dc2626;--red-dim:rgba(220,38,38,.1);
@@ -113,10 +113,10 @@ table.jobs tr:last-child td{border-bottom:none}
   table.jobs{display:block;overflow-x:auto;white-space:nowrap}
 }
 
-.sub-tabs{display:flex;gap:6px;margin-bottom:14px}
-.sub-tab{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:7px 14px;border-radius:8px;cursor:pointer}
-.sub-tab:hover{color:var(--text);border-color:var(--accent)}
-.sub-tab.on{color:#fff;background:var(--accent);border-color:var(--accent)}
+.sub-tabs{display:flex;gap:6px;padding:14px 24px;background:#f5f6fa}
+.sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 12px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
+.sub-tab:hover{color:var(--text);background:#e2e5f0}
+.sub-tab.on{background:#cffafe;color:#155e75}
 
 @media(max-width:768px){
   .nav-right{display:none;position:fixed;top:48px;right:10px;background:#fb7185;border-radius:10px;padding:6px;flex-direction:column;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:999;min-width:160px}

@@ -19,16 +19,16 @@ if('serviceWorker' in navigator){
 @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:15px}
-body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-height:100vh}
+body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-height:100vh;padding-top:48px}
 
 /* Header - dark navy bar */
-.sub-tabs{display:flex;gap:6px;padding:66px 20px 0;background:#f5f6fa}
-.sub-tabs .tab{color:#6b7084;background:#fff;border:1px solid #d8dbe3}
-.sub-tabs .tab:hover{color:#1a1a2e;border-color:#3b6de7}
-.sub-tabs .tab.on{color:#fff;background:#3b6de7;border-color:#3b6de7}
+.sub-tabs{display:flex;gap:6px;padding:14px 24px;background:#f5f6fa}
+.sub-tabs .tab{color:#6b7084;background:#f0f1f5;border:none;font-weight:600;padding:8px 16px;border-radius:999px;transition:.15s}
+.sub-tabs .tab:hover{color:#1a1a2e;background:#e2e5f0}
+.sub-tabs .tab.on{background:#e0e7ff;color:#3730a3}
 .tab{background:none;border:1px solid transparent;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:7px 16px;border-radius:6px;cursor:pointer;transition:.15s}
 .tab:hover{color:#fff;background:rgba(255,255,255,.08)}
-.tab.on{color:#fff;background:#3b6de7;border-color:#3b6de7}
+.tab.on{color:#fff;background:#6366f1;border-color:#6366f1}
 .ref-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(74,14,31,.9);padding:6px 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
 .ref-btn:hover{color:#4a0e1f;border-color:rgba(255,255,255,.5)}
 
@@ -38,7 +38,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-
 
 /* Buttons */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:none;border-radius:6px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
-.btn-primary{background:#3b6de7;color:#fff}
+.btn-primary{background:#6366f1;color:#fff}
 .btn-primary:hover{background:#2f5ec8}
 .btn-danger{background:#fff;color:#e53e3e;border:1px solid #fed7d7}
 .btn-danger:hover{background:#fff5f5}
@@ -54,7 +54,7 @@ td{padding:10px 14px;border-bottom:1px solid #f0f1f5;white-space:nowrap}
 tr:hover td{background:#f8f9fc}
 .tbl-actions{display:flex;gap:6px}
 .tbl-actions a{font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
-.tbl-actions .edit-link{color:#3b6de7}
+.tbl-actions .edit-link{color:#6366f1}
 .tbl-actions .edit-link:hover{text-decoration:underline}
 .tbl-actions .del-link{color:#e53e3e}
 .tbl-actions .del-link:hover{text-decoration:underline}
@@ -78,7 +78,7 @@ tr:hover td{background:#f8f9fc}
 .mo-row label{font-size:12px;font-weight:600;color:#888;margin-bottom:4px;display:block}
 .mo-row .field{flex:1}
 .mo-row input,.mo-row select,.mo-row textarea{width:100%;padding:10px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a2e;font:400 14px/1.4 'Noto Sans JP',sans-serif;outline:none;transition:.15s}
-.mo-row input:focus,.mo-row select:focus,.mo-row textarea:focus{border-color:#3b6de7;box-shadow:0 0 0 3px rgba(59,109,231,.1)}
+.mo-row input:focus,.mo-row select:focus,.mo-row textarea:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
 .mo-row textarea{resize:vertical;min-height:60px}
 .mo-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid #f0f1f5}
 
@@ -96,7 +96,7 @@ tr:hover td{background:#f8f9fc}
 /* Filter bar */
 .filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .filter-bar select,.filter-bar input{padding:7px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#333;font:400 13px/1 'Noto Sans JP',sans-serif;outline:none}
-.filter-bar select:focus,.filter-bar input:focus{border-color:#3b6de7}
+.filter-bar select:focus,.filter-bar input:focus{border-color:#6366f1}
 
 /* Avail date row */
 .avail-date-row{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
