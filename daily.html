@@ -358,6 +358,7 @@ let prodProjects=[];    // 生産部の進行中案件
 let projProjects=[];    // 企画制作部の進行中案件
 let allReports=[];      // 全員分の日報（最近30日分などを保持）
 let absenceList=[];     // 表示中の日付の欠勤者リスト
+let _absenceLoadedDate=null; // 最後にロードした日付（重複読み込み防止）
 let viewingDate=new Date();
 let writeDate=new Date();  // 「自分で書く」で選択中の日付
 const today=new Date();
@@ -402,7 +403,8 @@ async function loadAbsenceList(date){
 }
 async function loadAll(){
   $('loader').classList.remove('hidden');
-  await Promise.all([loadStaff(),loadProjects(),loadReports()]);
+  await Promise.all([loadStaff(),loadProjects(),loadReports(),loadAbsenceList(dateStr(viewingDate))]);
+  _absenceLoadedDate=dateStr(viewingDate);
   initWhoSelect();
   $('loader').classList.add('hidden');
   render();
@@ -776,10 +778,13 @@ function renderView(){
   $('viewDate').value=dateStr(viewingDate);
   const d=viewingDate;
   $('viewDateLabel').textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
-  // 即時描画（前回の絶対リストを使って暫定表示）
+  // 即時描画（既に持っている absenceList で表示）
   renderViewContent();
-  // 欠勤情報は裏で取得して、取れたら再描画
-  loadAbsenceList(dateStr(viewingDate)).then(()=>renderViewContent());
+  // 表示中日付の欠勤情報がまだ無い場合だけ取得
+  if(_absenceLoadedDate!==dateStr(viewingDate)){
+    _absenceLoadedDate=dateStr(viewingDate);
+    loadAbsenceList(dateStr(viewingDate)).then(()=>renderViewContent());
+  }
 }
 function viewDateMove(n){viewingDate.setDate(viewingDate.getDate()+n);renderView()}
 function viewDateToday(){viewingDate=new Date();viewingDate.setHours(0,0,0,0);renderView()}
