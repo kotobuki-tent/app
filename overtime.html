@@ -325,6 +325,15 @@ document.addEventListener('click',function(e){
     if(nr)nr.classList.remove('open');
   }
 });
+
+// ===== sessionStorage キャッシュ helper =====
+function _getCache(key){
+  try{const s=sessionStorage.getItem('seq_'+key);return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function _setCache(key,data){
+  try{sessionStorage.setItem('seq_'+key,JSON.stringify(data));}catch(e){}
+}
+
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const DEPT='overtime';
 const TIME_SLOTS=['18:00','18:30','19:00','19:30','20:00'];
@@ -380,6 +389,15 @@ function scheduleSyncFromServer(){
 }
 
 async function loadAll(){
+  // 週ごとにキャッシュキー分ける
+  const cacheKey='overtime_'+fmtDate(currentWeekStart);
+  const cached=_getCache(cacheKey);
+  if(cached){
+    staffList=cached.staff||[];
+    entries=cached.entries||[];
+    currentRequest=cached.req||null;
+    render();
+  }
   try{
     const[staffRes,entryRes,reqRes]=await Promise.all([
       apiGet({action:'staff'}),
@@ -389,7 +407,8 @@ async function loadAll(){
     staffList=staffRes.data||[];
     entries=entryRes.data||[];
     currentRequest=reqRes.data||null;
-  }catch(e){console.error('Load error:',e);staffList=[];entries=[];currentRequest=null;toast('データ取得に失敗しました',true);}
+    _setCache(cacheKey,{staff:staffList,entries:entries,req:currentRequest});
+  }catch(e){console.error('Load error:',e);if(!cached){staffList=[];entries=[];currentRequest=null;toast('データ取得に失敗しました',true);}}
   render();
 }
 async function refreshData(){document.getElementById('overviewGrid').innerHTML='<div class="loading">読み込み中...</div>';await loadAll();}

@@ -414,6 +414,15 @@ document.addEventListener('click',function(e){
     if(nr)nr.classList.remove('open');
   }
 });
+
+// ===== sessionStorage キャッシュ helper =====
+function _getCache(key){
+  try{const s=sessionStorage.getItem('seq_'+key);return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function _setCache(key,data){
+  try{sessionStorage.setItem('seq_'+key,JSON.stringify(data));}catch(e){}
+}
+
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const DEFAULT_CATS=['テント','横幕','テーブル','イス','備品'];
 const ACTIVE_STATUSES=['予約','貸出中','メンテ待ち','メンテ中'];
@@ -435,9 +444,19 @@ function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'C
 
 // === Load ===
 async function loadAll(){
-  try{
+  // キャッシュから即復元
+  const cached=_getCache('inventory');
+  if(cached){
+    items=cached.items||[];rentals=cached.rentals||[];projects=cached.projects||[];
+    populateCategoryFilters();
+    populateProjectSelect();
+    renderItems();renderRentals();renderMaint();renderAvail();
+  }else{
     $('items_loading').classList.remove('hidden');
     $('rentals_loading').classList.remove('hidden');
+  }
+  // 裏で最新取得
+  try{
     const [inv,rnt,prj]=await Promise.all([
       apiGet({action:'list'}).catch(()=>[]),
       apiGet({action:'rentals'}).catch(()=>[]),
@@ -449,6 +468,7 @@ async function loadAll(){
     renderItems();renderRentals();renderMaint();renderAvail();
     $('items_loading').classList.add('hidden');
     $('rentals_loading').classList.add('hidden');
+    _setCache('inventory',{items:items,rentals:rentals,projects:projects});
   }catch(e){
     toast('データ取得に失敗: '+e.message,false);
     $('items_loading').textContent='読み込み失敗';

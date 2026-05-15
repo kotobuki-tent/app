@@ -224,6 +224,15 @@ document.addEventListener('click',function(e){
     if(nr)nr.classList.remove('open');
   }
 });
+
+// ===== sessionStorage キャッシュ helper =====
+function _getCache(key){
+  try{const s=sessionStorage.getItem('seq_'+key);return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function _setCache(key,data){
+  try{sessionStorage.setItem('seq_'+key,JSON.stringify(data));}catch(e){}
+}
+
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -261,8 +270,16 @@ function fmtMin(min){
 }
 
 async function loadData(){
-  $('loader').classList.remove('hidden');
-  $('content').innerHTML='';
+  // キャッシュから即復元
+  const cached=_getCache('labor');
+  if(cached&&cached.jobs){
+    allJobs=cached.jobs;
+    renderTable();
+  }else{
+    $('loader').classList.remove('hidden');
+    $('content').innerHTML='';
+  }
+  // 裏で最新取得
   try{
     const r=await fetch(API+'?dept=labor&action=read');
     const j=await r.json();
@@ -275,6 +292,7 @@ async function loadData(){
     allJobs=[];
   }
   $('loader').classList.add('hidden');
+  _setCache('labor',{jobs:allJobs});
   renderTable();
 }
 

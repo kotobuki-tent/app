@@ -470,6 +470,15 @@ document.addEventListener('click',function(e){
     if(nr)nr.classList.remove('open');
   }
 });
+
+// ===== sessionStorage キャッシュ helper =====
+function _getCache(key){
+  try{const s=sessionStorage.getItem('seq_'+key);return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function _setCache(key,data){
+  try{sessionStorage.setItem('seq_'+key,JSON.stringify(data));}catch(e){}
+}
+
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 let prodData=[];
 let curProdView='factory';
@@ -512,7 +521,20 @@ async function loadAttendance(){
     if(j.success){staffList=j.staff||[];attendance=j.attendance||{}}
   }catch(e){/* 静かに失敗、STAFFボタンは出るが中身が空になる */}
 }
-async function loadAll(){$('loader').classList.remove('hidden');await Promise.all([loadProd(),loadAttendance()]);$('loader').classList.add('hidden');render()}
+async function loadAll(){
+  const cached=_getCache('index');
+  if(cached){
+    if(cached.prod)prodData=cached.prod;
+    if(cached.att)attendance=cached.att;
+    render();
+  }else{
+    $('loader').classList.remove('hidden');
+  }
+  await Promise.all([loadProd(),loadAttendance()]);
+  $('loader').classList.add('hidden');
+  _setCache('index',{prod:prodData,att:attendance});
+  render();
+}
 function refreshData(){loadAll()}
 
 // ===== ステータス変更検知 =====

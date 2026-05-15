@@ -330,6 +330,15 @@ document.addEventListener('click',function(e){
     if(nr)nr.classList.remove('open');
   }
 });
+
+// ===== sessionStorage キャッシュ helper =====
+function _getCache(key){
+  try{const s=sessionStorage.getItem('seq_'+key);return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function _setCache(key,data){
+  try{sessionStorage.setItem('seq_'+key,JSON.stringify(data));}catch(e){}
+}
+
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
@@ -402,11 +411,28 @@ async function loadAbsenceList(date){
   }catch(e){absenceList=[]}
 }
 async function loadAll(){
-  $('loader').classList.remove('hidden');
+  // キャッシュから即復元（あれば即描画）
+  const cached=_getCache('daily');
+  if(cached){
+    try{
+      staffList=cached.staff||[];
+      allReports=cached.reports||[];
+      projectsList=cached.projects||[];
+      absenceList=cached.absence||[];
+      _absenceLoadedDate=cached.absenceDate||null;
+      initWhoSelect();
+      render();
+    }catch(e){}
+  }else{
+    $('loader').classList.remove('hidden');
+  }
+  // 裏で最新取得
   await Promise.all([loadStaff(),loadProjects(),loadReports(),loadAbsenceList(dateStr(viewingDate))]);
   _absenceLoadedDate=dateStr(viewingDate);
   initWhoSelect();
   $('loader').classList.add('hidden');
+  // キャッシュ保存
+  _setCache('daily',{staff:staffList,reports:allReports,projects:projectsList,absence:absenceList,absenceDate:_absenceLoadedDate});
   render();
 }
 // バックグラウンド更新（60秒ごと、UI ブロックしない）

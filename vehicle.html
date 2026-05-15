@@ -361,6 +361,15 @@ document.addEventListener('click',function(e){
     if(nr)nr.classList.remove('open');
   }
 });
+
+// ===== sessionStorage キャッシュ helper =====
+function _getCache(key){
+  try{const s=sessionStorage.getItem('seq_'+key);return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function _setCache(key,data){
+  try{sessionStorage.setItem('seq_'+key,JSON.stringify(data));}catch(e){}
+}
+
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const $=id=>document.getElementById(id);
 const esc=s=>s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -392,12 +401,19 @@ function fireAndForget(body){
 
 // ===== データ読み込み =====
 async function loadAll(){
-  $('loadingEl').classList.remove('hidden');
+  // キャッシュから即復元
+  const cached=_getCache('vehicle');
+  if(cached&&cached.data){
+    vehicleData=cached.data;
+    render();
+  }else{
+    $('loadingEl').classList.remove('hidden');
+  }
+  // 裏で最新取得
   try{
     const res=await fetch(API+'?dept=vehicle');
     const json=await res.json();
     vehicleData=json.vehicles||[];
-    // maintenance_logをパース
     vehicleData.forEach(v=>{
       if(typeof v.maintenance_log==='string'&&v.maintenance_log){
         try{v._maint=JSON.parse(v.maintenance_log)}catch(e){v._maint=[]}
@@ -409,6 +425,7 @@ async function loadAll(){
     toast('データの読み込みに失敗しました',true);
   }
   $('loadingEl').classList.add('hidden');
+  _setCache('vehicle',{data:vehicleData});
   render();
 }
 

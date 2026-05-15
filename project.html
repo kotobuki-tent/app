@@ -529,6 +529,15 @@ document.addEventListener('click',function(e){
     if(nr)nr.classList.remove('open');
   }
 });
+
+// ===== sessionStorage キャッシュ helper =====
+function _getCache(key){
+  try{const s=sessionStorage.getItem('seq_'+key);return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function _setCache(key,data){
+  try{sessionStorage.setItem('seq_'+key,JSON.stringify(data));}catch(e){}
+}
+
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
 const HOLIDAYS={
@@ -585,7 +594,21 @@ function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'C
 async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success){projData=j.data;detectStatusChanges()}}catch(e){toast('企画制作データ取得エラー',true)}}
 async function loadRentals(){try{const r=await fetch(API+'?dept=inventory&action=rentals');const j=await r.json();rentalsData=j||[]}catch(e){rentalsData=[]}}
 async function loadInventoryItems(){try{const r=await fetch(API+'?dept=inventory&action=list');const j=await r.json();inventoryItems=j||[]}catch(e){inventoryItems=[]}}
-async function loadAll(){$('loader').classList.remove('hidden');await Promise.all([loadProj(),loadRentals(),loadInventoryItems()]);$('loader').classList.add('hidden');render()}
+async function loadAll(){
+  const cached=_getCache('project');
+  if(cached){
+    if(cached.proj)projData=cached.proj;
+    if(cached.rent)rentalsData=cached.rent;
+    if(cached.inv)inventoryItems=cached.inv;
+    render();
+  }else{
+    $('loader').classList.remove('hidden');
+  }
+  await Promise.all([loadProj(),loadRentals(),loadInventoryItems()]);
+  $('loader').classList.add('hidden');
+  _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
+  render();
+}
 function refreshData(){loadAll()}
 
 // ===== ステータス変更検知 =====
