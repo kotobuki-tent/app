@@ -102,9 +102,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .gantt-dates{display:flex;flex:1}
 .gantt-date-cell{flex:1;min-width:44px;text-align:center;padding:6px 2px;font-size:11px;font-weight:500;color:var(--text-dim);border-right:1px solid var(--surface3)}
 .gantt-date-cell.today{background:var(--accent-dim);color:var(--accent);font-weight:700}
-.gantt-date-cell
+.gantt-date-cell.sun{color:var(--red)}
 .gantt-date-cell.holiday{color:var(--red);background:rgba(217,64,64,.05)}
-.gantt-date-cell 
+.gantt-date-cell .hol-name{font-size:7px;display:block;color:var(--red);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gantt-date-cell.sat{color:var(--accent)}
 .gantt-date-cell .dow{font-size:9px;display:block}
 .gantt-date-cell .dm{font-size:12px;font-weight:700;display:block}
@@ -155,8 +155,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .view-row .view-val{color:var(--text)}
 .view-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--border-light);font-size:13px}
 .view-section h3{font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px}
-
-
+.view-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.view-tag{font-size:11px;padding:3px 8px;border-radius:5px;background:var(--accent-dim);color:var(--accent);font-weight:600}
 .proj-admin{padding:16px}
 /* レンタル品追加 */
 .rental-add-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--border-light)}
@@ -259,7 +259,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .prj-meta{font-size:9px}
   .gantt-date-cell{min-width:36px;font-size:10px}
   .gantt-date-cell .dm{font-size:11px}
-  .gantt-date-cell 
+  .gantt-date-cell .hol-name{font-size:6px}
   .gantt-bar-cell{min-width:36px}
   .gantt-legend{gap:10px;font-size:11px;margin-top:10px}
   .vehicle-summary{margin-top:16px;padding:12px}
