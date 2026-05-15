@@ -417,12 +417,13 @@ async function loadAll(){
     try{
       staffList=cached.staff||[];
       allReports=cached.reports||[];
-      projectsList=cached.projects||[];
+      prodProjects=cached.prodProj||[];
+      projProjects=cached.projProj||[];
       absenceList=cached.absence||[];
       _absenceLoadedDate=cached.absenceDate||null;
       initWhoSelect();
       render();
-    }catch(e){}
+    }catch(e){console.warn('Cache restore failed:',e);}
   }else{
     $('loader').classList.remove('hidden');
   }
@@ -432,7 +433,7 @@ async function loadAll(){
   initWhoSelect();
   $('loader').classList.add('hidden');
   // キャッシュ保存
-  _setCache('daily',{staff:staffList,reports:allReports,projects:projectsList,absence:absenceList,absenceDate:_absenceLoadedDate});
+  _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
   render();
 }
 // バックグラウンド更新（60秒ごと、UI ブロックしない）
