@@ -63,6 +63,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .fv-card.s-納品済{border-left-color:var(--accent)}
 .fv-card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px}
 .fv-card .pname{font-weight:600;font-size:15px;line-height:1.4;flex:1;word-break:break-word}
+.fv-card .client{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;word-break:break-word}
 .fv-card .badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0}
 .fv-card .badge.s-見積中{color:var(--purple);background:var(--purple-dim)}
 .fv-card .badge.s-受注{color:var(--blue);background:var(--blue-dim)}
@@ -484,13 +485,18 @@ function renderCard(d){
   h+=`<div class="pname">${esc(d.project||'―')}</div>`;
   h+=`<span class="badge s-${esc(st)}">${esc(st)}</span>`;
   h+='</div>';
+  if(d.client){
+    h+=`<div class="client">${esc(d.client)}</div>`;
+  }
   if(d.our_person){
     h+=`<div class="assignee">担当: <span class="tag person">${esc(d.our_person)}</span></div>`;
   }
-  h+=`<div class="meta">${esc(d.client||'')}`;
-  if(d.order_no)h+=` <span class="tag eno">${esc(d.order_no)}</span>`;
-  if(d.supplier)h+=` <span class="tag loc">${esc(d.supplier)}</span>`;
-  h+='</div>';
+  const tags=[];
+  if(d.order_no)tags.push(`<span class="tag eno">${esc(d.order_no)}</span>`);
+  if(d.supplier)tags.push(`<span class="tag loc">${esc(d.supplier)}</span>`);
+  if(tags.length){
+    h+=`<div class="meta">${tags.join(' ')}</div>`;
+  }
   let dlLine='';
   if(d.created_at)dlLine+=`受付: ${fmtDateJP(d.created_at)}`;
   if(d.deadline){
