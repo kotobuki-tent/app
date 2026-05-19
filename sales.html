@@ -556,9 +556,10 @@ function renderAdmin(){
     return va<vb?(adminSort.asc?-1:1):va>vb?(adminSort.asc?1:-1):0;
   });
   const cols=[
-    {key:'created_at',label:'受付日'},
     {key:'project',label:'物件名'},
     {key:'our_person',label:'担当者'},
+    {key:'estimate_no',label:'見積番号'},
+    {key:'order_no',label:'受注番号'},
     {key:'client',label:'得意先'},
     {key:'person',label:'窓口'},
     {key:'supplier',label:'仕入先'},
@@ -580,9 +581,9 @@ function renderAdmin(){
     const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';
     h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`;
   });
-  h+='<th>操作</th></tr></thead><tbody>';
+  h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
   if(items.length===0){
-    h+='<tr><td colspan="'+(cols.length+1)+'" style="text-align:center;color:var(--text-faint);padding:30px">該当する案件はありません</td></tr>';
+    h+='<tr><td colspan="'+(cols.length+2)+'" style="text-align:center;color:var(--text-faint);padding:30px">該当する案件はありません</td></tr>';
   }else{
     items.forEach(d=>{
       h+='<tr>';
@@ -592,7 +593,7 @@ function renderAdmin(){
           h+=`<td><select class="st-mini" onchange="changeStatus('${esc(d.id)}',this.value)">`;
           ALL_ST.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});
           h+='</select></td>';
-        }else if(c.key==='created_at'||c.key==='deadline'){
+        }else if(c.key==='deadline'){
           h+=`<td>${fmtDateJP(v)}</td>`;
         }else if(c.key==='amount'){
           h+=`<td style="text-align:right;font-variant-numeric:tabular-nums">${fmtAmount(v)}</td>`;
@@ -600,6 +601,8 @@ function renderAdmin(){
           h+=`<td>${esc(v)}</td>`;
         }
       });
+      const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
+      h+=`<td style="text-align:center"><input type="checkbox" ${chk?'checked':''} onchange="toggleInvoiced('${esc(d.id)}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td>`;
       h+=`<td><button class="act-btn" onclick="openMo('${esc(d.id)}')">編集</button> <button class="act-btn del" onclick="delEntry('${esc(d.id)}')">削除</button></td>`;
       h+='</tr>';
     });
@@ -650,10 +653,12 @@ function renderArchive(){
     return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0;
   });
   const cols=[
-    {key:'created_at',label:'受付日'},
     {key:'project',label:'物件名'},
     {key:'our_person',label:'担当者'},
+    {key:'estimate_no',label:'見積番号'},
+    {key:'order_no',label:'受注番号'},
     {key:'client',label:'得意先'},
+    {key:'person',label:'窓口'},
     {key:'supplier',label:'仕入先'},
     {key:'amount',label:'金額'},
     {key:'deadline',label:'納期'},
@@ -665,15 +670,15 @@ function renderArchive(){
     const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';
     h+=`<th data-acol="${c.key}">${c.label}<span class="arrow">${a}</span></th>`;
   });
-  h+='<th>操作</th></tr></thead><tbody>';
+  h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
   if(items.length===0){
-    h+='<tr><td colspan="'+(cols.length+1)+'" style="text-align:center;color:var(--text-faint);padding:30px">完了・見送り案件はありません</td></tr>';
+    h+='<tr><td colspan="'+(cols.length+2)+'" style="text-align:center;color:var(--text-faint);padding:30px">完了・見送り案件はありません</td></tr>';
   }else{
     items.forEach(d=>{
       h+='<tr>';
       cols.forEach(c=>{
         let v=d[c.key]||'';
-        if(c.key==='created_at'||c.key==='deadline'){
+        if(c.key==='deadline'){
           h+=`<td>${fmtDateJP(v)}</td>`;
         }else if(c.key==='amount'){
           h+=`<td style="text-align:right;font-variant-numeric:tabular-nums">${fmtAmount(v)}</td>`;
@@ -681,6 +686,8 @@ function renderArchive(){
           h+=`<td>${esc(v)}</td>`;
         }
       });
+      const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
+      h+=`<td style="text-align:center"><input type="checkbox" ${chk?'checked':''} onchange="toggleInvoiced('${esc(d.id)}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td>`;
       h+=`<td><button class="act-btn" onclick="openMo('${esc(d.id)}')">編集</button></td>`;
       h+='</tr>';
     });
@@ -816,6 +823,14 @@ function changeStatus(id,newSt){
   apiPost({action:'save',id,status:newSt});
   render();
   toast('ステータスを更新しました');
+}
+
+function toggleInvoiced(id,checked){
+  const idx=allEntries.findIndex(x=>String(x.id)===String(id));
+  if(idx<0)return;
+  allEntries[idx].invoiced=checked?'TRUE':'FALSE';
+  _setCache('sales',{entries:allEntries});
+  apiPost({action:'save',id,invoiced:allEntries[idx].invoiced});
 }
 
 function delEntry(id){
