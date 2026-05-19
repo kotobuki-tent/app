@@ -662,7 +662,7 @@ function renderArchive(){
     {key:'supplier',label:'仕入先'},
     {key:'amount',label:'金額'},
     {key:'deadline',label:'納期'},
-    {key:'status',label:'状態'}
+    {key:'status',label:'ステータス'}
   ];
   let h=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px;flex-wrap:wrap;gap:10px"><span style="font-size:13px;color:var(--text-dim)">完了・見送りの案件（${items.length}件）</span><input class="av-search" placeholder="検索..." oninput="archiveSearch=this.value;renderArchive()" value="${esc(archiveSearch)}"></div>`;
   h+='<div class="tbl-wrap"><table class="tbl"><thead><tr>';
