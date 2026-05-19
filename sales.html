@@ -124,6 +124,17 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
 .mo-foot .save{background:var(--accent);color:#fff;border-color:var(--accent)}
 .mo-foot .save:hover{opacity:.85}
 
+/* 閲覧モーダル用 view-row */
+.view-row{display:flex;gap:16px;margin-bottom:10px;font-size:13px}
+.view-row .view-label{font-weight:600;color:var(--text-dim);min-width:80px;flex-shrink:0}
+.view-row .view-val{color:var(--text);word-break:break-word}
+.st-change{margin-top:18px;padding-top:16px;border-top:2px solid var(--surface3)}
+.st-change-label{font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:10px}
+.st-change-btns{display:flex;gap:8px;flex-wrap:wrap}
+.st-btn{padding:10px 16px;border-radius:8px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
+.st-btn:hover{border-color:var(--accent);color:var(--accent)}
+.st-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);cursor:default}
+
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}
 
@@ -170,6 +181,11 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
   .mo-row .mo-field{margin-bottom:14px}
   .mo-foot{flex-direction:column-reverse;gap:8px;align-items:stretch}
   .mo-foot button{width:100%;padding:13px;min-height:46px;font-size:14px}
+  .view-row{flex-direction:column;gap:2px;margin-bottom:10px}
+  .view-row .view-label{min-width:0;font-size:11px}
+  .view-row .view-val{font-size:14px}
+  .st-change-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .st-btn{padding:12px 8px;font-size:13px;min-height:46px}
 }
 
 /* サブタブ */
@@ -262,6 +278,15 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
 
 <datalist id="customerList"></datalist>
 <datalist id="supplierList"></datalist>
+
+<!-- 案件詳細モーダル（閲覧専用） -->
+<div class="mo-bg" id="viewBg">
+  <div class="mo" style="max-width:640px">
+    <h2>案件詳細</h2>
+    <div id="viewContent"></div>
+    <div class="mo-foot"><button class="cancel" onclick="closeView()">閉じる</button></div>
+  </div>
+</div>
 
 <div id="toast" class="toast"></div>
 
@@ -455,7 +480,7 @@ function stColorVar(s){
 
 function renderCard(d){
   const st=String(d.status||'見積中');
-  let h=`<div class="fv-card s-${esc(st)}" onclick="openMo('${esc(d.id)}')">`;
+  let h=`<div class="fv-card s-${esc(st)}" onclick="openView('${esc(d.id)}')">`;
   h+='<div class="top">';
   h+=`<div class="pname">${esc(d.project||'―')}</div>`;
   h+=`<span class="badge s-${esc(st)}">${esc(st)}</span>`;
@@ -670,7 +695,49 @@ function renderArchive(){
   });
 }
 
-// ===== モーダル =====
+// ===== 案件詳細モーダル（閲覧専用） =====
+function vr(label,val){return`<div class="view-row"><div class="view-label">${label}</div><div class="view-val">${esc(val||'')}</div></div>`;}
+function openView(id){
+  const d=allEntries.find(x=>String(x.id)===String(id));
+  if(!d)return;
+  let h='';
+  h+=vr('物件名',d.project);
+  if(d.our_person)h+=vr('担当者',d.our_person);
+  if(d.estimate_no)h+=vr('見積番号',d.estimate_no);
+  if(d.order_no)h+=vr('受注番号',d.order_no);
+  if(d.client)h+=vr('得意先',d.client);
+  if(d.person)h+=vr('窓口',d.person);
+  if(d.supplier)h+=vr('仕入先',d.supplier);
+  if(d.amount!==''&&d.amount!=null&&!isNaN(Number(d.amount))&&Number(d.amount)>0){
+    h+=vr('金額',fmtAmount(d.amount));
+  }
+  h+=vr('受付日',fmtDateJP(d.created_at)||'―');
+  if(d.deadline)h+=vr('納期',fmtDateJP(d.deadline));
+  if(d.notes)h+=vr('備考',d.notes);
+  // ステータス変更ボタン
+  h+='<div class="st-change"><div class="st-change-label">ステータス変更</div><div class="st-change-btns">';
+  ACTIVE_ST.forEach(s=>{
+    const on=d.status===s?' on':'';
+    h+=`<button class="st-btn${on}" data-st="${esc(s)}">${esc(s)}</button>`;
+  });
+  h+='</div></div>';
+  $('viewContent').innerHTML=h;
+  $('viewContent').querySelectorAll('.st-btn').forEach(btn=>{
+    btn.onclick=()=>{
+      const newSt=btn.dataset.st;
+      if(d.status===newSt)return;
+      changeStatus(id,newSt);
+      openView(id); // 再描画してボタン状態更新
+    };
+  });
+  $('viewBg').classList.add('show');
+}
+function closeView(){$('viewBg').classList.remove('show');}
+document.getElementById('viewBg').addEventListener('click',function(e){
+  if(e.target===this)closeView();
+});
+
+// ===== 編集モーダル =====
 function openMo(id){
   const isEdit=!!id;
   let e={};
