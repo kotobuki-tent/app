@@ -486,7 +486,7 @@ function renderCard(d){
   h+=`<span class="badge s-${esc(st)}">${esc(st)}</span>`;
   h+='</div>';
   if(d.client){
-    h+=`<div class="assignee">得意先: <span class="tag" style="color:var(--text);background:var(--surface3);font-size:13px;padding:3px 10px">${esc(d.client)}</span></div>`;
+    h+=`<div class="assignee">得意先: <span style="font-size:13px;font-weight:600;color:var(--text)">${esc(d.client)}</span></div>`;
   }
   if(d.our_person){
     h+=`<div class="assignee">担当: <span class="tag person">${esc(d.our_person)}</span></div>`;
