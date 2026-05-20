@@ -86,6 +86,20 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .av-add{background:var(--accent);color:#fff;border:none;padding:9px 18px;border-radius:8px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
 .av-add:hover{opacity:.85}
 .av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px}
+
+/* ステータスログボタン */
+.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap}
+.slog-btn:hover{border-color:var(--accent);color:var(--accent)}
+.slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
+.slog-btn.has-new .dot{display:block}
+.slog-item{padding:12px 14px;border-bottom:1px solid var(--surface3);font-size:13px;line-height:1.6;cursor:pointer;transition:.15s}
+.slog-item:hover{background:var(--accent-dim)}
+.slog-item.sl-del{cursor:default;color:var(--text-dim)}
+.slog-item.sl-del:hover{background:transparent}
+.slog-item.sl-del .sl-st{color:var(--red)}
+.slog-item:last-child{border-bottom:none}
+.slog-item .sl-name{font-weight:600;color:var(--text)}
+.slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
 .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
 table.tbl{width:100%;border-collapse:collapse;font-size:13px}
 table.tbl th{background:var(--surface2);font-weight:600;text-align:left;padding:10px 12px;white-space:nowrap;cursor:pointer;user-select:none}
@@ -293,6 +307,18 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
   </div>
 </div>
 
+<!-- ステータスログモーダル -->
+<div class="mo-bg" id="slogBg">
+  <div class="mo" style="max-width:560px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="margin:0">ステータスログ</h2>
+      <button class="act-btn del" style="font-size:12px" onclick="clearSlog()">クリア</button>
+    </div>
+    <div id="slogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+    <div class="mo-foot"><button class="cancel" onclick="closeSlog()">閉じる</button></div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -356,6 +382,81 @@ let allEntries=[];
 let currentView='board';
 let boardFilter=null;
 let boardSearch='';
+
+// ===== ステータスログ =====
+let slog=[];
+let slogUnread=0;
+const SLOG_KEY='sales_status_snapshot';
+const SLOG_LIST_KEY='sales_status_log';
+const SLOG_UNREAD_KEY='sales_status_unread';
+
+function detectStatusChanges(){
+  const curr={};
+  allEntries.forEach(d=>{if(d.id&&String(d.id).indexOf('tmp_')!==0)curr[String(d.id)]={status:d.status||'',project:d.project||''}});
+  try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
+  try{slogUnread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){slogUnread=0}
+  let prev=null;
+  try{prev=JSON.parse(localStorage.getItem(SLOG_KEY)||'null')}catch(e){prev=null}
+  if(!prev){localStorage.setItem(SLOG_KEY,JSON.stringify(curr));return}
+  const newEntries=[];
+  Object.keys(curr).forEach(id=>{
+    if(!prev[id]){
+      newEntries.push({id,project:curr[id].project,from:'',to:'新規登録',ts:Date.now(),isNew:true});
+    }else if(prev[id].status!==curr[id].status){
+      newEntries.push({id,project:curr[id].project,from:prev[id].status,to:curr[id].status,ts:Date.now()});
+    }
+  });
+  Object.keys(prev).forEach(id=>{
+    if(!curr[id]){
+      newEntries.push({id,project:prev[id].project,from:prev[id].status,to:'削除',ts:Date.now(),isDel:true});
+    }
+  });
+  if(newEntries.length){
+    slog=[...newEntries,...slog].slice(0,20);
+    slogUnread=Math.min(slogUnread+newEntries.length,20);
+    localStorage.setItem(SLOG_LIST_KEY,JSON.stringify(slog));
+    localStorage.setItem(SLOG_UNREAD_KEY,String(slogUnread));
+  }
+  localStorage.setItem(SLOG_KEY,JSON.stringify(curr));
+}
+
+function openSlog(){
+  const el=$('slogList');
+  if(!slog.length){
+    el.innerHTML='<div class="empty-msg">変更履歴はまだありません</div>';
+  }else{
+    let h='';
+    slog.forEach(e=>{
+      const verb=(e.isNew||e.isDel)?'されました':'になりました';
+      const cls=e.isDel?' sl-del':'';
+      h+=`<div class="slog-item${cls}" data-id="${esc(e.id)}" data-del="${e.isDel?'1':'0'}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> ${verb}</div>`;
+    });
+    el.innerHTML=h;
+    el.querySelectorAll('.slog-item').forEach(it=>{
+      if(it.dataset.del==='1')return;
+      it.onclick=()=>{closeSlog();openView(it.dataset.id)};
+    });
+  }
+  slogUnread=0;
+  localStorage.setItem(SLOG_UNREAD_KEY,'0');
+  $('slogBg').classList.add('show');
+  if(currentView==='board')renderBoard();
+}
+
+function closeSlog(){
+  $('slogBg').classList.remove('show');
+}
+
+function clearSlog(){
+  if(!slog.length)return;
+  if(!confirm('ログをすべて削除しますか？'))return;
+  slog=[];
+  slogUnread=0;
+  localStorage.setItem(SLOG_LIST_KEY,'[]');
+  localStorage.setItem(SLOG_UNREAD_KEY,'0');
+  $('slogList').innerHTML='<div class="empty-msg">変更履歴はまだありません</div>';
+  if(currentView==='board')renderBoard();
+}
 let adminStatusFilter=null;
 let adminSearch='';
 let archiveSearch='';
@@ -422,6 +523,7 @@ async function loadData(){
     const j=await apiGet({action:'read'});
     if(j.success){
       allEntries=j.data||[];
+      detectStatusChanges();
     }
   }catch(e){
     console.warn('load error',e);
@@ -457,7 +559,7 @@ function renderBoard(){
   items.forEach(e=>{if(cnt[e.status]!==undefined)cnt[e.status]++});
   const total=items.length;
   const filtered=boardFilter?items.filter(e=>e.status===boardFilter):items;
-  let h=`<div class="av-top"><div class="fv-date">${dateStr}</div><input class="av-search" placeholder="検索..." oninput="boardCardFilter(this.value)" value="${esc(boardSearch||'')}"></div>`;
+  let h=`<div class="av-top"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div class="fv-date">${dateStr}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div><input class="av-search" placeholder="検索..." oninput="boardCardFilter(this.value)" value="${esc(boardSearch||'')}"></div>`;
   h+='<div class="fv-sum">';
   h+=`<div class="fv-si${boardFilter===null?' on':''}" onclick="setBoardFilter(null)"><div class="n">${total}</div><div class="l">すべて</div></div>`;
   ACTIVE_ST.forEach(s=>{
