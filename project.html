@@ -548,6 +548,10 @@ let curProjView='gantt';
 let projSort={col:null,asc:true};
 let projDoneSort={col:'_endDate',asc:false};
 let ganttStatusFilter='';
+const ACTIVE_PROJ_ST=['見積中','受注','準備中','現場中','レンタル中'];
+function stColorVar(s){
+  return{'見積中':'--text-faint','受注':'--purple','準備中':'--orange','現場中':'--green','レンタル中':'--accent','完了':'--text-dim','見送り':'--red'}[s]||'--text';
+}
 let ganttStart=null,ganttDays=28;
 // ステータスログ：slog は [{id, project, from, to, ts}]、新しい順、最大20件
 let slog=[];
@@ -691,8 +695,17 @@ function renderGantt(){
   let h=`<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px"><div style="font-size:14px;color:var(--text-dim)">${todayStr}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div>`;
   h+='<div class="gantt-controls"><div class="gantt-nav"><button onclick="ganttMove(-7)">← 1週</button><button onclick="ganttToday()">今日</button><button onclick="ganttMove(7)">1週 →</button></div>';
   h+=`<select onchange="ganttDays=+this.value;render()"><option value="14"${ganttDays===14?' selected':''}>2週間</option><option value="21"${ganttDays===21?' selected':''}>3週間</option><option value="28"${ganttDays===28?' selected':''}>4週間</option><option value="42"${ganttDays===42?' selected':''}>6週間</option></select>`;
-  h+=`<select onchange="ganttStatusFilter=this.value;render()"><option value=""${!ganttStatusFilter?' selected':''}>全ステータス</option><option value="見積中">見積中</option><option value="受注">受注</option><option value="準備中">準備中</option><option value="現場中">現場中</option><option value="レンタル中">レンタル中</option><option value="完了">完了</option></select>`;
-  h+=`<input style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:180px" placeholder="検索..." oninput="ganttFilter(this.value)"></div>`;
+  h+=`<input class="av-search" style="margin-left:auto" placeholder="検索..." oninput="ganttFilter(this.value)"></div>`;
+  // ステータスフィルタチップ
+  const allActive=projData.filter(d=>!['完了','見送り'].includes(d.status));
+  const cnt={};ACTIVE_PROJ_ST.forEach(s=>cnt[s]=0);
+  allActive.forEach(d=>{if(cnt[d.status]!==undefined)cnt[d.status]++});
+  h+='<div class="fv-sum">';
+  h+=`<div class="fv-si${ganttStatusFilter===''?' on':''}" onclick="ganttStatusFilter='';render()"><div class="n">${allActive.length}</div><div class="l">すべて</div></div>`;
+  ACTIVE_PROJ_ST.forEach(s=>{
+    h+=`<div class="fv-si${ganttStatusFilter===s?' on':''}" onclick="ganttStatusFilter='${s}';render()"><div class="n" style="color:var(${stColorVar(s)})">${cnt[s]||0}</div><div class="l">${s}</div></div>`;
+  });
+  h+='</div>';
   // 現場セクション
   h+=`<div class="gantt-section-hd">現場<span class="count">${siteItems.length}件</span></div>`;
   h+=buildGanttTable(siteItems,dates,'現場データがありません');

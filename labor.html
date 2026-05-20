@@ -39,6 +39,13 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 
 .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px}
+.av-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.fv-sum{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+.fv-si{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:90px;text-align:center;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.fv-si:hover{border-color:var(--accent)}
+.fv-si.on{border-color:var(--accent);background:var(--accent-dim)}
+.fv-si .n{font-size:26px;font-weight:900;line-height:1.1}
+.fv-si .l{font-size:11px;color:var(--text-dim);margin-top:2px}
 .toolbar select{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface)}
 .toolbar .count{font-size:12px;color:var(--text-dim);margin-left:auto}
 
@@ -152,17 +159,10 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="sub-tab" data-view="archive" onclick="setView('archive')">出荷済</button>
   </div>
 
-<div class="app"><div class="toolbar">
-    <input class="av-search" type="search" id="searchBox" placeholder="案件名・見積/受注番号で検索" oninput="renderTable()">
-    <select id="stFilter" onchange="renderTable()">
-      <option value="">全ステータス</option>
-      <option value="見積中">見積中</option>
-      <option value="受注">受注</option>
-      <option value="製作中">製作中</option>
-      <option value="完成">完成</option>
-      <option value="見送り">見送り</option>
-    </select>
+<div class="app">
+  <div class="av-top">
     <span class="count" id="countLabel"></span>
+    <input class="av-search" type="search" id="searchBox" placeholder="案件名・見積/受注番号で検索" oninput="renderTable()">
   </div>
 
   <div id="loader" class="loading"><div class="spin"></div><br>読み込み中...</div>
@@ -296,10 +296,28 @@ async function loadData(){
   renderTable();
 }
 
+// アクティブステータス（フィルタチップに出すもの）
+const ACTIVE_ST=['見積中','受注','製作中','完成'];
+let stFilter='';  // 空=すべて
+
+function setStFilter(v){
+  stFilter=v;
+  renderTable();
+}
+
+function stColorVar(s){
+  return{'見積中':'--purple','受注':'--blue','製作中':'--orange','完成':'--green','見送り':'--gray','出荷済':'--accent'}[s]||'--text';
+}
+
 function renderTable(){
   const kw=$('searchBox').value.trim().toLowerCase();
-  const stFilter=$('stFilter').value;
   const isArchive=currentView==='archive';
+  // フィルタ前リストでカウント計算
+  const allActive=allJobs.filter(j=>j.status!=='出荷済');
+  const cnt={};ACTIVE_ST.forEach(s=>cnt[s]=0);
+  allActive.forEach(j=>{if(cnt[j.status]!==undefined)cnt[j.status]++});
+  const total=allActive.length;
+
   let list=allJobs.filter(j=>{
     // ビューによる振り分け
     if(isArchive){
@@ -329,12 +347,23 @@ function renderTable(){
 
   $('countLabel').textContent=list.length+'件';
 
+  // フィルタチップHTML（アーカイブビューでは出さない）
+  let chipHtml='';
+  if(!isArchive){
+    chipHtml='<div class="fv-sum">';
+    chipHtml+=`<div class="fv-si${stFilter===''?' on':''}" onclick="setStFilter('')"><div class="n">${total}</div><div class="l">すべて</div></div>`;
+    ACTIVE_ST.forEach(s=>{
+      chipHtml+=`<div class="fv-si${stFilter===s?' on':''}" onclick="setStFilter('${s}')"><div class="n" style="color:var(${stColorVar(s)})">${cnt[s]||0}</div><div class="l">${s}</div></div>`;
+    });
+    chipHtml+='</div>';
+  }
+
   if(!list.length){
-    $('content').innerHTML='<div class="empty-msg">該当する案件がありません</div>';
+    $('content').innerHTML=chipHtml+'<div class="empty-msg">該当する案件がありません</div>';
     return;
   }
 
-  let h='<table class="jobs"><thead><tr>';
+  let h=chipHtml+'<table class="jobs"><thead><tr>';
   h+='<th>見積番号</th><th>受注番号</th><th>案件名</th><th>ステータス</th><th>納期</th><th class="num">延べ工数</th><th class="num">人数</th>';
   h+='</tr></thead><tbody>';
   list.forEach(j=>{
