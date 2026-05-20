@@ -251,14 +251,8 @@ function setView(v){
   document.querySelectorAll('.sub-tab').forEach(b=>{
     b.classList.toggle('on',b.dataset.view===v);
   });
-  // archiveのときはステータスフィルタ無効化（出荷済のみなので）
-  const sf=$('stFilter');
-  if(v==='archive'){
-    sf.value='';
-    sf.disabled=true;
-  } else {
-    sf.disabled=false;
-  }
+  // archiveのときはステータスフィルタリセット（出荷済のみ表示なので）
+  if(v==='archive')stFilter='';
   renderTable();
 }
 
