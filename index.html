@@ -696,7 +696,7 @@ function renderFactory(){
   let filtered=items;
   if(prodFilter){if(['製作中','完成','受注'].includes(prodFilter))filtered=items.filter(d=>d.status===prodFilter);else if(['2F工場','1F工場','出力関係','外注','未定','その他'].includes(prodFilter))filtered=items.filter(d=>d.section===prodFilter);else if(prodFilter==='urgent')filtered=items.filter(d=>d._urgN<=0);else if(prodFilter==='thisweek')filtered=items.filter(d=>d._urgN===1)}
   const si=(f,n,l,color)=>{const on=prodFilter===f?' on':'';return`<div class="fv-si${on}" data-f="${f}" style="${color?'color:'+color:''}"><div class="n">${n}</div><div class="l">${l}</div></div>`};
-  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div class="fv-date">${dateJP(today)}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button><button class="staff-btn" onclick="openStaff()">STAFF <span class="count">${staffCount().present}/${staffCount().total}</span></button></div><input class="av-search" placeholder="検索..." oninput="factoryFilter(this.value)"></div><div class="fv-sum">`;
+  let h=`<div class="av-top"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div class="fv-date">${dateJP(today)}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button><button class="staff-btn" onclick="openStaff()">STAFF <span class="count">${staffCount().present}/${staffCount().total}</span></button></div><input class="av-search" placeholder="検索..." oninput="factoryFilter(this.value)"></div><div class="fv-sum">`;
   h+=si('all',items.length,'すべて','');
   h+=si('urgent',items.filter(d=>d._urgN<=0).length,'納期迫る','var(--red)');
   h+=si('thisweek',items.filter(d=>d._urgN===1).length,'今週中','var(--orange)');
@@ -759,7 +759,7 @@ function renderArchive(){
     va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0
   });
   const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'deadline',label:'納期'}];
-  let h='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px"><span style="font-size:13px;color:var(--text-dim)">出荷済の案件（'+items.length+'件）</span><input class="av-search" placeholder="検索..." oninput="archiveFilter(this.value)"></div>';
+  let h='<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">出荷済の案件（'+items.length+'件）</span><input class="av-search" placeholder="検索..." oninput="archiveFilter(this.value)"></div>';
   h+='<div class="tbl-wrap"><table><thead><tr>';
   cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}" style="cursor:pointer">${c.label}<span class="arrow">${a}</span></th>`});
   h+='<th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
