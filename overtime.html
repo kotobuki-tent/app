@@ -36,10 +36,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#fed7aa;color:#9a3412}
 @media(max-width:768px){
-  .sub-tabs{padding:10px 10px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
 }
+@media(max-width:768px){
+  }
 .week-bar{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
 .week-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:var(--radius);font:500 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
 .week-btn:hover{background:var(--surface3)}

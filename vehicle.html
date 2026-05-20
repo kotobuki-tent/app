@@ -31,7 +31,7 @@ if('serviceWorker' in navigator){
   --teal:#0d9488;--teal-dim:rgba(13,148,136,.1);
 }
 html{font-size:15px}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px}
 
 /* Header */
 
@@ -41,12 +41,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#d1fae5;color:#065f46}
 @media(max-width:768px){
-  .sub-tabs{padding:10px 10px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
 }
+@media(max-width:768px){
+  }
 
-.app{padding-top:48px}
 .hidden{display:none!important}
 
 /* Loading */
@@ -228,13 +229,13 @@ tr:hover td{background:rgba(13,148,136,.03)}
     <button class="hdr-btn" onclick="safeRefresh(this, refreshData)">↻ 更新</button>
   </div>
 </div>
-<div class="app">
-  <div class="sub-tabs" id="vTabs">
+<div class="sub-tabs" id="vTabs">
     <button class="sub-tab on" data-view="dash">ダッシュボード</button>
     <button class="sub-tab" data-view="admin">管理</button>
     <button class="sub-tab" data-view="settings">アラート設定</button>
   </div>
-  <div id="loadingEl" class="loading"><div class="spin"></div><div>読み込み中...</div></div>
+
+<div class="app"><div id="loadingEl" class="loading"><div class="spin"></div><div>読み込み中...</div></div>
   <div id="dashView" class="dash hidden"></div>
   <div id="adminView" class="admin-view hidden"></div>
   <div id="settingsView" class="settings-view hidden"></div>

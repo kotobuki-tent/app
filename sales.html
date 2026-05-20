@@ -195,10 +195,12 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#fce7f3;color:#9d174d}
 @media(max-width:768px){
-  .sub-tabs{padding:10px 10px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
 }
+@media(max-width:768px){
+  }
 </style>
 </head>
 <body>
@@ -222,14 +224,13 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
   </div>
 </div>
 
-<div class="app">
-  <div class="sub-tabs">
+<div class="sub-tabs">
     <button class="sub-tab on" data-view="board" onclick="setView('board')">一覧</button>
     <button class="sub-tab" data-view="archive" onclick="setView('archive')">完了済</button>
     <button class="sub-tab" data-view="admin" onclick="setView('admin')">管理</button>
   </div>
 
-  <div id="loader" class="loading hidden"><div class="spin"></div>読み込み中…</div>
+<div class="app"><div id="loader" class="loading hidden"><div class="spin"></div>読み込み中…</div>
 
   <div id="boardView" class="factory-view hidden"></div>
   <div id="archiveView" class="admin-view hidden"></div>

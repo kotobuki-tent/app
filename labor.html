@@ -115,10 +115,12 @@ table.jobs tr:last-child td{border-bottom:none}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#cffafe;color:#155e75}
 @media(max-width:768px){
-  .sub-tabs{padding:10px 10px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
 }
+@media(max-width:768px){
+  }
 
 
 </style>
@@ -142,12 +144,12 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="hdr-btn" onclick="safeRefresh(this, loadData)">↻ 更新</button>
   </div>
 </div>
-<div class="app">
-  <div class="sub-tabs">
+<div class="sub-tabs">
     <button class="sub-tab on" data-view="active" onclick="setView('active')">工場ボード</button>
     <button class="sub-tab" data-view="archive" onclick="setView('archive')">出荷済</button>
   </div>
-  <div class="toolbar">
+
+<div class="app"><div class="toolbar">
     <input type="search" id="searchBox" placeholder="案件名・見積/受注番号で検索" oninput="renderTable()">
     <select id="stFilter" onchange="renderTable()">
       <option value="">全ステータス</option>
