@@ -245,7 +245,7 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
     <button class="sub-tab" data-view="admin" onclick="setView('admin')">管理</button>
   </div>
 
-<div class="app"><div id="loader" class="loading-overlay hidden"><div class="spin"></div><br>読み込み中…</div>
+<div class="app"><div id="loader" class="loading-overlay"><div class="spin"></div><br>読み込み中…</div>
 
   <div id="boardView" class="factory-view hidden"></div>
   <div id="archiveView" class="admin-view hidden"></div>
@@ -516,9 +516,8 @@ async function loadData(){
   const cached=_getCache('sales');
   if(cached&&cached.entries){
     allEntries=cached.entries;
+    $('loader').classList.add('hidden');
     render();
-  }else{
-    $('loader').classList.remove('hidden');
   }
   try{
     const j=await apiGet({action:'read'});

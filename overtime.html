@@ -262,7 +262,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <button class="av-add" onclick="openStaffModal()">従業員管理</button>
     <button class="av-add" onclick="safeRefresh(this, refreshData)">↻ 更新</button>
   </div>
-  <div class="loading-overlay hidden" id="loaderOverlay"><div class="spin"></div><br>読み込み中...</div>
+  <div class="loading-overlay" id="loaderOverlay"><div class="spin"></div><br>読み込み中...</div>
   <div id="overviewGrid"></div>
 </div>
 <div class="mo-bg" id="staffModalBg">
@@ -408,9 +408,8 @@ async function loadAll(){
     staffList=cached.staff||[];
     entries=cached.entries||[];
     currentRequest=cached.req||null;
+    document.getElementById('loaderOverlay').classList.add('hidden');
     render();
-  } else {
-    document.getElementById('loaderOverlay').classList.remove('hidden');
   }
   try{
     const[staffRes,entryRes,reqRes]=await Promise.all([
