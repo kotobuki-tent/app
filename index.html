@@ -515,9 +515,8 @@ async function loadAll(){
   if(cached){
     if(cached.prod)prodData=cached.prod;
     if(cached.att)attendance=cached.att;
+    $('loader').classList.add('hidden');
     render();
-  }else{
-    $('loader').classList.remove('hidden');
   }
   await Promise.all([loadProd(),loadAttendance()]);
   $('loader').classList.add('hidden');

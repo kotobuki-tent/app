@@ -405,9 +405,8 @@ async function loadAll(){
   const cached=_getCache('vehicle');
   if(cached&&cached.data){
     vehicleData=cached.data;
+    $('loadingEl').classList.add('hidden');
     render();
-  }else{
-    $('loadingEl').classList.remove('hidden');
   }
   // 裏で最新取得
   try{

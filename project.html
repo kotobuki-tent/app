@@ -600,9 +600,8 @@ async function loadAll(){
     if(cached.proj)projData=cached.proj;
     if(cached.rent)rentalsData=cached.rent;
     if(cached.inv)inventoryItems=cached.inv;
+    $('loader').classList.add('hidden');
     render();
-  }else{
-    $('loader').classList.remove('hidden');
   }
   await Promise.all([loadProj(),loadRentals(),loadInventoryItems()]);
   $('loader').classList.add('hidden');

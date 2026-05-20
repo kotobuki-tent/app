@@ -270,10 +270,8 @@ async function loadData(){
   const cached=_getCache('labor');
   if(cached&&cached.jobs){
     allJobs=cached.jobs;
+    $('loader').classList.add('hidden');
     renderTable();
-  }else{
-    $('loader').classList.remove('hidden');
-    $('content').innerHTML='';
   }
   // 裏で最新取得
   try{

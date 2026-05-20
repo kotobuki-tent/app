@@ -421,10 +421,9 @@ async function loadAll(){
       absenceList=cached.absence||[];
       _absenceLoadedDate=cached.absenceDate||null;
       initWhoSelect();
+      $('loader').classList.add('hidden');
       render();
     }catch(e){console.warn('Cache restore failed:',e);}
-  }else{
-    $('loader').classList.remove('hidden');
   }
   // 裏で最新取得
   await Promise.all([loadStaff(),loadProjects(),loadReports(),loadAbsenceList(dateStr(viewingDate))]);
