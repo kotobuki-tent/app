@@ -40,14 +40,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-
 .hidden{display:none!important}
 
 /* Buttons */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:none;border-radius:6px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
-.btn-primary{background:#6366f1;color:#fff}
-.btn-primary:hover{background:#2f5ec8}
-.btn-danger{background:#fff;color:#e53e3e;border:1px solid #fed7d7}
-.btn-danger:hover{background:#fff5f5}
-.btn-ghost{background:#fff;color:#555;border:1px solid #ddd}
-.btn-ghost:hover{background:#f9f9f9;border-color:#bbb}
-.btn-sm{padding:5px 12px;font-size:11px}
+.av-add{background:var(--accent);color:#fff;border:none;padding:9px 18px;border-radius:8px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+.av-add:hover{opacity:.85}
+.act-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:2px 6px}
+.act-btn.del{color:var(--red)}
+.act-btn:hover{text-decoration:underline}
 
 /* Table */
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:#fff;border:1px solid #e2e5f0;border-radius:8px}
@@ -84,6 +81,10 @@ tr:hover td{background:#f8f9fc}
 .mo-row input:focus,.mo-row select:focus,.mo-row textarea:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
 .mo-row textarea{resize:vertical;min-height:60px}
 .mo-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid #f0f1f5}
+.mo-foot button{padding:10px 22px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:1px solid var(--border)}
+.mo-foot .cancel{background:var(--surface);color:var(--text-dim)}
+.mo-foot .save{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mo-foot .save:hover{opacity:.85}
 
 /* Availability bars */
 .avail-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -205,7 +206,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
         <select id="flt_cat" onchange="renderItems()"><option value="">全カテゴリ</option></select>
         <input id="flt_item_q" placeholder="検索..." oninput="itemTableFilter(this.value)">
       </div>
-      <button class="btn btn-primary" onclick="openItemMo()">＋ 商品追加</button>
+      <button class="av-add" onclick="openItemMo()">＋ 商品追加</button>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -228,7 +229,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
         <select id="flt_r_cat" onchange="renderRentals()"><option value="">全カテゴリ</option></select>
         <input id="flt_r_q" placeholder="検索..." oninput="renderRentals()">
       </div>
-      <button class="btn btn-primary" onclick="openRentalMo()">＋ 貸出/予約登録</button>
+      <button class="av-add" onclick="openRentalMo()">＋ 貸出/予約登録</button>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -299,8 +300,8 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
       <textarea id="xf_item_notes"></textarea>
     </div>
     <div class="mo-foot">
-      <button class="btn btn-ghost" onclick="closeItemMo()">キャンセル</button>
-      <button class="btn btn-primary" onclick="saveItem()">保存</button>
+      <button class="cancel" onclick="closeItemMo()">キャンセル</button>
+      <button class="save" onclick="saveItem()">保存</button>
     </div>
   </div>
 </div>
@@ -357,8 +358,8 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
       <textarea id="xf_r_notes"></textarea>
     </div>
     <div class="mo-foot">
-      <button class="btn btn-ghost" onclick="closeRentalMo()">キャンセル</button>
-      <button class="btn btn-primary" onclick="saveRental()">保存</button>
+      <button class="cancel" onclick="closeRentalMo()">キャンセル</button>
+      <button class="save" onclick="saveRental()">保存</button>
     </div>
   </div>
 </div>
