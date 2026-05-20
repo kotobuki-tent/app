@@ -80,10 +80,10 @@ tr:hover td{background:#f8f9fc}
 .st-メンテ中{background:#fee2e2;color:#dc2626}
 
 /* Modal overlay */
-.mo-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
-.mo-bg.show{opacity:1;pointer-events:auto}
-.mo{background:#fff;border-radius:12px;width:95%;max-width:560px;max-height:85vh;overflow-y:auto;padding:28px 28px;box-shadow:0 20px 60px rgba(0,0,0,.15)}
-.mo h3{font-size:17px;font-weight:700;margin-bottom:20px;color:#1a1a2e}
+.mo-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto}
+.mo-bg.show{display:flex}
+.mo{background:var(--surface);border-radius:14px;padding:28px;width:100%;max-width:580px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.mo h3{font-size:17px;font-weight:800;margin-bottom:18px}
 .mo-row{display:flex;gap:14px;margin-bottom:16px}
 .mo-row.full{flex-direction:column}
 .mo-field{flex:1}

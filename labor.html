@@ -59,14 +59,14 @@ table.jobs tr:last-child td{border-bottom:none}
 .mins-hint{color:var(--text-faint);font-size:11px;margin-left:4px}
 
 /* モーダル */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:500;padding:20px}
-.modal-bg.hidden{display:none}
-.modal{background:var(--surface);border-radius:12px;max-width:500px;width:100%;max-height:85vh;overflow:auto}
-.modal-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.modal-head h2{font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px}
-.modal-head .mh-sub{font-size:12px;color:var(--text-dim)}
-.modal-close{background:none;border:none;font-size:22px;color:var(--text-dim);cursor:pointer;line-height:1;padding:0 4px}
-.modal-body{padding:18px 20px}
+.mo-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto}
+.mo-bg.show{display:flex}
+.mo{background:var(--surface);border-radius:14px;padding:28px;width:100%;max-width:580px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.mo h3{font-size:17px;font-weight:800;margin-bottom:6px}
+.mh-sub{font-size:12px;color:var(--text-dim);margin-bottom:18px}
+.mo-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;align-items:center}
+.mo-foot button{padding:10px 22px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:1px solid var(--border)}
+.mo-foot .cancel{background:var(--surface);color:var(--text-dim)}
 .mb-total{background:var(--accent-dim);padding:12px 14px;border-radius:8px;margin-bottom:14px}
 .mb-total .tt-label{font-size:11px;color:var(--text-dim);font-weight:600}
 .mb-total .tt-val{font-size:20px;font-weight:800;color:var(--accent);margin-top:2px}
@@ -170,16 +170,14 @@ table.jobs tr:last-child td{border-bottom:none}
 </div>
 
 <!-- 詳細モーダル -->
-<div id="detailModal" class="modal-bg hidden" onclick="if(event.target===this)closeDetail()">
-  <div class="modal">
-    <div class="modal-head">
-      <div>
-        <h2 id="dmTitle"></h2>
-        <div class="mh-sub" id="dmSub"></div>
-      </div>
-      <button class="modal-close" onclick="closeDetail()">×</button>
+<div id="detailModal" class="mo-bg" onclick="if(event.target===this)closeDetail()">
+  <div class="mo">
+    <h3 id="dmTitle"></h3>
+    <div class="mh-sub" id="dmSub"></div>
+    <div id="dmBody"></div>
+    <div class="mo-foot">
+      <button class="cancel" onclick="closeDetail()">閉じる</button>
     </div>
-    <div class="modal-body" id="dmBody"></div>
   </div>
 </div>
 
@@ -377,9 +375,9 @@ function showDetail(id){
     h+='<div class="empty-msg">工数の記録はまだありません</div>';
   }
   $('dmBody').innerHTML=h;
-  $('detailModal').classList.remove('hidden');
+  $('detailModal').classList.add('show');
 }
-function closeDetail(){$('detailModal').classList.add('hidden')}
+function closeDetail(){$('detailModal').classList.remove('show')}
 
 loadData();
 // 自動更新：5分間隔、タブが見えてる時だけ、前回が走り切ってから
