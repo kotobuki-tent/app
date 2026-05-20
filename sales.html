@@ -241,7 +241,7 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
 
 <div class="sub-tabs">
     <button class="sub-tab on" data-view="board" onclick="setView('board')">一覧</button>
-    <button class="sub-tab" data-view="archive" onclick="setView('archive')">完了済</button>
+    <button class="sub-tab" data-view="archive" onclick="setView('archive')">完了</button>
     <button class="sub-tab" data-view="admin" onclick="setView('admin')">管理</button>
   </div>
 
@@ -639,7 +639,7 @@ function boardCardFilter(q){
 // ===== 管理ビュー =====
 function renderAdmin(){
   const el=$('adminView');
-  // 完了・見送りは完了済タブに表示するので、管理タブからは除外
+  // 完了・見送りは完了タブに表示するので、管理タブからは除外
   let items=allEntries.filter(e=>!ARCHIVE_ST.includes(e.status));
   const kw=adminSearch.trim().toLowerCase();
   if(adminStatusFilter){
@@ -743,7 +743,7 @@ function renderAdmin(){
   });
 }
 
-// ===== 完了済ビュー =====
+// ===== 完了ビュー =====
 function renderArchive(){
   const el=$('archiveView');
   let items=allEntries.filter(e=>ARCHIVE_ST.includes(String(e.status||'').trim()));
