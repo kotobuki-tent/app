@@ -117,6 +117,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .staff-del{background:none;border:none;color:var(--red);font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;padding:4px 8px}
 .staff-del:hover{text-decoration:underline}
 /* req-textarea → .mo-field textarea に統合済み */
+.loading-overlay{position:fixed;inset:48px 0 0 0;background:rgba(255,255,255,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;color:var(--text-dim);font-size:14px;backdrop-filter:blur(2px)}
+.loading-overlay .spin{display:inline-block;width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
 .loading{text-align:center;padding:80px 20px;color:var(--text-dim);font-size:14px}
 .loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -260,7 +262,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <button class="av-add" onclick="openStaffModal()">従業員管理</button>
     <button class="av-add" onclick="safeRefresh(this, refreshData)">↻ 更新</button>
   </div>
-  <div id="overviewGrid" class="loading">読み込み中...</div>
+  <div class="loading-overlay hidden" id="loaderOverlay"><div class="spin"></div><br>読み込み中...</div>
+  <div id="overviewGrid"></div>
 </div>
 <div class="mo-bg" id="staffModalBg">
   <div class="mo">
@@ -406,6 +409,8 @@ async function loadAll(){
     entries=cached.entries||[];
     currentRequest=cached.req||null;
     render();
+  } else {
+    document.getElementById('loaderOverlay').classList.remove('hidden');
   }
   try{
     const[staffRes,entryRes,reqRes]=await Promise.all([
@@ -418,9 +423,10 @@ async function loadAll(){
     currentRequest=reqRes.data||null;
     _setCache(cacheKey,{staff:staffList,entries:entries,req:currentRequest});
   }catch(e){console.error('Load error:',e);if(!cached){staffList=[];entries=[];currentRequest=null;toast('データ取得に失敗しました',true);}}
+  document.getElementById('loaderOverlay').classList.add('hidden');
   render();
 }
-async function refreshData(){document.getElementById('overviewGrid').innerHTML='<div class="loading">読み込み中...</div>';await loadAll();}
+async function refreshData(){await loadAll();}
 
 function changeWeek(delta){const d=new Date(currentWeekStart);d.setDate(d.getDate()+7*delta);currentWeekStart=d;entries=[];render();loadAll();}
 function goThisWeek(){currentWeekStart=getMonday(new Date());entries=[];render();loadAll();}

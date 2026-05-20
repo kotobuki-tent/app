@@ -45,6 +45,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 @media(max-width:768px){
   }
 .hidden{display:none!important}
+.loading-overlay{position:fixed;inset:48px 0 0 0;background:rgba(255,255,255,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;color:var(--text-dim);font-size:14px;backdrop-filter:blur(2px)}
+.loading-overlay .spin{display:inline-block;width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
 .loading{text-align:center;padding:80px 20px;color:var(--text-dim);font-size:14px}
 .loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -351,7 +353,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 <div class="app"><div id="prodFactory" class="factory-view"></div>
   <div id="prodAdmin" class="admin-view hidden"></div>
   <div id="prodArchive" class="admin-view hidden"></div>
-  <div class="loading" id="loader"><div class="spin"></div><br>読み込み中...</div>
+  <div class="loading-overlay" id="loader"><div class="spin"></div><br>読み込み中...</div>
 </div>
 <!-- 案件登録/編集モーダル -->
 <div class="mo-bg" id="prodMoBg">
