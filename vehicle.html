@@ -53,8 +53,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 /* Loading */
 .loading{text-align:center;padding:80px 20px;color:var(--text-dim);font-size:14px}
-.loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;margin-bottom:12px}
-@keyframes sp{to{transform:rotate(360deg)}}
+.loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+}
 
 /* Dashboard */
 .dash{padding:16px}
@@ -236,7 +237,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
     <button class="sub-tab" data-view="settings">アラート設定</button>
   </div>
 
-<div class="app"><div id="loadingEl" class="loading"><div class="spin"></div><div>読み込み中...</div></div>
+<div class="app"><div id="loadingEl" class="loading"><div class="spin"></div><br>読み込み中...</div>
   <div id="dashView" class="dash hidden"></div>
   <div id="adminView" class="admin-view hidden"></div>
   <div id="settingsView" class="settings-view hidden"></div>

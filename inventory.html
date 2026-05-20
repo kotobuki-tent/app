@@ -120,7 +120,9 @@ tr:hover td{background:#f8f9fc}
 .toast.err{background:#dc2626}
 
 /* Loading */
-.loading{text-align:center;padding:40px;color:#aaa;font-size:13px}
+.loading{text-align:center;padding:80px 20px;color:var(--text-dim);font-size:14px}
+.loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
 .empty-msg{text-align:center;color:#aaa;padding:32px;font-size:13px}
 tr.overdue td{background:#fff5f5}
 tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}

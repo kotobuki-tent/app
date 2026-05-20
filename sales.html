@@ -37,8 +37,9 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .hidden{display:none!important}
 
 .loading{text-align:center;padding:80px 20px;color:var(--text-dim);font-size:14px}
-.loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;margin-bottom:12px}
-@keyframes sp{to{transform:rotate(360deg)}}
+.loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+}
 
 /* === 一覧ビュー（生産部 factory-view 相当） === */
 .factory-view{padding:16px}
@@ -230,7 +231,7 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
     <button class="sub-tab" data-view="admin" onclick="setView('admin')">管理</button>
   </div>
 
-<div class="app"><div id="loader" class="loading hidden"><div class="spin"></div>読み込み中…</div>
+<div class="app"><div id="loader" class="loading hidden"><div class="spin"></div><br>読み込み中…</div>
 
   <div id="boardView" class="factory-view hidden"></div>
   <div id="archiveView" class="admin-view hidden"></div>
