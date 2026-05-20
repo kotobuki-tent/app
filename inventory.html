@@ -75,11 +75,11 @@ tr:hover td{background:#f8f9fc}
 .mo h3{font-size:17px;font-weight:700;margin-bottom:20px;color:#1a1a2e}
 .mo-row{display:flex;gap:14px;margin-bottom:16px}
 .mo-row.full{flex-direction:column}
-.mo-row label{font-size:12px;font-weight:600;color:#888;margin-bottom:4px;display:block}
-.mo-row .field{flex:1}
-.mo-row input,.mo-row select,.mo-row textarea{width:100%;padding:10px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#1a1a2e;font:400 14px/1.4 'Noto Sans JP',sans-serif;outline:none;transition:.15s}
-.mo-row input:focus,.mo-row select:focus,.mo-row textarea:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
-.mo-row textarea{resize:vertical;min-height:60px}
+.mo-field{flex:1}
+.mo-field label{font-size:12px;font-weight:600;color:#888;margin-bottom:4px;display:block}
+.mo-field input,.mo-field select,.mo-field textarea{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.4 'Noto Sans JP',sans-serif;background:var(--surface2);width:100%}
+.mo-field input:focus,.mo-field select:focus,.mo-field textarea:focus{outline:none;border-color:var(--accent)}
+.mo-field textarea{resize:vertical;min-height:60px}
 .mo-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid #f0f1f5}
 .mo-foot button{padding:10px 22px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:1px solid var(--border)}
 .mo-foot .cancel{background:var(--surface);color:var(--text-dim)}
@@ -278,27 +278,27 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
     <h3 id="itemMoTitle">商品追加</h3>
     <input type="hidden" id="xf_item_id">
     <div class="mo-row">
-      <div class="field">
+      <div class="mo-field">
         <label>カテゴリ *</label>
         <select id="xf_item_cat"><option value="">選択してください</option></select>
       </div>
-      <div class="field">
+      <div class="mo-field">
         <label>新規カテゴリ（上にない場合）</label>
         <input id="xf_item_newcat" placeholder="新しいカテゴリ名">
       </div>
     </div>
-    <div class="mo-row full">
+    <div class="mo-row full"><div class="mo-field">
       <label>商品名 *</label>
       <input id="xf_item_name" placeholder="例: 3m×3m">
-    </div>
-    <div class="mo-row full">
+    </div></div>
+    <div class="mo-row full"><div class="mo-field">
       <label>保有数</label>
       <input id="xf_item_qty" type="number" min="0" value="0">
-    </div>
-    <div class="mo-row full">
+    </div></div>
+    <div class="mo-row full"><div class="mo-field">
       <label>備考</label>
       <textarea id="xf_item_notes"></textarea>
-    </div>
+    </div></div>
     <div class="mo-foot">
       <button class="cancel" onclick="closeItemMo()">キャンセル</button>
       <button class="save" onclick="saveItem()">保存</button>
@@ -312,21 +312,21 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
     <h3 id="rentalMoTitle">貸出/予約登録</h3>
     <input type="hidden" id="xf_r_id">
     <div class="mo-row">
-      <div class="field">
+      <div class="mo-field">
         <label>カテゴリ *</label>
         <select id="xf_r_cat" onchange="populateItemSelect()"><option value="">選択</option></select>
       </div>
-      <div class="field">
+      <div class="mo-field">
         <label>商品名 *</label>
         <select id="xf_r_item"><option value="">先にカテゴリを選択</option></select>
       </div>
     </div>
     <div class="mo-row">
-      <div class="field">
+      <div class="mo-field">
         <label>数量 *</label>
         <input id="xf_r_qty" type="number" min="1" value="1">
       </div>
-      <div class="field">
+      <div class="mo-field">
         <label>ステータス</label>
         <select id="xf_r_status">
           <option>予約</option><option>貸出中</option><option>返却済</option>
@@ -335,16 +335,16 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
       </div>
     </div>
     <div class="mo-row">
-      <div class="field">
+      <div class="mo-field">
         <label>開始日 *</label>
         <input id="xf_r_start" type="date">
       </div>
-      <div class="field">
+      <div class="mo-field">
         <label>終了日 *</label>
         <input id="xf_r_end" type="date">
       </div>
     </div>
-    <div class="mo-row full">
+    <div class="mo-row full"><div class="mo-field">
       <label>案件 / 顧客名</label>
       <div style="display:flex;gap:8px">
         <select id="xf_r_project" style="flex:1" onchange="onProjectSelect()">
@@ -352,11 +352,11 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
         </select>
         <input id="xf_r_client" style="flex:1" placeholder="または顧客名を入力">
       </div>
-    </div>
-    <div class="mo-row full">
+    </div></div>
+    <div class="mo-row full"><div class="mo-field">
       <label>備考</label>
       <textarea id="xf_r_notes"></textarea>
-    </div>
+    </div></div>
     <div class="mo-foot">
       <button class="cancel" onclick="closeRentalMo()">キャンセル</button>
       <button class="save" onclick="saveRental()">保存</button>
