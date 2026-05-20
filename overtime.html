@@ -404,13 +404,20 @@ async function loadAll(){
   // 週ごとにキャッシュキー分ける
   const cacheKey='overtime_'+fmtDate(currentWeekStart);
   const cached=_getCache(cacheKey);
+  const overlay=document.getElementById('loaderOverlay');
+  console.log('[DEBUG] loadAll start. cached=',!!cached,'overlay=',overlay,'overlay.className=',overlay?overlay.className:'NULL');
   if(cached){
     staffList=cached.staff||[];
     entries=cached.entries||[];
     currentRequest=cached.req||null;
-    document.getElementById('loaderOverlay').classList.add('hidden');
+    overlay.classList.add('hidden');
+    console.log('[DEBUG] cache hit, overlay hidden');
     render();
+  } else {
+    console.log('[DEBUG] no cache, overlay should be visible. className=',overlay.className);
   }
+  // キャッシュ無しの場合のみ、API完了まで最低300msオーバーレイ表示
+  const showStart=Date.now();
   try{
     const[staffRes,entryRes,reqRes]=await Promise.all([
       apiGet({action:'staff'}),
@@ -422,7 +429,11 @@ async function loadAll(){
     currentRequest=reqRes.data||null;
     _setCache(cacheKey,{staff:staffList,entries:entries,req:currentRequest});
   }catch(e){console.error('Load error:',e);if(!cached){staffList=[];entries=[];currentRequest=null;toast('データ取得に失敗しました',true);}}
-  document.getElementById('loaderOverlay').classList.add('hidden');
+  if(!cached){
+    const elapsed=Date.now()-showStart;
+    const wait=Math.max(0,300-elapsed);
+    setTimeout(()=>overlay.classList.add('hidden'),wait);
+  }
   render();
 }
 async function refreshData(){await loadAll();}
