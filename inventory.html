@@ -270,19 +270,19 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 
   <!-- ===== 在庫確認 ===== -->
   <div id="v_avail">
+    <div class="av-top">
+      <div class="avail-date-row">
+        <label>開始日</label>
+        <input type="date" id="avail_start" onchange="renderAvail()">
+        <label>終了日</label>
+        <input type="date" id="avail_end" onchange="renderAvail()">
+        <select id="avail_cat" onchange="renderAvail()"><option value="">全カテゴリ</option></select>
+      </div>
+      <input class="av-search" placeholder="検索..." oninput="availFilter(this.value)">
+    </div>
     <div class="section">
       <h2>在庫バッティング確認</h2>
       <p class="desc">指定期間中に「予約」「貸出中」の数量を合計し、保有数に対する使用率を表示します。</p>
-      <div class="av-top">
-        <div class="avail-date-row">
-          <label>開始日</label>
-          <input type="date" id="avail_start" onchange="renderAvail()">
-          <label>終了日</label>
-          <input type="date" id="avail_end" onchange="renderAvail()">
-          <select id="avail_cat" onchange="renderAvail()"><option value="">全カテゴリ</option></select>
-        </div>
-        <input class="av-search" placeholder="検索..." oninput="availFilter(this.value)">
-      </div>
       <div id="avail_body"></div>
     </div>
   </div>
