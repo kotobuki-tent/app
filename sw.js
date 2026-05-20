@@ -5,7 +5,7 @@
 // HTML/CSS/JS を変更したら必ずこの数字をインクリメントすること。
 // 例: "v1" → "v2" → "v3" ...
 // ============================================================
-const CACHE_VERSION = 'v73';
+const CACHE_VERSION = 'v74';
 const CACHE_NAME = `sequence-lab-${CACHE_VERSION}`;
 
 // プリキャッシュ対象（アプリシェル）
@@ -80,21 +80,24 @@ self.addEventListener('fetch', (event) => {
   // クロスオリジンは素通し
   if (url.origin !== self.location.origin) return;
 
-  // 同一オリジンの静的リソース：network-first（安全側）
-  // オンライン時は常に最新を取得、失敗時のみキャッシュにフォールバック
+// 同一オリジンの静的リソース：stale-while-revalidate
+// キャッシュから即返してUIを速く表示、裏でネットワーク取得して次回用に更新
   event.respondWith(
-    fetch(req)
-      .then((res) => {
-        // 成功したらキャッシュも更新（同種ファイルだけ）
-        if (res.ok && res.status === 200) {
-          const resClone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(req, resClone).catch(() => {});
-          });
-        }
-        return res;
-      })
-      .catch(() => caches.match(req).then((cached) => cached || Response.error()))
+    caches.match(req).then((cached) => {
+      const fetchPromise = fetch(req)
+        .then((res) => {
+          if (res.ok && res.status === 200) {
+            const resClone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(req, resClone).catch(() => {});
+            });
+          }
+          return res;
+        })
+        .catch(() => cached || Response.error());
+      // キャッシュがあれば即返す、無ければネットワーク待ち
+      return cached || fetchPromise;
+    })
   );
 });
 
