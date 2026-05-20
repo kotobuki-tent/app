@@ -19,7 +19,17 @@ if('serviceWorker' in navigator){
 @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:15px}
-body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-height:100vh;padding-top:48px}
+:root{
+  --bg:#f5f6fa;--surface:#fff;--surface2:#fafbfc;--surface3:#f0f1f5;
+  --text:#1a1a2e;--text-dim:#5a6270;--text-faint:#8a92a0;
+  --border:#e0e2e8;--border-light:#ecedf0;
+  --accent:#6366f1;--accent-dim:rgba(99,102,241,.1);
+  --green:#2a9d5a;--green-dim:rgba(42,157,90,.1);
+  --orange:#f59e0b;--orange-dim:rgba(245,158,11,.1);
+  --red:#dc2626;--red-dim:rgba(220,38,38,.1);
+  --purple:#8b5cf6;--purple-dim:rgba(139,92,246,.1);
+}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px}
 
 /* Header - dark navy bar */
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
