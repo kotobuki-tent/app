@@ -38,8 +38,8 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .hidden{display:none!important}
 
 .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.toolbar input[type="search"]{padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface);min-width:260px}
-.toolbar select{padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface)}
+.av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px}
+.toolbar select{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface)}
 .toolbar .count{font-size:12px;color:var(--text-dim);margin-left:auto}
 
 table.jobs{width:100%;background:var(--surface);border-collapse:collapse;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
@@ -107,7 +107,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
 @media (max-width:768px){
   .app{padding:14px 10px}
-  .toolbar input[type="search"]{min-width:auto;width:100%}
+  .av-search{min-width:auto;width:100%}
   table.jobs{display:block;overflow-x:auto;white-space:nowrap}
 }
 
@@ -153,7 +153,7 @@ table.jobs tr:last-child td{border-bottom:none}
   </div>
 
 <div class="app"><div class="toolbar">
-    <input type="search" id="searchBox" placeholder="案件名・見積/受注番号で検索" oninput="renderTable()">
+    <input class="av-search" type="search" id="searchBox" placeholder="案件名・見積/受注番号で検索" oninput="renderTable()">
     <select id="stFilter" onchange="renderTable()">
       <option value="">全ステータス</option>
       <option value="見積中">見積中</option>
