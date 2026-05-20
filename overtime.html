@@ -252,6 +252,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <button class="week-btn" onclick="changeWeek(1)">来週 →</button>
 </div>
 <div id="requestBanner" class="request-banner" style="display:none"></div>
+<div class="loading-overlay" id="loaderOverlay"><div class="spin"></div><br>読み込み中...</div>
 <div id="staffView" class="staff-section">
   <div class="staff-select-bar" id="staffChips"></div>
   <div class="day-grid" id="dayGrid"></div>
@@ -262,7 +263,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <button class="av-add" onclick="openStaffModal()">従業員管理</button>
     <button class="av-add" onclick="safeRefresh(this, refreshData)">↻ 更新</button>
   </div>
-  <div class="loading-overlay" id="loaderOverlay"><div class="spin"></div><br>読み込み中...</div>
   <div id="overviewGrid"></div>
 </div>
 <div class="mo-bg" id="staffModalBg">
@@ -405,16 +405,12 @@ async function loadAll(){
   const cacheKey='overtime_'+fmtDate(currentWeekStart);
   const cached=_getCache(cacheKey);
   const overlay=document.getElementById('loaderOverlay');
-  console.log('[DEBUG] loadAll start. cached=',!!cached,'overlay=',overlay,'overlay.className=',overlay?overlay.className:'NULL');
   if(cached){
     staffList=cached.staff||[];
     entries=cached.entries||[];
     currentRequest=cached.req||null;
     overlay.classList.add('hidden');
-    console.log('[DEBUG] cache hit, overlay hidden');
     render();
-  } else {
-    console.log('[DEBUG] no cache, overlay should be visible. className=',overlay.className);
   }
   // キャッシュ無しの場合のみ、API完了まで最低300msオーバーレイ表示
   const showStart=Date.now();
