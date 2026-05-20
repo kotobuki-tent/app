@@ -33,6 +33,7 @@ if('serviceWorker' in navigator){
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text);background:var(--bg);min-height:100vh;padding-top:48px}
+.empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 .app{padding:16px}
 .hidden{display:none!important}
 
@@ -102,7 +103,6 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
 .adm-filter .ft:hover{color:var(--text);background:#e2e5f0}
 .adm-filter .ft.on{background:#fce7f3;color:#9d174d}
 
-.no-data{text-align:center;color:var(--text-faint);padding:40px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
 
 /* === モーダル（生産部準拠） === */
 .mo-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto}
@@ -464,7 +464,7 @@ function renderBoard(){
   });
   h+='</div>';
   if(filtered.length===0){
-    h+='<div class="no-data">該当する案件はありません</div>';
+    h+='<div class="empty-msg">該当する案件はありません</div>';
     el.innerHTML=h;
     return;
   }
@@ -588,7 +588,7 @@ function renderAdmin(){
   });
   h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
   if(items.length===0){
-    h+='<tr><td colspan="'+(cols.length+2)+'" style="text-align:center;color:var(--text-faint);padding:30px">該当する案件はありません</td></tr>';
+    h+='<tr><td colspan="'+(cols.length+2)+'" class="empty-msg">該当する案件はありません</td></tr>';
   }else{
     items.forEach(d=>{
       h+='<tr>';
@@ -677,7 +677,7 @@ function renderArchive(){
   });
   h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
   if(items.length===0){
-    h+='<tr><td colspan="'+(cols.length+2)+'" style="text-align:center;color:var(--text-faint);padding:30px">完了・見送り案件はありません</td></tr>';
+    h+='<tr><td colspan="'+(cols.length+2)+'" class="empty-msg">完了・見送り案件はありません</td></tr>';
   }else{
     items.forEach(d=>{
       h+='<tr>';

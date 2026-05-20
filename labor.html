@@ -30,6 +30,7 @@ function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text);background:var(--bg);min-height:100vh;padding-top:48px}
+.empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 .app{padding:16px}
 .loading{text-align:center;padding:80px 20px;color:var(--text-dim);font-size:14px}
 .loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
@@ -56,7 +57,6 @@ table.jobs tr:last-child td{border-bottom:none}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .num strong{font-weight:700;color:var(--text)}
 .mins-hint{color:var(--text-faint);font-size:11px;margin-left:4px}
-.no-data{text-align:center;color:var(--text-faint);padding:40px}
 
 /* モーダル */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:500;padding:20px}
@@ -332,7 +332,7 @@ function renderTable(){
   $('countLabel').textContent=list.length+'件';
 
   if(!list.length){
-    $('content').innerHTML='<div class="no-data">該当する案件がありません</div>';
+    $('content').innerHTML='<div class="empty-msg">該当する案件がありません</div>';
     return;
   }
 
@@ -374,7 +374,7 @@ function showDetail(id){
     });
     h+='</div>';
   }else{
-    h+='<div class="no-data">工数の記録はまだありません</div>';
+    h+='<div class="empty-msg">工数の記録はまだありません</div>';
   }
   $('dmBody').innerHTML=h;
   $('detailModal').classList.remove('hidden');

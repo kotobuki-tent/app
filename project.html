@@ -31,6 +31,7 @@ if('serviceWorker' in navigator){
 }
 html{font-size:15px}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px}
+.empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
@@ -198,7 +199,6 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .slog-item:last-child{border-bottom:none}
 .slog-item .sl-name{font-weight:600;color:var(--text)}
 .slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
-.slog-empty{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 
 /* 現場詳細モーダル内のステータス変更ボタン */
 .st-change{margin-top:18px;padding-top:16px;border-top:2px solid var(--surface3)}
@@ -634,7 +634,7 @@ function detectStatusChanges(){
 function openSlog(){
   const el=$('slogList');
   if(!slog.length){
-    el.innerHTML='<div class="slog-empty">変更履歴はまだありません</div>';
+    el.innerHTML='<div class="empty-msg">変更履歴はまだありません</div>';
   }else{
     let h='';
     slog.forEach(e=>{
@@ -663,7 +663,7 @@ function clearSlog(){
   slogUnread=0;
   localStorage.setItem(SLOG_LIST_KEY,'[]');
   localStorage.setItem(SLOG_UNREAD_KEY,'0');
-  $('slogList').innerHTML='<div class="slog-empty">変更履歴はまだありません</div>';
+  $('slogList').innerHTML='<div class="empty-msg">変更履歴はまだありません</div>';
   if(curProjView==='gantt')renderGantt();
 }
 
@@ -761,7 +761,7 @@ function renderProjDone(){
   h+='<div class="tbl-wrap"><table><thead><tr>';
   cols.forEach(c=>{const a=projDoneSort.col===c.key?(projDoneSort.asc?'▲':'▼'):'';h+='<th data-dcol="'+c.key+'" style="cursor:pointer">'+c.label+'<span class="arrow">'+a+'</span></th>'});
   h+='<th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
-  if(!items.length)h+='<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-faint)">該当する現場はありません</td></tr>';
+  if(!items.length)h+='<tr><td colspan="10" class="empty-msg">該当する現場はありません</td></tr>';
   items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';const chk=String(d.invoiced||'').toUpperCase()==='TRUE';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="toggleProjInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="editProj(\''+d.id+'\')">編集</button></td></tr>'});
   h+='</tbody></table></div>';el.innerHTML=h;
   el.querySelectorAll('th[data-dcol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.dcol;if(projDoneSort.col===c)projDoneSort.asc=!projDoneSort.asc;else{projDoneSort.col=c;projDoneSort.asc=true}render()}});

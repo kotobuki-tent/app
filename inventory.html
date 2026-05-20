@@ -30,6 +30,7 @@ html{font-size:15px}
   --purple:#8b5cf6;--purple-dim:rgba(139,92,246,.1);
 }
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px}
+.empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 
 /* Header - dark navy bar */
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
@@ -134,7 +135,6 @@ tr:hover td{background:#f8f9fc}
 .loading{text-align:center;padding:80px 20px;color:var(--text-dim);font-size:14px}
 .loading .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:12px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.empty-msg{text-align:center;color:#aaa;padding:32px;font-size:13px}
 tr.overdue td{background:#fff5f5}
 tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 .overdue-badge{font-size:10px;font-weight:600;color:#dc2626;background:#fee2e2;padding:2px 6px;border-radius:4px;margin-left:4px}
@@ -730,7 +730,7 @@ function renderAvail(){
   });
 
   const entries=Object.values(usage).sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.item_name).localeCompare(String(b.item_name)));
-  if(!entries.length){body.innerHTML='<p style="color:#aaa;font-size:13px">商品が登録されていません。</p>';return}
+  if(!entries.length){body.innerHTML='<p class="empty-msg">商品が登録されていません。</p>';return}
 
   let html='';let lastCat='';
   entries.forEach(e=>{

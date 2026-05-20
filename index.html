@@ -31,6 +31,7 @@ if('serviceWorker' in navigator){
 }
 html{font-size:15px}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px}
+.empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
@@ -133,7 +134,6 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .fp-item .fp-icon{width:36px;height:36px;border-radius:6px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:var(--text-dim);flex-shrink:0}
 .fp-item .fp-name{flex:1;font-size:13px;font-weight:500}
 .fp-item .fp-meta{font-size:11px;color:var(--text-faint)}
-.files-empty{font-size:12px;color:var(--text-faint);padding:8px 0}
 .st-change{margin-top:18px;padding-top:16px;border-top:2px solid var(--surface3)}
 .st-change-label{font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:10px}
 .st-change-btns{display:flex;gap:8px;flex-wrap:wrap}
@@ -154,7 +154,6 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .slog-item:last-child{border-bottom:none}
 .slog-item .sl-name{font-weight:600;color:var(--text)}
 .slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
-.slog-empty{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 
 /* STAFFボタンと出勤モーダル */
 .staff-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap}
@@ -570,7 +569,7 @@ function detectStatusChanges(){
 function openSlog(){
   const el=$('slogList');
   if(!slog.length){
-    el.innerHTML='<div class="slog-empty">変更履歴はまだありません</div>';
+    el.innerHTML='<div class="empty-msg">変更履歴はまだありません</div>';
   }else{
     let h='';
     slog.forEach(e=>{
@@ -601,7 +600,7 @@ function clearSlog(){
   localStorage.setItem(SLOG_LIST_KEY,'[]');
   localStorage.setItem(SLOG_UNREAD_KEY,'0');
   // モーダル内容を空表示に更新
-  $('slogList').innerHTML='<div class="slog-empty">変更履歴はまだありません</div>';
+  $('slogList').innerHTML='<div class="empty-msg">変更履歴はまだありません</div>';
   if(curProdView==='factory')renderFactory();
 }
 
@@ -635,7 +634,7 @@ function renderStaffGrid(){
   const c=staffCount();
   $('staffCountLabel').textContent=`${c.present}/${c.total}`;
   const el=$('staffGrid');
-  if(!staffList.length){el.innerHTML='<div class="slog-empty" style="grid-column:1/-1">STAFFが登録されていません</div>';return}
+  if(!staffList.length){el.innerHTML='<div class="empty-msg" style="grid-column:1/-1">STAFFが登録されていません</div>';return}
   let h='';
   staffList.forEach(s=>{
     const f=attendance[s.employee_no]||'';
@@ -764,7 +763,7 @@ function renderArchive(){
   h+='<div class="tbl-wrap"><table><thead><tr>';
   cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}" style="cursor:pointer">${c.label}<span class="arrow">${a}</span></th>`});
   h+='<th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
-  if(!items.length)h+='<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-faint)">該当する案件はありません</td></tr>';
+  if(!items.length)h+='<tr><td colspan="10" class="empty-msg">該当する案件はありません</td></tr>';
   items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';const chk=d.invoiced==='TRUE'||d.invoiced===true;h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="toggleInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="editProd(\''+d.id+'\')">編集</button></td></tr>'});
   h+='</tbody></table></div>';el.innerHTML=h;
   el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}render()}});
@@ -802,8 +801,8 @@ function fileIcon(type){if(type&&type.includes('pdf'))return'PDF';if(type&&type.
 
 function renderLinkedFiles(d){
   const el=$('linkedFiles');const ids=getLinkedFileIds(d);
-  if(!ids.length){el.innerHTML='<div class="files-empty">ファイルが紐づけられていません</div>';return}
-  if(!driveFiles){el.innerHTML='<div class="files-empty">読み込み中...</div>';loadDriveFiles().then(()=>renderLinkedFiles(d));return}
+  if(!ids.length){el.innerHTML='<div class="empty-msg">ファイルが紐づけられていません</div>';return}
+  if(!driveFiles){el.innerHTML='<div class="empty-msg">読み込み中...</div>';loadDriveFiles().then(()=>renderLinkedFiles(d));return}
   let h='';
   ids.forEach(fid=>{
     const f=driveFiles.find(x=>x.id===fid);
@@ -825,7 +824,7 @@ function openFilePicker(){
     $('filePickerLoading').classList.add('hidden');
     const d=prodData.find(x=>String(x.id)===String(currentViewId));
     const linked=d?getLinkedFileIds(d):[];
-    if(!driveFiles||!driveFiles.length){$('filePickerList').innerHTML='<div style="padding:20px;text-align:center;color:var(--text-faint)">Driveフォルダにファイルがありません</div>';return}
+    if(!driveFiles||!driveFiles.length){$('filePickerList').innerHTML='<div class="empty-msg">Driveフォルダにファイルがありません</div>';return}
     let h='';
     driveFiles.forEach(f=>{
       const already=linked.includes(f.id);

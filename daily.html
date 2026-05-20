@@ -29,6 +29,7 @@ if('serviceWorker' in navigator){
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text);background:var(--bg);min-height:100vh;padding-top:48px}
+.empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 .app{padding:16px}
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
@@ -133,7 +134,6 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .member-entry .me-proj{flex:2;font-weight:600;color:var(--text)}
 .member-entry .me-action{flex:1;color:var(--accent);font-weight:600}
 .member-entry .me-note{flex:2;color:var(--text-dim);font-size:12px;font-style:italic}
-.empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}

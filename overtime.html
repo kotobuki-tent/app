@@ -31,6 +31,7 @@ if('serviceWorker' in navigator){
 }
 html{font-size:15px}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;padding-bottom:100px}
+.empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
@@ -565,7 +566,7 @@ function openStaffModal(){document.getElementById('staffModalBg').classList.add(
 function closeStaffModal(){document.getElementById('staffModalBg').classList.remove('show');}
 function renderStaffList(){
   const container=document.getElementById('staffListItems');
-  if(staffList.length===0){container.innerHTML='<div style="color:var(--text-faint);padding:12px;font-size:13px">まだ登録されていません</div>';return;}
+  if(staffList.length===0){container.innerHTML='<div class="empty-msg" style="padding:12px">まだ登録されていません</div>';return;}
   let html='';
   staffList.forEach(s=>{const name=s.name;html+=`<div class="staff-list-item"><span>${esc(name)}</span><button class="staff-del" onclick="removeStaff('${esc(name)}')">削除</button></div>`;});
   container.innerHTML=html;
