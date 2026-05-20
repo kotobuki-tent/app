@@ -355,6 +355,7 @@ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 let allEntries=[];
 let currentView='board';
 let boardFilter=null;
+let boardSearch='';
 let adminStatusFilter=null;
 let adminSearch='';
 let archiveSearch='';
@@ -456,7 +457,7 @@ function renderBoard(){
   items.forEach(e=>{if(cnt[e.status]!==undefined)cnt[e.status]++});
   const total=items.length;
   const filtered=boardFilter?items.filter(e=>e.status===boardFilter):items;
-  let h=`<div class="fv-date">${dateStr}</div>`;
+  let h=`<div class="av-top"><div class="fv-date">${dateStr}</div><input class="av-search" placeholder="検索..." oninput="boardCardFilter(this.value)" value="${esc(boardSearch||'')}"></div>`;
   h+='<div class="fv-sum">';
   h+=`<div class="fv-si${boardFilter===null?' on':''}" onclick="setBoardFilter(null)"><div class="n">${total}</div><div class="l">すべて</div></div>`;
   ACTIVE_ST.forEach(s=>{
@@ -477,6 +478,7 @@ function renderBoard(){
     h+='</div></div>';
   });
   el.innerHTML=h;
+  if(boardSearch)boardCardFilter(boardSearch);
 }
 
 function stColorVar(s){
@@ -523,6 +525,13 @@ function renderCard(d){
 function setBoardFilter(v){
   boardFilter=v;
   renderBoard();
+}
+function boardCardFilter(q){
+  boardSearch=q;
+  q=String(q||'').toLowerCase();
+  $('boardView').querySelectorAll('.fv-card').forEach(c=>{
+    c.style.display=c.textContent.toLowerCase().includes(q)?'':'none';
+  });
 }
 
 // ===== 管理ビュー =====
