@@ -135,6 +135,7 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
 
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}
+.toast.err{background:#dc2626}
 
 /* ヘッダー（全HTML統一） */
 .hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#fb7185;display:flex;align-items:stretch;height:48px;padding:0;gap:0}
@@ -196,6 +197,7 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
 @media(max-width:768px){
   }
@@ -848,13 +850,6 @@ function delEntry(id){
   toast('削除しました');
 }
 
-function toast(msg){
-  const t=$('toast');
-  t.textContent=msg;
-  t.classList.add('show');
-  clearTimeout(t._tm);
-  t._tm=setTimeout(()=>t.classList.remove('show'),2000);
-}
 
 setView('board');
 loadData();
@@ -881,6 +876,7 @@ async function safeRefresh(btn, fn){
     setTimeout(()=>{ btn.innerHTML = orig; btn.disabled = false; }, 1000);
   }
 }
+function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 </script>
 </body>
 </html>

@@ -14,6 +14,7 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW登録失敗:',e));
   });
 }
+function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
@@ -110,6 +111,9 @@ table.jobs tr:last-child td{border-bottom:none}
   table.jobs{display:block;overflow-x:auto;white-space:nowrap}
 }
 
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+.toast.err{background:#dc2626}
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
@@ -118,9 +122,8 @@ table.jobs tr:last-child td{border-bottom:none}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:768px){
-  }
 
 
 </style>
@@ -405,5 +408,6 @@ async function safeRefresh(btn, fn){
 }
 
 </script>
+<div id="toast" class="toast"></div>
 </body>
 </html>

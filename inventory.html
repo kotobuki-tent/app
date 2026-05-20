@@ -30,6 +30,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
 @media(max-width:768px){
   }
@@ -114,10 +115,9 @@ tr:hover td{background:#f8f9fc}
 .cat-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#f0f1f5;color:#666}
 
 /* Toast */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;font:600 13px/1 'Noto Sans JP',sans-serif;z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}
-.toast.ok{background:#059669;color:#fff}
-.toast.err{background:#dc2626;color:#fff}
+.toast.err{background:#dc2626}
 
 /* Loading */
 .loading{text-align:center;padding:40px;color:#aaa;font-size:13px}
@@ -422,7 +422,6 @@ const ACTIVE_STATUSES=['予約','貸出中','メンテ待ち','メンテ中'];
 let items=[], rentals=[], projects=[];
 
 const $=id=>document.getElementById(id);
-function toast(msg,ok=true){const t=$('toast');t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(()=>t.classList.remove('show'),2500)}
 function dateJP(d){if(!d)return'';const dt=new Date(d+'T00:00:00');return(dt.getMonth()+1)+'/'+dt.getDate()}
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -767,6 +766,7 @@ async function safeRefresh(btn, fn){
   }
 }
 
+function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 </script>
 </body>
 </html>

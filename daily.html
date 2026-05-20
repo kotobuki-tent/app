@@ -38,6 +38,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
 @media(max-width:768px){
   }
@@ -134,9 +135,9 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .member-entry .me-note{flex:2;color:var(--text-dim);font-size:12px;font-style:italic}
 .empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}
-.toast.err{background:var(--red)}
+.toast.err{background:#dc2626}
 
 /* スマホ対応 */
 .hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#fb7185;display:flex;align-items:stretch;height:48px;padding:0;gap:0}
@@ -371,7 +372,6 @@ const today=new Date();
 today.setHours(0,0,0,0);
 writeDate.setHours(0,0,0,0);
 
-function toast(msg,err){const t=$('toast');t.textContent=msg;t.className='toast show'+(err?' err':'');setTimeout(()=>t.className='toast',2500)}
 function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
 
 async function loadStaff(){
@@ -996,6 +996,7 @@ async function safeRefresh(btn, fn){
   }
 }
 
+function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 </script>
 </body>
 </html>

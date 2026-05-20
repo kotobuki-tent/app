@@ -39,6 +39,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
 @media(max-width:768px){
   }
@@ -201,10 +202,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   .week-btn{padding:9px 10px;font-size:11px}
   .week-label{font-size:12px}
 }
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:14px 28px;border-radius:12px;font:600 14px/1 'Noto Sans JP',sans-serif;z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.15)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.ok{background:#059669;color:#fff}
-.toast.err{background:#dc2626;color:#fff}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+.toast.err{background:#dc2626}
 
 
 </style>
@@ -353,7 +353,6 @@ let currentTab='staff';
 let currentRequest=null;
 
 function getMonday(d){const dt=new Date(d);const day=dt.getDay();const diff=day===0?-6:1-day;dt.setDate(dt.getDate()+diff);dt.setHours(0,0,0,0);return dt;}
-function toast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(err?'err':'ok');setTimeout(()=>t.className='toast',3000);}
 function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function getWeekDates(mon){const dates=[];for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(d.getDate()+i);dates.push(d);}return dates;}
 function isHolidayOrWeekend(ds,dow){return dow===0||dow===6||HOLIDAYS.hasOwnProperty(ds);}
@@ -587,6 +586,7 @@ async function safeRefresh(btn, fn){
   }
 }
 
+function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 </script>
 <div class="toast" id="toast"></div>
 </body>

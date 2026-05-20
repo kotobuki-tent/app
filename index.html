@@ -39,6 +39,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
 @media(max-width:768px){
   }
@@ -109,9 +110,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .mo-foot .cancel{background:var(--surface);color:var(--text-dim)}
 .mo-foot .save{background:var(--accent);color:#fff;border-color:var(--accent)}
 .mo-foot .save:hover{opacity:.85}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}
-.toast.err{background:var(--red)}
+.toast.err{background:#dc2626}
 .view-row{display:flex;gap:16px;margin-bottom:10px;font-size:13px}
 .view-row .view-label{font-weight:600;color:var(--text-dim);min-width:80px;flex-shrink:0}
 .view-row .view-val{color:var(--text)}
@@ -314,8 +315,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .fp-item .fp-meta{font-size:10px}
 
   /* toast 位置調整 */
-  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
-}
+  }
 
 @media (max-width:420px){
   .fv-sum{grid-template-columns:repeat(2,1fr)}
@@ -494,7 +494,6 @@ const dateJP=d=>`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${
 const parseD=s=>{if(!s)return null;const d=new Date(s+'T00:00:00');return isNaN(d)?null:d};
 const diffDays=(a,b)=>Math.round((a-b)/864e5);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-function toast(msg,err){const t=$('toast');t.textContent=msg;t.className='toast show'+(err?' err':'');setTimeout(()=>t.className='toast',3000)}
 function vr(label,val){return`<div class="view-row"><div class="view-label">${label}</div><div class="view-val">${esc(val||'')}</div></div>`}
 
 // ===== Fire-and-forget (楽観的更新) =====
@@ -924,6 +923,7 @@ async function safeRefresh(btn, fn){
   }
 }
 
+function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 </script>
 </body>
 </html>

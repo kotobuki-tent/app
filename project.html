@@ -39,6 +39,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
 @media(max-width:768px){
   }
@@ -90,9 +91,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .gantt-section-hd{font-size:13px;font-weight:700;color:var(--text-dim);padding:14px 4px 8px;margin-top:8px;border-top:1px solid var(--border)}
 .gantt-section-hd:first-of-type{border-top:none;margin-top:0;padding-top:4px}
 .gantt-section-hd .count{font-weight:500;color:var(--text-faint);margin-left:6px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}
-.toast.err{background:var(--red)}
+.toast.err{background:#dc2626}
 /* ガントチャート */
 .proj-view{padding:16px}
 .gantt-controls{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
@@ -368,8 +369,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .rental-existing .re-info{font-size:12px;line-height:1.5}
 
   /* toast */
-  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
-}
+  }
 
 @media (max-width:420px){
   .phase-grid{grid-template-columns:1fr 1fr;gap:6px}
@@ -563,7 +563,6 @@ const dow='日月火水木金土';
 const parseD=s=>{if(!s)return null;const d=new Date(s+'T00:00:00');return isNaN(d)?null:d};
 const parseDates=s=>{if(!s)return[];return String(s).split(',').map(x=>x.trim()).filter(Boolean).map(x=>parseD(x)).filter(Boolean)};
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-function toast(msg,err){const t=$('toast');t.textContent=msg;t.className='toast show'+(err?' err':'');setTimeout(()=>t.className='toast',3000)}
 function vr(label,val){return`<div class="view-row"><div class="view-label">${label}</div><div class="view-val">${esc(val||'')}</div></div>`}
 function addDateInput(containerId,val){const wrap=document.getElementById(containerId);const item=document.createElement('div');item.className='date-item';const inp=document.createElement('input');inp.type='date';inp.value=val||'';const rm=document.createElement('button');rm.type='button';rm.className='date-rm';rm.textContent='×';rm.onclick=()=>{item.remove()};item.appendChild(inp);item.appendChild(rm);wrap.appendChild(item)}
 function getDatesFromList(containerId){const inputs=document.getElementById(containerId).querySelectorAll('input[type="date"]');return Array.from(inputs).map(i=>i.value).filter(Boolean).join(',')}
@@ -939,6 +938,7 @@ async function safeRefresh(btn, fn){
   }
 }
 
+function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 </script>
 </body>
 </html>
