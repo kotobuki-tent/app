@@ -40,6 +40,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#d1fae5;color:#065f46}
+@media(max-width:768px){
+  .sub-tabs{padding:10px 10px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs::-webkit-scrollbar{display:none}
+  .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+}
 
 .app{padding-top:48px}
 .hidden{display:none!important}
@@ -200,7 +205,6 @@ tr:hover td{background:rgba(13,148,136,.03)}
   .nav-link{flex-shrink:0;font-size:12px;padding:0 10px}
   .hdr-btn{flex-shrink:0;font-size:11px;padding:0 10px}
 }
-
 
 
 </style>

@@ -31,10 +31,15 @@ if('serviceWorker' in navigator){
 }
 html{font-size:15px}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;padding-bottom:100px}
-.tabs{display:flex;gap:6px;padding:14px 24px;background:#f5f6fa}
-.tab{padding:8px 16px;font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);border:none;background:#f0f1f5;cursor:pointer;border-radius:999px;transition:.15s}
-.tab:hover{color:var(--text);background:#e2e5f0}
-.tab.active{background:#fed7aa;color:#9a3412}
+.sub-tabs{display:flex;gap:6px;padding:14px 24px;background:#f5f6fa}
+.sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
+.sub-tab:hover{color:var(--text);background:#e2e5f0}
+.sub-tab.on{background:#fed7aa;color:#9a3412}
+@media(max-width:768px){
+  .sub-tabs{padding:10px 10px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs::-webkit-scrollbar{display:none}
+  .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+}
 .week-bar{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
 .week-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:var(--radius);font:500 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
 .week-btn:hover{background:var(--surface3)}
@@ -137,9 +142,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   /* ヘッダー：横スクロール */
 
   /* タブ */
-  .tabs{padding:14px 16px}
-  .tab{padding:8px 14px;font-size:13px}
-
+    
   /* 週ナビ：コンパクトに */
   .week-bar{padding:10px 12px;gap:8px}
   .week-btn{padding:10px 12px;font-size:12px;min-height:40px}
@@ -222,9 +225,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <button class="hdr-btn" onclick="safeRefresh(this, refreshData)">↻ 更新</button>
   </div>
 </div>
-<div class="tabs">
-  <button class="tab active" onclick="switchTab('staff')">申告する</button>
-  <button class="tab" onclick="switchTab('admin')">管理</button>
+<div class="sub-tabs">
+  <button class="sub-tab on" onclick="switchTab('staff')">申告する</button>
+  <button class="sub-tab" onclick="switchTab('admin')">管理</button>
 </div>
 <div class="week-bar">
   <button class="week-btn" onclick="changeWeek(-1)">← 先週</button>
@@ -405,8 +408,8 @@ function renderWeekLabel(){const dates=getWeekDates(currentWeekStart);const s=da
 
 function switchTab(tab){
   currentTab=tab;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab')[tab==='staff'?0:1].classList.add('active');
+  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.sub-tab')[tab==='staff'?0:1].classList.add('on');
   document.getElementById('staffView').style.display=tab==='staff'?'':'none';
   document.getElementById('adminView').style.display=tab==='admin'?'':'none';
   render();

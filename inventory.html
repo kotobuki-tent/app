@@ -23,12 +23,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:#f5f6fa;color:#1a1a2e;min-
 
 /* Header - dark navy bar */
 .sub-tabs{display:flex;gap:6px;padding:14px 24px;background:#f5f6fa}
-.sub-tabs .tab{color:#6b7084;background:#f0f1f5;border:none;font-weight:600;padding:8px 16px;border-radius:999px;transition:.15s}
-.sub-tabs .tab:hover{color:#1a1a2e;background:#e2e5f0}
-.sub-tabs .tab.on{background:#e0e7ff;color:#3730a3}
-.tab{background:none;border:1px solid transparent;color:rgba(255,255,255,.6);font:600 13px/1 'Noto Sans JP',sans-serif;padding:7px 16px;border-radius:6px;cursor:pointer;transition:.15s}
-.tab:hover{color:#fff;background:rgba(255,255,255,.08)}
-.tab.on{color:#fff;background:#6366f1;border-color:#6366f1}
+.sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
+.sub-tab:hover{color:var(--text);background:#e2e5f0}
+.sub-tab.on{background:#e0e7ff;color:#3730a3}
+@media(max-width:768px){
+  .sub-tabs{padding:10px 10px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs::-webkit-scrollbar{display:none}
+  .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+}
 
 /* Main */
 .main{padding:16px 24px 40px}
@@ -154,7 +156,6 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 
 
 @media(max-width:640px){
-  .tab{padding:6px 10px;font-size:12px}
   .main{padding:12px 12px 32px}
   .mo{padding:20px 16px;width:98%}
   .mo-row{flex-direction:column}
@@ -185,10 +186,10 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
   </div>
 </div>
 <div class="sub-tabs">
-  <button class="tab on" data-tab="avail" onclick="switchTab('avail')">在庫確認</button>
-  <button class="tab" data-tab="rentals" onclick="switchTab('rentals')">貸出/予約</button>
-  <button class="tab" data-tab="maint" onclick="switchTab('maint')">メンテ</button>
-  <button class="tab" data-tab="items" onclick="switchTab('items')">商品台帳</button>
+  <button class="sub-tab on" data-tab="avail" onclick="switchTab('avail')">在庫確認</button>
+  <button class="sub-tab" data-tab="rentals" onclick="switchTab('rentals')">貸出/予約</button>
+  <button class="sub-tab" data-tab="maint" onclick="switchTab('maint')">メンテ</button>
+  <button class="sub-tab" data-tab="items" onclick="switchTab('items')">商品台帳</button>
 </div>
 
 <div class="main">
@@ -492,7 +493,7 @@ function onProjectSelect(){if($('xf_r_project').value)$('xf_r_client').value=$('
 
 // === Tab ===
 function switchTab(t){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  document.querySelectorAll('.sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
   ['items','rentals','maint','avail'].forEach(v=>$('v_'+v).classList.toggle('hidden',v!==t));
   if(t==='avail')renderAvail();
   if(t==='maint')renderMaint();
