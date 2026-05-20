@@ -53,6 +53,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* Buttons */
 .av-add{background:var(--accent);color:#fff;border:none;padding:9px 18px;border-radius:8px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
 .av-add:hover{opacity:.85}
+.av-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px}
 .act-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:2px 6px}
 .act-btn.del{color:var(--red)}
 .act-btn:hover{text-decoration:underline}
@@ -176,6 +178,8 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
   .mo-row{flex-direction:column}
   .avail-item-name{min-width:100px;font-size:12px}
   .toolbar{flex-direction:column;align-items:flex-start}
+  .av-top{flex-direction:column;align-items:stretch;gap:8px}
+  .av-search{width:100%}
 }
 
 
@@ -211,12 +215,12 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 
   <!-- ===== 商品台帳 ===== -->
   <div id="v_items" class="hidden">
-    <div class="toolbar">
-      <div class="filter-bar">
+    <div class="av-top">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button class="av-add" onclick="openItemMo()">＋ 商品追加</button>
         <select id="flt_cat" onchange="renderItems()"><option value="">全カテゴリ</option></select>
-        <input id="flt_item_q" placeholder="検索..." oninput="itemTableFilter(this.value)">
       </div>
-      <button class="av-add" onclick="openItemMo()">＋ 商品追加</button>
+      <input class="av-search" id="flt_item_q" placeholder="検索..." oninput="itemTableFilter(this.value)">
     </div>
     <div class="tbl-wrap">
       <table>
@@ -229,17 +233,17 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 
   <!-- ===== 貸出/予約 ===== -->
   <div id="v_rentals" class="hidden">
-    <div class="toolbar">
-      <div class="filter-bar">
+    <div class="av-top">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button class="av-add" onclick="openRentalMo()">＋ 貸出/予約登録</button>
         <select id="flt_r_status" onchange="renderRentals()">
           <option value="">全ステータス</option>
           <option>予約</option><option>貸出中</option><option>返却済</option>
           <option>検品中</option><option>メンテ待ち</option><option>メンテ中</option>
         </select>
         <select id="flt_r_cat" onchange="renderRentals()"><option value="">全カテゴリ</option></select>
-        <input id="flt_r_q" placeholder="検索..." oninput="renderRentals()">
       </div>
-      <button class="av-add" onclick="openRentalMo()">＋ 貸出/予約登録</button>
+      <input class="av-search" id="flt_r_q" placeholder="検索..." oninput="renderRentals()">
     </div>
     <div class="tbl-wrap">
       <table>
@@ -252,8 +256,9 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 
   <!-- ===== メンテ ===== -->
   <div id="v_maint" class="hidden">
-    <div class="toolbar" style="margin-bottom:12px">
-      <input id="flt_maint_q" placeholder="検索..." oninput="renderMaint()" style="padding:7px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#333;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px">
+    <div class="av-top">
+      <div></div>
+      <input class="av-search" id="flt_maint_q" placeholder="検索..." oninput="renderMaint()">
     </div>
     <div class="tbl-wrap">
       <table>
@@ -268,13 +273,15 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
     <div class="section">
       <h2>在庫バッティング確認</h2>
       <p class="desc">指定期間中に「予約」「貸出中」の数量を合計し、保有数に対する使用率を表示します。</p>
-      <div class="avail-date-row">
-        <label>開始日</label>
-        <input type="date" id="avail_start" onchange="renderAvail()">
-        <label>終了日</label>
-        <input type="date" id="avail_end" onchange="renderAvail()">
-        <select id="avail_cat" onchange="renderAvail()"><option value="">全カテゴリ</option></select>
-        <input placeholder="検索..." oninput="availFilter(this.value)" style="padding:7px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;color:#333;font:400 13px/1 'Noto Sans JP',sans-serif;width:160px">
+      <div class="av-top">
+        <div class="avail-date-row">
+          <label>開始日</label>
+          <input type="date" id="avail_start" onchange="renderAvail()">
+          <label>終了日</label>
+          <input type="date" id="avail_end" onchange="renderAvail()">
+          <select id="avail_cat" onchange="renderAvail()"><option value="">全カテゴリ</option></select>
+        </div>
+        <input class="av-search" placeholder="検索..." oninput="availFilter(this.value)">
       </div>
       <div id="avail_body"></div>
     </div>
