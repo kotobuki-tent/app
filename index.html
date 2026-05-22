@@ -223,11 +223,12 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .staff-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
   .staff-cell{padding:12px 8px;font-size:13px;min-height:48px}
 
-  /* サマリー：2〜3列grid化 */
-  .fv-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:18px}
-  .fv-si{padding:10px 6px;min-width:0}
-  .fv-si .n{font-size:22px}
-  .fv-si .l{font-size:10px}
+  /* サマリー：文字ピル化（管理タブのフィルターと統一） */
+  .fv-sum{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .fv-si{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;min-width:0;border-radius:999px;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
+  .fv-si .n{font-size:13px;font-weight:700;line-height:1;margin:0;order:2}
+  .fv-si .l{font-size:12px;font-weight:600;line-height:1;margin:0;color:inherit;order:1}
+  .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
 
   /* 工場カード：1列＆内部調整 */
   .fv-cards{grid-template-columns:1fr;gap:10px}
@@ -328,11 +329,6 @@ tr:hover td{background:rgba(59,111,216,.03)}
 
   /* toast 位置調整 */
   }
-
-@media (max-width:420px){
-  .fv-sum{grid-template-columns:repeat(2,1fr)}
-  .fv-si .n{font-size:20px}
-}
 
 
 </style>
