@@ -130,6 +130,20 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .gantt-row-label .prj-assignee{display:block;font-size:12px;color:var(--text-dim);margin:2px 0}
 .prj-meta{font-size:10px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gantt-row-label .prj-status{font-size:10px;font-weight:600;padding:1px 5px;border-radius:4px;display:inline-block;margin-top:2px}
+
+/* モバイル用カード（PCでは非表示） */
+.prj-cards{display:none}
+.prj-card{background:var(--surface);border-radius:12px;padding:14px 16px;border-left:4px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;margin-bottom:10px;transition:.15s}
+.prj-card:active{background:rgba(59,111,216,.06)}
+.prj-card .pc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.prj-card .pc-name{font-weight:700;font-size:15px;line-height:1.4;color:var(--text)}
+.prj-card .pc-status{font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+.prj-card .pc-meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:12px;color:var(--text-dim)}
+.prj-card .pc-person{color:var(--green);background:rgba(42,157,90,.1);font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px}
+.prj-card .pc-eno{color:var(--accent);font-weight:600}
+.prj-card .pc-date{font-size:12px;color:var(--text-dim);margin-top:6px;font-weight:600}
+.prj-cards .prj-group-label{font-size:13px;font-weight:700;color:var(--text-dim);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.prj-cards .prj-group-label:first-child{margin-top:4px}
 .gantt-bars{display:flex;flex:1;position:relative}
 .gantt-bar-cell{flex:1;min-width:44px;border-right:1px solid var(--surface3);position:relative;overflow:hidden;min-height:52px}
 .gantt-bar-cell.today{background:rgba(59,111,216,.04)}
@@ -271,6 +285,13 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .gantt-legend{gap:10px;font-size:11px;margin-top:10px}
   .vehicle-summary{margin-top:16px;padding:12px}
   .vehicle-summary h3{font-size:13px}
+
+  /* スケジュール：ガント→カード切替。週移動・凡例・セクション見出しは隠す */
+  .sched-gantt{display:none}
+  .gantt-controls{display:none}
+  .gantt-legend{display:none}
+  .gantt-section-hd{display:none}
+  .prj-cards{display:block}
 
   /* 管理ビュー上部 */
   .av-top{flex-direction:column;align-items:stretch;gap:8px}
@@ -715,10 +736,10 @@ function renderGantt(){
   h+='</div>';
   // 現場セクション
   h+=`<div class="gantt-section-hd">現場<span class="count">${siteItems.length}件</span></div>`;
-  h+=buildGanttTable(siteItems,dates,'現場データがありません');
+  h+=buildGanttTable(siteItems,dates,'現場データがありません','現場');
   // レンタルセクション
   h+=`<div class="gantt-section-hd">レンタル<span class="count">${rentalItems.length}件</span></div>`;
-  h+=buildGanttTable(rentalItems,dates,'レンタル案件はありません');
+  h+=buildGanttTable(rentalItems,dates,'レンタル案件はありません','レンタル');
   h+='<div class="gantt-legend"><span><span class="dot" style="background:#64b5f6"></span>搬入</span><span><span class="dot" style="background:#81c784"></span>設営</span><span><span class="dot" style="background:#ffb74d"></span>本番</span><span><span class="dot" style="background:#e57373"></span>撤去</span><span><span class="dot" style="background:#ab47bc"></span>貸出</span><span><span class="dot" style="background:#78909c"></span>返却</span><span><span class="dot" style="background:#ce93d8;opacity:.5"></span>貸出中</span></div>';
   // 車両バッティング（両方含めて判定）
   const allForVh=[...siteItems,...rentalItems];
@@ -728,14 +749,16 @@ function renderGantt(){
   let hasV=false;VEHICLES.forEach(v=>{if(Object.keys(usage[v]).length)hasV=true});
   if(hasV){h+='<div class="vehicle-summary"><h3>車両バッティング確認</h3><div class="vh-desc">同じ日に同じ車両を2件以上使う場合、赤く表示されます</div>';if(!hasConflict)h+='<div class="vh-no-conflict">✓ バッティングなし</div>';else{h+='<div class="gantt-wrap" style="margin-top:10px"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd" style="font-size:11px">車両</div><div class="gantt-dates">';h+=ganttDateHeaders(dates);h+='</div></div>';VEHICLES.forEach(v=>{const hasC=Object.values(usage[v]).some(c=>c>=2);if(!hasC)return;h+=`<div class="gantt-row" style="cursor:default"><div class="gantt-row-label"><span class="prj-name">${v}</span></div><div class="gantt-bars">`;dates.forEach(dt=>{const ds=dateStr(dt);const c=usage[v][ds]||0;const isT=dateStr(dt)===dateStr(today);h+=`<div class="gantt-bar-cell${isT?' today':''}" style="display:flex;align-items:center;justify-content:center">`;if(c>=2)h+=`<span style="font-size:12px;font-weight:700;color:#fff;background:var(--red);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center">${c}</span>`;else if(c===1)h+=`<span style="font-size:10px;color:var(--text-faint)">${c}</span>`;h+='</div>'});h+='</div></div>'});h+='</div></div>'}h+='</div>'}
   el.innerHTML=h;el.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.onclick=()=>viewProj(r.dataset.id)});
+  el.querySelectorAll('.prj-card[data-id]').forEach(r=>{r.onclick=()=>viewProj(r.dataset.id)});
 }
 
 // ガント表の構築（現場/レンタル共用）
-function buildGanttTable(items,dates,emptyMsg){
-  let h='<div class="gantt-wrap"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd">現場名</div><div class="gantt-dates">';
+function buildGanttTable(items,dates,emptyMsg,sectionLabel){
+  let h='<div class="gantt-wrap sched-gantt"><div class="gantt"><div class="gantt-header"><div class="gantt-label-hd">現場名</div><div class="gantt-dates">';
   h+=ganttDateHeaders(dates);
   h+='</div></div>';
-  if(!items.length){h+=`<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px">${emptyMsg}</div>`;h+='</div></div>';return h}
+  if(!items.length){h+=`<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px">${emptyMsg}</div>`;h+='</div></div>';}
+  else{
   items.forEach(d=>{
     const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],'レンタル中':['var(--cyan)','var(--cyan-dim)'],完了:['var(--text-dim)','var(--surface3)']};
     const sc=stColors[d.status]||['var(--text-faint)','var(--surface3)'];
@@ -756,9 +779,36 @@ function buildGanttTable(items,dates,emptyMsg){
     h+='</div></div>';
   });
   h+='</div></div>';
+  }
+
+  // モバイル用カード（同じitemsから生成、CSSで出し分け。工期順はitemsの並びを踏襲）
+  h+='<div class="prj-cards">';
+  if(sectionLabel)h+=`<div class="prj-group-label">${esc(sectionLabel)}　${items.length}件</div>`;
+  if(!items.length){h+=`<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px">${emptyMsg}</div>`;}
+  else{
+    items.forEach(d=>{
+      const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],'レンタル中':['var(--cyan)','var(--cyan-dim)'],完了:['var(--text-dim)','var(--surface3)']};
+      const sc=stColors[d.status]||['var(--text-faint)','var(--surface3)'];
+      const allDates=[].concat(parseDates(d.date_load_in),parseDates(d.date_setup),parseDates(d.date_event),parseDates(d.date_teardown),parseDates(d.date_rental_out),parseDates(d.date_rental_return)).filter(Boolean).sort((a,b)=>a-b);
+      const dateRange=allDates.length?`${allDates[0].getMonth()+1}/${allDates[0].getDate()}〜${allDates[allDates.length-1].getMonth()+1}/${allDates[allDates.length-1].getDate()}`:'日程未定';
+      h+=`<div class="prj-card" data-id="${d.id}" style="border-left-color:${sc[0]}">
+        <div class="pc-top">
+          <div class="pc-name">${esc(d.project||'(現場名なし)')}</div>
+          <span class="pc-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span>
+        </div>
+        <div class="pc-meta">
+          ${d.our_person?`<span class="pc-person">${esc(d.our_person)}</span>`:''}
+          ${d.client?`<span>${esc(d.client)}</span>`:''}
+          ${d.order_no?`<span class="pc-eno">${esc(d.order_no)}</span>`:''}
+        </div>
+        <div class="pc-date">${dateRange}</div>
+      </div>`;
+    });
+  }
+  h+='</div>';
   return h;
 }
-function ganttFilter(q){q=q.toLowerCase();document.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
+function ganttFilter(q){q=q.toLowerCase();document.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'});document.querySelectorAll('.prj-card[data-id]').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
 
 // ===== 完了一覧 =====
 function getEndDate(d){

@@ -21,7 +21,7 @@ function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.
 :root{
   --bg:#f5f6fa;--surface:#fff;--surface2:#fafbfc;--surface3:#f0f1f5;
   --text:#1a1d27;--text-dim:#5a6270;--text-faint:#8a92a0;
-  --border:#e0e2e8;--border-light:#ecedf0;
+  --border:#d8dbe3;--border-light:#ecedf0;
   --accent:#06b6d4;--accent-dim:rgba(51,102,255,.1);
   --green:#2a9d5a;--green-dim:rgba(42,157,90,.1);
   --orange:#f59e0b;--orange-dim:rgba(245,158,11,.1);
@@ -67,6 +67,21 @@ table.jobs tr:last-child td{border-bottom:none}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .num strong{font-weight:700;color:var(--text)}
 .mins-hint{color:var(--text-faint);font-size:11px;margin-left:4px}
+
+/* モバイル用カード（PCでは非表示） */
+.job-cards{display:none}
+.job-card{background:var(--surface);border-radius:12px;padding:14px 16px;border-left:4px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;margin-bottom:10px;transition:.15s}
+.job-card:active{background:var(--accent-dim)}
+.job-card .jc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.job-card .jc-name{font-weight:700;font-size:15px;line-height:1.4;color:var(--text)}
+.job-card .jc-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+.job-card .jc-tag{font-size:11px;padding:2px 8px;border-radius:5px;font-weight:600}
+.job-card .jc-tag.eno{color:var(--accent);background:var(--accent-dim)}
+.job-card .jc-tag.dl{color:var(--text-dim);background:var(--surface3)}
+.job-card .jc-foot{display:flex;justify-content:space-between;align-items:baseline;padding-top:8px;border-top:1px solid var(--border-light)}
+.job-card .jc-foot .jc-mins{font-size:18px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.job-card .jc-foot .jc-mins small{font-size:11px;color:var(--text-faint);font-weight:500;margin-left:2px}
+.job-card .jc-foot .jc-ppl{font-size:12px;color:var(--text-dim);font-weight:600}
 
 /* モーダル */
 .mo-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto}
@@ -118,7 +133,8 @@ table.jobs tr:last-child td{border-bottom:none}
 @media (max-width:768px){
   .app{padding:14px 10px}
   .av-search{min-width:auto;width:100%}
-  table.jobs{display:block;overflow-x:auto;white-space:nowrap}
+  table.jobs{display:none}
+  .job-cards{display:block}
 }
 
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
@@ -373,6 +389,28 @@ function renderTable(){
     </tr>`;
   });
   h+='</tbody></table>';
+
+  // モバイル用カード（同じlistから生成、CSSで出し分け）
+  h+='<div class="job-cards">';
+  list.forEach(j=>{
+    const no=j.order_no||j.estimate_no||'';
+    h+=`<div class="job-card" onclick="showDetail('${esc(j.id)}')">
+      <div class="jc-top">
+        <div class="jc-name">${esc(j.project||'(案件名なし)')}</div>
+        <span class="st-badge st-${esc(j.status)}">${esc(j.status)}</span>
+      </div>
+      <div class="jc-meta">
+        ${no?`<span class="jc-tag eno">#${esc(no)}</span>`:''}
+        ${j.deadline?`<span class="jc-tag dl">納期 ${esc(j.deadline)}</span>`:''}
+      </div>
+      <div class="jc-foot">
+        <span class="jc-mins">${fmtMin(j.total_minutes)}<small>延べ工数</small></span>
+        <span class="jc-ppl">${j.people_count||0}人</span>
+      </div>
+    </div>`;
+  });
+  h+='</div>';
+
   $('content').innerHTML=h;
 }
 
