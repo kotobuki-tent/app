@@ -69,9 +69,8 @@ table.jobs tr:last-child td{border-bottom:none}
 .mins-hint{color:var(--text-faint);font-size:11px;margin-left:4px}
 
 /* モバイル用カード（PCでは非表示） */
-table.jobs{display:none}
-.job-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.job-card{background:var(--surface);border-radius:12px;padding:14px 16px;border-left:4px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;transition:.15s}
+.job-cards{display:none}
+.job-card{background:var(--surface);border-radius:12px;padding:14px 16px;border-left:4px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;margin-bottom:10px;transition:.15s}
 .job-card:active{background:var(--accent-dim)}
 .job-card .jc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
 .job-card .jc-name{font-weight:700;font-size:15px;line-height:1.4;color:var(--text)}
