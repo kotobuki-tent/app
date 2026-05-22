@@ -41,7 +41,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .hidden{display:none!important}
 
 .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px}
+.av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px;appearance:none;-webkit-appearance:none;background:var(--surface)}
 .av-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 .fv-sum{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
 .fv-si{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:90px;text-align:center;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
@@ -128,7 +128,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
 
 @media (max-width:768px){
-  .app{padding:14px 10px}
+  .app{padding:12px 10px}
   .av-search{min-width:auto;width:100%}
   table.jobs{display:none}
   .job-cards{display:block}
