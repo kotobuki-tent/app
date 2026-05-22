@@ -60,7 +60,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* Dashboard */
-.dash{padding:16px}
+.dash{padding:25px 16px 16px}
 .dash-date{font-size:14px;color:var(--text-dim);margin-bottom:14px}
 .alert-section{margin-bottom:24px}
 .alert-section-hd{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px;display:flex;align-items:center;gap:8px}
@@ -204,6 +204,10 @@ tr:hover td{background:rgba(13,148,136,.03)}
   .nav-link{flex-shrink:0;font-size:12px;padding:0 11px}
   .hdr-btn{flex-shrink:0;font-size:11px;padding:0 11px;margin-left:8px}
   .hdr::after{content:'';position:absolute;top:0;right:0;width:22px;height:48px;background:linear-gradient(to right,transparent,#fb7185);pointer-events:none;z-index:1}
+
+  /* コンテンツpaddingを他アプリに揃える（左右10px） */
+  .dash{padding:12px 10px}
+  .vlist{padding:12px 10px}
 
   /* === テーブル→カード化（管理ビュー） === */
   #adminView .tbl-wrap{border:none;background:transparent;overflow:visible}
