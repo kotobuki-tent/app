@@ -184,17 +184,14 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .nav-spacer{flex:1}
 .nav-right{display:contents}
 @media(max-width:768px){
-  .nav-right{display:none;position:fixed;top:48px;right:10px;background:#fb7185;border-radius:10px;padding:6px;flex-direction:column;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:999;min-width:160px}
-  .nav-right.open{display:flex}
-  .nav-right .nav-link{padding:10px 14px;border-radius:6px;font-size:14px;text-align:left;background:transparent;color:rgba(74,14,31,.85)}
-  .nav-right .nav-link.on{background:var(--bg,#f5f6fa);color:#1a1d27}
-  .nav-right .nav-link.on::after{display:none}
-  .nav-menu-btn{display:inline-flex;align-items:center;justify-content:center}
-  .nav-spacer{flex:1}
-  .hdr-inner{padding:6px 8px 0 8px;overflow-x:auto;scrollbar-width:none}
+  .nav-spacer{display:none}
+  .nav-right{display:contents}
+  .nav-menu-btn{display:none}
+  .hdr-inner{padding:6px 8px 0 8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   .hdr-inner::-webkit-scrollbar{display:none}
-  .nav-link{flex-shrink:0;font-size:12px;padding:0 10px}
-  .hdr-btn{flex-shrink:0;font-size:11px;padding:0 10px}
+  .nav-link{flex-shrink:0;font-size:12px;padding:0 11px}
+  .hdr-btn{flex-shrink:0;font-size:11px;padding:0 11px;margin-left:8px}
+  .hdr::after{content:'';position:absolute;top:0;right:0;width:22px;height:48px;background:linear-gradient(to right,transparent,#fb7185);pointer-events:none;z-index:1}
 }
 
 
@@ -340,7 +337,6 @@ tr:hover td{background:rgba(59,111,216,.03)}
       <a href="inventory.html" class="nav-link">在庫</a>
       <a href="vehicle.html" class="nav-link">車両</a>
     </div>
-    <button class="nav-menu-btn" onclick="toggleNavMenu()" aria-label="メニュー">≡</button>
     <button class="hdr-btn" onclick="safeRefresh(this, refreshData)">↻ 更新</button>
   </div>
 </div>
@@ -418,48 +414,16 @@ tr:hover td{background:rgba(59,111,216,.03)}
 </div>
 <div class="toast" id="toast"></div>
 <script>
-// モバイル時のみ nav-right を body 直下に移動（祖先のoverflow影響回避）
-(function(){
-  let originalParent=null, originalNextSibling=null;
-  function syncNavRight(){
-    const nr=document.querySelector('.nav-right');
-    if(!nr)return;
-    const isMobile=window.matchMedia('(max-width:768px)').matches;
-    if(isMobile){
-      if(nr.parentElement!==document.body){
-        originalParent=nr.parentElement;
-        originalNextSibling=nr.nextSibling;
-        document.body.appendChild(nr);
-      }
-    } else {
-      if(nr.parentElement===document.body&&originalParent){
-        if(originalNextSibling&&originalNextSibling.parentElement===originalParent){
-          originalParent.insertBefore(nr,originalNextSibling);
-        } else {
-          originalParent.appendChild(nr);
-        }
-      }
-    }
-  }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',syncNavRight);
-  }else{
-    syncNavRight();
-  }
-  window.addEventListener('resize',syncNavRight);
-})();
-function toggleNavMenu(){
-  const el=document.querySelector('.nav-right');
-  if(el)el.classList.toggle('open');
+// モバイル：現在地タブを見える位置へ自動スクロール
+function centerActiveNav(){
+  try{
+    if(window.innerWidth>768)return;
+    const inner=document.querySelector('.hdr-inner');
+    const on=document.querySelector('.hdr-inner .nav-link.on');
+    if(inner&&on)on.scrollIntoView({inline:'center',block:'nearest'});
+  }catch(e){}
 }
-document.addEventListener('click',function(e){
-  const btn=e.target.closest('.nav-menu-btn');
-  const menu=e.target.closest('.nav-right');
-  if(!btn&&!menu){
-    const nr=document.querySelector('.nav-right');
-    if(nr)nr.classList.remove('open');
-  }
-});
+window.addEventListener('load',centerActiveNav);
 
 // ===== sessionStorage キャッシュ helper =====
 function _getCache(key){
