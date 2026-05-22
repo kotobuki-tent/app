@@ -230,6 +230,20 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .st-btn:hover{border-color:var(--accent);color:var(--accent)}
 .st-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);cursor:default}
 
+/* 折りたたみ式ステータス変更（誤タップ防止） */
+.st-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 16px;border-radius:10px;border:2px solid var(--border);background:var(--surface);cursor:pointer;font:600 14px/1 'Noto Sans JP',sans-serif;color:var(--text);transition:.15s}
+.st-toggle:hover{border-color:var(--accent)}
+.st-toggle .st-cur{display:flex;align-items:center;gap:8px}
+.st-toggle .st-cur-badge{display:inline-block;padding:3px 12px;border-radius:6px;font-size:13px;font-weight:700;background:var(--accent);color:#fff}
+.st-toggle .st-caret{color:var(--text-faint);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.st-toggle .st-arrow{display:inline-block;font-size:11px;transition:transform .2s}
+.st-toggle.open .st-arrow{transform:rotate(180deg)}
+.st-opts{display:none;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.st-opts.open{display:grid}
+.st-opt{padding:13px 10px;border-radius:8px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
+.st-opt:hover{border-color:var(--accent);color:var(--accent)}
+.st-opt.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+
 /* ========== スマホ対応 ========== */
 .hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#fb7185;display:flex;align-items:stretch;height:48px;padding:0;gap:0}
 .hdr-inner{display:flex;align-items:stretch;width:100%;padding:6px 8px 0 8px;gap:2px}
@@ -830,11 +844,15 @@ function projSearch(q){$('projAdminView').querySelectorAll('tbody tr').forEach(r
 
 // ===== 現場詳細 =====
 function viewProj(id){const d=projData.find(x=>String(x.id)===String(id));if(!d)return;const fmtDates=s=>{if(!s)return'';return String(s).split(',').map(x=>{const dd=parseD(x.trim());return dd?`${dd.getMonth()+1}/${dd.getDate()}（${dow[dd.getDay()]}）`:''}).filter(Boolean).join('、')};let h='';h+=vr('物件名',d.project);if(d.our_person)h+=vr('担当者',d.our_person);if(d.estimate_no)h+=vr('見積番号',d.estimate_no);if(d.order_no)h+=vr('受注番号',d.order_no);h+=vr('得意先',d.client);h+=vr('窓口',d.person);if(d.venue)h+=vr('会場',d.venue);if(d.address)h+=vr('住所',d.address);h+='<div class="view-section"><h3>日程</h3>';if(d.date_load_in)h+=vr('搬入',fmtDates(d.date_load_in));if(d.date_setup)h+=vr('設営',fmtDates(d.date_setup));if(d.date_event)h+=vr('本番',fmtDates(d.date_event));if(d.date_teardown)h+=vr('撤去',fmtDates(d.date_teardown));if(d.date_rental_out)h+=vr('貸出',fmtDates(d.date_rental_out));if(d.date_rental_return)h+=vr('返却',fmtDates(d.date_rental_return));h+='</div>';if(d.people_load_in||d.people_setup||d.people_event||d.people_teardown){h+='<div class="view-section"><h3>人数（予定）</h3>';if(d.people_load_in)h+=vr('搬入',d.people_load_in+'人');if(d.people_setup)h+=vr('設営',d.people_setup+'人');if(d.people_event)h+=vr('本番',d.people_event+'人');if(d.people_teardown)h+=vr('撤去',d.people_teardown+'人');h+='</div>'}const hasVh=d.vehicles_load_in||d.vehicles_setup||d.vehicles_event||d.vehicles_teardown||d.vehicles_rental_out||d.vehicles_rental_return;if(hasVh){h+='<div class="view-section"><h3>車両</h3>';if(d.vehicles_load_in)h+=vr('搬入',d.vehicles_load_in);if(d.vehicles_setup)h+=vr('設営',d.vehicles_setup);if(d.vehicles_event)h+=vr('本番',d.vehicles_event);if(d.vehicles_teardown)h+=vr('撤去',d.vehicles_teardown);if(d.vehicles_rental_out)h+=vr('貸出',d.vehicles_rental_out);if(d.vehicles_rental_return)h+=vr('返却',d.vehicles_rental_return);h+='</div>'}if(d.rentals)h+='<div class="view-section"><h3>レンタル品（メモ）</h3><div class="view-row"><div class="view-val">'+esc(d.rentals)+'</div></div></div>';const projRentals=rentalsData.filter(r=>r.client_name===d.project);h+='<div class="rental-add-section"><h3>レンタル品</h3>';if(projRentals.length){projRentals.forEach(r=>{const ds=r.date_start?((new Date(r.date_start+'T00:00:00').getMonth()+1)+'/'+new Date(r.date_start+'T00:00:00').getDate()):'';const de=r.date_end?((new Date(r.date_end+'T00:00:00').getMonth()+1)+'/'+new Date(r.date_end+'T00:00:00').getDate()):'';h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+ds+'〜'+de+'　<span style="font-size:11px;padding:2px 6px;border-radius:4px;background:var(--purple-dim);color:var(--purple)">'+esc(r.status)+'</span></span><button class="re-del" onclick="deleteProjectRental(\''+r.id+'\')">削除</button></div>'})}else{h+='<div style="font-size:12px;color:var(--text-faint);margin-bottom:6px">まだ登録されていません</div>'}h+='<div id="rentalAddRows"></div><button class="rental-add-btn" onclick="addRentalRow(\''+esc(d.project)+'\')">＋ レンタル品を追加</button>';h+='<div id="rentalSaveBtnWrap" class="hidden"><button class="rental-save-btn" onclick="saveProjectRentals(\''+esc(d.project)+'\')">まとめて登録</button></div>';h+='</div>';if(d.notes)h+='<div class="view-section"><h3>備考</h3><div class="view-row"><div class="view-val">'+esc(d.notes)+'</div></div></div>';
-  h+='<div class="st-change"><div class="st-change-label">ステータス変更</div><div class="st-change-btns">';
-  ['見積中','受注','準備中','現場中','レンタル中','完了'].forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-btn${on}" data-st="${s}">${s}</button>`});
+  h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
+  h+=`<button class="st-toggle" id="projStToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
+  h+='<div class="st-opts" id="projStOpts">';
+  ['見積中','受注','準備中','現場中','レンタル中','完了'].forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${s}">${s}</button>`});
   h+='</div></div>';
   $('projViewContent').innerHTML=h;
-  $('projViewContent').querySelectorAll('.st-btn').forEach(btn=>{btn.onclick=()=>{const newSt=btn.dataset.st;if(d.status===newSt)return;d.status=newSt;fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');viewProj(id);render()}});
+  const ptgl=$('projStToggle'),popts=$('projStOpts');
+  if(ptgl&&popts)ptgl.onclick=()=>{ptgl.classList.toggle('open');popts.classList.toggle('open')};
+  $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}d.status=newSt;fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');viewProj(id);render()}});
   $('projViewBg').classList.add('show')}
 
 // ===== モーダル操作 =====

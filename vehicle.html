@@ -204,6 +204,32 @@ tr:hover td{background:rgba(13,148,136,.03)}
   .nav-link{flex-shrink:0;font-size:12px;padding:0 11px}
   .hdr-btn{flex-shrink:0;font-size:11px;padding:0 11px;margin-left:8px}
   .hdr::after{content:'';position:absolute;top:0;right:0;width:22px;height:48px;background:linear-gradient(to right,transparent,#fb7185);pointer-events:none;z-index:1}
+
+  /* === テーブル→カード化（管理ビュー） === */
+  #adminView .tbl-wrap{border:none;background:transparent;overflow:visible}
+  #adminView table,#adminView thead,#adminView tbody,#adminView tr,#adminView td{display:block;width:100%}
+  #adminView thead{display:none}
+  #adminView tr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  #adminView td{padding:5px 0;border:none;white-space:normal;font-size:13px;display:flex;align-items:center;gap:8px;text-align:left !important}
+  #adminView td::before{font-size:11px;font-weight:600;color:var(--text-dim);min-width:84px;flex-shrink:0}
+  /* 車両名称（1列目）大きく、ラベル非表示 */
+  #adminView td:nth-of-type(1){font-size:15px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--surface3);margin-bottom:6px;display:block}
+  #adminView td:nth-of-type(1)::before{display:none}
+  /* 列ラベル（車両：車両名称/ナンバー/車種/用途/ステータス/車検満了/自賠責満了/任意保険満了/走行距離/操作） */
+  #adminView td:nth-of-type(2)::before{content:'ナンバー'}
+  #adminView td:nth-of-type(3)::before{content:'車種'}
+  #adminView td:nth-of-type(4)::before{content:'用途'}
+  #adminView td:nth-of-type(5)::before{content:'ステータス'}
+  #adminView td:nth-of-type(6)::before{content:'車検満了'}
+  #adminView td:nth-of-type(7)::before{content:'自賠責満了'}
+  #adminView td:nth-of-type(8)::before{content:'任意保険満了'}
+  #adminView td:nth-of-type(9)::before{content:'走行距離'}
+  #adminView td:nth-of-type(10)::before{content:'操作'}
+  #adminView td:empty{display:none}
+  #adminView td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px;margin-right:4px}
+  #adminView td .act-btn.del{color:var(--red)}
+  #adminView td[colspan]{display:block;text-align:center !important;padding:30px !important}
+  #adminView td[colspan]::before{display:none}
 }
 
 

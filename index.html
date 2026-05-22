@@ -143,6 +143,20 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .st-btn:hover{border-color:var(--accent);color:var(--accent)}
 .st-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);cursor:default}
 
+/* 折りたたみ式ステータス変更（誤タップ防止） */
+.st-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 16px;border-radius:10px;border:2px solid var(--border);background:var(--surface);cursor:pointer;font:600 14px/1 'Noto Sans JP',sans-serif;color:var(--text);transition:.15s}
+.st-toggle:hover{border-color:var(--accent)}
+.st-toggle .st-cur{display:flex;align-items:center;gap:8px}
+.st-toggle .st-cur-badge{display:inline-block;padding:3px 12px;border-radius:6px;font-size:13px;font-weight:700;background:var(--accent);color:#fff}
+.st-toggle .st-caret{color:var(--text-faint);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.st-toggle .st-arrow{display:inline-block;font-size:11px;transition:transform .2s}
+.st-toggle.open .st-arrow{transform:rotate(180deg)}
+.st-opts{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.st-opts.open{display:grid}
+.st-opt{padding:13px 16px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
+.st-opt:hover{border-color:var(--accent);color:var(--accent)}
+.st-opt.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+
 /* ステータスログボタン */
 .slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -753,11 +767,15 @@ function prodSearch(q){$('prodAdmin').querySelectorAll('tbody tr').forEach(r=>{r
 let currentViewId=null;
 let driveFiles=null;
 function viewProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;currentViewId=id;const dl=parseD(d.deadline);const diff=dl?diffDays(dl,today):null;const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?' ⚠ '+Math.abs(diff)+'日超過':' あと'+diff+'日'):''}`:'未定';const st=parseD(d.start_date);const stStr=st?`${st.getMonth()+1}/${st.getDate()}（${dow[st.getDay()]}）`:'';let h='';h+=vr('物件名',d.project);if(d.our_person)h+=vr('担当者',d.our_person);if(d.estimate_no)h+=vr('見積番号',d.estimate_no);if(d.order_no)h+=vr('受注番号',d.order_no);h+=vr('得意先',d.client);h+=vr('窓口',d.person);h+=vr('作業場所',d.section);if(d.subcontractor)h+=vr('外注先',d.subcontractor);if(stStr)h+=vr('作業開始',stStr);h+=vr('納期',dlStr);if(d.notes)h+=vr('備考',d.notes);
-  h+='<div class="st-change"><div class="st-change-label">ステータス変更</div><div class="st-change-btns">';
-  ['受注','製作中','完成','出荷済'].forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-btn${on}" data-st="${s}">${s}</button>`});
+  h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
+  h+=`<button class="st-toggle" id="stToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
+  h+='<div class="st-opts" id="stOpts">';
+  ['受注','製作中','完成','出荷済'].forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${s}">${s}</button>`});
   h+='</div></div>';
   $('prodViewContent').innerHTML=h;
-  $('prodViewContent').querySelectorAll('.st-btn').forEach(btn=>{btn.onclick=()=>{const newSt=btn.dataset.st;if(d.status===newSt)return;d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');viewProd(id);render()}});
+  const tgl=$('stToggle'),opts=$('stOpts');
+  if(tgl&&opts)tgl.onclick=()=>{tgl.classList.toggle('open');opts.classList.toggle('open')};
+  $('prodViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{const newSt=btn.dataset.st;if(d.status===newSt){tgl.classList.remove('open');opts.classList.remove('open');return}d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');viewProd(id);render()}});
   renderLinkedFiles(d);$('prodViewBg').classList.add('show')}
 
 // ===== 製作図ファイル =====
