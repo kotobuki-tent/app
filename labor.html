@@ -43,6 +43,20 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px;appearance:none;-webkit-appearance:none;background:var(--surface)}
 .av-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.fv-date{font-size:14px;color:var(--text-dim)}
+.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap}
+.slog-btn:hover{border-color:var(--accent);color:var(--accent)}
+.slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
+.slog-btn.has-new .dot{display:block}
+.slog-item{padding:12px 14px;border-bottom:1px solid var(--surface3);font-size:13px;line-height:1.6;cursor:pointer;transition:.15s}
+.slog-item:hover{background:var(--accent-dim)}
+.slog-item.sl-del{cursor:default;color:var(--text-dim)}
+.slog-item.sl-del:hover{background:transparent}
+.slog-item.sl-del .sl-st{color:var(--red)}
+.slog-item:last-child{border-bottom:none}
+.slog-item .sl-name{font-weight:600;color:var(--text)}
+.slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
+.empty-msg{padding:30px;text-align:center;color:var(--text-dim);font-size:13px}
 .fv-sum{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
 .fv-si{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:90px;text-align:center;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .fv-si:hover{border-color:var(--accent)}
@@ -185,12 +199,26 @@ table.jobs tr:last-child td{border-bottom:none}
 
 <div class="app">
   <div class="av-top">
-    <span class="count" id="countLabel"></span>
-    <input class="av-search" type="search" id="searchBox" placeholder="検索..." oninput="renderTable()">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="fv-date" id="laborDate"></div>
+      <button class="slog-btn" id="laborSlogBtn" onclick="openSlog()">ステータスログ<span class="dot"></span></button>
+    </div>
+    <input class="av-search" id="searchBox" placeholder="検索..." oninput="renderTable()">
   </div>
 
   <div id="loader" class="loading-overlay"><div class="spin"></div><br>読み込み中...</div>
   <div id="content"></div>
+</div>
+
+<!-- ステータスログモーダル -->
+<div class="mo-bg" id="slogBg">
+<div class="mo" style="max-width:480px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <h2 style="margin:0">ステータスログ</h2>
+  </div>
+  <div id="slogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+  <div class="mo-foot"><button class="cancel" onclick="closeSlog()">閉じる</button></div>
+</div>
 </div>
 
 <!-- 詳細モーダル -->
@@ -280,6 +308,50 @@ async function loadData(){
   renderTable();
 }
 
+// ===== 本日の日付表示 =====
+(function(){
+  const dow='日月火水木金土';
+  const d=new Date();
+  const s=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
+  const set=()=>{const el=$('laborDate');if(el)el.textContent=s;};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',set);else set();
+})();
+
+// ===== ステータスログ（生産が記録したログを共有表示。工数は記録しない） =====
+let slog=[];
+const SLOG_LIST_KEY='prod_status_log';
+const SLOG_UNREAD_KEY='prod_status_unread';
+function loadSlogShared(){
+  try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
+  // 未読バッジ（生産と共有）
+  let unread=0;try{unread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){unread=0}
+  const btn=$('laborSlogBtn');if(btn)btn.classList.toggle('has-new',unread>0);
+}
+function openSlog(){
+  loadSlogShared();
+  const el=$('slogList');
+  if(!slog.length){
+    el.innerHTML='<div class="empty-msg">変更履歴はまだありません</div>';
+  }else{
+    let h='';
+    slog.forEach(e=>{
+      const verb=(e.isNew||e.isDel)?'されました':'になりました';
+      const cls=e.isDel?' sl-del':'';
+      h+=`<div class="slog-item${cls}" data-id="${esc(e.id)}" data-del="${e.isDel?'1':'0'}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> ${verb}</div>`;
+    });
+    el.innerHTML=h;
+    // 工数はステータス変更しないので、クリックで案件の工数内訳を開く
+    el.querySelectorAll('.slog-item').forEach(it=>{
+      if(it.dataset.del==='1')return;
+      it.onclick=()=>{closeSlog();showDetail(it.dataset.id)};
+    });
+  }
+  $('slogBg').classList.add('show');
+}
+function closeSlog(){$('slogBg').classList.remove('show');}
+// 起動時に未読バッジ反映
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadSlogShared);else loadSlogShared();
+
 // アクティブステータス（フィルタチップに出すもの）
 const ACTIVE_ST=['見積中','受注','製作中','完成'];
 let stFilter='';  // 空=すべて
@@ -328,8 +400,6 @@ function renderTable(){
     if(!bd)return -1;
     return bd.localeCompare(ad);  // 降順
   });
-
-  $('countLabel').textContent=list.length+'件';
 
   // フィルタチップHTML（アーカイブビューでは出さない）
   let chipHtml='';
