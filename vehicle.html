@@ -41,7 +41,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#d1fae5;color:#065f46}
+.mobile-date{display:none}
 @media(max-width:768px){
+  .mobile-date{display:block;padding:10px 10px 0;font-size:14px;color:var(--text-dim);font-weight:500}
+  .fv-date,.slog-btn,.staff-btn{display:none!important}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
@@ -262,6 +265,8 @@ tr:hover td{background:rgba(13,148,136,.03)}
     <button class="sub-tab" data-view="admin">管理</button>
     <button class="sub-tab" data-view="settings">アラート設定</button>
   </div>
+
+<div class="mobile-date" id="mobileDate"></div>
 
 <div class="app"><div id="loadingEl" class="loading-overlay"><div class="spin"></div><br>読み込み中...</div>
   <div id="dashView" class="dash hidden"></div>
@@ -805,6 +810,9 @@ async function safeRefresh(btn, fn){
 }
 
 function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
+
+// モバイル：サブタブ直下の固定日付バーに本日日付をセット
+window.addEventListener('load',function(){var el=document.getElementById('mobileDate');if(el){var d=new Date();var w='日月火水木金土';el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';}});
 </script>
 </body>
 </html>
