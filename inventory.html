@@ -49,6 +49,13 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;background:var(--
 .slog-item:last-child{border-bottom:none}
 .slog-item .sl-name{font-weight:600;color:var(--text)}
 .slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
+/* ステータスフィルタチップ */
+.fv-sum{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.fv-si{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:90px;text-align:center;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.fv-si:hover{border-color:var(--accent)}
+.fv-si.on{border-color:var(--accent);background:var(--accent-dim)}
+.fv-si .n{font-size:26px;font-weight:900;line-height:1.1}
+.fv-si .l{font-size:11px;color:var(--text-dim);margin-top:2px}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s;min-width:123px;text-align:center}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#e0e7ff;color:#3730a3}
@@ -62,6 +69,11 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;background:var(--
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .fv-sum{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .fv-si{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;min-width:0;border-radius:999px;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
+  .fv-si .n{font-size:13px;font-weight:700;line-height:1;margin:0;order:2}
+  .fv-si .l{font-size:12px;font-weight:600;line-height:1;margin:0;color:inherit;order:1}
+  .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
 @media(max-width:768px){
@@ -261,15 +273,11 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
     <div class="av-top">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <button class="av-add" onclick="openRentalMo()">＋ 貸出/予約登録</button>
-        <select id="flt_r_status" onchange="renderRentals()">
-          <option value="">全ステータス</option>
-          <option>予約</option><option>貸出中</option><option>返却済</option>
-          <option>検品中</option><option>メンテ待ち</option><option>メンテ中</option>
-        </select>
         <select id="flt_r_cat" onchange="renderRentals()"><option value="">全カテゴリ</option></select>
       </div>
       
     </div>
+    <div class="fv-sum" id="rentalChips"></div>
     <div class="tbl-wrap">
       <table>
         <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
@@ -681,10 +689,24 @@ function renderMaint(){
 }
 
 // ==================== 貸出/予約 ====================
+let rentalStatusFilter='';
+const RENTAL_ST=['予約','貸出中','返却済','検品中','メンテ待ち','メンテ中'];
 function renderRentals(){
-  const st=$('flt_r_status').value;const cat=$('flt_r_cat').value;
+  const cat=$('flt_r_cat').value;
+  // ステータスチップ生成（件数つき）
+  const chipEl=$('rentalChips');
+  if(chipEl){
+    const catFiltered=cat?rentals.filter(r=>r.category===cat):rentals;
+    const cnt={};RENTAL_ST.forEach(s=>cnt[s]=0);
+    catFiltered.forEach(r=>{if(cnt[r.status]!==undefined)cnt[r.status]++});
+    let ch=`<div class="fv-si${rentalStatusFilter===''?' on':''}" onclick="rentalStatusFilter='';renderRentals()"><div class="n">${catFiltered.length}</div><div class="l">すべて</div></div>`;
+    RENTAL_ST.forEach(s=>{
+      ch+=`<div class="fv-si${rentalStatusFilter===s?' on':''}" onclick="rentalStatusFilter='${s}';renderRentals()"><div class="n">${cnt[s]||0}</div><div class="l">${s}</div></div>`;
+    });
+    chipEl.innerHTML=ch;
+  }
   const f=rentals.filter(r=>{
-    if(st&&r.status!==st)return false;
+    if(rentalStatusFilter&&r.status!==rentalStatusFilter)return false;
     if(cat&&r.category!==cat)return false;
     return true;
   });
