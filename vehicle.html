@@ -40,6 +40,19 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa;align-items:center}
 .subtab-date{font-size:14px;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
 .subtab-search{margin-left:auto;padding:7px 14px;border:1px solid var(--border);border-radius:999px;font:400 13px/1 'Noto Sans JP',sans-serif;width:200px;appearance:none;-webkit-appearance:none;background:var(--surface);flex-shrink:0}
+.slog-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap;flex-shrink:0}
+.slog-btn:hover{border-color:var(--accent);color:var(--accent)}
+.slog-btn+.subtab-search{margin-left:8px}
+.slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
+.slog-btn.has-new .dot{display:block}
+.slog-item{padding:12px 14px;border-bottom:1px solid var(--surface3);font-size:13px;line-height:1.6;cursor:pointer;transition:.15s}
+.slog-item:hover{background:var(--accent-dim)}
+.slog-item.sl-del{cursor:default;color:var(--text-dim)}
+.slog-item.sl-del:hover{background:transparent}
+.slog-item.sl-del .sl-st{color:var(--red)}
+.slog-item:last-child{border-bottom:none}
+.slog-item .sl-name{font-weight:600;color:var(--text)}
+.slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s;min-width:123px;text-align:center}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#d1fae5;color:#065f46}
@@ -270,6 +283,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
     <button class="sub-tab on" data-view="dash">ダッシュボード</button>
     <button class="sub-tab" data-view="admin">管理</button>
     <button class="sub-tab" data-view="settings">アラート設定</button>
+    <button class="slog-btn" id="vSlogBtn" onclick="openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="pcSearch" placeholder="検索..." oninput="unifiedSearch(this.value)">
   </div>
 
@@ -355,6 +369,17 @@ tr:hover td{background:rgba(13,148,136,.03)}
 </div>
 </div>
 
+<div class="mo-bg" id="slogBg">
+<div class="mo" style="max-width:560px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <h2 style="margin:0">ステータスログ</h2>
+    <button class="act-btn del" style="font-size:12px" onclick="clearSlog()">クリア</button>
+  </div>
+  <div id="slogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+  <div class="mo-foot"><button class="cancel" onclick="closeSlog()">閉じる</button></div>
+</div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -405,6 +430,70 @@ function fireAndForget(body){
   fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)});
 }
 
+// ===== ステータスログ =====
+const VLOG_KEY='vehicle_status_snapshot';
+const VLOG_LIST_KEY='vehicle_status_log';
+const VLOG_UNREAD_KEY='vehicle_status_unread';
+let vslog=[];
+let vslogUnread=0;
+function _vesc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function detectVehicleChanges(){
+  const curr={};
+  vehicleData.forEach(v=>{if(v.id&&String(v.id).indexOf('tmp_')!==0)curr[String(v.id)]={status:v.status||'稼働中',name:v.name||''}});
+  try{vslog=JSON.parse(localStorage.getItem(VLOG_LIST_KEY)||'[]')}catch(e){vslog=[]}
+  try{vslogUnread=parseInt(localStorage.getItem(VLOG_UNREAD_KEY)||'0',10)||0}catch(e){vslogUnread=0}
+  let prev=null;
+  try{prev=JSON.parse(localStorage.getItem(VLOG_KEY)||'null')}catch(e){prev=null}
+  if(!prev){localStorage.setItem(VLOG_KEY,JSON.stringify(curr));return}
+  const newEntries=[];
+  Object.keys(curr).forEach(id=>{
+    if(!prev[id]){newEntries.push({id,name:curr[id].name,from:'',to:'新規登録',ts:Date.now(),isNew:true})}
+    else if(prev[id].status!==curr[id].status){newEntries.push({id,name:curr[id].name,from:prev[id].status,to:curr[id].status,ts:Date.now()})}
+  });
+  Object.keys(prev).forEach(id=>{
+    if(!curr[id]){newEntries.push({id,name:prev[id].name,from:prev[id].status,to:'削除',ts:Date.now(),isDel:true})}
+  });
+  if(newEntries.length){
+    vslog=[...newEntries,...vslog].slice(0,20);
+    vslogUnread=Math.min(vslogUnread+newEntries.length,20);
+    localStorage.setItem(VLOG_LIST_KEY,JSON.stringify(vslog));
+    localStorage.setItem(VLOG_UNREAD_KEY,String(vslogUnread));
+  }
+  localStorage.setItem(VLOG_KEY,JSON.stringify(curr));
+}
+function updateSlogBtn(){
+  const btn=$('vSlogBtn');if(!btn)return;
+  btn.classList.toggle('has-new',vslogUnread>0);
+}
+function openSlog(){
+  const el=$('slogList');
+  if(!vslog.length){el.innerHTML='<div class="empty-msg" style="padding:20px;text-align:center;color:var(--text-faint)">変更履歴はまだありません</div>'}
+  else{
+    let h='';
+    vslog.forEach(e=>{
+      const verb=(e.isNew||e.isDel)?'されました':'になりました';
+      const cls=e.isDel?' sl-del':'';
+      h+=`<div class="slog-item${cls}" data-id="${_vesc(e.id)}" data-del="${e.isDel?'1':'0'}"><span class="sl-name">${_vesc(e.name)}</span> が <span class="sl-st">${_vesc(e.to)}</span> ${verb}</div>`;
+    });
+    el.innerHTML=h;
+    el.querySelectorAll('.slog-item').forEach(it=>{
+      if(it.dataset.del==='1')return;
+      it.onclick=()=>{closeSlog();viewVehicle(it.dataset.id)};
+    });
+  }
+  vslogUnread=0;localStorage.setItem(VLOG_UNREAD_KEY,'0');updateSlogBtn();
+  $('slogBg').classList.add('show');
+}
+function closeSlog(){$('slogBg').classList.remove('show')}
+function clearSlog(){
+  if(!vslog.length)return;
+  if(!confirm('ログをすべて削除しますか？'))return;
+  vslog=[];vslogUnread=0;
+  localStorage.setItem(VLOG_LIST_KEY,'[]');localStorage.setItem(VLOG_UNREAD_KEY,'0');
+  $('slogList').innerHTML='<div class="empty-msg" style="padding:20px;text-align:center;color:var(--text-faint)">変更履歴はまだありません</div>';
+  updateSlogBtn();
+}
+
 // ===== データ読み込み =====
 async function loadAll(){
   // キャッシュから即復元
@@ -412,6 +501,8 @@ async function loadAll(){
   if(cached&&cached.data){
     vehicleData=cached.data;
     $('loadingEl').classList.add('hidden');
+    detectVehicleChanges();
+    updateSlogBtn();
     render();
   }
   // 裏で最新取得
@@ -431,6 +522,8 @@ async function loadAll(){
   }
   $('loadingEl').classList.add('hidden');
   _setCache('vehicle',{data:vehicleData});
+  detectVehicleChanges();
+  updateSlogBtn();
   render();
 }
 
