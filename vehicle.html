@@ -53,6 +53,19 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .slog-item:last-child{border-bottom:none}
 .slog-item .sl-name{font-weight:600;color:var(--text)}
 .slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
+/* 折りたたみ式ステータス変更（誤タップ防止） */
+.st-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 16px;border-radius:10px;border:2px solid var(--border);background:var(--surface);cursor:pointer;font:600 14px/1 'Noto Sans JP',sans-serif;color:var(--text);transition:.15s}
+.st-toggle:hover{border-color:var(--accent)}
+.st-toggle .st-cur{display:flex;align-items:center;gap:8px}
+.st-toggle .st-cur-badge{display:inline-block;padding:3px 12px;border-radius:6px;font-size:13px;font-weight:700;background:var(--accent);color:#fff}
+.st-toggle .st-caret{color:var(--text-faint);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.st-toggle .st-arrow{display:inline-block;font-size:11px;transition:transform .2s}
+.st-toggle.open .st-arrow{transform:rotate(180deg)}
+.st-opts{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.st-opts.open{display:grid}
+.st-opt{padding:13px 16px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
+.st-opt:hover{border-color:var(--accent);color:var(--accent)}
+.st-opt.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s;min-width:123px;text-align:center}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#d1fae5;color:#065f46}
@@ -364,7 +377,6 @@ tr:hover td{background:rgba(13,148,136,.03)}
   </div>
   <div class="mo-foot" style="margin-top:16px">
     <button class="cancel" onclick="closeVView()">閉じる</button>
-    <button class="save" onclick="editFromView()" style="background:var(--accent)">編集</button>
   </div>
 </div>
 </div>
@@ -696,7 +708,12 @@ function viewVehicle(id){
   h+=vr('ナンバー',esc(v.plate));
   h+=vr('車種',esc(v.type));
   h+=vr('用途',esc(v.usage));
-  h+=vr('ステータス',`<span class="v-status ${esc(v.status||'稼働中')}" style="font-size:12px">${esc(v.status||'稼働中')}</span>`);
+  // ステータス変更（折りたたみ式）
+  h+='<div class="view-row" style="display:block"><div class="vr-label" style="margin-bottom:8px">ステータス</div>';
+  h+=`<button class="st-toggle" id="stToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(v.status||'稼働中')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
+  h+='<div class="st-opts" id="stOpts">';
+  ['稼働中','整備中','休車'].forEach(s=>{const on=(v.status||'稼働中')===s?' on':'';h+=`<button class="st-opt${on}" data-st="${s}">${s}</button>`});
+  h+='</div></div>';
   h+=vr('走行距離',fmtKm(v.current_km));
   // 期限系（残日数つき）
   const dateFmt=(label,dateStr,thDays)=>{
@@ -717,6 +734,21 @@ function viewVehicle(id){
   h+=vr('最終タイヤ交換',v.tire_last?dateJP(v.tire_last):'');
   if(v.notes)h+=vr('備考',esc(v.notes));
   $('vViewContent').innerHTML=h;
+
+  // ステータス変更ハンドラ（折りたたみ式）
+  const tgl=$('stToggle'),opts=$('stOpts');
+  if(tgl&&opts)tgl.onclick=()=>{tgl.classList.toggle('open');opts.classList.toggle('open')};
+  $('vViewContent').querySelectorAll('.st-opt').forEach(btn=>{
+    btn.onclick=()=>{
+      const newSt=btn.dataset.st;
+      if((v.status||'稼働中')===newSt){tgl.classList.remove('open');opts.classList.remove('open');return}
+      v.status=newSt;
+      fireAndForget({action:'save',id:v.id,status:newSt});
+      toast(newSt+'に変更しました');
+      detectVehicleChanges();updateSlogBtn();
+      viewVehicle(id);render();
+    };
+  });
 
   // メンテ履歴
   renderMaintList(v);
@@ -771,9 +803,11 @@ function delMaintEntry(idx){
 }
 
 function editFromView(){
+  const id=currentViewId;
   closeVView();
-  editVehicle(currentViewId);
+  editVehicle(id);
 }
+
 function closeVView(){$('vViewBg').classList.remove('show');currentViewId=null}
 
 // ===== モーダル =====
