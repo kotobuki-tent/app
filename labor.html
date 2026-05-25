@@ -354,6 +354,9 @@ function openSlog(){
     });
   }
   $('slogBg').classList.add('show');
+  // 既読化（生産と共有の未読数を0に、赤丸を消す）
+  try{localStorage.setItem(SLOG_UNREAD_KEY,'0')}catch(e){}
+  const sb=$('laborSlogBtn');if(sb)sb.classList.remove('has-new');
 }
 function closeSlog(){$('slogBg').classList.remove('show');}
 // 起動時に未読バッジ反映
