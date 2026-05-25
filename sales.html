@@ -91,7 +91,8 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px;appearance:none;-webkit-appearance:none;background:var(--surface)}
 
 /* ステータスログボタン */
-.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap}
+.slog-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap;flex-shrink:0}
+.slog-btn+.subtab-search{margin-left:8px}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
 .slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
 .slog-btn.has-new .dot{display:block}
@@ -304,6 +305,7 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
     <button class="sub-tab on" data-view="board" onclick="setView('board')">一覧</button>
     <button class="sub-tab" data-view="archive" onclick="setView('archive')">完了</button>
     <button class="sub-tab" data-view="admin" onclick="setView('admin')">管理</button>
+    <button class="slog-btn" id="salesSlogBtn" onclick="openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="pcSearch" placeholder="検索..." oninput="unifiedSearch(this.value)">
   </div>
 
@@ -428,6 +430,7 @@ function detectStatusChanges(){
   allEntries.forEach(d=>{if(d.id&&String(d.id).indexOf('tmp_')!==0)curr[String(d.id)]={status:d.status||'',project:d.project||''}});
   try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
   try{slogUnread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){slogUnread=0}
+  updateSlogBtn();
   let prev=null;
   try{prev=JSON.parse(localStorage.getItem(SLOG_KEY)||'null')}catch(e){prev=null}
   if(!prev){localStorage.setItem(SLOG_KEY,JSON.stringify(curr));return}
@@ -449,10 +452,12 @@ function detectStatusChanges(){
     slogUnread=Math.min(slogUnread+newEntries.length,20);
     localStorage.setItem(SLOG_LIST_KEY,JSON.stringify(slog));
     localStorage.setItem(SLOG_UNREAD_KEY,String(slogUnread));
+    updateSlogBtn();
   }
   localStorage.setItem(SLOG_KEY,JSON.stringify(curr));
 }
 
+function updateSlogBtn(){const b=document.getElementById('salesSlogBtn');if(b)b.classList.toggle('has-new',slogUnread>0);}
 function openSlog(){
   const el=$('slogList');
   if(!slog.length){
@@ -471,6 +476,7 @@ function openSlog(){
     });
   }
   slogUnread=0;
+  updateSlogBtn();
   localStorage.setItem(SLOG_UNREAD_KEY,'0');
   $('slogBg').classList.add('show');
   if(currentView==='board')renderBoard();
@@ -487,6 +493,7 @@ function clearSlog(){
   slogUnread=0;
   localStorage.setItem(SLOG_LIST_KEY,'[]');
   localStorage.setItem(SLOG_UNREAD_KEY,'0');
+  updateSlogBtn();
   $('slogList').innerHTML='<div class="empty-msg">変更履歴はまだありません</div>';
   if(currentView==='board')renderBoard();
 }
@@ -591,7 +598,7 @@ function renderBoard(){
   items.forEach(e=>{if(cnt[e.status]!==undefined)cnt[e.status]++});
   const total=items.length;
   const filtered=boardFilter?items.filter(e=>e.status===boardFilter):items;
-  let h=`<div class="av-top"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div class="fv-date">${dateStr}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div></div>`;
+  let h='';
   h+='<div class="fv-sum">';
   h+=`<div class="fv-si${boardFilter===null?' on':''}" onclick="setBoardFilter(null)"><div class="n">${total}</div><div class="l">すべて</div></div>`;
   ACTIVE_ST.forEach(s=>{

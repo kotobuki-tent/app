@@ -170,7 +170,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .st-opt.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 
 /* ステータスログボタン */
-.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap}
+.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap;flex-shrink:0}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
 .slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
 .slog-btn.has-new .dot{display:block}
@@ -184,7 +184,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
 
 /* STAFFボタンと出勤モーダル */
-.staff-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap}
+.staff-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
+.staff-btn+.slog-btn{margin-left:8px}
+.slog-btn+.subtab-search{margin-left:8px}
 .staff-btn:hover{border-color:var(--accent);color:var(--accent)}
 .staff-btn .count{font-weight:700;color:var(--text);margin-left:4px}
 .staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:4px}
@@ -361,6 +363,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
     <button class="sub-tab on" data-view="factory">工場ボード</button>
     <button class="sub-tab" data-view="archive">出荷済</button>
     <button class="sub-tab" data-view="admin">管理</button>
+    <button class="staff-btn" id="prodStaffBtn" onclick="openStaff()">STAFF <span class="count">-</span></button>
+    <button class="slog-btn" id="prodSlogBtn" onclick="openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="pcSearch" placeholder="検索..." oninput="unifiedSearch(this.value)">
   </div>
 
@@ -552,6 +556,9 @@ function detectStatusChanges(){
   localStorage.setItem(SLOG_KEY,JSON.stringify(curr));
 }
 
+// ===== サブタブ行ボタンの更新 =====
+function updateSlogBtn(){const b=$('prodSlogBtn');if(b)b.classList.toggle('has-new',slogUnread>0)}
+
 // ===== ステータスログモーダル =====
 function openSlog(){
   const el=$('slogList');
@@ -671,6 +678,7 @@ function render(){
   if(curProdView==='factory'){$('prodFactory').classList.remove('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.add('hidden');renderFactory()}
   else if(curProdView==='admin'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.remove('hidden');$('prodArchive').classList.add('hidden');renderProdAdmin()}
   else if(curProdView==='archive'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.remove('hidden');renderArchive()}
+  updateSlogBtn();updateStaffBtnCount();
 }
 
 // ===== 工場ボード =====
@@ -683,7 +691,7 @@ function renderFactory(){
   let filtered=items;
   if(prodFilter){if(['製作中','完成','受注'].includes(prodFilter))filtered=items.filter(d=>d.status===prodFilter);else if(['2F工場','1F工場','出力関係','外注','未定','その他'].includes(prodFilter))filtered=items.filter(d=>d.section===prodFilter);else if(prodFilter==='urgent')filtered=items.filter(d=>d._urgN<=0);else if(prodFilter==='thisweek')filtered=items.filter(d=>d._urgN===1)}
   const si=(f,n,l,color)=>{const on=prodFilter===f?' on':'';return`<div class="fv-si${on}" data-f="${f}" style="${color?'color:'+color:''}"><div class="n">${n}</div><div class="l">${l}</div></div>`};
-  let h=`<div class="av-top"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div class="fv-date">${dateJP(today)}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button><button class="staff-btn" onclick="openStaff()">STAFF <span class="count">${staffCount().present}/${staffCount().total}</span></button></div></div><div class="fv-sum">`;
+  let h=`<div class="fv-sum">`;
   h+=si('all',items.length,'すべて','');
   h+=si('urgent',items.filter(d=>d._urgN<=0).length,'納期迫る','var(--red)');
   h+=si('thisweek',items.filter(d=>d._urgN===1).length,'今週中','var(--orange)');

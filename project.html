@@ -222,7 +222,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .rental-existing .re-del:hover{text-decoration:underline}
 
 /* ステータスログボタン */
-.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap}
+.slog-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap;flex-shrink:0}
+.slog-btn+.subtab-search{margin-left:8px}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
 .slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
 .slog-btn.has-new .dot{display:block}
@@ -460,6 +461,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
     <button class="sub-tab on" data-view="gantt">スケジュール</button>
     <button class="sub-tab" data-view="projDone">完了</button>
     <button class="sub-tab" data-view="projAdmin">管理</button>
+    <button class="slog-btn" id="projSlogBtn" onclick="openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="pcSearch" placeholder="検索..." oninput="unifiedSearch(this.value)">
   </div>
 
@@ -639,6 +641,7 @@ function detectStatusChanges(){
   projData.forEach(d=>{if(d.id&&String(d.id).indexOf('tmp_')!==0)curr[String(d.id)]={status:d.status||'',project:d.project||''}});
   try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
   try{slogUnread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){slogUnread=0}
+  updateSlogBtn();
   let prev=null;
   try{prev=JSON.parse(localStorage.getItem(SLOG_KEY)||'null')}catch(e){prev=null}
   if(!prev){localStorage.setItem(SLOG_KEY,JSON.stringify(curr));return}
@@ -660,11 +663,13 @@ function detectStatusChanges(){
     slogUnread=Math.min(slogUnread+newEntries.length,20);
     localStorage.setItem(SLOG_LIST_KEY,JSON.stringify(slog));
     localStorage.setItem(SLOG_UNREAD_KEY,String(slogUnread));
+    updateSlogBtn();
   }
   localStorage.setItem(SLOG_KEY,JSON.stringify(curr));
 }
 
 // ===== ステータスログモーダル =====
+function updateSlogBtn(){const b=document.getElementById('projSlogBtn');if(b)b.classList.toggle('has-new',slogUnread>0);}
 function openSlog(){
   const el=$('slogList');
   if(!slog.length){
@@ -683,6 +688,7 @@ function openSlog(){
     });
   }
   slogUnread=0;
+  updateSlogBtn();
   localStorage.setItem(SLOG_UNREAD_KEY,'0');
   $('slogBg').classList.add('show');
   if(curProjView==='gantt')renderGantt();
@@ -697,6 +703,7 @@ function clearSlog(){
   slogUnread=0;
   localStorage.setItem(SLOG_LIST_KEY,'[]');
   localStorage.setItem(SLOG_UNREAD_KEY,'0');
+  updateSlogBtn();
   $('slogList').innerHTML='<div class="empty-msg">変更履歴はまだありません</div>';
   if(curProjView==='gantt')renderGantt();
 }
@@ -722,7 +729,7 @@ function renderGantt(){
   const rentalItems=allItems.filter(d=>d.type==='レンタル').sort(sortFn);
   const dates=[];for(let i=0;i<ganttDays;i++){const d=new Date(ganttStart);d.setDate(d.getDate()+i);dates.push(d)}
   const todayStr=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
-  let h=`<div class="av-top"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div class="fv-date" style="font-size:14px;color:var(--text-dim)">${todayStr}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div></div>`;
+  let h='';
   h+='<div class="gantt-controls"><div class="gantt-nav"><button onclick="ganttMove(-7)">← 1週</button><button onclick="ganttToday()">今日</button><button onclick="ganttMove(7)">1週 →</button></div>';
   h+=`<select onchange="ganttDays=+this.value;render()"><option value="14"${ganttDays===14?' selected':''}>2週間</option><option value="21"${ganttDays===21?' selected':''}>3週間</option><option value="28"${ganttDays===28?' selected':''}>4週間</option><option value="42"${ganttDays===42?' selected':''}>6週間</option></select>`;
   h+=`</div>`;

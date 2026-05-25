@@ -45,7 +45,8 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px;appearance:none;-webkit-appearance:none;background:var(--surface)}
 .av-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 .fv-date{display:none}
-.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap}
+.slog-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap;flex-shrink:0}
+.slog-btn+.subtab-search{margin-left:8px}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
 .slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
 .slog-btn.has-new .dot{display:block}
@@ -203,19 +204,14 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="pcDate"></span>
     <button class="sub-tab on" data-view="active" onclick="setView('active')">工場ボード</button>
     <button class="sub-tab" data-view="archive" onclick="setView('archive')">出荷済</button>
+    <button class="slog-btn" id="laborSlogBtn" onclick="openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="searchBox" placeholder="検索..." oninput="renderTable()">
   </div>
 
 <div class="mobile-date" id="mobileDate"></div>
 
 <div class="app">
-  <div class="av-top">
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <div class="fv-date" id="laborDate"></div>
-      <button class="slog-btn" id="laborSlogBtn" onclick="openSlog()">ステータスログ<span class="dot"></span></button>
-    </div>
-    
-  </div>
+
 
   <div id="loader" class="loading-overlay"><div class="spin"></div><br>読み込み中...</div>
   <div id="content"></div>
