@@ -85,7 +85,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
-  .fv-sum{display:flex !important;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .fv-sum{display:none !important}
   .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none !important;text-align:left}
   .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
   .fv-si .l{font-size:12px !important;font-weight:600;line-height:1;margin:0 !important;color:inherit;order:1}
@@ -127,7 +127,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 /* Summary bar */
 .summary-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.sum-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:100px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.sum-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:90px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;transition:.15s}
+.sum-item:hover{border-color:var(--accent)}
+.sum-item.on{border-color:var(--accent);background:var(--accent-dim)}
 .sum-item .n{font-size:26px;font-weight:900;line-height:1.1}
 .sum-item .l{font-size:11px;color:var(--text-dim);margin-top:2px}
 .sum-item.danger .n{color:var(--red)}
@@ -436,6 +438,7 @@ let vehicleData=[];
 let curView='dash';
 let adminSort={col:null,asc:true};
 let adminStatusFilter=null;
+let dashFilter='';
 let currentViewId=null;
 
 // アラート閾値（日数）— ローカルストレージに保存
@@ -610,10 +613,10 @@ function renderDash(){
 
   let h=`<div class="dash-date">${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）</div>`;
   h+=`<div class="summary-bar">`;
-  h+=`<div class="sum-item"><div class="n">${vehicleData.length}</div><div class="l">全車両</div></div>`;
-  h+=`<div class="sum-item ok"><div class="n">${activeCount}</div><div class="l">稼働中</div></div>`;
-  h+=`<div class="sum-item danger"><div class="n">${dangerCount}</div><div class="l">要対応</div></div>`;
-  h+=`<div class="sum-item warn"><div class="n">${warnCount}</div><div class="l">注意</div></div>`;
+  h+=`<div class="sum-item${dashFilter===''?' on':''}" data-df=""><div class="n">${vehicleData.length}</div><div class="l">全車両</div></div>`;
+  h+=`<div class="sum-item ok${dashFilter==='active'?' on':''}" data-df="active"><div class="n">${activeCount}</div><div class="l">稼働中</div></div>`;
+  h+=`<div class="sum-item danger${dashFilter==='danger'?' on':''}" data-df="danger"><div class="n">${dangerCount}</div><div class="l">要対応</div></div>`;
+  h+=`<div class="sum-item warn${dashFilter==='warn'?' on':''}" data-df="warn"><div class="n">${warnCount}</div><div class="l">注意</div></div>`;
   h+=`</div>`;
 
   if(!alerts.length){
@@ -643,8 +646,15 @@ function renderDash(){
   if(vehicleData.length){
     const th=getThresholds();
     const dateLevel=(diff,thDays)=>{if(diff===null)return'';if(diff<0)return'danger';if(diff<=14)return'danger';if(diff<=thDays)return'warn';return'ok'};
-    h+=`<div class="alert-section"><div class="alert-section-hd">車両一覧　${vehicleData.length}件</div><div class="vlist-grid">`;
-    vehicleData.forEach(v=>{
+    // dashFilterで絞り込み
+    const dangerIds=new Set(alerts.filter(a=>a.level==='danger').map(a=>String(a.vehicle.id)));
+    const warnIds=new Set(alerts.filter(a=>a.level==='warn').map(a=>String(a.vehicle.id)));
+    let vlist=vehicleData;
+    if(dashFilter==='active')vlist=vehicleData.filter(v=>(v.status||'稼働中')==='稼働中');
+    else if(dashFilter==='danger')vlist=vehicleData.filter(v=>dangerIds.has(String(v.id)));
+    else if(dashFilter==='warn')vlist=vehicleData.filter(v=>warnIds.has(String(v.id)));
+    h+=`<div class="alert-section"><div class="alert-section-hd">車両一覧　${vlist.length}件</div><div class="vlist-grid">`;
+    vlist.forEach(v=>{
       const shakenDiff=diffDays(v.shaken_date);
       const jiDiff=diffDays(v.jibaiseki_date);
       const hokenDiff=diffDays(v.hoken_date);
@@ -662,6 +672,7 @@ function renderDash(){
   }
 
   el.innerHTML=h;
+  el.querySelectorAll('.sum-item[data-df]').forEach(s=>{s.onclick=()=>{dashFilter=s.dataset.df||'';renderDash()}});
   el.querySelectorAll('.alert-card').forEach(c=>{c.onclick=()=>viewVehicle(c.dataset.id)});
   el.querySelectorAll('.v-card').forEach(c=>{c.onclick=()=>viewVehicle(c.dataset.id)});
 }
