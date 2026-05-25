@@ -32,13 +32,16 @@ if('serviceWorker' in navigator){
 html{font-size:15px;scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px}
 .empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
-.sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
+.sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa;align-items:center}
+.subtab-date{font-size:14px;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
+.fv-date{display:none}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#dbeafe;color:#1e40af}
 .mobile-date{display:none}
 @media(max-width:768px){
   .mobile-date{display:block;padding:10px 10px 0;font-size:14px;color:var(--text-dim);font-weight:500}
+  .subtab-date{display:none}
   .fv-date,.slog-btn,.staff-btn{display:none!important}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
@@ -451,6 +454,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   </div>
 </div>
 <div class="sub-tabs" id="projTabs">
+    <span class="subtab-date" id="pcDate"></span>
     <button class="sub-tab on" data-view="gantt">スケジュール</button>
     <button class="sub-tab" data-view="projDone">完了</button>
     <button class="sub-tab" data-view="projAdmin">管理</button>
@@ -1018,7 +1022,7 @@ async function safeRefresh(btn, fn){
 function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 
 // モバイル：サブタブ直下の固定日付バーに本日日付をセット
-window.addEventListener('load',function(){var el=document.getElementById('mobileDate');if(el){var d=new Date();var w='日月火水木金土';el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';}});
+window.addEventListener('load',function(){var d=new Date();var w='日月火水木金土';var s=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';var el=document.getElementById('mobileDate');if(el)el.textContent=s;var pc=document.getElementById('pcDate');if(pc)pc.textContent=s;});
 </script>
 </body>
 </html>

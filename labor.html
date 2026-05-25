@@ -44,7 +44,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px;appearance:none;-webkit-appearance:none;background:var(--surface)}
 .av-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
-.fv-date{font-size:14px;color:var(--text-dim)}
+.fv-date{display:none}
 .slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
 .slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
@@ -132,6 +132,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .nav-right{display:contents}
 @media(max-width:768px){
   .mobile-date{display:block;padding:10px 10px 0;font-size:14px;color:var(--text-dim);font-weight:500}
+  .subtab-date{display:none}
   .fv-date,.slog-btn,.staff-btn{display:none!important}
   .nav-spacer{display:none}
   .nav-right{display:contents}
@@ -154,7 +155,8 @@ table.jobs tr:last-child td{border-bottom:none}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}
 .toast.err{background:#dc2626}
-.sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
+.sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa;align-items:center}
+.subtab-date{font-size:14px;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#cffafe;color:#155e75}
@@ -196,6 +198,7 @@ table.jobs tr:last-child td{border-bottom:none}
   </div>
 </div>
 <div class="sub-tabs">
+    <span class="subtab-date" id="pcDate"></span>
     <button class="sub-tab on" data-view="active" onclick="setView('active')">工場ボード</button>
     <button class="sub-tab" data-view="archive" onclick="setView('archive')">出荷済</button>
   </div>
@@ -517,7 +520,7 @@ async function safeRefresh(btn, fn){
 
 
 // モバイル：サブタブ直下の固定日付バーに本日日付をセット
-window.addEventListener('load',function(){var el=document.getElementById('mobileDate');if(el){var d=new Date();var w='日月火水木金土';el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';}});
+window.addEventListener('load',function(){var d=new Date();var w='日月火水木金土';var ds=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';var el=document.getElementById('mobileDate');if(el)el.textContent=ds;var pc=document.getElementById('pcDate');if(pc)pc.textContent=ds;});
 </script>
 <div id="toast" class="toast"></div>
 </body>

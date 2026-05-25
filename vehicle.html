@@ -37,13 +37,15 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* Header */
 
 /* Sub tabs */
-.sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
+.sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa;align-items:center}
+.subtab-date{font-size:14px;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#d1fae5;color:#065f46}
 .mobile-date{display:none}
 @media(max-width:768px){
   .mobile-date{display:block;padding:10px 10px 0;font-size:14px;color:var(--text-dim);font-weight:500}
+  .subtab-date{display:none}
   .fv-date,.slog-btn,.staff-btn,.dash-date{display:none!important}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
@@ -64,7 +66,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 /* Dashboard */
 .dash{padding:25px 16px 16px}
-.dash-date{font-size:14px;color:var(--text-dim);margin-bottom:14px}
+.dash-date{display:none}
 .alert-section{margin-bottom:24px}
 .alert-section-hd{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .alert-section-hd::after{content:'';flex:1;height:1px;background:var(--border)}
@@ -262,6 +264,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
   </div>
 </div>
 <div class="sub-tabs" id="vTabs">
+    <span class="subtab-date" id="pcDate"></span>
     <button class="sub-tab on" data-view="dash">ダッシュボード</button>
     <button class="sub-tab" data-view="admin">管理</button>
     <button class="sub-tab" data-view="settings">アラート設定</button>
@@ -813,7 +816,7 @@ async function safeRefresh(btn, fn){
 function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 
 // モバイル：サブタブ直下の固定日付バーに本日日付をセット
-window.addEventListener('load',function(){var el=document.getElementById('mobileDate');if(el){var d=new Date();var w='日月火水木金土';el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';}});
+window.addEventListener('load',function(){var d=new Date();var w='日月火水木金土';var ds=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';var el=document.getElementById('mobileDate');if(el)el.textContent=ds;var pc=document.getElementById('pcDate');if(pc)pc.textContent=ds;});
 </script>
 </body>
 </html>
