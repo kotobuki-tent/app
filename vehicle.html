@@ -85,6 +85,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .fv-sum{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .fv-si{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;min-width:0;border-radius:999px;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
+  .fv-si .n{font-size:13px;font-weight:700;line-height:1;margin:0;order:2}
+  .fv-si .l{font-size:12px;font-weight:600;line-height:1;margin:0;color:inherit;order:1}
+  .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
 @media(max-width:768px){
