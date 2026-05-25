@@ -507,10 +507,9 @@ function switchTab(t){
 var itemSort={col:'category',asc:true};
 function sortItems(col){if(itemSort.col===col)itemSort.asc=!itemSort.asc;else{itemSort.col=col;itemSort.asc=true}renderItems()}
 function renderItems(){
-  const cat=$('flt_cat').value;const q=$('flt_item_q').value.toLowerCase();
+  const cat=$('flt_cat').value;
   const f=items.filter(i=>{
     if(cat&&i.category!==cat)return false;
-    if(q&&!(i.item_name||'').toLowerCase().includes(q)&&!(i.category||'').toLowerCase().includes(q))return false;
     return true;
   });
   // ソート
@@ -595,11 +594,10 @@ function renderMaint(){
 
 // ==================== 貸出/予約 ====================
 function renderRentals(){
-  const st=$('flt_r_status').value;const cat=$('flt_r_cat').value;const q=$('flt_r_q').value.toLowerCase();
+  const st=$('flt_r_status').value;const cat=$('flt_r_cat').value;
   const f=rentals.filter(r=>{
     if(st&&r.status!==st)return false;
     if(cat&&r.category!==cat)return false;
-    if(q&&![r.item_name,r.category,r.client_name,r.notes].join(' ').toLowerCase().includes(q))return false;
     return true;
   });
   const tb=$('rentals_tbody');
