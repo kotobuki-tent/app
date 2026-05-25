@@ -28,15 +28,19 @@ if('serviceWorker' in navigator){
   --red:#dc2626;--red-dim:rgba(220,38,38,.1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scrollbar-gutter:stable}
+html{scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text);background:var(--bg);min-height:100vh;padding-top:48px}
 .empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 .app{padding:16px}
-.sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
-.sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
+.sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa;align-items:center}
+.subtab-date{font-size:14px;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
+.mobile-date{display:none}
+.sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s;min-width:123px;text-align:center}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#ede9fe;color:#6d28d9}
 @media(max-width:768px){
+  .mobile-date{display:block;padding:10px 10px 0;font-size:14px;color:var(--text-dim);font-weight:500}
+  .subtab-date{display:none}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
@@ -204,9 +208,12 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
   </div>
 </div>
 <div class="sub-tabs" id="dailyTabs">
+    <span class="subtab-date" id="pcDate"></span>
     <button class="sub-tab on" data-view="write">自分で書く</button>
     <button class="sub-tab" data-view="view">みんなの日報</button>
   </div>
+
+<div class="mobile-date" id="mobileDate"></div>
 
 <div class="app"><div id="loader" class="loading-overlay"><div class="spin"></div><br>読み込み中...</div>
 
@@ -215,8 +222,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
     <div class="card">
       <div class="card-head">
         <div style="flex:1">
-          <div class="today-date" id="todayLabel"></div>
-          <div class="today-hint" style="display:flex;align-items:center;gap:10px;margin-top:8px">
+          <div class="today-hint" style="display:flex;align-items:center;gap:10px">
             <span>日付：</span>
             <input type="date" id="writeDate" onchange="onWriteDateChange()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:500 13px/1 'Noto Sans JP',sans-serif">
             <button onclick="setWriteDateToday()" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer">今日</button>
@@ -295,6 +301,8 @@ function centerActiveNav(){
   }catch(e){}
 }
 window.addEventListener('load',centerActiveNav);
+// サブタブ行/モバイルの本日日付をセット
+window.addEventListener('load',function(){var d=new Date();var w='日月火水木金土';var ds=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';var pc=document.getElementById('pcDate');if(pc)pc.textContent=ds;var md=document.getElementById('mobileDate');if(md)md.textContent=ds;});
 
 // ===== sessionStorage キャッシュ helper =====
 function _getCache(key){
@@ -455,7 +463,6 @@ function render(){
 // ====== 自分で書く ======
 function renderWrite(){
   const d=writeDate;
-  $('todayLabel').textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
   // 日付ピッカーを設定（過去無制限〜今日）
   const datePicker=$('writeDate');
   datePicker.value=dateStr(d);
