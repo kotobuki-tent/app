@@ -254,11 +254,8 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
   <!-- ===== 商品台帳 ===== -->
   <div id="v_items" class="hidden">
     <div class="av-top">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <button class="av-add" onclick="openItemMo()">＋ 商品追加</button>
-        <select id="flt_cat" onchange="renderItems()"><option value="">全カテゴリ</option></select>
-      </div>
-      
+      <select id="flt_cat" onchange="renderItems()"><option value="">全カテゴリ</option></select>
+      <button class="av-add" onclick="openItemMo()">＋ 商品追加</button>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -272,11 +269,8 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
   <div id="v_rentals" class="hidden">
     <div class="fv-sum" id="rentalChips"></div>
     <div class="av-top">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <button class="av-add" onclick="openRentalMo()">＋ 貸出/予約登録</button>
-        <select id="flt_r_cat" onchange="renderRentals()"><option value="">全カテゴリ</option></select>
-      </div>
-      
+      <select id="flt_r_cat" onchange="renderRentals()"><option value="">全カテゴリ</option></select>
+      <button class="av-add" onclick="openRentalMo()">＋ 貸出/予約登録</button>
     </div>
     <div class="tbl-wrap">
       <table>

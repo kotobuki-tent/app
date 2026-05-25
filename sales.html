@@ -116,7 +116,7 @@ table.tbl tr:hover td{background:rgba(219,39,119,.03)}
 .act-btn:hover{text-decoration:underline}
 .st-mini{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer}
 
-.adm-filter{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.adm-filter{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
 .adm-filter .ft{background:#f0f1f5;border:1px solid transparent;color:var(--text-dim);font:600 12px/1 'Noto Sans JP',sans-serif;padding:7px 13px;border-radius:999px;cursor:pointer;transition:.15s}
 .adm-filter .ft:hover{color:var(--text);background:#e2e5f0}
 .adm-filter .ft.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent)}
@@ -736,9 +736,9 @@ function renderAdmin(){
     const cnt=val?stCnt[val]||0:allEntries.filter(e=>!ARCHIVE_ST.includes(e.status)).length;
     return `<button class="ft${on}" data-st="${val||''}">${label} (${cnt})</button>`;
   };
-  let h=`<div class="av-top"><button class="av-add" onclick="openMo()">+ 新規登録</button></div>`;
-  h+=`<div class="adm-filter">${ftBtn('すべて',null)}`;
+  let h=`<div class="adm-filter">${ftBtn('すべて',null)}`;
   ACTIVE_ST.forEach(s=>{h+=ftBtn(s,s)});
+  h+='<button class="av-add" style="margin-left:auto" onclick="openMo()">+ 新規登録</button>';
   h+='</div>';
   h+='<div class="tbl-wrap"><table class="tbl"><thead><tr>';
   cols.forEach(c=>{

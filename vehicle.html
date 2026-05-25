@@ -670,7 +670,7 @@ function renderAdmin(){
   let items=[...vehicleData];
   if(adminSort.col)items.sort((a,b)=>{let va=String(a[adminSort.col]||'').toLowerCase(),vb=String(b[adminSort.col]||'').toLowerCase();return va<vb?(adminSort.asc?-1:1):va>vb?(adminSort.asc?1:-1):0});
   const cols=[{key:'name',label:'車両名称'},{key:'plate',label:'ナンバー'},{key:'type',label:'車種'},{key:'usage',label:'用途'},{key:'status',label:'ステータス'},{key:'shaken_date',label:'車検満了'},{key:'jibaiseki_date',label:'自賠責満了'},{key:'hoken_date',label:'任意保険満了'},{key:'current_km',label:'走行距離'}];
-  let h=`<div class="av-top"><button class="av-add" onclick="openVMo()">+ 車両登録</button></div>`;
+  let h=`<div class="av-top" style="justify-content:flex-end"><button class="av-add" onclick="openVMo()">+ 車両登録</button></div>`;
   h+='<div class="tbl-wrap"><table><thead><tr>';
   cols.forEach(c=>{const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
   h+='<th>操作</th></tr></thead><tbody>';
