@@ -53,6 +53,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .slog-item:last-child{border-bottom:none}
 .slog-item .sl-name{font-weight:600;color:var(--text)}
 .slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
+/* ステータスフィルタチップ */
+.fv-sum{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.fv-si{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:90px;text-align:center;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.fv-si:hover{border-color:var(--accent)}
+.fv-si.on{border-color:var(--accent);background:var(--accent-dim)}
+.fv-si .n{font-size:26px;font-weight:900;line-height:1.1}
+.fv-si .l{font-size:11px;color:var(--text-dim);margin-top:2px}
 /* 折りたたみ式ステータス変更（誤タップ防止） */
 .st-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 16px;border-radius:10px;border:2px solid var(--border);background:var(--surface);cursor:pointer;font:600 14px/1 'Noto Sans JP',sans-serif;color:var(--text);transition:.15s}
 .st-toggle:hover{border-color:var(--accent)}
@@ -423,6 +430,7 @@ const dow=['日','月','火','水','木','金','土'];
 let vehicleData=[];
 let curView='dash';
 let adminSort={col:null,asc:true};
+let adminStatusFilter=null;
 let currentViewId=null;
 
 // アラート閾値（日数）— ローカルストレージに保存
@@ -667,10 +675,15 @@ function alertCardHTML(a){
 // ===== 管理テーブル =====
 function renderAdmin(){
   const el=$('adminView');
-  let items=[...vehicleData];
+  const VEH_ST=['稼働中','整備中','休車'];
+  // ステータスチップ生成（件数つき）＋登録ボタン右端
+  const cnt={};VEH_ST.forEach(s=>cnt[s]=0);
+  vehicleData.forEach(v=>{const st=v.status||'稼働中';if(cnt[st]!==undefined)cnt[st]++});
+  const chip=(label,val)=>{const on=adminStatusFilter===val?' on':'';const c=val?cnt[val]||0:vehicleData.length;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${c}</div><div class="l">${label}</div></div>`};
+  let items=adminStatusFilter?vehicleData.filter(v=>(v.status||'稼働中')===adminStatusFilter):[...vehicleData];
   if(adminSort.col)items.sort((a,b)=>{let va=String(a[adminSort.col]||'').toLowerCase(),vb=String(b[adminSort.col]||'').toLowerCase();return va<vb?(adminSort.asc?-1:1):va>vb?(adminSort.asc?1:-1):0});
   const cols=[{key:'name',label:'車両名称'},{key:'plate',label:'ナンバー'},{key:'type',label:'車種'},{key:'usage',label:'用途'},{key:'status',label:'ステータス'},{key:'shaken_date',label:'車検満了'},{key:'jibaiseki_date',label:'自賠責満了'},{key:'hoken_date',label:'任意保険満了'},{key:'current_km',label:'走行距離'}];
-  let h=`<div class="av-top" style="justify-content:flex-end"><button class="av-add" onclick="openVMo()">+ 車両登録</button></div>`;
+  let h=`<div class="fv-sum">${chip('すべて',null)}${chip('稼働中','稼働中')}${chip('整備中','整備中')}${chip('休車','休車')}<button class="av-add" style="margin-left:auto" onclick="openVMo()">+ 車両登録</button></div>`;
   h+='<div class="tbl-wrap"><table><thead><tr>';
   cols.forEach(c=>{const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
   h+='<th>操作</th></tr></thead><tbody>';
@@ -687,6 +700,7 @@ function renderAdmin(){
   h+='</tbody></table></div>';
   el.innerHTML=h;
   el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(adminSort.col===c)adminSort.asc=!adminSort.asc;else{adminSort.col=c;adminSort.asc=true}render()}});
+  el.querySelectorAll('.fv-si[data-st]').forEach(chip=>{chip.onclick=()=>{const v=chip.dataset.st;adminStatusFilter=v||null;render()}});
 }
 function unifiedSearch(q){
   q=String(q||'').toLowerCase();
