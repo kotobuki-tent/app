@@ -253,8 +253,9 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 
   <!-- ===== 商品台帳 ===== -->
   <div id="v_items" class="hidden">
+    <div class="fv-sum" id="itemChips"></div>
     <div class="av-top">
-      <select id="flt_cat" onchange="renderItems()"><option value="">全カテゴリ</option></select>
+      <div></div>
       <button class="av-add" onclick="openItemMo()">＋ 商品追加</button>
     </div>
     <div class="tbl-wrap">
@@ -282,10 +283,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 
   <!-- ===== メンテ ===== -->
   <div id="v_maint" class="hidden">
-    <div class="av-top">
-      <div></div>
-      
-    </div>
+    <div class="fv-sum" id="maintChips"></div>
     <div class="tbl-wrap">
       <table>
         <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
@@ -296,13 +294,13 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 
   <!-- ===== 在庫確認 ===== -->
   <div id="v_avail">
+    <div class="fv-sum" id="availChips"></div>
     <div class="av-top">
       <div class="avail-date-row">
         <label>開始日</label>
         <input type="date" id="avail_start" onchange="renderAvail()">
         <label>終了日</label>
         <input type="date" id="avail_end" onchange="renderAvail()">
-        <select id="avail_cat" onchange="renderAvail()"><option value="">全カテゴリ</option></select>
       </div>
       
     </div>
@@ -557,8 +555,9 @@ function getAllCategories(){
 }
 function populateCategoryFilters(){
   const cats=getAllCategories();
-  ['flt_cat','flt_r_cat','avail_cat','xf_item_cat','xf_r_cat'].forEach(id=>{
-    const sel=$(id);const val=sel.value;
+  ['flt_r_cat','xf_item_cat','xf_r_cat'].forEach(id=>{
+    const sel=$(id);if(!sel)return;
+    const val=sel.value;
     const first=sel.options[0].outerHTML;
     sel.innerHTML=first;
     cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
@@ -596,8 +595,21 @@ function switchTab(t){
 // ==================== 商品台帳 ====================
 var itemSort={col:'category',asc:true};
 function sortItems(col){if(itemSort.col===col)itemSort.asc=!itemSort.asc;else{itemSort.col=col;itemSort.asc=true}renderItems()}
+let itemCatFilter='';
 function renderItems(){
-  const cat=$('flt_cat').value;
+  const cat=itemCatFilter;
+  // カテゴリチップ生成（件数=商品数）
+  const chipEl=$('itemChips');
+  if(chipEl){
+    const cats=getAllCategories();
+    const cnt={};cats.forEach(c=>cnt[c]=0);
+    items.forEach(i=>{if(cnt[i.category]!==undefined)cnt[i.category]++});
+    let ch=`<div class="fv-si${itemCatFilter===''?' on':''}" onclick="itemCatFilter='';renderItems()"><div class="n">${items.length}</div><div class="l">すべて</div></div>`;
+    cats.forEach(c=>{
+      ch+=`<div class="fv-si${itemCatFilter===c?' on':''}" onclick="itemCatFilter='${c}';renderItems()"><div class="n">${cnt[c]||0}</div><div class="l">${c}</div></div>`;
+    });
+    chipEl.innerHTML=ch;
+  }
   const f=items.filter(i=>{
     if(cat&&i.category!==cat)return false;
     return true;
@@ -660,11 +672,22 @@ function deleteItem(id,name){
 }
 
 // ==================== メンテ ====================
+let maintStatusFilter='';
 function renderMaint(){
   const MAINT_ST=['メンテ待ち','メンテ中'];
   let f=rentals.filter(r=>MAINT_ST.includes(r.status));
-  const mqEl=document.getElementById('flt_maint_q');
-  if(mqEl&&mqEl.value){const q=mqEl.value.toLowerCase();f=f.filter(r=>[r.item_name,r.category,r.client_name,r.notes].join(' ').toLowerCase().includes(q))}
+  // ステータスチップ生成
+  const chipEl=$('maintChips');
+  if(chipEl){
+    const cnt={};MAINT_ST.forEach(s=>cnt[s]=0);
+    f.forEach(r=>{if(cnt[r.status]!==undefined)cnt[r.status]++});
+    let ch=`<div class="fv-si${maintStatusFilter===''?' on':''}" onclick="maintStatusFilter='';renderMaint()"><div class="n">${f.length}</div><div class="l">すべて</div></div>`;
+    MAINT_ST.forEach(s=>{
+      ch+=`<div class="fv-si${maintStatusFilter===s?' on':''}" onclick="maintStatusFilter='${s}';renderMaint()"><div class="n">${cnt[s]||0}</div><div class="l">${s}</div></div>`;
+    });
+    chipEl.innerHTML=ch;
+  }
+  if(maintStatusFilter)f=f.filter(r=>r.status===maintStatusFilter);
   const tb=$('maint_tbody');
   if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">メンテ待ち・メンテ中の商品はありません</td></tr>';return}
   tb.innerHTML=f.map(r=>`<tr>
@@ -789,9 +812,22 @@ function deleteRental(id){
 
 // ==================== 在庫確認 ====================
 function availFilter(q){q=q.toLowerCase();document.querySelectorAll('#avail_body .avail-bar').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'});document.querySelectorAll('#avail_body .avail-cat-hd').forEach(h=>{const bars=[];let el=h.nextElementSibling;while(el&&el.classList.contains('avail-bar')){bars.push(el);el=el.nextElementSibling}h.style.display=bars.some(b=>b.style.display!=='none')?'':'none'})}
+let availCatFilter='';
 function renderAvail(){
   const startStr=$('avail_start').value;const endStr=$('avail_end').value;
-  const cat=$('avail_cat').value;const body=$('avail_body');
+  const cat=availCatFilter;const body=$('avail_body');
+  // カテゴリチップ生成（件数=商品数）
+  const chipEl=$('availChips');
+  if(chipEl){
+    const cats=getAllCategories();
+    const cnt={};cats.forEach(c=>cnt[c]=0);
+    items.forEach(i=>{if(cnt[i.category]!==undefined)cnt[i.category]++});
+    let ch=`<div class="fv-si${availCatFilter===''?' on':''}" onclick="availCatFilter='';renderAvail()"><div class="n">${items.length}</div><div class="l">すべて</div></div>`;
+    cats.forEach(c=>{
+      ch+=`<div class="fv-si${availCatFilter===c?' on':''}" onclick="availCatFilter='${c}';renderAvail()"><div class="n">${cnt[c]||0}</div><div class="l">${c}</div></div>`;
+    });
+    chipEl.innerHTML=ch;
+  }
   if(!startStr||!endStr){body.innerHTML='<p style="color:#aaa;font-size:13px">開始日と終了日を指定してください。</p>';return}
 
   const start=new Date(startStr+'T00:00:00');const end=new Date(endStr+'T00:00:00');
