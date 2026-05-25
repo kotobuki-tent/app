@@ -47,7 +47,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 /* === 一覧ビュー（生産部 factory-view 相当） === */
 .factory-view{padding:16px}
 .fv-date{display:none}
-.fv-sum{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+.fv-sum{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap;align-items:center}
 .fv-si{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:90px;text-align:center;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .fv-si:hover{border-color:var(--accent)}
 .fv-si.on{border-color:var(--accent);background:var(--accent-dim)}
@@ -734,9 +734,9 @@ function renderAdmin(){
   const ftBtn=(label,val)=>{
     const on=adminStatusFilter===val?' on':'';
     const cnt=val?stCnt[val]||0:allEntries.filter(e=>!ARCHIVE_ST.includes(e.status)).length;
-    return `<button class="ft${on}" data-st="${val||''}">${label} (${cnt})</button>`;
+    return `<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`;
   };
-  let h=`<div class="adm-filter">${ftBtn('すべて',null)}`;
+  let h=`<div class="fv-sum">${ftBtn('すべて',null)}`;
   ACTIVE_ST.forEach(s=>{h+=ftBtn(s,s)});
   h+='<button class="av-add" style="margin-left:auto" onclick="openMo()">+ 新規登録</button>';
   h+='</div>';
