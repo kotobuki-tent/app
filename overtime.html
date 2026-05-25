@@ -29,14 +29,18 @@ if('serviceWorker' in navigator){
   --purple:#7c3aed;--purple-light:#ede9fe;
   --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.08);
 }
-html{font-size:15px;scrollbar-gutter:stable}
+html{font-size:15px;scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;padding-bottom:100px}
 .empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
-.sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa}
+.sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa;align-items:center}
+.subtab-date{font-size:14px;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
+.mobile-date{display:none}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#fed7aa;color:#9a3412}
 @media(max-width:768px){
+  .mobile-date{display:block;padding:10px 10px 0;font-size:14px;color:var(--text-dim);font-weight:500}
+  .subtab-date{display:none}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
@@ -239,9 +243,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 <div class="sub-tabs">
+  <span class="subtab-date" id="pcDate"></span>
   <button class="sub-tab on" onclick="switchTab('staff')">申告する</button>
   <button class="sub-tab" onclick="switchTab('admin')">管理</button>
 </div>
+<div class="mobile-date" id="mobileDate"></div>
 <div class="week-bar">
   <button class="week-btn" onclick="changeWeek(-1)">← 先週</button>
   <button class="week-btn" onclick="goThisWeek()">今週</button>
@@ -583,6 +589,9 @@ async function safeRefresh(btn, fn){
 }
 
 function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
+
+// サブタブ行/モバイルの本日日付をセット
+window.addEventListener('load',function(){var d=new Date();var w='日月火水木金土';var ds=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';var pc=document.getElementById('pcDate');if(pc)pc.textContent=ds;var md=document.getElementById('mobileDate');if(md)md.textContent=ds;});
 </script>
 <div class="toast" id="toast"></div>
 </body>
