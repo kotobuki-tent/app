@@ -253,10 +253,9 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 
   <!-- ===== 商品台帳 ===== -->
   <div id="v_items" class="hidden">
-    <div class="fv-sum" id="itemChips"></div>
-    <div class="av-top">
-      <div></div>
-      <button class="av-add" onclick="openItemMo()">＋ 商品追加</button>
+    <div class="fv-sum">
+      <span id="itemChips" style="display:contents"></span>
+      <button class="av-add" onclick="openItemMo()" style="margin-left:auto">＋ 商品追加</button>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -268,9 +267,9 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
 
   <!-- ===== 貸出/予約 ===== -->
   <div id="v_rentals" class="hidden">
-    <div class="fv-sum" id="rentalChips"></div>
-    <div class="av-top">
-      <select id="flt_r_cat" onchange="renderRentals()"><option value="">全カテゴリ</option></select>
+    <div class="fv-sum">
+      <span id="rentalChips" style="display:contents"></span>
+      <select id="flt_r_cat" onchange="renderRentals()" style="margin-left:auto"><option value="">全カテゴリ</option></select>
       <button class="av-add" onclick="openRentalMo()">＋ 貸出/予約登録</button>
     </div>
     <div class="tbl-wrap">
