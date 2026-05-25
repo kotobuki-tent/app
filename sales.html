@@ -889,9 +889,6 @@ function openView(id){
   $('viewBg').classList.add('show');
 }
 function closeView(){$('viewBg').classList.remove('show');}
-document.getElementById('viewBg').addEventListener('click',function(e){
-  if(e.target===this)closeView();
-});
 
 // ===== 編集モーダル =====
 function openMo(id){
@@ -918,9 +915,6 @@ function openMo(id){
   $('moBg').classList.add('show');
 }
 function closeMo(){$('moBg').classList.remove('show');}
-document.getElementById('moBg').addEventListener('click',function(e){
-  if(e.target===this)closeMo();
-});
 
 function saveEntry(){
   const id=$('f_id').value;

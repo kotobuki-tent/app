@@ -718,7 +718,7 @@ function renderGantt(){
   const rentalItems=allItems.filter(d=>d.type==='レンタル').sort(sortFn);
   const dates=[];for(let i=0;i<ganttDays;i++){const d=new Date(ganttStart);d.setDate(d.getDate()+i);dates.push(d)}
   const todayStr=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
-  let h=`<div class="av-top"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:14px;color:var(--text-dim)">${todayStr}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div><input class="av-search" placeholder="検索..." oninput="ganttFilter(this.value)"></div>`;
+  let h=`<div class="av-top"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div class="fv-date" style="font-size:14px;color:var(--text-dim)">${todayStr}</div><button class="slog-btn${slogUnread?' has-new':''}" onclick="openSlog()">ステータスログ<span class="dot"></span></button></div><input class="av-search" placeholder="検索..." oninput="ganttFilter(this.value)"></div>`;
   h+='<div class="gantt-controls"><div class="gantt-nav"><button onclick="ganttMove(-7)">← 1週</button><button onclick="ganttToday()">今日</button><button onclick="ganttMove(7)">1週 →</button></div>';
   h+=`<select onchange="ganttDays=+this.value;render()"><option value="14"${ganttDays===14?' selected':''}>2週間</option><option value="21"${ganttDays===21?' selected':''}>3週間</option><option value="28"${ganttDays===28?' selected':''}>4週間</option><option value="42"${ganttDays===42?' selected':''}>6週間</option></select>`;
   h+=`</div>`;
