@@ -34,6 +34,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 .app{padding:16px}
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa;align-items:center}
 .subtab-date{font-size:14px;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
+.subtab-search{margin-left:auto;padding:7px 14px;border:1px solid var(--border);border-radius:999px;font:400 13px/1 'Noto Sans JP',sans-serif;width:200px;appearance:none;-webkit-appearance:none;background:var(--surface);flex-shrink:0}
 .mobile-date{display:none}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s;min-width:123px;text-align:center}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
@@ -41,6 +42,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
 @media(max-width:768px){
   .mobile-date{display:block;padding:10px 10px 0;font-size:14px;color:var(--text-dim);font-weight:500}
   .subtab-date{display:none}
+  .subtab-search{display:none}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
@@ -211,6 +213,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;color:var(--text)
     <span class="subtab-date" id="pcDate"></span>
     <button class="sub-tab on" data-view="write">自分で書く</button>
     <button class="sub-tab" data-view="view">みんなの日報</button>
+    <input class="subtab-search" id="pcSearch" placeholder="検索..." oninput="unifiedSearch(this.value)">
   </div>
 
 <div class="mobile-date" id="mobileDate"></div>
@@ -301,6 +304,15 @@ function centerActiveNav(){
   }catch(e){}
 }
 window.addEventListener('load',centerActiveNav);
+// サブタブ行の統一検索（Ctrl+F相当：表示中ビュー内の要素をテキストで絞る）
+function unifiedSearch(q){
+  q=String(q||'').toLowerCase();
+  var view=document.querySelector('#writeView:not(.hidden), #viewView:not(.hidden)');
+  if(!view)return;
+  view.querySelectorAll('tbody tr, .saved-entry, .emp-block, .report-card, .entry-row').forEach(function(el){
+    el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
 // サブタブ行/モバイルの本日日付をセット
 window.addEventListener('load',function(){var d=new Date();var w='日月火水木金土';var ds=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';var pc=document.getElementById('pcDate');if(pc)pc.textContent=ds;var md=document.getElementById('mobileDate');if(md)md.textContent=ds;});
 

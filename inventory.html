@@ -35,6 +35,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;background:var(--
 /* Header - dark navy bar */
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa;align-items:center}
 .subtab-date{font-size:14px;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
+.subtab-search{margin-left:auto;padding:7px 14px;border:1px solid var(--border);border-radius:999px;font:400 13px/1 'Noto Sans JP',sans-serif;width:200px;appearance:none;-webkit-appearance:none;background:var(--surface);flex-shrink:0}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s;min-width:123px;text-align:center}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#e0e7ff;color:#3730a3}
@@ -42,6 +43,7 @@ body{font:400 14px/1.5 'Noto Sans JP',-apple-system,sans-serif;background:var(--
 @media(max-width:768px){
   .mobile-date{display:block;padding:10px 10px 0;font-size:14px!important;line-height:1.4!important;color:var(--text-dim);font-weight:500!important}
   .subtab-date{display:none}
+  .subtab-search{display:none}
   .fv-date,.slog-btn,.staff-btn{display:none!important}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
@@ -214,6 +216,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
   <button class="sub-tab" data-tab="rentals" onclick="switchTab('rentals')">貸出/予約</button>
   <button class="sub-tab" data-tab="maint" onclick="switchTab('maint')">メンテ</button>
   <button class="sub-tab" data-tab="items" onclick="switchTab('items')">商品台帳</button>
+  <input class="subtab-search" id="pcSearch" placeholder="検索..." oninput="unifiedSearch(this.value)">
 </div>
 
 <div class="mobile-date" id="mobileDate"></div>
@@ -228,7 +231,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
         <button class="av-add" onclick="openItemMo()">＋ 商品追加</button>
         <select id="flt_cat" onchange="renderItems()"><option value="">全カテゴリ</option></select>
       </div>
-      <input class="av-search" id="flt_item_q" placeholder="検索..." oninput="itemTableFilter(this.value)">
+      
     </div>
     <div class="tbl-wrap">
       <table>
@@ -250,7 +253,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
         </select>
         <select id="flt_r_cat" onchange="renderRentals()"><option value="">全カテゴリ</option></select>
       </div>
-      <input class="av-search" id="flt_r_q" placeholder="検索..." oninput="renderRentals()">
+      
     </div>
     <div class="tbl-wrap">
       <table>
@@ -264,7 +267,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
   <div id="v_maint" class="hidden">
     <div class="av-top">
       <div></div>
-      <input class="av-search" id="flt_maint_q" placeholder="検索..." oninput="renderMaint()">
+      
     </div>
     <div class="tbl-wrap">
       <table>
@@ -284,7 +287,7 @@ tr.overdue td:first-child .st{background:#fee2e2;color:#dc2626}
         <input type="date" id="avail_end" onchange="renderAvail()">
         <select id="avail_cat" onchange="renderAvail()"><option value="">全カテゴリ</option></select>
       </div>
-      <input class="av-search" placeholder="検索..." oninput="availFilter(this.value)">
+      
     </div>
     <div class="section">
       <h2>在庫バッティング確認</h2>
@@ -482,6 +485,17 @@ function populateProjectSelect(){
 function onProjectSelect(){if($('xf_r_project').value)$('xf_r_client').value=$('xf_r_project').value}
 
 // === Tab ===
+function unifiedSearch(q){
+  const on=document.querySelector('.sub-tab.on');
+  const t=on?on.dataset.tab:'avail';
+  if(t==='avail'&&typeof availFilter==='function')availFilter(q);
+  else if(t==='items'&&typeof itemTableFilter==='function')itemTableFilter(q);
+  else {
+    // rentals/maint: 表示中ビューのtbody trを絞る
+    const view=document.querySelector('#v_'+t);
+    if(view)view.querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(String(q||'').toLowerCase())?'':'none';});
+  }
+}
 function switchTab(t){
   document.querySelectorAll('.sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
   ['items','rentals','maint','avail'].forEach(v=>$('v_'+v).classList.toggle('hidden',v!==t));

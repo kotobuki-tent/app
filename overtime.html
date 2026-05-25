@@ -34,6 +34,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa;align-items:center}
 .subtab-date{font-size:14px;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
+.subtab-search{margin-left:auto;padding:7px 14px;border:1px solid var(--border);border-radius:999px;font:400 13px/1 'Noto Sans JP',sans-serif;width:200px;appearance:none;-webkit-appearance:none;background:var(--surface);flex-shrink:0}
 .mobile-date{display:none}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s;min-width:123px;text-align:center}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
@@ -41,6 +42,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 @media(max-width:768px){
   .mobile-date{display:block;padding:10px 10px 0;font-size:14px;color:var(--text-dim);font-weight:500}
   .subtab-date{display:none}
+  .subtab-search{display:none}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
@@ -246,6 +248,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <span class="subtab-date" id="pcDate"></span>
   <button class="sub-tab on" onclick="switchTab('staff')">申告する</button>
   <button class="sub-tab" onclick="switchTab('admin')">管理</button>
+  <input class="subtab-search" id="pcSearch" placeholder="検索..." oninput="unifiedSearch(this.value)">
 </div>
 <div class="mobile-date" id="mobileDate"></div>
 <div class="week-bar">
@@ -590,6 +593,18 @@ async function safeRefresh(btn, fn){
 
 function toast(msg,err){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 
+// サブタブ行の統一検索（Ctrl+F相当：表示中ビュー内の要素をテキストで絞る）
+function unifiedSearch(q){
+  q=String(q||'').toLowerCase();
+  var views=['staffView','adminView'];
+  var view=null;
+  views.forEach(function(id){var el=document.getElementById(id);if(el&&el.style.display!=='none')view=el;});
+  if(!view)return;
+  // 行・カード・ブロックを絞る
+  view.querySelectorAll('tbody tr, .ot-card, .se-card, .day-block, .staff-row').forEach(function(el){
+    el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
 // サブタブ行/モバイルの本日日付をセット
 window.addEventListener('load',function(){var d=new Date();var w='日月火水木金土';var ds=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+w[d.getDay()]+'）';var pc=document.getElementById('pcDate');if(pc)pc.textContent=ds;var md=document.getElementById('mobileDate');if(md)md.textContent=ds;});
 </script>

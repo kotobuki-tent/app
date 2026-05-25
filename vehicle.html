@@ -39,6 +39,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* Sub tabs */
 .sub-tabs{display:flex;gap:6px;padding:14px 16px;background:#f5f6fa;align-items:center}
 .subtab-date{font-size:14px;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
+.subtab-search{margin-left:auto;padding:7px 14px;border:1px solid var(--border);border-radius:999px;font:400 13px/1 'Noto Sans JP',sans-serif;width:200px;appearance:none;-webkit-appearance:none;background:var(--surface);flex-shrink:0}
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 16px;border-radius:999px;cursor:pointer;transition:.15s;min-width:123px;text-align:center}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#d1fae5;color:#065f46}
@@ -46,6 +47,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 @media(max-width:768px){
   .mobile-date{display:block;padding:10px 10px 0;font-size:14px;color:var(--text-dim);font-weight:500}
   .subtab-date{display:none}
+  .subtab-search{display:none}
   .fv-date,.slog-btn,.staff-btn,.dash-date{display:none!important}
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
@@ -268,6 +270,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
     <button class="sub-tab on" data-view="dash">ダッシュボード</button>
     <button class="sub-tab" data-view="admin">管理</button>
     <button class="sub-tab" data-view="settings">アラート設定</button>
+    <input class="subtab-search" id="pcSearch" placeholder="検索..." oninput="unifiedSearch(this.value)">
   </div>
 
 <div class="mobile-date" id="mobileDate"></div>
@@ -562,7 +565,7 @@ function renderAdmin(){
   let items=[...vehicleData];
   if(adminSort.col)items.sort((a,b)=>{let va=String(a[adminSort.col]||'').toLowerCase(),vb=String(b[adminSort.col]||'').toLowerCase();return va<vb?(adminSort.asc?-1:1):va>vb?(adminSort.asc?1:-1):0});
   const cols=[{key:'name',label:'車両名称'},{key:'plate',label:'ナンバー'},{key:'type',label:'車種'},{key:'usage',label:'用途'},{key:'status',label:'ステータス'},{key:'shaken_date',label:'車検満了'},{key:'jibaiseki_date',label:'自賠責満了'},{key:'hoken_date',label:'任意保険満了'},{key:'current_km',label:'走行距離'}];
-  let h=`<div class="av-top"><button class="av-add" onclick="openVMo()">+ 車両登録</button><input class="av-search" placeholder="検索..." oninput="adminSearch(this.value)"></div>`;
+  let h=`<div class="av-top"><button class="av-add" onclick="openVMo()">+ 車両登録</button></div>`;
   h+='<div class="tbl-wrap"><table><thead><tr>';
   cols.forEach(c=>{const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
   h+='<th>操作</th></tr></thead><tbody>';
@@ -579,6 +582,12 @@ function renderAdmin(){
   h+='</tbody></table></div>';
   el.innerHTML=h;
   el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(adminSort.col===c)adminSort.asc=!adminSort.asc;else{adminSort.col=c;adminSort.asc=true}render()}});
+}
+function unifiedSearch(q){
+  q=String(q||'').toLowerCase();
+  const view=document.querySelector('#dashView:not(.hidden), #adminView:not(.hidden), #settingsView:not(.hidden)');
+  if(!view)return;
+  view.querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';});
 }
 function adminSearch(q){$('adminView').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'})}
 
