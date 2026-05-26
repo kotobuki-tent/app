@@ -4977,7 +4977,7 @@ $('refreshBtn').addEventListener('click', function(){
 
 // 横スワイプでアプリ切替（リターン式＝端で止める。誤爆対策：横>縦・一定距離・横スクロール要素上は無効）
 (function(){
-  const ORDER=['portal','prod','proj','inv','veh','sales','labor','daily','ot'];
+  const ORDER=['portal','daily','ot','prod','proj','sales','labor','inv','veh'];
   let sx=0, sy=0, tracking=false, blocked=false;
   const H_THRESHOLD=60;   // 横移動の発火距離
   const RATIO=1.5;        // 横が縦の何倍で「横スワイプ」とみなすか
