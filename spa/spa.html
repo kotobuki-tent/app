@@ -20,8 +20,8 @@
   --purple:#8b5cf6;--purple-dim:rgba(139,92,246,.1);
   --cyan:#0891b2;--cyan-dim:rgba(8,145,178,.1);
 }
-html{font-size:15px;scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;overscroll-behavior-y:contain}
+html{font-size:15px;scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;overscroll-behavior-y:none}
 /* pull-to-refresh インジケータ */
 #ptr{position:fixed;top:48px;left:0;right:0;display:flex;justify-content:center;align-items:center;height:0;overflow:hidden;z-index:200;pointer-events:none;transition:height .2s,opacity .2s;opacity:0}
 #ptr.show{opacity:1}
@@ -4937,10 +4937,12 @@ $('refreshBtn').addEventListener('click', function(){
     if(!pulling||refreshing)return;
     dist=e.touches[0].clientY-startY;
     if(dist<=0){ptr.style.height='0';ptr.classList.remove('show');return;}
+    // 最上部で下に引っ張っている間はネイティブのpull-to-refresh（=リロード）を抑止
+    if(e.cancelable)e.preventDefault();
     const h=Math.min(dist*0.5,MAX);
     ptr.style.height=h+'px';
     ptr.classList.add('show');
-  },{passive:true});
+  },{passive:false});
   window.addEventListener('touchend',async()=>{
     if(!pulling||refreshing){pulling=false;return;}
     pulling=false;
