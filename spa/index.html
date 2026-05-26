@@ -359,11 +359,14 @@ tr:hover td{background:rgba(59,111,216,.03)}
 @media(max-width:768px){
   }
 @keyframes spin{to{transform:rotate(360deg)}}
+.type-toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;cursor:pointer;user-select:none}
 .type-toggle:hover{border-color:var(--accent)}
 .type-toggle input{width:18px;height:18px;cursor:pointer}
 .type-toggle label{font-size:13px;font-weight:600;color:var(--text);cursor:pointer;margin:0}
 .type-toggle .hint{font-size:11px;color:var(--text-dim);margin-left:8px}
+.rental-disabled{opacity:.4;pointer-events:none}
 .rental-disabled input,.rental-disabled select,.rental-disabled textarea,.rental-disabled button{background:var(--surface3)!important;cursor:not-allowed!important}
+.gantt-section-hd{font-size:13px;font-weight:700;color:var(--text-dim);padding:14px 4px 8px;margin-top:8px;border-top:1px solid var(--border)}
 .gantt-section-hd:first-of-type{border-top:none;margin-top:0;padding-top:4px}
 .gantt-section-hd .count{font-weight:500;color:var(--text-faint);margin-left:6px}
 .gantt-controls{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
@@ -442,7 +445,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .view-section h3{font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px}
 .view-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .view-tag{font-size:11px;padding:3px 8px;border-radius:5px;background:var(--accent-dim);color:var(--accent);font-weight:600}
+.proj-view{padding:16px}
 .proj-admin{padding:16px}
+.rental-add-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--border-light)}
 .rental-add-section h3{font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px}
 .rental-add-row{display:flex;gap:6px;margin-bottom:6px;align-items:flex-end;flex-wrap:wrap}
 .rental-add-row select,.rental-add-row input{padding:7px 8px;border:1px solid var(--border);border-radius:6px;font:400 12px/1.3 'Noto Sans JP',sans-serif;background:var(--surface2)}
