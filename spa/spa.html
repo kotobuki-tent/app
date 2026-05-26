@@ -4926,7 +4926,7 @@ $('refreshBtn').addEventListener('click', function(){
 (function(){
   const ptr=$('ptr');
   let startY=0, pulling=false, dist=0, refreshing=false;
-  const THRESHOLD=70, MAX=90;
+  const THRESHOLD=70, MAX=120;
   function curSection(){return document.querySelector('section[id^="view-"]:not(.hidden)')}
   function setPull(px){
     const sec=curSection();
@@ -4951,13 +4951,13 @@ $('refreshBtn').addEventListener('click', function(){
     // 最上部で下に引っ張っている間はネイティブのpull-to-refresh（=リロード）を抑止
     if(e.cancelable)e.preventDefault();
     // 抵抗感：引っ張るほど鈍くなる
-    const px=Math.min(dist*0.45,MAX);
+    const px=Math.min(dist*0.6,MAX);
     setPull(px);
   },{passive:false});
   window.addEventListener('touchend',async()=>{
     if(!pulling||refreshing){pulling=false;return;}
     pulling=false;
-    if(dist*0.45>=THRESHOLD){
+    if(dist*0.6>=THRESHOLD){
       refreshing=true;
       const sec=curSection();
       if(sec){sec.style.transition='transform .2s';sec.style.transform='translateY(50px)';}
