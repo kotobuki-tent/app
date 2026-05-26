@@ -21,7 +21,12 @@
   --cyan:#0891b2;--cyan-dim:rgba(8,145,178,.1);
 }
 html{font-size:15px;scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;overscroll-behavior-y:contain}
+/* pull-to-refresh インジケータ */
+#ptr{position:fixed;top:48px;left:0;right:0;display:flex;justify-content:center;align-items:center;height:0;overflow:hidden;z-index:200;pointer-events:none;transition:height .2s,opacity .2s;opacity:0}
+#ptr.show{opacity:1}
+#ptr .ptr-spin{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:8px 0}
+#ptr.spinning .ptr-spin{animation:spin .7s linear infinite}
 .empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 
 /* ===== サブタブ行（共通） ===== */
@@ -2024,6 +2029,7 @@ table.jobs tr:last-child td{border-bottom:none}
 </section>
 
 <div class="loading-overlay hidden" id="loader"><div class="spin"></div><br>読み込み中...</div>
+<div id="ptr"><div class="ptr-spin"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -4915,6 +4921,45 @@ const App = {
 $('refreshBtn').addEventListener('click', function(){
   safeRefresh(this, ()=>App.refreshCurrent());
 });
+
+// pull-to-refresh：最上部で下に引っ張る→今表示中のアプリだけデータ更新（リロードしない＝ポータルに戻らない）
+(function(){
+  const ptr=$('ptr');
+  let startY=0, pulling=false, dist=0, refreshing=false;
+  const THRESHOLD=70, MAX=90;
+  window.addEventListener('touchstart',e=>{
+    if(refreshing)return;
+    // ページ最上部のときだけpull-to-refresh開始
+    if(window.scrollY>0||document.documentElement.scrollTop>0){pulling=false;return;}
+    startY=e.touches[0].clientY; pulling=true; dist=0;
+  },{passive:true});
+  window.addEventListener('touchmove',e=>{
+    if(!pulling||refreshing)return;
+    dist=e.touches[0].clientY-startY;
+    if(dist<=0){ptr.style.height='0';ptr.classList.remove('show');return;}
+    const h=Math.min(dist*0.5,MAX);
+    ptr.style.height=h+'px';
+    ptr.classList.add('show');
+  },{passive:true});
+  window.addEventListener('touchend',async()=>{
+    if(!pulling||refreshing){pulling=false;return;}
+    pulling=false;
+    if(dist*0.5>=THRESHOLD){
+      refreshing=true;
+      ptr.style.height=MAX*0.6+'px';
+      ptr.classList.add('spinning');
+      try{ await App.refreshCurrent(); }
+      catch(e){ toast('更新に失敗しました',true); }
+      finally{
+        ptr.classList.remove('spinning');
+        ptr.style.height='0'; ptr.classList.remove('show');
+        refreshing=false;
+      }
+    }else{
+      ptr.style.height='0'; ptr.classList.remove('show');
+    }
+  },{passive:true});
+})();
 
 // 自動更新：5分間隔・タブが見えてる時だけ・前回完了後・「今表示中のアプリだけ」
 let _bgBusy=false;
