@@ -28,11 +28,6 @@
 }
 html{font-size:15px;scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;overscroll-behavior-y:none}
-/* pull-to-refresh インジケータ */
-#ptr{position:fixed;top:48px;left:0;right:0;display:flex;justify-content:center;align-items:center;height:0;overflow:hidden;z-index:200;pointer-events:none;transition:height .2s,opacity .2s;opacity:0}
-#ptr.show{opacity:1}
-#ptr .ptr-spin{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:8px 0}
-#ptr.spinning .ptr-spin{animation:spin .7s linear infinite}
 .empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 
 /* ===== サブタブ行（共通） ===== */
@@ -2035,7 +2030,6 @@ table.jobs tr:last-child td{border-bottom:none}
 </section>
 
 <div class="loading-overlay hidden" id="loader"><div class="spin"></div><br>読み込み中...</div>
-<div id="ptr"><div class="ptr-spin"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -4928,95 +4922,6 @@ $('refreshBtn').addEventListener('click', function(){
   safeRefresh(this, ()=>App.refreshCurrent());
 });
 
-// pull-to-refresh：最上部で下に引っ張る→今表示中のアプリだけデータ更新（リロードしない＝ポータルに戻らない）
-(function(){
-  const ptr=$('ptr');
-  let startY=0, pulling=false, dist=0, refreshing=false;
-  const THRESHOLD=70, MAX=120;
-  function curSection(){return document.querySelector('section[id^="view-"]:not(.hidden)')}
-  function setPull(px){
-    const sec=curSection();
-    if(sec){sec.style.transition='none';sec.style.transform=px>0?`translateY(${px}px)`:'';}
-    ptr.style.height=px+'px';
-    ptr.classList.toggle('show',px>0);
-  }
-  function resetPull(animate){
-    const sec=curSection();
-    if(sec){sec.style.transition=animate?'transform .25s':'none';sec.style.transform='';}
-    ptr.style.height='0';ptr.classList.remove('show');
-  }
-  window.addEventListener('touchstart',e=>{
-    if(refreshing)return;
-    if(window.scrollY>0||document.documentElement.scrollTop>0){pulling=false;return;}
-    startY=e.touches[0].clientY; pulling=true; dist=0;
-  },{passive:true});
-  window.addEventListener('touchmove',e=>{
-    if(!pulling||refreshing)return;
-    dist=e.touches[0].clientY-startY;
-    if(dist<=0){resetPull(false);return;}
-    // 最上部で下に引っ張っている間はネイティブのpull-to-refresh（=リロード）を抑止
-    if(e.cancelable)e.preventDefault();
-    // 抵抗感：引っ張るほど鈍くなる
-    const px=Math.min(dist*0.6,MAX);
-    setPull(px);
-  },{passive:false});
-  window.addEventListener('touchend',async()=>{
-    if(!pulling||refreshing){pulling=false;return;}
-    pulling=false;
-    if(dist*0.6>=THRESHOLD){
-      refreshing=true;
-      const sec=curSection();
-      if(sec){sec.style.transition='transform .2s';sec.style.transform='translateY(50px)';}
-      ptr.style.height='50px';ptr.classList.add('show','spinning');
-      try{ await App.refreshCurrent(); }
-      catch(e){ toast('更新に失敗しました',true); }
-      finally{
-        ptr.classList.remove('spinning');
-        resetPull(true);
-        refreshing=false;
-      }
-    }else{
-      resetPull(true);
-    }
-  },{passive:true});
-})();
-
-// 横スワイプでアプリ切替（リターン式＝端で止める。誤爆対策：横>縦・一定距離・横スクロール要素上は無効）
-(function(){
-  const ORDER=['portal','daily','ot','prod','proj','sales','labor','inv','veh'];
-  let sx=0, sy=0, tracking=false, blocked=false;
-  const H_THRESHOLD=60;   // 横移動の発火距離
-  const RATIO=1.5;        // 横が縦の何倍で「横スワイプ」とみなすか
-  // 横スクロールする要素の上で始まったタッチは無視（表・グリッド・ナビを守る）
-  function inScrollable(el){
-    while(el && el!==document.body){
-      if(el.classList && (el.classList.contains('tbl-wrap')||el.classList.contains('gantt-wrap')||el.classList.contains('overview-grid')||el.classList.contains('sub-tabs'))) return true;
-      el=el.parentElement;
-    }
-    return false;
-  }
-  window.addEventListener('touchstart',e=>{
-    if(e.touches.length!==1){tracking=false;return;}
-    blocked=inScrollable(e.target);
-    sx=e.touches[0].clientX; sy=e.touches[0].clientY; tracking=true;
-  },{passive:true});
-  window.addEventListener('touchend',e=>{
-    if(!tracking||blocked){tracking=false;return;}
-    tracking=false;
-    const t=e.changedTouches[0];
-    const dx=t.clientX-sx, dy=t.clientY-sy;
-    if(Math.abs(dx)<H_THRESHOLD) return;          // 横移動が足りない
-    if(Math.abs(dx)<Math.abs(dy)*RATIO) return;   // 縦の方が大きい＝縦スクロール
-    const cur=App.current||'portal';
-    const i=ORDER.indexOf(cur);
-    if(i<0) return;
-    if(dx<0){ // 左スワイプ＝次へ
-      if(i<ORDER.length-1) App.nav(ORDER[i+1]);
-    }else{    // 右スワイプ＝前へ
-      if(i>0) App.nav(ORDER[i-1]);
-    }
-  },{passive:true});
-})();
 setInterval(()=>{
   if(document.visibilityState!=='visible')return;
   if(_bgBusy)return;
