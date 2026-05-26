@@ -200,7 +200,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 /* ステータスログボタン */
 .slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap;flex-shrink:0}
 /* 企画はSTAFFボタンが無いので、slogボタンを右寄せ起点に（生産は#prodTabsで無影響） */
-#projTabs .slog-btn{margin-left:auto}
+/* 右寄せ起点：生産はstaff-btnが起点（既定）。STAFFボタンを持たないアプリ（企画/在庫/今後追加分）は
+   各slogボタンを margin-left:auto で起点にし、slog＋検索バーを右端に寄せる */
+#projSlogBtn, #invSlogBtn{margin-left:auto}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
 .slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
 .slog-btn.has-new .dot{display:block}
@@ -667,6 +669,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .st-検品中{background:#fef9c3;color:#a16207}
 .st-メンテ待ち{background:#ffedd5;color:#c2410c}
 .st-メンテ中{background:#fee2e2;color:#dc2626}
+.avail-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.avail-date-row{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
 .avail-item-name{font-size:13px;font-weight:600;min-width:180px;color:var(--text)}
 .avail-meter{flex:1;height:22px;background:#f0f1f5;border-radius:6px;overflow:hidden}
 .avail-fill{height:100%;border-radius:6px;transition:.3s}
@@ -2352,7 +2356,7 @@ const Inv = (function(){
     if($('avail_start'))$('avail_start').value=todayStr();
     const tw=new Date(d.getTime()+14*86400000);
     if($('avail_end'))$('avail_end').value=tw.getFullYear()+'-'+String(tw.getMonth()+1).padStart(2,'0')+'-'+String(tw.getDate()).padStart(2,'0');
-    const pc=$('invPcDate');if(pc)pc.textContent=(d.getMonth()+1)+'/'+d.getDate();
+    const pc=$('invPcDate');if(pc)pc.textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
     if($('invPcSearch'))$('invPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
   }
 
