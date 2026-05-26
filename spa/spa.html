@@ -204,7 +204,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
    各slogボタンを margin-left:auto で起点にし、slog＋検索バーを右端に寄せる */
 /* STAFFボタンを持つのは生産だけ。それ以外（企画/在庫/車両/今後追加分）はslogボタンを右寄せ起点に。
    ★アプリ追加時はここに #〇〇SlogBtn を必ず足すこと（横展開漏れ防止） */
-#projSlogBtn, #invSlogBtn, #vSlogBtn, #salesSlogBtn{margin-left:auto}
+#projSlogBtn, #invSlogBtn, #vSlogBtn, #salesSlogBtn, #laborSlogBtn{margin-left:auto}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
 .slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
 .slog-btn.has-new .dot{display:block}
@@ -945,6 +945,85 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
 }
 
+
+/* ===== 工数 固有CSS ===== */
+table.jobs{width:100%;background:var(--surface);border-collapse:collapse;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+table.jobs th{background:var(--surface3);padding:10px 12px;text-align:left;font-size:12px;font-weight:700;color:var(--text-dim);border-bottom:1px solid var(--border)}
+table.jobs td{padding:12px;border-bottom:1px solid var(--border-light);font-size:13px;cursor:pointer}
+table.jobs tr:hover td{background:var(--accent-dim)}
+table.jobs tr:last-child td{border-bottom:none}
+.job-cards{display:none}
+#view-labor .app{padding:16px}
+
+.toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.toolbar select{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface)}
+.toolbar .count{font-size:12px;color:var(--text-dim);margin-left:auto}
+.st-badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.num strong{font-weight:700;color:var(--text)}
+.mins-hint{color:var(--text-faint);font-size:11px;margin-left:4px}
+.job-card{background:var(--surface);border-radius:12px;padding:14px 16px;border-left:4px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;margin-bottom:10px;transition:.15s}
+.job-card:active{background:var(--accent-dim)}
+.job-card .jc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.job-card .jc-name{font-weight:700;font-size:15px;line-height:1.4;color:var(--text)}
+.job-card .jc-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+.job-card .jc-tag{font-size:11px;padding:2px 8px;border-radius:5px;font-weight:600}
+.job-card .jc-tag.eno{color:var(--accent);background:var(--accent-dim)}
+.job-card .jc-tag.dl{color:var(--text-dim);background:var(--surface3)}
+.job-card .jc-foot{display:flex;justify-content:space-between;align-items:baseline;padding-top:8px;border-top:1px solid var(--border-light)}
+.job-card .jc-foot .jc-mins{font-size:18px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.job-card .jc-foot .jc-mins small{font-size:11px;color:var(--text-faint);font-weight:500;margin-left:2px}
+.job-card .jc-foot .jc-ppl{font-size:12px;color:var(--text-dim);font-weight:600}
+.mh-sub{font-size:12px;color:var(--text-dim);margin-bottom:18px}
+.mb-total{background:var(--accent-dim);padding:12px 14px;border-radius:8px;margin-bottom:14px}
+.mb-total .tt-label{font-size:11px;color:var(--text-dim);font-weight:600}
+.mb-total .tt-val{font-size:20px;font-weight:800;color:var(--accent);margin-top:2px}
+.mb-total .tt-val small{font-size:12px;color:var(--text-dim);font-weight:500;margin-left:6px}
+.mb-list{display:flex;flex-direction:column;gap:8px}
+.mb-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--surface2);border:1px solid var(--border-light);border-radius:8px}
+.mb-row .mb-name{font-weight:600;color:var(--text)}
+.mb-row .mb-mins{font-variant-numeric:tabular-nums;color:var(--text-dim)}
+.mb-row .mb-mins strong{color:var(--text);font-weight:700}
+@media(max-width:768px){
+  .mobile-date{display:none!important}
+  .subtab-date{display:none!important}
+  .subtab-search{display:none}
+  .fv-date,.slog-btn,.staff-btn{display:none!important}
+  .nav-spacer{display:none}
+  .nav-right{display:contents}
+  .nav-menu-btn{display:none}
+  .hdr-inner{padding:6px 8px 0 8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .hdr-inner::-webkit-scrollbar{display:none}
+  .nav-link{flex-shrink:0;font-size:12px;padding:0 11px}
+  .hdr-btn{flex-shrink:0;font-size:11px;padding:0 11px;margin-left:8px}
+  .hdr::after{content:'';position:absolute;top:0;right:0;width:22px;height:48px;background:linear-gradient(to right,transparent,#fb7185);pointer-events:none;z-index:1}
+}
+
+
+@media (max-width:768px){
+  .app{padding:12px 10px}
+  .av-search{display:none}
+  table.jobs{display:none}
+  .job-cards{display:block}
+}
+@media(max-width:768px){
+  .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs::-webkit-scrollbar{display:none}
+  .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
+}
+
+
+
+@media(max-width:768px){
+  /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
+  .fv-sum{display:none !important}
+  .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
+  .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
+  .fv-si .l{font-size:12px !important;font-weight:600;line-height:1;margin:0 !important;color:inherit;order:1}
+  .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
+}
+
 /* ===== モバイル(@media 768px)共通微調整 ===== */
 </style>
 </head>
@@ -962,7 +1041,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
       <button class="nav-link on" id="navProd" onclick="App.nav('prod')">生産</button>
       <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
       <button class="nav-link" id="navSales" onclick="App.nav('sales')">販売</button>
-      <a href="../app/labor.html" class="nav-link">工数</a>
+      <button class="nav-link" id="navLabor" onclick="App.nav('labor')">工数</button>
       <button class="nav-link" id="navInv" onclick="App.nav('inv')">在庫</button>
       <button class="nav-link" id="navVeh" onclick="App.nav('veh')">車両</button>
     </div>
@@ -1449,6 +1528,42 @@ tr:hover td{background:rgba(59,111,216,.03)}
       </div>
       <div id="salesSlogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
       <div class="mo-foot"><button class="cancel" onclick="Sales.closeSlog()">閉じる</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 工数 section ===== -->
+<section id="view-labor" class="hidden">
+  <div class="sub-tabs" id="laborTabs">
+    <span class="subtab-date" id="laborPcDate"></span>
+    <button class="sub-tab on" data-view="active">工場ボード</button>
+    <button class="sub-tab" data-view="archive">出荷済</button>
+    <button class="slog-btn" id="laborSlogBtn" onclick="Labor.openSlog()">ステータスログ<span class="dot"></span></button>
+    <input class="subtab-search" id="laborPcSearch" placeholder="検索...">
+  </div>
+
+  <div class="app">
+    <div id="laborContent"></div>
+  </div>
+
+  <!-- ステータスログモーダル（slogBg→laborSlogBg / slogList→laborSlogList） -->
+  <div class="mo-bg" id="laborSlogBg">
+    <div class="mo" style="max-width:480px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h2 style="margin:0">ステータスログ</h2>
+      </div>
+      <div id="laborSlogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+      <div class="mo-foot"><button class="cancel" onclick="Labor.closeSlog()">閉じる</button></div>
+    </div>
+  </div>
+
+  <!-- 詳細モーダル -->
+  <div id="detailModal" class="mo-bg">
+    <div class="mo">
+      <h3 id="dmTitle"></h3>
+      <div class="mh-sub" id="dmSub"></div>
+      <div id="dmBody"></div>
+      <div class="mo-foot"><button class="cancel" onclick="Labor.closeDetail()">閉じる</button></div>
     </div>
   </div>
 </section>
@@ -3670,6 +3785,160 @@ const Sales = (function(){
   };
 })();
 
+const Labor = (function(){
+  let allJobs=[];
+  let currentView='active';
+  let stFilter='';
+  let slog=[];
+  const stOrderActive={'完成':1,'製作中':2,'受注':3,'見積中':4,'見送り':5};
+  const stOrderArchive={'出荷済':1};
+  const SLOG_LIST_KEY='prod_status_log';
+  const SLOG_UNREAD_KEY='prod_status_unread';
+  const ACTIVE_ST=['見積中','受注','製作中','完成'];
+
+  function fmtMin(min){if(!min)return'0分';const h=Math.floor(min/60),m=min%60;if(h===0)return min+'分';return min+'分 <span class="mins-hint">('+h+'時間'+(m?m+'分':'')+')</span>'}
+  function stColorVar(s){return{'見積中':'--purple','受注':'--blue','製作中':'--orange','完成':'--green','見送り':'--gray','出荷済':'--accent'}[s]||'--text'}
+
+  function setView(v){
+    currentView=v;
+    $('laborTabs').querySelectorAll('.sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+    if(v==='archive')stFilter='';
+    renderTable();
+  }
+  function setStFilter(v){stFilter=v;renderTable()}
+
+  // ===== Load（生産データ orders を読み取り） =====
+  async function loadAll(){
+    const cached=_getCache('labor');
+    if(cached&&cached.jobs){allJobs=cached.jobs;renderTable()}
+    try{
+      const r=await fetch(API+'?dept=labor&action=read');
+      const j=await r.json();
+      allJobs=j.success?(j.data||[]):[];
+    }catch(e){allJobs=[]}
+    _setCache('labor',{jobs:allJobs});
+    renderTable();
+  }
+
+  // ===== ステータスログ（生産のprod_status_logを共有読み取り。記録しない） =====
+  function loadSlogShared(){
+    try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
+    let unread=0;try{unread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){unread=0}
+    const btn=$('laborSlogBtn');if(btn)btn.classList.toggle('has-new',unread>0);
+  }
+  function openSlog(){
+    loadSlogShared();
+    const el=$('laborSlogList');
+    if(!slog.length){el.innerHTML='<div class="empty-msg">変更履歴はまだありません</div>'}
+    else{
+      let h='';
+      slog.forEach(e=>{
+        const verb=(e.isNew||e.isDel)?'されました':'になりました';
+        const cls=e.isDel?' sl-del':'';
+        h+=`<div class="slog-item${cls}" data-id="${esc(e.id)}" data-del="${e.isDel?'1':'0'}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> ${verb}</div>`;
+      });
+      el.innerHTML=h;
+      el.querySelectorAll('.slog-item').forEach(it=>{if(it.dataset.del==='1')return;it.onclick=()=>{closeSlog();showDetail(it.dataset.id)}});
+    }
+    $('laborSlogBg').classList.add('show');
+    try{localStorage.setItem(SLOG_UNREAD_KEY,'0')}catch(e){}
+    const sb=$('laborSlogBtn');if(sb)sb.classList.remove('has-new');
+  }
+  function closeSlog(){$('laborSlogBg').classList.remove('show')}
+
+  // ===== テーブル描画 =====
+  function renderTable(){
+    const kw=($('laborPcSearch')?$('laborPcSearch').value:'').trim().toLowerCase();
+    const isArchive=currentView==='archive';
+    const allActive=allJobs.filter(j=>j.status!=='出荷済');
+    const cnt={};ACTIVE_ST.forEach(s=>cnt[s]=0);
+    allActive.forEach(j=>{if(cnt[j.status]!==undefined)cnt[j.status]++});
+    const total=allActive.length;
+    let list=allJobs.filter(j=>{
+      if(isArchive){if(j.status!=='出荷済')return false}
+      else{if(j.status==='出荷済')return false;if(stFilter&&j.status!==stFilter)return false}
+      if(kw){const target=(j.project+' '+j.order_no+' '+j.estimate_no).toLowerCase();if(!target.includes(kw))return false}
+      return true;
+    });
+    const stOrder=isArchive?stOrderArchive:stOrderActive;
+    list.sort((a,b)=>{const so=(stOrder[a.status]||99)-(stOrder[b.status]||99);if(so)return so;const ad=a.deadline||'',bd=b.deadline||'';if(!ad&&!bd)return 0;if(!ad)return 1;if(!bd)return-1;return bd.localeCompare(ad)});
+    let chipHtml='';
+    if(!isArchive){
+      chipHtml='<div class="fv-sum">';
+      chipHtml+=`<div class="fv-si${stFilter===''?' on':''}" onclick="Labor.setStFilter('')"><div class="n">${total}</div><div class="l">すべて</div></div>`;
+      ACTIVE_ST.forEach(s=>{chipHtml+=`<div class="fv-si${stFilter===s?' on':''}" onclick="Labor.setStFilter('${s}')"><div class="n" style="color:var(${stColorVar(s)})">${cnt[s]||0}</div><div class="l">${s}</div></div>`});
+      chipHtml+='</div>';
+    }
+    if(!list.length){$('laborContent').innerHTML=chipHtml+'<div class="empty-msg">該当する案件がありません</div>';return}
+    let h=chipHtml+'<table class="jobs"><thead><tr>';
+    h+='<th>見積番号</th><th>受注番号</th><th>案件名</th><th>ステータス</th><th>納期</th><th class="num">延べ工数</th><th class="num">人数</th>';
+    h+='</tr></thead><tbody>';
+    list.forEach(j=>{
+      h+=`<tr onclick="Labor.showDetail('${esc(j.id)}')">
+        <td>${esc(j.estimate_no||'')}</td>
+        <td>${esc(j.order_no||'')}</td>
+        <td>${esc(j.project||'')}</td>
+        <td><span class="st-badge st-${esc(j.status)}">${esc(j.status)}</span></td>
+        <td>${esc(j.deadline||'')}</td>
+        <td class="num"><strong>${fmtMin(j.total_minutes)}</strong></td>
+        <td class="num">${j.people_count||0}人</td>
+      </tr>`;
+    });
+    h+='</tbody></table>';
+    h+='<div class="job-cards">';
+    list.forEach(j=>{
+      const no=j.order_no||j.estimate_no||'';
+      h+=`<div class="job-card" onclick="Labor.showDetail('${esc(j.id)}')">
+        <div class="jc-top">
+          <div class="jc-name">${esc(j.project||'(案件名なし)')}</div>
+          <span class="st-badge st-${esc(j.status)}">${esc(j.status)}</span>
+        </div>
+        <div class="jc-meta">
+          ${no?`<span class="jc-tag eno">#${esc(no)}</span>`:''}
+          ${j.deadline?`<span class="jc-tag dl">納期 ${esc(j.deadline)}</span>`:''}
+        </div>
+        <div class="jc-foot">
+          <span class="jc-mins">${fmtMin(j.total_minutes)}<small>延べ工数</small></span>
+          <span class="jc-ppl">${j.people_count||0}人</span>
+        </div>
+      </div>`;
+    });
+    h+='</div>';
+    $('laborContent').innerHTML=h;
+  }
+
+  // ===== 詳細モーダル =====
+  function showDetail(id){
+    const job=allJobs.find(x=>String(x.id)===String(id));if(!job)return;
+    const no=job.order_no||job.estimate_no;
+    $('dmTitle').textContent=(no?'#'+no+' ':'')+job.project;
+    $('dmSub').innerHTML=`<span class="st-badge st-${esc(job.status)}">${esc(job.status)}</span>${job.deadline?' 　納期 '+esc(job.deadline):''}`;
+    let h=`<div class="mb-total"><div class="tt-label">延べ工数</div><div class="tt-val">${fmtMin(job.total_minutes)}<small>${job.people_count||0}人が関与</small></div></div>`;
+    if(job.by_employee&&job.by_employee.length){
+      h+='<div class="mb-list">';
+      job.by_employee.forEach(e=>{h+=`<div class="mb-row"><span class="mb-name">${esc(e.name)}</span><span class="mb-mins">${fmtMin(e.minutes)}</span></div>`});
+      h+='</div>';
+    }else{h+='<div class="empty-msg">工数の記録はまだありません</div>'}
+    $('dmBody').innerHTML=h;
+    $('detailModal').classList.add('show');
+  }
+  function closeDetail(){$('detailModal').classList.remove('show')}
+
+  // ===== init =====
+  function init(){
+    $('laborTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;setView(t.dataset.view)});
+    const pc=$('laborPcDate');if(pc)pc.textContent=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
+    if($('laborPcSearch'))$('laborPcSearch').addEventListener('input',renderTable);
+    loadSlogShared();
+  }
+
+  return {
+    loadAll, init,
+    setView, setStFilter, openSlog, closeSlog,
+    showDetail, closeDetail, renderTable
+  };
+})();
+
 /* ========================================================================
    App.nav：画面切替＋遅延ロード機構（SPAの心臓部）
    - display切替（hidden付け外し）＝0秒
@@ -3687,6 +3956,7 @@ const App = {
     {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv'},
     {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh'},
     {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales'},
+    {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor'},
   ],
   _loaded:{},
   _loading:{},
