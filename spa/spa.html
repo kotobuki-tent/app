@@ -204,7 +204,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
    各slogボタンを margin-left:auto で起点にし、slog＋検索バーを右端に寄せる */
 /* STAFFボタンを持つのは生産だけ。それ以外（企画/在庫/車両/今後追加分）はslogボタンを右寄せ起点に。
    ★アプリ追加時はここに #〇〇SlogBtn を必ず足すこと（横展開漏れ防止） */
-#projSlogBtn, #invSlogBtn, #vSlogBtn{margin-left:auto}
+#projSlogBtn, #invSlogBtn, #vSlogBtn, #salesSlogBtn{margin-left:auto}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
 .slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
 .slog-btn.has-new .dot{display:block}
@@ -843,6 +843,108 @@ tr:hover td{background:rgba(59,111,216,.03)}
   #adminView td[colspan]::before{display:none}
 }
 
+
+/* ===== 販売 固有CSS ===== */
+.fv-card.s-見積中{border-left-color:var(--purple)}
+.fv-card.s-受注{border-left-color:var(--blue)}
+.fv-card.s-発注済{border-left-color:var(--orange)}
+.fv-card.s-入荷済{border-left-color:var(--green)}
+.fv-card.s-納品済{border-left-color:var(--accent)}
+.badge.s-見積中{color:var(--purple);background:var(--purple-dim)}
+.badge.s-受注{color:var(--blue);background:var(--blue-dim)}
+.badge.s-発注済{color:var(--orange);background:var(--orange-dim)}
+.badge.s-入荷済{color:var(--green);background:var(--green-dim)}
+.badge.s-納品済{color:var(--accent);background:var(--accent-dim)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.st-mini{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer}
+@media(max-width:768px){
+  .mobile-date{display:none!important}
+  .subtab-date{display:none!important}
+  .subtab-search{display:none}
+  .fv-date,.slog-btn,.staff-btn{display:none!important}
+  .nav-spacer{display:none}
+  .nav-right{display:contents}
+  .nav-menu-btn{display:none}
+  .hdr-inner{padding:6px 8px 0 8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .hdr-inner::-webkit-scrollbar{display:none}
+  .nav-link{flex-shrink:0;font-size:12px;padding:0 11px}
+  .hdr-btn{flex-shrink:0;font-size:11px;padding:0 11px;margin-left:8px}
+  .hdr::after{content:'';position:absolute;top:0;right:0;width:22px;height:48px;background:linear-gradient(to right,transparent,#fb7185);pointer-events:none;z-index:1}
+}
+
+@media (max-width:768px){
+  .factory-view,.admin-view{padding:12px 10px}
+  .fv-cards{grid-template-columns:1fr;gap:10px}
+  .fv-card{padding:14px 13px}
+  .fv-card .pname{font-size:15px;line-height:1.35}
+  .fv-card .top{gap:8px}
+  .fv-card .meta{font-size:11px;gap:5px}
+  .fv-card .tag{font-size:10px;padding:2px 6px}
+  .av-top{flex-direction:column;align-items:stretch;gap:8px}
+  .av-search{display:none}
+  .av-add{padding:11px 18px;font-size:13px}
+  .mo-row{flex-direction:column;gap:0;margin-bottom:0}
+  .mo-row .mo-field{margin-bottom:14px}
+  .mo-foot{flex-direction:column-reverse;gap:8px;align-items:stretch}
+  .mo-foot button{width:100%;padding:13px;min-height:46px;font-size:14px}
+  .view-row{flex-direction:column;gap:2px;margin-bottom:10px}
+  .view-row .view-label{min-width:0;font-size:11px}
+  .view-row .view-val{font-size:14px}
+  .st-change-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .st-btn{padding:12px 8px;font-size:13px;min-height:46px}
+}
+@media(max-width:768px){
+  .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs::-webkit-scrollbar{display:none}
+  .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
+}
+@media(max-width:768px){
+  /* === テーブル→カード化（管理・完了ビュー） === */
+  #adminView .tbl-wrap,#archiveView .tbl-wrap{border:none;background:transparent;overflow:visible}
+  #adminView table,#adminView thead,#adminView tbody,#adminView tr,#adminView td,
+  #archiveView table,#archiveView thead,#archiveView tbody,#archiveView tr,#archiveView td{display:block;width:100%}
+  #adminView thead,#archiveView thead{display:none}
+  #adminView tr,#archiveView tr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  #adminView td,#archiveView td{padding:5px 0;border:none;white-space:normal;font-size:13px;display:flex;align-items:center;gap:8px;text-align:left !important}
+  #adminView td::before,#archiveView td::before{font-size:11px;font-weight:600;color:var(--text-dim);min-width:72px;flex-shrink:0}
+  /* 物件名（1列目）大きく、ラベル非表示 */
+  #adminView td:nth-of-type(1),#archiveView td:nth-of-type(1){font-size:15px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--surface3);margin-bottom:6px;display:block}
+  #adminView td:nth-of-type(1)::before,#archiveView td:nth-of-type(1)::before{display:none}
+  /* 列ラベル（販売：物件名/担当者/見積/受注/得意先/窓口/仕入先/金額/納期/ステータス/伝票/操作） */
+  #adminView td:nth-of-type(2)::before,#archiveView td:nth-of-type(2)::before{content:'担当'}
+  #adminView td:nth-of-type(3)::before,#archiveView td:nth-of-type(3)::before{content:'見積'}
+  #adminView td:nth-of-type(4)::before,#archiveView td:nth-of-type(4)::before{content:'受注'}
+  #adminView td:nth-of-type(5)::before,#archiveView td:nth-of-type(5)::before{content:'得意先'}
+  #adminView td:nth-of-type(6)::before,#archiveView td:nth-of-type(6)::before{content:'窓口'}
+  #adminView td:nth-of-type(7)::before,#archiveView td:nth-of-type(7)::before{content:'仕入先'}
+  #adminView td:nth-of-type(8)::before,#archiveView td:nth-of-type(8)::before{content:'金額'}
+  #adminView td:nth-of-type(9)::before,#archiveView td:nth-of-type(9)::before{content:'納期'}
+  #adminView td:nth-of-type(10)::before,#archiveView td:nth-of-type(10)::before{content:'ステータス'}
+  #adminView td:nth-of-type(11)::before,#archiveView td:nth-of-type(11)::before{content:'伝票'}
+  #adminView td:nth-of-type(12)::before,#archiveView td:nth-of-type(12)::before{content:'操作'}
+  /* 空セルは隠す */
+  #adminView td:empty,#archiveView td:empty{display:none}
+  /* 金額の右寄せをカードでは左に */
+  #adminView td:nth-of-type(8),#archiveView td:nth-of-type(8){justify-content:flex-start}
+  /* selectとボタンを大きく */
+  #adminView td select{flex:1;padding:8px 10px !important;font-size:13px !important;min-height:38px}
+  #adminView td .act-btn,#archiveView td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px;margin-right:4px}
+  #adminView td .act-btn.del{color:var(--red)}
+  /* 該当なし行は通常表示 */
+  #adminView td[colspan],#archiveView td[colspan]{display:block;text-align:center !important;padding:30px !important}
+  #adminView td[colspan]::before,#archiveView td[colspan]::before{display:none}
+}
+
+@media(max-width:768px){
+  /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
+  .fv-sum{display:none !important}
+  .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
+  .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
+  .fv-si .l{font-size:12px !important;font-weight:600;line-height:1;margin:0 !important;color:inherit;order:1}
+  .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
+}
+
 /* ===== モバイル(@media 768px)共通微調整 ===== */
 </style>
 </head>
@@ -859,7 +961,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
     <div class="nav-right">
       <button class="nav-link on" id="navProd" onclick="App.nav('prod')">生産</button>
       <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
-      <a href="../app/sales.html" class="nav-link">販売</a>
+      <button class="nav-link" id="navSales" onclick="App.nav('sales')">販売</button>
       <a href="../app/labor.html" class="nav-link">工数</a>
       <button class="nav-link" id="navInv" onclick="App.nav('inv')">在庫</button>
       <button class="nav-link" id="navVeh" onclick="App.nav('veh')">車両</button>
@@ -1265,6 +1367,89 @@ tr:hover td{background:rgba(59,111,216,.03)}
     <div id="vSlogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
     <div class="mo-foot"><button class="cancel" onclick="Veh.closeSlog()">閉じる</button></div>
   </div>
+  </div>
+</section>
+
+<!-- ===== 販売 section ===== -->
+<section id="view-sales" class="hidden">
+  <div class="sub-tabs" id="salesTabs">
+    <span class="subtab-date" id="salesPcDate"></span>
+    <button class="sub-tab on" data-view="board">一覧</button>
+    <button class="sub-tab" data-view="archive">完了</button>
+    <button class="sub-tab" data-view="admin">管理</button>
+    <button class="slog-btn" id="salesSlogBtn" onclick="Sales.openSlog()">ステータスログ<span class="dot"></span></button>
+    <input class="subtab-search" id="salesPcSearch" placeholder="検索..." oninput="Sales.unifiedSearch(this.value)">
+  </div>
+
+  <div class="app">
+    <div id="boardView" class="factory-view hidden"></div>
+    <div id="archiveView" class="admin-view hidden"></div>
+    <div id="salesAdminView" class="admin-view hidden"></div>
+  </div>
+
+  <!-- 案件登録/編集モーダル -->
+  <div class="mo-bg" id="moBg">
+    <div class="mo">
+      <h2 id="moTitle">案件登録</h2>
+      <input type="hidden" id="f_id">
+      <div class="mo-row full"><div class="mo-field"><label>物件名 *</label><input id="f_project" placeholder="例：かんたんてんと 販売"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="f_our_person" placeholder="自社の担当者"></div></div>
+      <div class="mo-row">
+        <div class="mo-field"><label>見積番号</label><input id="f_estimate_no"></div>
+        <div class="mo-field"><label>受注番号</label><input id="f_order_no"></div>
+      </div>
+      <div class="mo-row">
+        <div class="mo-field"><label>得意先</label><input id="f_client" list="salesCustomerList" placeholder="例: ㈱○○ / 現金客 / ○○さん"></div>
+        <div class="mo-field"><label>窓口</label><input id="f_person"></div>
+      </div>
+      <div class="mo-row">
+        <div class="mo-field"><label>仕入先</label><input id="f_supplier" list="salesSupplierList"></div>
+        <div class="mo-field"><label>金額（円）</label><input type="number" id="f_amount" min="0" step="1"></div>
+      </div>
+      <div class="mo-row">
+        <div class="mo-field"><label>受付日 *</label><input type="date" id="f_created_at"></div>
+        <div class="mo-field"><label>納期</label><input type="date" id="f_deadline"></div>
+      </div>
+      <div class="mo-row full">
+        <div class="mo-field"><label>ステータス</label>
+          <select id="f_status">
+            <option value="見積中">見積中</option><option value="受注">受注</option>
+            <option value="発注済">発注済</option><option value="入荷済">入荷済</option>
+            <option value="納品済">納品済</option><option value="完了">完了</option>
+            <option value="見送り">見送り</option>
+          </select>
+        </div>
+      </div>
+      <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="f_notes" placeholder="値引き・運賃・特記事項など"></textarea></div></div>
+      <div class="mo-foot">
+        <button class="cancel" onclick="Sales.closeMo()">キャンセル</button>
+        <button class="save" onclick="Sales.saveEntry()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <datalist id="salesCustomerList"></datalist>
+  <datalist id="salesSupplierList"></datalist>
+
+  <!-- 案件詳細モーダル -->
+  <div class="mo-bg" id="viewBg">
+    <div class="mo" style="max-width:640px">
+      <h2>案件詳細</h2>
+      <div id="viewContent"></div>
+      <div class="mo-foot"><button class="cancel" onclick="Sales.closeView()">閉じる</button></div>
+    </div>
+  </div>
+
+  <!-- ステータスログモーダル（slogBg→salesSlogBg / slogList→salesSlogList） -->
+  <div class="mo-bg" id="salesSlogBg">
+    <div class="mo" style="max-width:560px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <h2 style="margin:0">ステータスログ</h2>
+        <button class="act-btn del" style="font-size:12px" onclick="Sales.clearSlog()">クリア</button>
+      </div>
+      <div id="salesSlogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+      <div class="mo-foot"><button class="cancel" onclick="Sales.closeSlog()">閉じる</button></div>
+    </div>
   </div>
 </section>
 
@@ -3105,6 +3290,386 @@ const Veh = (function(){
   };
 })();
 
+const Sales = (function(){
+  const DEPT='sales';
+  let allEntries=[];
+  let currentView='board';
+  let boardFilter=null;
+  let boardSearch='';
+  let adminStatusFilter=null;
+  let adminSearch='';
+  let archiveSearch='';
+  let adminSort={col:'created_at',asc:false};
+  let archiveSort={col:'created_at',asc:false};
+  let slog=[];
+  let slogUnread=0;
+  const SLOG_KEY='sales_status_snapshot';
+  const SLOG_LIST_KEY='sales_status_log';
+  const SLOG_UNREAD_KEY='sales_status_unread';
+  const ACTIVE_ST=['見積中','受注','発注済','入荷済','納品済'];
+  const ARCHIVE_ST=['完了','見送り'];
+  const ALL_ST=[...ACTIVE_ST,...ARCHIVE_ST];
+
+  // ===== 販売方言ユーティリティ =====
+  async function apiGet(params){const u=API+'?dept='+DEPT+'&'+new URLSearchParams(params);const r=await fetch(u);return r.json()}
+  function apiPost(body){body.dept=DEPT;fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+  function fmtDate(d){if(!d)return'';const dt=(d instanceof Date)?d:new Date(d);if(isNaN(dt))return String(d).slice(0,10);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')}
+  function fmtDateJP(s){if(!s)return'';const dt=new Date(s);if(isNaN(dt))return String(s);return(dt.getMonth()+1)+'/'+dt.getDate()+'（'+dow[dt.getDay()]+'）'}
+  function fmtAmount(v){if(v===''||v==null||isNaN(Number(v)))return'';return'¥'+Number(v).toLocaleString()}
+
+  // ===== ステータスログ（slogBg→salesSlogBg / slogList→salesSlogList） =====
+  function detectStatusChanges(){
+    const curr={};
+    allEntries.forEach(d=>{if(d.id&&String(d.id).indexOf('s_')!==0)curr[String(d.id)]={status:d.status||'',project:d.project||''}});
+    try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
+    try{slogUnread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){slogUnread=0}
+    updateSlogBtn();
+    let prev=null;
+    try{prev=JSON.parse(localStorage.getItem(SLOG_KEY)||'null')}catch(e){prev=null}
+    if(!prev){localStorage.setItem(SLOG_KEY,JSON.stringify(curr));return}
+    const newEntries=[];
+    Object.keys(curr).forEach(id=>{
+      if(!prev[id]){newEntries.push({id,project:curr[id].project,from:'',to:'新規登録',ts:Date.now(),isNew:true})}
+      else if(prev[id].status!==curr[id].status){newEntries.push({id,project:curr[id].project,from:prev[id].status,to:curr[id].status,ts:Date.now()})}
+    });
+    Object.keys(prev).forEach(id=>{
+      if(!curr[id]){newEntries.push({id,project:prev[id].project,from:prev[id].status,to:'削除',ts:Date.now(),isDel:true})}
+    });
+    if(newEntries.length){
+      slog=[...newEntries,...slog].slice(0,20);
+      slogUnread=Math.min(slogUnread+newEntries.length,20);
+      localStorage.setItem(SLOG_LIST_KEY,JSON.stringify(slog));
+      localStorage.setItem(SLOG_UNREAD_KEY,String(slogUnread));
+      updateSlogBtn();
+    }
+    localStorage.setItem(SLOG_KEY,JSON.stringify(curr));
+  }
+  function updateSlogBtn(){const b=$('salesSlogBtn');if(b)b.classList.toggle('has-new',slogUnread>0)}
+  function openSlog(){
+    const el=$('salesSlogList');
+    if(!slog.length){el.innerHTML='<div class="empty-msg" style="padding:20px;text-align:center">変更履歴はまだありません</div>'}
+    else{
+      let h='';
+      slog.forEach(e=>{
+        const verb=(e.isNew||e.isDel)?'されました':'になりました';
+        const cls=e.isDel?' sl-del':'';
+        h+=`<div class="slog-item${cls}" data-id="${esc(e.id)}" data-del="${e.isDel?'1':'0'}"><span class="sl-name">${esc(e.project)}</span> が <span class="sl-st">${esc(e.to)}</span> ${verb}</div>`;
+      });
+      el.innerHTML=h;
+      el.querySelectorAll('.slog-item').forEach(it=>{
+        if(it.dataset.del==='1')return;
+        it.onclick=()=>{closeSlog();openView(it.dataset.id)};
+      });
+    }
+    slogUnread=0;localStorage.setItem(SLOG_UNREAD_KEY,'0');updateSlogBtn();
+    $('salesSlogBg').classList.add('show');
+  }
+  function closeSlog(){$('salesSlogBg').classList.remove('show')}
+  function clearSlog(){
+    if(!slog.length)return;
+    if(!confirm('ログをすべて削除しますか？'))return;
+    slog=[];slogUnread=0;
+    localStorage.setItem(SLOG_LIST_KEY,'[]');localStorage.setItem(SLOG_UNREAD_KEY,'0');
+    $('salesSlogList').innerHTML='<div class="empty-msg" style="padding:20px;text-align:center">変更履歴はまだありません</div>';
+    updateSlogBtn();
+  }
+
+  // ===== view切替 =====
+  function setView(v){
+    currentView=v;
+    $('salesTabs').querySelectorAll('.sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+    $('boardView').classList.toggle('hidden',v!=='board');
+    $('archiveView').classList.toggle('hidden',v!=='archive');
+    $('salesAdminView').classList.toggle('hidden',v!=='admin');
+    render();
+  }
+
+  // ===== Load（loadAll：App統一名） =====
+  async function loadAll(){
+    const cached=_getCache('sales');
+    if(cached&&cached.entries){allEntries=cached.entries;render()}
+    try{
+      const j=await apiGet({action:'read'});
+      if(j.success){allEntries=j.data||[];detectStatusChanges()}
+    }catch(e){console.warn('load error',e)}
+    _setCache('sales',{entries:allEntries});
+    render();refreshDatalists();
+  }
+  function refreshDatalists(){
+    const cust=[...new Set(allEntries.map(e=>String(e.client||'').trim()).filter(Boolean))].sort();
+    const supp=[...new Set(allEntries.map(e=>String(e.supplier||'').trim()).filter(Boolean))].sort();
+    if($('salesCustomerList'))$('salesCustomerList').innerHTML=cust.map(c=>`<option value="${esc(c)}">`).join('');
+    if($('salesSupplierList'))$('salesSupplierList').innerHTML=supp.map(s=>`<option value="${esc(s)}">`).join('');
+  }
+  function render(){
+    if(currentView==='board')renderBoard();
+    else if(currentView==='archive')renderArchive();
+    else if(currentView==='admin')renderAdmin();
+  }
+
+  function stColorVar(s){return{'見積中':'--purple','受注':'--blue','発注済':'--orange','入荷済':'--green','納品済':'--accent','完了':'--gray','見送り':'--red'}[s]||'--text'}
+
+  // ===== ボード =====
+  function renderBoard(){
+    const el=$('boardView');
+    const items=allEntries.filter(e=>ACTIVE_ST.includes(String(e.status||'').trim()));
+    const cnt={};ACTIVE_ST.forEach(s=>cnt[s]=0);
+    items.forEach(e=>{if(cnt[e.status]!==undefined)cnt[e.status]++});
+    const total=items.length;
+    const filtered=boardFilter?items.filter(e=>e.status===boardFilter):items;
+    let h='';
+    h+='<div class="fv-sum">';
+    h+=`<div class="fv-si${boardFilter===null?' on':''}" onclick="Sales.setBoardFilter(null)"><div class="n">${total}</div><div class="l">すべて</div></div>`;
+    ACTIVE_ST.forEach(s=>{
+      h+=`<div class="fv-si${boardFilter===s?' on':''}" onclick="Sales.setBoardFilter('${s}')"><div class="n" style="color:var(${stColorVar(s)})">${cnt[s]||0}</div><div class="l">${s}</div></div>`;
+    });
+    h+='</div>';
+    if(filtered.length===0){h+='<div class="empty-msg">該当する案件はありません</div>';el.innerHTML=h;return}
+    ACTIVE_ST.forEach(st=>{
+      const grp=filtered.filter(e=>e.status===st);
+      if(grp.length===0)return;
+      grp.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+      h+=`<div class="fv-grp"><div class="fv-grp-hd">${st}　${grp.length}件</div><div class="fv-cards">`;
+      grp.forEach(d=>{h+=renderCard(d)});
+      h+='</div></div>';
+    });
+    el.innerHTML=h;
+    if(boardSearch)boardCardFilter(boardSearch);
+  }
+  function renderCard(d){
+    const st=String(d.status||'見積中');
+    let h=`<div class="fv-card s-${esc(st)}" onclick="Sales.openView('${esc(d.id)}')">`;
+    h+='<div class="top">';
+    h+=`<div class="pname">${esc(d.project||'―')}</div>`;
+    h+=`<span class="badge s-${esc(st)}">${esc(st)}</span>`;
+    h+='</div>';
+    if(d.client)h+=`<div class="assignee">得意先: <span style="font-size:13px;font-weight:600;color:var(--text)">${esc(d.client)}</span></div>`;
+    if(d.our_person)h+=`<div class="assignee">担当: <span class="tag person">${esc(d.our_person)}</span></div>`;
+    const tags=[];
+    if(d.order_no)tags.push(`<span class="tag eno">${esc(d.order_no)}</span>`);
+    if(d.supplier)tags.push(`<span class="tag loc">${esc(d.supplier)}</span>`);
+    if(tags.length)h+=`<div class="meta">${tags.join(' ')}</div>`;
+    let dlLine='';
+    if(d.created_at)dlLine+=`受付: ${fmtDateJP(d.created_at)}`;
+    if(d.deadline){if(dlLine)dlLine+='　/　';dlLine+=`納期: ${fmtDateJP(d.deadline)}`}
+    if(dlLine)h+=`<div class="dl">${dlLine}</div>`;
+    if(d.amount!==''&&d.amount!=null&&!isNaN(Number(d.amount))&&Number(d.amount)>0)h+=`<div class="sub-info">${fmtAmount(d.amount)}</div>`;
+    if(d.notes){const nt=String(d.notes);h+=`<div class="note">${esc(nt.length>60?nt.slice(0,60)+'…':nt)}</div>`}
+    h+='</div>';
+    return h;
+  }
+  function setBoardFilter(v){boardFilter=v;renderBoard()}
+  function unifiedSearch(q){
+    q=String(q||'').toLowerCase();
+    const view=document.querySelector('#boardView:not(.hidden), #archiveView:not(.hidden), #salesAdminView:not(.hidden)');
+    if(!view)return;
+    view.querySelectorAll('.fv-card, tbody tr').forEach(el=>{el.style.display=el.textContent.toLowerCase().includes(q)?'':'none'});
+  }
+  function boardCardFilter(q){
+    boardSearch=q;q=String(q||'').toLowerCase();
+    $('boardView').querySelectorAll('.fv-card').forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(q)?'':'none'});
+  }
+
+  // ===== 管理（adminView→salesAdminView） =====
+  function renderAdmin(){
+    const el=$('salesAdminView');
+    let items=allEntries.filter(e=>!ARCHIVE_ST.includes(e.status));
+    const kw=adminSearch.trim().toLowerCase();
+    if(adminStatusFilter)items=items.filter(e=>e.status===adminStatusFilter);
+    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.person||'')+' '+String(e.order_no||'')+' '+String(e.estimate_no||'')).toLowerCase();return blob.includes(kw)});
+    const stCnt={};ALL_ST.forEach(s=>stCnt[s]=0);
+    allEntries.filter(e=>!ARCHIVE_ST.includes(e.status)).forEach(e=>{if(stCnt[e.status]!==undefined)stCnt[e.status]++});
+    items.sort((a,b)=>{
+      let va=a[adminSort.col],vb=b[adminSort.col];
+      const ea=va==null||va==='',eb=vb==null||vb==='';
+      if(ea&&eb)return 0;if(ea)return 1;if(eb)return-1;
+      if(adminSort.col==='created_at'||adminSort.col==='updated_at'||adminSort.col==='deadline'){va=String(va);vb=String(vb);return adminSort.asc?va.localeCompare(vb):vb.localeCompare(va)}
+      if(adminSort.col==='amount'){const na=Number(va)||0,nb=Number(vb)||0;return adminSort.asc?na-nb:nb-na}
+      if(adminSort.col==='status'){const oa=ALL_ST.indexOf(va),ob=ALL_ST.indexOf(vb);return adminSort.asc?oa-ob:ob-oa}
+      va=String(va).toLowerCase();vb=String(vb).toLowerCase();
+      return va<vb?(adminSort.asc?-1:1):va>vb?(adminSort.asc?1:-1):0;
+    });
+    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'supplier',label:'仕入先'},{key:'amount',label:'金額'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
+    const ftBtn=(label,val)=>{const on=adminStatusFilter===val?' on':'';const cnt=val?stCnt[val]||0:allEntries.filter(e=>!ARCHIVE_ST.includes(e.status)).length;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`};
+    let h=`<div class="fv-sum">${ftBtn('すべて',null)}`;
+    ACTIVE_ST.forEach(s=>{h+=ftBtn(s,s)});
+    h+='<button class="av-add" style="margin-left:auto" onclick="Sales.openMo()">+ 新規登録</button></div>';
+    h+='<div class="tbl-wrap"><table class="tbl"><thead><tr>';
+    cols.forEach(c=>{const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
+    h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
+    if(items.length===0){h+='<tr><td colspan="'+(cols.length+2)+'" class="empty-msg">該当する案件はありません</td></tr>';}
+    else{items.forEach(d=>{
+      h+='<tr>';
+      cols.forEach(c=>{
+        let v=d[c.key]||'';
+        if(c.key==='status'){h+=`<td><select class="st-mini" onchange="Sales.changeStatus('${esc(d.id)}',this.value)">`;ALL_ST.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});h+='</select></td>';}
+        else if(c.key==='deadline'){h+=`<td>${fmtDateJP(v)}</td>`;}
+        else if(c.key==='amount'){h+=`<td style="text-align:right;font-variant-numeric:tabular-nums">${fmtAmount(v)}</td>`;}
+        else{h+=`<td>${esc(v)}</td>`;}
+      });
+      const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
+      h+=`<td style="text-align:center"><input type="checkbox" ${chk?'checked':''} onchange="Sales.toggleInvoiced('${esc(d.id)}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td>`;
+      h+=`<td><button class="act-btn" onclick="Sales.openMo('${esc(d.id)}')">編集</button> <button class="act-btn del" onclick="Sales.delEntry('${esc(d.id)}')">削除</button></td>`;
+      h+='</tr>';
+    });}
+    h+='</tbody></table></div>';
+    el.innerHTML=h;
+    el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(adminSort.col===c)adminSort.asc=!adminSort.asc;else{adminSort.col=c;adminSort.asc=true}renderAdmin()}});
+    el.querySelectorAll('[data-st]').forEach(btn=>{btn.onclick=()=>{const v=btn.dataset.st;adminStatusFilter=v||null;renderAdmin()}});
+  }
+
+  // ===== 完了 =====
+  function renderArchive(){
+    const el=$('archiveView');
+    let items=allEntries.filter(e=>ARCHIVE_ST.includes(String(e.status||'').trim()));
+    const kw=archiveSearch.trim().toLowerCase();
+    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||'')).toLowerCase();return blob.includes(kw)});
+    items.sort((a,b)=>{
+      let va=a[archiveSort.col],vb=b[archiveSort.col];
+      const ea=va==null||va==='',eb=vb==null||vb==='';
+      if(ea&&eb)return 0;if(ea)return 1;if(eb)return-1;
+      if(archiveSort.col==='created_at'||archiveSort.col==='deadline'){va=String(va);vb=String(vb);return archiveSort.asc?va.localeCompare(vb):vb.localeCompare(va)}
+      if(archiveSort.col==='amount'){const na=Number(va)||0,nb=Number(vb)||0;return archiveSort.asc?na-nb:nb-na}
+      va=String(va).toLowerCase();vb=String(vb).toLowerCase();
+      return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0;
+    });
+    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'supplier',label:'仕入先'},{key:'amount',label:'金額'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
+    let h=`<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">完了・見送りの案件（${items.length}件）</span></div>`;
+    h+='<div class="tbl-wrap"><table class="tbl"><thead><tr>';
+    cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
+    h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
+    if(items.length===0){h+='<tr><td colspan="'+(cols.length+2)+'" class="empty-msg">完了・見送り案件はありません</td></tr>';}
+    else{items.forEach(d=>{
+      h+='<tr>';
+      cols.forEach(c=>{
+        let v=d[c.key]||'';
+        if(c.key==='deadline'){h+=`<td>${fmtDateJP(v)}</td>`;}
+        else if(c.key==='amount'){h+=`<td style="text-align:right;font-variant-numeric:tabular-nums">${fmtAmount(v)}</td>`;}
+        else{h+=`<td>${esc(v)}</td>`;}
+      });
+      const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
+      h+=`<td style="text-align:center"><input type="checkbox" ${chk?'checked':''} onchange="Sales.toggleInvoiced('${esc(d.id)}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td>`;
+      h+=`<td><button class="act-btn" onclick="Sales.openMo('${esc(d.id)}')">編集</button></td>`;
+      h+='</tr>';
+    });}
+    h+='</tbody></table></div>';
+    el.innerHTML=h;
+    el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}renderArchive()}});
+  }
+
+  // ===== 詳細（salesStToggle/salesStOpts） =====
+  function vr(label,val){return`<div class="view-row"><div class="view-label">${label}</div><div class="view-val">${esc(val||'')}</div></div>`}
+  function openView(id){
+    const d=allEntries.find(x=>String(x.id)===String(id));if(!d)return;
+    let h='';
+    h+=vr('物件名',d.project);
+    if(d.our_person)h+=vr('担当者',d.our_person);
+    if(d.estimate_no)h+=vr('見積番号',d.estimate_no);
+    if(d.order_no)h+=vr('受注番号',d.order_no);
+    if(d.client)h+=vr('得意先',d.client);
+    if(d.person)h+=vr('窓口',d.person);
+    if(d.supplier)h+=vr('仕入先',d.supplier);
+    if(d.amount!==''&&d.amount!=null&&!isNaN(Number(d.amount))&&Number(d.amount)>0)h+=vr('金額',fmtAmount(d.amount));
+    h+=vr('受付日',fmtDateJP(d.created_at)||'―');
+    if(d.deadline)h+=vr('納期',fmtDateJP(d.deadline));
+    if(d.notes)h+=vr('備考',d.notes);
+    h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
+    h+=`<button class="st-toggle" id="salesStToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
+    h+='<div class="st-opts" id="salesStOpts">';
+    ACTIVE_ST.forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${esc(s)}">${esc(s)}</button>`});
+    h+='</div></div>';
+    $('viewContent').innerHTML=h;
+    const stgl=$('salesStToggle'),sopts=$('salesStOpts');
+    if(stgl&&sopts)stgl.onclick=()=>{stgl.classList.toggle('open');sopts.classList.toggle('open')};
+    $('viewContent').querySelectorAll('.st-opt').forEach(btn=>{
+      btn.onclick=()=>{const newSt=btn.dataset.st;if(d.status===newSt){stgl.classList.remove('open');sopts.classList.remove('open');return}changeStatus(id,newSt);openView(id)};
+    });
+    $('viewBg').classList.add('show');
+  }
+  function closeView(){$('viewBg').classList.remove('show')}
+
+  // ===== 編集モーダル =====
+  function openMo(id){
+    const isEdit=!!id;let e={};
+    if(isEdit)e=allEntries.find(x=>String(x.id)===String(id))||{};
+    $('moTitle').textContent=isEdit?'案件編集':'案件登録';
+    $('f_id').value=isEdit?e.id:'';
+    $('f_project').value=isEdit?(e.project||''):'';
+    $('f_our_person').value=isEdit?(e.our_person||''):'';
+    $('f_estimate_no').value=isEdit?(e.estimate_no||''):'';
+    $('f_order_no').value=isEdit?(e.order_no||''):'';
+    $('f_client').value=isEdit?(e.client||''):'';
+    $('f_person').value=isEdit?(e.person||''):'';
+    $('f_supplier').value=isEdit?(e.supplier||''):'';
+    $('f_amount').value=isEdit?(e.amount===''||e.amount==null?'':e.amount):'';
+    $('f_created_at').value=isEdit?fmtDate(e.created_at):fmtDate(new Date());
+    $('f_deadline').value=isEdit?fmtDate(e.deadline):'';
+    $('f_status').value=isEdit?(e.status||'見積中'):'見積中';
+    $('f_notes').value=isEdit?(e.notes||''):'';
+    refreshDatalists();
+    $('moBg').classList.add('show');
+  }
+  function closeMo(){$('moBg').classList.remove('show')}
+  function saveEntry(){
+    const id=$('f_id').value;
+    const payload={project:$('f_project').value.trim(),our_person:$('f_our_person').value.trim(),estimate_no:$('f_estimate_no').value.trim(),order_no:$('f_order_no').value.trim(),client:$('f_client').value.trim(),person:$('f_person').value.trim(),supplier:$('f_supplier').value.trim(),amount:$('f_amount').value,created_at:$('f_created_at').value,deadline:$('f_deadline').value,status:$('f_status').value,notes:$('f_notes').value};
+    if(!payload.project){toast('物件名は必須');$('f_project').focus();return}
+    if(!payload.created_at){toast('受付日は必須');return}
+    const today=fmtDate(new Date());
+    if(id){
+      const idx=allEntries.findIndex(x=>String(x.id)===String(id));
+      if(idx>=0)allEntries[idx]={...allEntries[idx],...payload,id,updated_at:today};
+      apiPost({action:'save',id,...payload});
+      toast('更新しました');
+    }else{
+      const tempId='s_'+Date.now();
+      allEntries.push({id:tempId,...payload,updated_at:today});
+      apiPost({action:'save',...payload});
+      toast('登録しました');
+      setTimeout(()=>{loadAll()},1500);
+    }
+    _setCache('sales',{entries:allEntries});
+    closeMo();render();refreshDatalists();
+  }
+  function changeStatus(id,newSt){
+    const idx=allEntries.findIndex(x=>String(x.id)===String(id));if(idx<0)return;
+    const today=fmtDate(new Date());
+    allEntries[idx]={...allEntries[idx],status:newSt,updated_at:today};
+    _setCache('sales',{entries:allEntries});
+    apiPost({action:'save',id,status:newSt});
+    render();toast('ステータスを更新しました');
+  }
+  function toggleInvoiced(id,checked){
+    const idx=allEntries.findIndex(x=>String(x.id)===String(id));if(idx<0)return;
+    allEntries[idx].invoiced=checked?'TRUE':'FALSE';
+    _setCache('sales',{entries:allEntries});
+    apiPost({action:'save',id,invoiced:allEntries[idx].invoiced});
+  }
+  function delEntry(id){
+    const e=allEntries.find(x=>String(x.id)===String(id));if(!e)return;
+    if(!confirm('この案件を削除しますか？\n'+(e.client||'')+' / '+(e.project||'')))return;
+    allEntries=allEntries.filter(x=>String(x.id)!==String(id));
+    _setCache('sales',{entries:allEntries});
+    apiPost({action:'delete',id});
+    render();refreshDatalists();toast('削除しました');
+  }
+
+  // ===== init（末尾のsetView/loadDataをここへ。タブ切替配線） =====
+  function init(){
+    $('salesTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t)return;setView(t.dataset.view)});
+    const pc=$('salesPcDate');if(pc)pc.textContent=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
+    if($('salesPcSearch'))$('salesPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
+    setView('board');
+  }
+
+  return {
+    loadAll, init,
+    setView, setBoardFilter, openSlog, closeSlog, clearSlog,
+    openView, closeView, openMo, closeMo, saveEntry,
+    changeStatus, toggleInvoiced, delEntry, unifiedSearch
+  };
+})();
+
 /* ========================================================================
    App.nav：画面切替＋遅延ロード機構（SPAの心臓部）
    - display切替（hidden付け外し）＝0秒
@@ -3121,6 +3686,7 @@ const App = {
     {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj'},
     {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv'},
     {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh'},
+    {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales'},
   ],
   _loaded:{},
   _loading:{},
