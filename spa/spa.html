@@ -4927,38 +4927,50 @@ $('refreshBtn').addEventListener('click', function(){
   const ptr=$('ptr');
   let startY=0, pulling=false, dist=0, refreshing=false;
   const THRESHOLD=70, MAX=90;
+  function curSection(){return document.querySelector('section[id^="view-"]:not(.hidden)')}
+  function setPull(px){
+    const sec=curSection();
+    if(sec){sec.style.transition='none';sec.style.transform=px>0?`translateY(${px}px)`:'';}
+    ptr.style.height=px+'px';
+    ptr.classList.toggle('show',px>0);
+  }
+  function resetPull(animate){
+    const sec=curSection();
+    if(sec){sec.style.transition=animate?'transform .25s':'none';sec.style.transform='';}
+    ptr.style.height='0';ptr.classList.remove('show');
+  }
   window.addEventListener('touchstart',e=>{
     if(refreshing)return;
-    // ページ最上部のときだけpull-to-refresh開始
     if(window.scrollY>0||document.documentElement.scrollTop>0){pulling=false;return;}
     startY=e.touches[0].clientY; pulling=true; dist=0;
   },{passive:true});
   window.addEventListener('touchmove',e=>{
     if(!pulling||refreshing)return;
     dist=e.touches[0].clientY-startY;
-    if(dist<=0){ptr.style.height='0';ptr.classList.remove('show');return;}
+    if(dist<=0){resetPull(false);return;}
     // 最上部で下に引っ張っている間はネイティブのpull-to-refresh（=リロード）を抑止
     if(e.cancelable)e.preventDefault();
-    const h=Math.min(dist*0.5,MAX);
-    ptr.style.height=h+'px';
-    ptr.classList.add('show');
+    // 抵抗感：引っ張るほど鈍くなる
+    const px=Math.min(dist*0.45,MAX);
+    setPull(px);
   },{passive:false});
   window.addEventListener('touchend',async()=>{
     if(!pulling||refreshing){pulling=false;return;}
     pulling=false;
-    if(dist*0.5>=THRESHOLD){
+    if(dist*0.45>=THRESHOLD){
       refreshing=true;
-      ptr.style.height=MAX*0.6+'px';
-      ptr.classList.add('spinning');
+      const sec=curSection();
+      if(sec){sec.style.transition='transform .2s';sec.style.transform='translateY(50px)';}
+      ptr.style.height='50px';ptr.classList.add('show','spinning');
       try{ await App.refreshCurrent(); }
       catch(e){ toast('更新に失敗しました',true); }
       finally{
         ptr.classList.remove('spinning');
-        ptr.style.height='0'; ptr.classList.remove('show');
+        resetPull(true);
         refreshing=false;
       }
     }else{
-      ptr.style.height='0'; ptr.classList.remove('show');
+      resetPull(true);
     }
   },{passive:true});
 })();
