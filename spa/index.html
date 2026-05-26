@@ -634,6 +634,77 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
 }
 
+
+/* ===== 在庫 固有CSS（在庫バー/ステータスバッジ/テーブルアクション） ===== */
+.cat-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#f0f1f5;color:var(--text-dim)}
+@media(max-width:768px){
+  .mobile-date{display:none!important}
+  .subtab-date{display:none}
+  .subtab-search{display:none}
+  .slog-btn{display:none}
+  .fv-date,.slog-btn,.staff-btn{display:none!important}
+  .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
+  .sub-tabs::-webkit-scrollbar{display:none}
+  .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
+  .fv-sum{display:none !important}
+  .fv-si{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;min-width:0;border-radius:999px;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
+  .fv-si .n{font-size:13px;font-weight:700;line-height:1;margin:0;order:2}
+  .fv-si .l{font-size:12px;font-weight:600;line-height:1;margin:0;color:inherit;order:1}
+  .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
+  .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
+}
+@media(max-width:768px){
+  }
+.tbl-actions{display:flex;gap:6px}
+.tbl-actions a{font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
+.tbl-actions .edit-link{color:#6366f1}
+.tbl-actions .edit-link:hover{text-decoration:underline}
+.tbl-actions .del-link{color:#e53e3e}
+.tbl-actions .del-link:hover{text-decoration:underline}
+.st-予約{background:#ede9fe;color:#7c3aed}
+.st-貸出中{background:#dbeafe;color:#2563eb}
+.st-返却済{background:#d1fae5;color:#059669}
+.st-検品中{background:#fef9c3;color:#a16207}
+.st-メンテ待ち{background:#ffedd5;color:#c2410c}
+.st-メンテ中{background:#fee2e2;color:#dc2626}
+.avail-item-name{font-size:13px;font-weight:600;min-width:180px;color:var(--text)}
+.avail-meter{flex:1;height:22px;background:#f0f1f5;border-radius:6px;overflow:hidden}
+.avail-fill{height:100%;border-radius:6px;transition:.3s}
+.avail-fill.ok{background:#34d399}
+.avail-fill.warn{background:#fbbf24}
+.avail-fill.danger{background:#f87171}
+.avail-nums{font-size:12px;color:#888;min-width:120px;text-align:right}
+.avail-cat-hd{margin-top:18px;margin-bottom:8px;font-size:13px;font-weight:700;color:var(--text-dim);padding-bottom:4px;border-bottom:1px solid var(--border)}
+.filter-bar select,.filter-bar input{padding:7px 12px;background:#fff;border1px solid var(--border);border-radius:6px;color:var(--text);font:400 13px/1 'Noto Sans JP',sans-serif;outline:none}
+.filter-bar select:focus,.filter-bar input:focus{border-color:#6366f1}
+.avail-date-row label{font-size:12px;font-weight:600;color:#888}
+.avail-date-row input,.avail-date-row select{padding:7px 12px;background:#fff;border1px solid var(--border);border-radius:6px;color:var(--text);font:400 13px/1 'Noto Sans JP',sans-serif;outline:none}
+.section h2{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
+.section p.desc{font-size:12px;color:#999;margin-bottom:16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overdue-badge{font-size:10px;font-weight:600;color:#dc2626;background:#fee2e2;padding:2px 6px;border-radius:4px;margin-left:4px}
+@media(max-width:768px){
+  .nav-spacer{display:none}
+  .nav-right{display:contents}
+  .nav-menu-btn{display:none}
+  .hdr-inner{padding:6px 8px 0 8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .hdr-inner::-webkit-scrollbar{display:none}
+  .nav-link{flex-shrink:0;font-size:12px;padding:0 11px}
+  .hdr-btn{flex-shrink:0;font-size:11px;padding:0 11px;margin-left:8px}
+  .hdr::after{content:'';position:absolute;top:0;right:0;width:22px;height:48px;background:linear-gradient(to right,transparent,#fb7185);pointer-events:none;z-index:1}
+}
+
+
+@media(max-width:640px){
+  .main{padding:12px 12px 32px}
+  .mo{padding:20px 16px;width:98%}
+  .mo-row{flex-direction:column}
+  .avail-item-name{min-width:100px;font-size:12px}
+  .toolbar{flex-direction:column;align-items:flex-start}
+  .av-top{flex-direction:column;align-items:stretch;gap:8px}
+  .av-search{display:none}
+}
+
 /* ===== モバイル(@media 768px)共通微調整 ===== */
 </style>
 </head>
@@ -652,7 +723,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
       <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
       <a href="../app/sales.html" class="nav-link">販売</a>
       <a href="../app/labor.html" class="nav-link">工数</a>
-      <a href="../app/inventory.html" class="nav-link">在庫</a>
+      <button class="nav-link" id="navInv" onclick="App.nav('inv')">在庫</button>
       <a href="../app/vehicle.html" class="nav-link">車両</a>
     </div>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
@@ -823,7 +894,139 @@ tr:hover td{background:rgba(59,111,216,.03)}
   </div>
 </section>
 
-<!-- ===== 共用 loader / toast（1個ずつ・section外） ===== -->
+<!-- ===== 在庫 section ===== -->
+<section id="view-inv" class="hidden">
+  <div class="sub-tabs" id="invTabs">
+    <span class="subtab-date" id="invPcDate"></span>
+    <button class="sub-tab on" data-tab="avail" onclick="Inv.switchTab('avail')">在庫確認</button>
+    <button class="sub-tab" data-tab="rentals" onclick="Inv.switchTab('rentals')">貸出/予約</button>
+    <button class="sub-tab" data-tab="maint" onclick="Inv.switchTab('maint')">メンテ</button>
+    <button class="sub-tab" data-tab="items" onclick="Inv.switchTab('items')">商品台帳</button>
+    <button class="slog-btn" id="invSlogBtn" onclick="Inv.openSlog()">ステータスログ<span class="dot"></span></button>
+    <input class="subtab-search" id="invPcSearch" placeholder="検索...">
+  </div>
+
+  <div class="main">
+    <!-- 商品台帳 -->
+    <div id="v_items" class="hidden">
+      <div class="fv-sum">
+        <span id="itemChips" style="display:contents"></span>
+        <button class="av-add" onclick="Inv.openItemMo()" style="margin-left:auto">＋ 商品追加</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th data-col="category" onclick="Inv.sortItems('category')" style="cursor:pointer">カテゴリ <span id="item_sort_category" class="arrow"></span></th><th data-col="item_name" onclick="Inv.sortItems('item_name')" style="cursor:pointer">商品名 <span id="item_sort_item_name" class="arrow"></span></th><th data-col="total_qty" onclick="Inv.sortItems('total_qty')" style="cursor:pointer">保有数 <span id="item_sort_total_qty" class="arrow"></span></th><th>備考</th><th>操作</th></tr></thead>
+          <tbody id="items_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 貸出/予約 -->
+    <div id="v_rentals" class="hidden">
+      <div class="fv-sum">
+        <span id="rentalChips" style="display:contents"></span>
+        <select id="flt_r_cat" onchange="Inv.renderRentals()" style="margin-left:auto"><option value="">全カテゴリ</option></select>
+        <button class="av-add" onclick="Inv.openRentalMo()">＋ 貸出/予約登録</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
+          <tbody id="rentals_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- メンテ -->
+    <div id="v_maint" class="hidden">
+      <div class="fv-sum" id="maintChips"></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
+          <tbody id="maint_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 在庫確認 -->
+    <div id="v_avail">
+      <div class="fv-sum" id="availChips"></div>
+      <div class="av-top">
+        <div class="avail-date-row">
+          <label>開始日</label>
+          <input type="date" id="avail_start" onchange="Inv.renderAvail()">
+          <label>終了日</label>
+          <input type="date" id="avail_end" onchange="Inv.renderAvail()">
+        </div>
+      </div>
+      <div class="section">
+        <h2>在庫バッティング確認</h2>
+        <p class="desc">指定期間中に「予約」「貸出中」の数量を合計し、保有数に対する使用率を表示します。</p>
+        <div id="avail_body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 商品モーダル -->
+  <div class="mo-bg" id="itemMoBg">
+    <div class="mo">
+      <h3 id="itemMoTitle">商品追加</h3>
+      <input type="hidden" id="xf_item_id">
+      <div class="mo-row">
+        <div class="mo-field"><label>カテゴリ *</label><select id="xf_item_cat"><option value="">選択してください</option></select></div>
+        <div class="mo-field"><label>新規カテゴリ（上にない場合）</label><input id="xf_item_newcat" placeholder="新しいカテゴリ名"></div>
+      </div>
+      <div class="mo-row full"><div class="mo-field"><label>商品名 *</label><input id="xf_item_name" placeholder="例: 3m×3m"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>保有数</label><input id="xf_item_qty" type="number" min="0" value="0"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="xf_item_notes"></textarea></div></div>
+      <div class="mo-foot">
+        <button class="cancel" onclick="Inv.closeItemMo()">キャンセル</button>
+        <button class="save" onclick="Inv.saveItem()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 貸出/予約モーダル -->
+  <div class="mo-bg" id="rentalMoBg">
+    <div class="mo">
+      <h3 id="rentalMoTitle">貸出/予約登録</h3>
+      <input type="hidden" id="xf_r_id">
+      <div class="mo-row">
+        <div class="mo-field"><label>カテゴリ *</label><select id="xf_r_cat" onchange="Inv.populateItemSelect()"><option value="">選択</option></select></div>
+        <div class="mo-field"><label>商品名 *</label><select id="xf_r_item"><option value="">先にカテゴリを選択</option></select></div>
+      </div>
+      <div class="mo-row">
+        <div class="mo-field"><label>数量 *</label><input id="xf_r_qty" type="number" min="1" value="1"></div>
+        <div class="mo-field"><label>ステータス</label><select id="xf_r_status"><option>予約</option><option>貸出中</option><option>返却済</option><option>検品中</option><option>メンテ待ち</option><option>メンテ中</option></select></div>
+      </div>
+      <div class="mo-row">
+        <div class="mo-field"><label>開始日 *</label><input id="xf_r_start" type="date"></div>
+        <div class="mo-field"><label>終了日 *</label><input id="xf_r_end" type="date"></div>
+      </div>
+      <div class="mo-row full"><div class="mo-field">
+        <label>案件 / 顧客名</label>
+        <div style="display:flex;gap:8px">
+          <select id="xf_r_project" style="flex:1" onchange="Inv.onProjectSelect()"><option value="">案件を選択（任意）</option></select>
+          <input id="xf_r_client" style="flex:1" placeholder="または顧客名を入力">
+        </div>
+      </div></div>
+      <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="xf_r_notes"></textarea></div></div>
+      <div class="mo-foot">
+        <button class="cancel" onclick="Inv.closeRentalMo()">キャンセル</button>
+        <button class="save" onclick="Inv.saveRental()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ステータスログモーダル（slogBg→invSlogBg / slogList→invSlogList） -->
+  <div class="mo-bg" id="invSlogBg">
+  <div class="mo" style="max-width:560px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="margin:0">ステータスログ</h2>
+      <button class="act-btn del" style="font-size:12px" onclick="Inv.clearSlog()">クリア</button>
+    </div>
+    <div id="invSlogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+    <div class="mo-foot"><button class="cancel" onclick="Inv.closeSlog()">閉じる</button></div>
+  </div>
+  </div>
+</section>
+
 <div class="loading-overlay hidden" id="loader"><div class="spin"></div><br>読み込み中...</div>
 <div class="toast" id="toast"></div>
 
@@ -1728,6 +1931,444 @@ const Proj = (function(){
   };
 })();
 
+const Inv = (function(){
+  // ===== 状態（旧グローバル変数→IIFE内に隔離） =====
+  const DEFAULT_CATS=['テント','横幕','テーブル','イス','備品'];
+  const ACTIVE_STATUSES=['予約','貸出中','メンテ待ち','メンテ中'];
+  const RENTAL_ST=['予約','貸出中','返却済','検品中','メンテ待ち','メンテ中'];
+  let items=[], rentals=[], projects=[];
+  let itemSort={col:'category',asc:true};
+  let itemCatFilter='';
+  let maintStatusFilter='';
+  let rentalStatusFilter='';
+  let availCatFilter='';
+  // slog（inv独自：i付き変数・ILOG_KEY）
+  const ILOG_KEY='inv_status_snapshot';
+  const ILOG_LIST_KEY='inv_status_log';
+  const ILOG_UNREAD_KEY='inv_status_unread';
+  let islog=[];
+  let islogUnread=0;
+
+  // ===== inventory方言ユーティリティ（共通土台と中身が違うため内部に保持） =====
+  function dateJP(d){if(!d)return'';const dt=new Date(d+'T00:00:00');return(dt.getMonth()+1)+'/'+dt.getDate()}
+  function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+  async function apiGet(params){
+    const url=API+'?dept=inventory&'+new URLSearchParams(params);
+    const r=await fetch(url);return r.json();
+  }
+  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})})}
+
+  // ===== ステータスログ =====
+  function detectInvChanges(){
+    const curr={};
+    rentals.forEach(r=>{if(r.id&&String(r.id).indexOf('tmp_')!==0)curr[String(r.id)]={status:r.status||'',name:(r.item_name||'')+(r.client_name?'（'+r.client_name+'）':'')}});
+    try{islog=JSON.parse(localStorage.getItem(ILOG_LIST_KEY)||'[]')}catch(e){islog=[]}
+    try{islogUnread=parseInt(localStorage.getItem(ILOG_UNREAD_KEY)||'0',10)||0}catch(e){islogUnread=0}
+    let prev=null;
+    try{prev=JSON.parse(localStorage.getItem(ILOG_KEY)||'null')}catch(e){prev=null}
+    if(!prev){localStorage.setItem(ILOG_KEY,JSON.stringify(curr));return}
+    const newEntries=[];
+    Object.keys(curr).forEach(id=>{
+      if(!prev[id]){newEntries.push({id,name:curr[id].name,from:'',to:'新規登録',ts:Date.now(),isNew:true})}
+      else if(prev[id].status!==curr[id].status){newEntries.push({id,name:curr[id].name,from:prev[id].status,to:curr[id].status,ts:Date.now()})}
+    });
+    Object.keys(prev).forEach(id=>{
+      if(!curr[id]){newEntries.push({id,name:prev[id].name,from:prev[id].status,to:'削除',ts:Date.now(),isDel:true})}
+    });
+    if(newEntries.length){
+      islog=[...newEntries,...islog].slice(0,20);
+      islogUnread=Math.min(islogUnread+newEntries.length,20);
+      localStorage.setItem(ILOG_LIST_KEY,JSON.stringify(islog));
+      localStorage.setItem(ILOG_UNREAD_KEY,String(islogUnread));
+    }
+    localStorage.setItem(ILOG_KEY,JSON.stringify(curr));
+  }
+  function updateSlogBtn(){const b=$('invSlogBtn');if(b)b.classList.toggle('has-new',islogUnread>0)}
+  function openSlog(){
+    const el=$('invSlogList');
+    if(!islog.length){el.innerHTML='<div class="empty-msg" style="padding:20px;text-align:center">変更履歴はまだありません</div>'}
+    else{
+      let h='';
+      islog.forEach(e=>{
+        const verb=(e.isNew||e.isDel)?'されました':'になりました';
+        const cls=e.isDel?' sl-del':'';
+        h+=`<div class="slog-item${cls}" data-id="${esc(e.id)}" data-del="${e.isDel?'1':'0'}"><span class="sl-name">${esc(e.name)}</span> が <span class="sl-st">${esc(e.to)}</span> ${verb}</div>`;
+      });
+      el.innerHTML=h;
+      el.querySelectorAll('.slog-item').forEach(it=>{
+        if(it.dataset.del==='1')return;
+        it.onclick=()=>{closeSlog();switchTab('rentals');editRental(it.dataset.id)};
+      });
+    }
+    islogUnread=0;localStorage.setItem(ILOG_UNREAD_KEY,'0');updateSlogBtn();
+    $('invSlogBg').classList.add('show');
+  }
+  function closeSlog(){$('invSlogBg').classList.remove('show')}
+  function clearSlog(){
+    if(!islog.length)return;
+    if(!confirm('ログをすべて削除しますか？'))return;
+    islog=[];islogUnread=0;
+    localStorage.setItem(ILOG_LIST_KEY,'[]');localStorage.setItem(ILOG_UNREAD_KEY,'0');
+    $('invSlogList').innerHTML='<div class="empty-msg" style="padding:20px;text-align:center">変更履歴はまだありません</div>';
+    updateSlogBtn();
+  }
+
+  // ===== Load（3本：list/rentals/projects。共用loaderを使用） =====
+  async function loadAll(){
+    const cached=_getCache('inventory');
+    if(cached){
+      items=cached.items||[];rentals=cached.rentals||[];projects=cached.projects||[];
+      populateCategoryFilters();
+      populateProjectSelect();
+      renderItems();renderRentals();renderMaint();renderAvail();
+      detectInvChanges();updateSlogBtn();
+    }
+    try{
+      const [inv,rnt,prj]=await Promise.all([
+        apiGet({action:'list'}).catch(()=>[]),
+        apiGet({action:'rentals'}).catch(()=>[]),
+        apiGet({action:'projects'}).catch(()=>[])
+      ]);
+      items=inv||[];rentals=rnt||[];projects=prj||[];
+      populateCategoryFilters();
+      populateProjectSelect();
+      renderItems();renderRentals();renderMaint();renderAvail();
+      detectInvChanges();updateSlogBtn();
+      _setCache('inventory',{items:items,rentals:rentals,projects:projects});
+    }catch(e){
+      toast('データ取得に失敗: '+e.message,false);
+    }
+  }
+
+  // ===== Categories =====
+  function getAllCategories(){
+    const cats=new Set(DEFAULT_CATS);
+    items.forEach(i=>{if(i.category)cats.add(i.category)});
+    return [...cats].sort();
+  }
+  function populateCategoryFilters(){
+    const cats=getAllCategories();
+    // 商品モーダルのカテゴリ選択
+    const ic=$('xf_item_cat');
+    if(ic){const cur=ic.value;ic.innerHTML='<option value="">選択してください</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');ic.value=cur}
+    // 貸出モーダルのカテゴリ
+    const rc=$('xf_r_cat');
+    if(rc){const cur=rc.value;rc.innerHTML='<option value="">選択</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');rc.value=cur}
+    // 貸出フィルタのカテゴリ
+    const fc=$('flt_r_cat');
+    if(fc){const cur=fc.value;fc.innerHTML='<option value="">全カテゴリ</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');fc.value=cur}
+  }
+  function populateProjectSelect(){
+    const sel=$('xf_r_project');if(!sel)return;
+    sel.innerHTML='<option value="">案件を選択（任意）</option>'+projects.map(p=>`<option value="${esc(p.project||p.client||'')}">${esc(p.project||p.client||'')}</option>`).join('');
+  }
+  function onProjectSelect(){if($('xf_r_project').value)$('xf_r_client').value=$('xf_r_project').value}
+
+  function unifiedSearch(q){
+    q=(q||'').toLowerCase();
+    const view=document.querySelector('#v_items:not(.hidden), #v_rentals:not(.hidden), #v_maint:not(.hidden), #v_avail:not(.hidden)');
+    if(!view)return;
+    view.querySelectorAll('tbody tr, .avail-bar').forEach(el=>{
+      el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
+    });
+  }
+
+  // ===== タブ切替（inv独自：v_items/v_rentals/v_maint/v_avail を出し分け） =====
+  function switchTab(t){
+    document.querySelectorAll('#invTabs .sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+    ['items','rentals','maint','avail'].forEach(v=>$('v_'+v).classList.toggle('hidden',v!==t));
+    if(t==='avail')renderAvail();
+    if(t==='maint')renderMaint();
+  }
+
+  // ===== 商品台帳 =====
+  function sortItems(col){if(itemSort.col===col)itemSort.asc=!itemSort.asc;else{itemSort.col=col;itemSort.asc=true}renderItems()}
+  function setItemCatFilter(v){itemCatFilter=v;renderItems()}
+  function renderItems(){
+    const cat=itemCatFilter;
+    const chipEl=$('itemChips');
+    if(chipEl){
+      const cats=getAllCategories();
+      const cnt={};cats.forEach(c=>cnt[c]=0);
+      items.forEach(i=>{if(cnt[i.category]!==undefined)cnt[i.category]++});
+      let ch=`<div class="fv-si${itemCatFilter===''?' on':''}" onclick="Inv.setItemCatFilter('')"><div class="n">${items.length}</div><div class="l">すべて</div></div>`;
+      cats.forEach(c=>{
+        ch+=`<div class="fv-si${itemCatFilter===c?' on':''}" onclick="Inv.setItemCatFilter('${esc(c)}')"><div class="n">${cnt[c]||0}</div><div class="l">${esc(c)}</div></div>`;
+      });
+      chipEl.innerHTML=ch;
+    }
+    const f=items.filter(i=>{ if(cat&&i.category!==cat)return false; return true; });
+    f.sort((a,b)=>{
+      let va=a[itemSort.col],vb=b[itemSort.col];
+      if(itemSort.col==='total_qty'){va=Number(va)||0;vb=Number(vb)||0;return itemSort.asc?va-vb:vb-va}
+      va=String(va||'').toLowerCase();vb=String(vb||'').toLowerCase();
+      if(va===vb&&itemSort.col==='category'){va=String(a.item_name||'').toLowerCase();vb=String(b.item_name||'').toLowerCase()}
+      return va<vb?(itemSort.asc?-1:1):va>vb?(itemSort.asc?1:-1):0
+    });
+    ['category','item_name','total_qty'].forEach(c=>{const el=document.getElementById('item_sort_'+c);if(el)el.textContent=itemSort.col===c?(itemSort.asc?'▲':'▼'):''});
+    const tb=$('items_tbody');
+    if(!f.length){tb.innerHTML='<tr><td colspan="5" class="empty-msg">商品が登録されていません</td></tr>';return}
+    tb.innerHTML=f.map(i=>`<tr>
+      <td><span class="cat-tag">${esc(i.category)}</span></td>
+      <td><strong>${esc(i.item_name)}</strong></td>
+      <td>${i.total_qty}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${esc(i.notes)}</td>
+      <td><div class="tbl-actions">
+        <a class="edit-link" onclick="Inv.editItem('${i.id}')">編集</a>
+        <a class="del-link" onclick="Inv.deleteItem('${i.id}','${esc(i.item_name)}')">削除</a>
+      </div></td>
+    </tr>`).join('');
+  }
+  function openItemMo(data){
+    $('itemMoTitle').textContent=data?'商品編集':'商品追加';
+    $('xf_item_id').value=data?data.id:'';
+    $('xf_item_cat').value=data?data.category:'';
+    $('xf_item_newcat').value='';
+    $('xf_item_name').value=data?data.item_name:'';
+    $('xf_item_qty').value=data?data.total_qty:0;
+    $('xf_item_notes').value=data?data.notes||'':'';
+    $('itemMoBg').classList.add('show');
+  }
+  function closeItemMo(){$('itemMoBg').classList.remove('show')}
+  function editItem(id){const d=items.find(i=>i.id===id);if(d)openItemMo(d)}
+  function saveItem(){
+    const cat=$('xf_item_newcat').value.trim()||$('xf_item_cat').value;
+    const name=$('xf_item_name').value.trim();
+    if(!cat||!name){toast('カテゴリと商品名は必須です',false);return}
+    const existingId=$('xf_item_id').value;const id=existingId||'tmp_'+Date.now();
+    const qty=$('xf_item_qty').value;const notes=$('xf_item_notes').value.trim();
+    fireAndForget({action:'save_item',id:existingId||undefined,category:cat,item_name:name,total_qty:qty,notes});
+    const local={id,category:cat,item_name:name,total_qty:Number(qty)||0,notes};
+    if(existingId){const idx=items.findIndex(x=>x.id===existingId);if(idx>=0)items[idx]={...items[idx],...local};else items.push(local)}else{items.push(local)}
+    toast('保存しました');closeItemMo();populateCategoryFilters();renderItems();renderAvail();
+  }
+  function deleteItem(id,name){
+    if(!confirm(name+' を削除しますか？'))return;
+    fireAndForget({action:'delete_item',id});
+    items=items.filter(x=>x.id!==id);
+    toast('削除しました');renderItems();renderAvail();
+  }
+
+  // ===== メンテ =====
+  function setMaintFilter(v){maintStatusFilter=v;renderMaint()}
+  function renderMaint(){
+    const MAINT_ST=['メンテ待ち','メンテ中'];
+    let f=rentals.filter(r=>MAINT_ST.includes(r.status));
+    const chipEl=$('maintChips');
+    if(chipEl){
+      const cnt={};MAINT_ST.forEach(s=>cnt[s]=0);
+      f.forEach(r=>{if(cnt[r.status]!==undefined)cnt[r.status]++});
+      let ch=`<div class="fv-si${maintStatusFilter===''?' on':''}" onclick="Inv.setMaintFilter('')"><div class="n">${f.length}</div><div class="l">すべて</div></div>`;
+      MAINT_ST.forEach(s=>{
+        ch+=`<div class="fv-si${maintStatusFilter===s?' on':''}" onclick="Inv.setMaintFilter('${s}')"><div class="n">${cnt[s]||0}</div><div class="l">${s}</div></div>`;
+      });
+      chipEl.innerHTML=ch;
+    }
+    if(maintStatusFilter)f=f.filter(r=>r.status===maintStatusFilter);
+    const tb=$('maint_tbody');
+    if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">メンテ待ち・メンテ中の商品はありません</td></tr>';return}
+    tb.innerHTML=f.map(r=>`<tr>
+      <td><span class="st st-${r.status}">${r.status}</span></td>
+      <td><span class="cat-tag">${esc(r.category)}</span></td>
+      <td><strong>${esc(r.item_name)}</strong></td>
+      <td>${r.qty}</td>
+      <td>${dateJP(r.date_start)}</td>
+      <td>${dateJP(r.date_end)}</td>
+      <td>${esc(r.client_name)}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
+      <td><div class="tbl-actions">
+        <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
+      </div></td>
+    </tr>`).join('');
+  }
+
+  // ===== 貸出/予約 =====
+  function setRentalFilter(v){rentalStatusFilter=v;renderRentals()}
+  function renderRentals(){
+    const cat=$('flt_r_cat').value;
+    const chipEl=$('rentalChips');
+    if(chipEl){
+      const catFiltered=cat?rentals.filter(r=>r.category===cat):rentals;
+      const cnt={};RENTAL_ST.forEach(s=>cnt[s]=0);
+      catFiltered.forEach(r=>{if(cnt[r.status]!==undefined)cnt[r.status]++});
+      let ch=`<div class="fv-si${rentalStatusFilter===''?' on':''}" onclick="Inv.setRentalFilter('')"><div class="n">${catFiltered.length}</div><div class="l">すべて</div></div>`;
+      RENTAL_ST.forEach(s=>{
+        ch+=`<div class="fv-si${rentalStatusFilter===s?' on':''}" onclick="Inv.setRentalFilter('${s}')"><div class="n">${cnt[s]||0}</div><div class="l">${s}</div></div>`;
+      });
+      chipEl.innerHTML=ch;
+    }
+    const f=rentals.filter(r=>{
+      if(rentalStatusFilter&&r.status!==rentalStatusFilter)return false;
+      if(cat&&r.category!==cat)return false;
+      return true;
+    });
+    const tb=$('rentals_tbody');
+    if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">貸出/予約データがありません</td></tr>';return}
+    const now=todayStr();
+    tb.innerHTML=f.map(r=>{
+      const isOverdue=r.date_end&&r.date_end<now&&r.status==='貸出中';
+      return`<tr${isOverdue?' class="overdue"':''}>
+      <td><span class="st st-${r.status}">${r.status}</span>${isOverdue?'<span class="overdue-badge">期限超過</span>':''}</td>
+      <td><span class="cat-tag">${esc(r.category)}</span></td>
+      <td><strong>${esc(r.item_name)}</strong></td>
+      <td>${r.qty}</td>
+      <td>${dateJP(r.date_start)}</td>
+      <td>${dateJP(r.date_end)}</td>
+      <td>${esc(r.client_name)}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
+      <td><div class="tbl-actions">
+        <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
+        <a class="del-link" onclick="Inv.deleteRental('${r.id}')">削除</a>
+      </div></td>
+    </tr>`}).join('');
+  }
+  function populateItemSelect(){
+    const cat=$('xf_r_cat').value;const sel=$('xf_r_item');
+    sel.innerHTML='<option value="">商品を選択</option>';
+    if(!cat)return;
+    items.filter(i=>i.category===cat).forEach(i=>{
+      const o=document.createElement('option');o.value=i.item_name;
+      o.textContent=i.item_name+' (保有:'+i.total_qty+')';sel.appendChild(o);
+    });
+    const o=document.createElement('option');o.value='__new__';o.textContent='＋ 一覧にない商品を追加';sel.appendChild(o);
+  }
+  function openRentalMo(data){
+    $('rentalMoTitle').textContent=data?'貸出/予約編集':'貸出/予約登録';
+    $('xf_r_id').value=data?data.id:'';
+    $('xf_r_cat').value=data?data.category:'';
+    populateItemSelect();
+    if(data){
+      const sel=$('xf_r_item');let found=false;
+      for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===data.item_name){sel.selectedIndex=i;found=true;break}}
+      if(!found&&data.item_name){const o=document.createElement('option');o.value=data.item_name;o.textContent=data.item_name;sel.insertBefore(o,sel.lastElementChild);sel.value=data.item_name}
+    }
+    $('xf_r_qty').value=data?data.qty:1;
+    $('xf_r_status').value=data?data.status:'予約';
+    $('xf_r_start').value=data?data.date_start:'';
+    $('xf_r_end').value=data?data.date_end:'';
+    $('xf_r_client').value=data?data.client_name||'':'';
+    $('xf_r_project').value='';
+    if(data&&data.client_name){const sel=$('xf_r_project');for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===data.client_name){sel.selectedIndex=i;break}}}
+    $('xf_r_notes').value=data?data.notes||'':'';
+    $('rentalMoBg').classList.add('show');
+  }
+  function closeRentalMo(){$('rentalMoBg').classList.remove('show')}
+  function editRental(id){const d=rentals.find(r=>r.id===id);if(d)openRentalMo(d)}
+  function saveRental(){
+    const cat=$('xf_r_cat').value;let itemName=$('xf_r_item').value;
+    const start=$('xf_r_start').value;const end=$('xf_r_end').value;
+    if(itemName==='__new__'){
+      const newName=prompt('新しい商品名を入力（カテゴリ: '+cat+'）');if(!newName)return;
+      const qty=prompt('保有数を入力','0');
+      fireAndForget({action:'save_item',category:cat,item_name:newName,total_qty:Number(qty)||0,notes:''});
+      items.push({id:'tmp_'+Date.now(),category:cat,item_name:newName,total_qty:Number(qty)||0,notes:''});
+      itemName=newName;toast('商品「'+newName+'」を追加しました');
+      populateCategoryFilters();renderItems();
+    }
+    if(!cat||!itemName||!start||!end){toast('カテゴリ・商品名・開始日・終了日は必須です',false);return}
+    const existingId=$('xf_r_id').value;const id=existingId||'tmp_'+Date.now();
+    const qtyVal=$('xf_r_qty').value;const status=$('xf_r_status').value;
+    const clientName=$('xf_r_client').value.trim();const notes=$('xf_r_notes').value.trim();
+    fireAndForget({action:'save_rental',id:existingId||undefined,category:cat,item_name:itemName,qty:qtyVal,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes});
+    const local={id,category:cat,item_name:itemName,qty:Number(qtyVal)||1,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes};
+    if(existingId){const idx=rentals.findIndex(x=>x.id===existingId);if(idx>=0)rentals[idx]={...rentals[idx],...local};else rentals.push(local)}else{rentals.push(local)}
+    toast('保存しました');closeRentalMo();renderRentals();renderMaint();renderAvail();
+  }
+  function deleteRental(id){
+    if(!confirm('この貸出/予約を削除しますか？'))return;
+    fireAndForget({action:'delete_rental',id});
+    rentals=rentals.filter(x=>x.id!==id);
+    toast('削除しました');renderRentals();renderMaint();renderAvail();
+  }
+
+  // ===== 在庫確認 =====
+  function setAvailCatFilter(v){availCatFilter=v;renderAvail()}
+  function renderAvail(){
+    const startStr=$('avail_start').value;const endStr=$('avail_end').value;
+    const cat=availCatFilter;const body=$('avail_body');
+    const chipEl=$('availChips');
+    if(chipEl){
+      const cats=getAllCategories();
+      const cnt={};cats.forEach(c=>cnt[c]=0);
+      items.forEach(i=>{if(cnt[i.category]!==undefined)cnt[i.category]++});
+      let ch=`<div class="fv-si${availCatFilter===''?' on':''}" onclick="Inv.setAvailCatFilter('')"><div class="n">${items.length}</div><div class="l">すべて</div></div>`;
+      cats.forEach(c=>{
+        ch+=`<div class="fv-si${availCatFilter===c?' on':''}" onclick="Inv.setAvailCatFilter('${esc(c)}')"><div class="n">${cnt[c]||0}</div><div class="l">${esc(c)}</div></div>`;
+      });
+      chipEl.innerHTML=ch;
+    }
+    if(!startStr||!endStr){body.innerHTML='<p style="color:#aaa;font-size:13px">開始日と終了日を指定してください。</p>';return}
+    const start=new Date(startStr+'T00:00:00');const end=new Date(endStr+'T00:00:00');
+    const usage={};
+    items.forEach(i=>{
+      if(cat&&i.category!==cat)return;
+      usage[i.category+'|'+i.item_name]={category:i.category,item_name:i.item_name,total:Number(i.total_qty)||0,used:0,rent:0,maint:0};
+    });
+    const dayMs=86400000;const days=[];
+    for(let d=new Date(start);d<=end;d=new Date(d.getTime()+dayMs))days.push(new Date(d));
+    Object.keys(usage).forEach(key=>{
+      let max=0,maxRent=0,maxMaint=0;
+      days.forEach(day=>{
+        const ds=day.toISOString().slice(0,10);let u=0,r2=0,m=0;
+        rentals.forEach(r=>{
+          if(!ACTIVE_STATUSES.includes(r.status))return;
+          if((r.category+'|'+r.item_name)!==key)return;
+          if(r.date_start<=ds&&r.date_end>=ds){
+            const q=Number(r.qty)||0;u+=q;
+            if(r.status==='メンテ待ち'||r.status==='メンテ中')m+=q;else r2+=q;
+          }
+        });
+        if(u>max){max=u;maxRent=r2;maxMaint=m}
+      });
+      usage[key].used=max;usage[key].rent=maxRent;usage[key].maint=maxMaint;
+    });
+    const entries=Object.values(usage).sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.item_name).localeCompare(String(b.item_name)));
+    if(!entries.length){body.innerHTML='<p class="empty-msg">商品が登録されていません。</p>';return}
+    let html='';let lastCat='';
+    entries.forEach(e=>{
+      if(e.category!==lastCat){lastCat=e.category;html+=`<div class="avail-cat-hd">${esc(e.category)}</div>`}
+      const pct=e.total>0?Math.round((e.used/e.total)*100):0;
+      const avail=e.total-e.used;
+      let cls='ok';if(pct>=100)cls='danger';else if(pct>=70)cls='warn';
+      let numColor='#059669';if(avail<=0)numColor='#dc2626';else if(avail<=Math.ceil(e.total*0.3))numColor='#d97706';
+      let detail='';
+      if(e.rent>0&&e.maint>0)detail='貸出'+e.rent+' + メンテ'+e.maint;
+      else if(e.rent>0)detail='貸出'+e.rent;
+      else if(e.maint>0)detail='メンテ'+e.maint;
+      const usedStr=detail?(detail+' = '+e.used):e.used;
+      html+=`<div class="avail-bar">
+        <span class="avail-item-name">${esc(e.item_name)}</span>
+        <div class="avail-meter"><div class="avail-fill ${cls}" style="width:${Math.min(pct,100)}%"></div></div>
+        <span class="avail-nums">${usedStr} / ${e.total} 使用　残 <strong style="color:${numColor}">${avail}</strong></span>
+      </div>`;
+    });
+    body.innerHTML=html;
+  }
+
+  // ===== init（タブ初期状態・日付初期値・イベント配線） =====
+  function init(){
+    // 在庫確認の日付初期値（今日〜14日後）
+    const d=new Date();
+    if($('avail_start'))$('avail_start').value=todayStr();
+    const tw=new Date(d.getTime()+14*86400000);
+    if($('avail_end'))$('avail_end').value=tw.getFullYear()+'-'+String(tw.getMonth()+1).padStart(2,'0')+'-'+String(tw.getDate()).padStart(2,'0');
+    const pc=$('invPcDate');if(pc)pc.textContent=(d.getMonth()+1)+'/'+d.getDate();
+    if($('invPcSearch'))$('invPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
+  }
+
+  // ===== expose（onclick等から呼ぶ関数＋nav用loadAll/init＋setter） =====
+  return {
+    loadAll, init,
+    switchTab,
+    openSlog, closeSlog, clearSlog,
+    sortItems, openItemMo, closeItemMo, editItem, saveItem, deleteItem,
+    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental,
+    populateItemSelect, onProjectSelect, renderAvail, renderMaint,
+    setItemCatFilter, setMaintFilter, setRentalFilter, setAvailCatFilter,
+    unifiedSearch
+  };
+})();
+
 /* ========================================================================
    App.nav：画面切替＋遅延ロード機構（SPAの心臓部）
    - display切替（hidden付け外し）＝0秒
@@ -1738,22 +2379,27 @@ const Proj = (function(){
    ======================================================================== */
 const App = {
   current:null,
-  _loaded:{prod:false, proj:false},
-  _loading:{prod:false, proj:false},
-  apps(){ return {prod:Prod, proj:Proj}; },
+  // アプリ登録：ここに {key, ns(IIFE), sectionId, navId} を足すだけで全機構が回る
+  REG:[
+    {key:'prod', ns:()=>Prod, section:'view-prod', nav:'navProd'},
+    {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj'},
+    {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv'},
+  ],
+  _loaded:{},
+  _loading:{},
+  reg(name){ return this.REG.find(r=>r.key===name); },
   async nav(name){
-    if(this.current===name) return;     // 同じ画面なら何もしない
-    // section の display 切替（0秒）
-    $('view-prod').classList.toggle('hidden', name!=='prod');
-    $('view-proj').classList.toggle('hidden', name!=='proj');
-    // ヘッダーナビの .on 切替
-    $('navProd').classList.toggle('on', name==='prod');
-    $('navProj').classList.toggle('on', name==='proj');
+    if(this.current===name) return;
+    // 全sectionのdisplay切替＋ナビ.on切替（登録ぶん全部回す＝0秒）
+    this.REG.forEach(r=>{
+      $(r.section).classList.toggle('hidden', r.key!==name);
+      const nv=$(r.nav); if(nv) nv.classList.toggle('on', r.key===name);
+    });
     this.current=name;
     centerActiveNav();
 
     // 遅延ロード：初回だけ。_loading ガードで二重発火防止
-    const app = this.apps()[name];
+    const app = this.reg(name).ns();
     if(!this._loaded[name] && !this._loading[name]){
       this._loading[name]=true;
       $('loader').classList.remove('hidden');
@@ -1764,8 +2410,6 @@ const App = {
         toast('データ取得エラー',true);
       }finally{
         this._loading[name]=false;
-        // loader競合対策：今表示中の画面がまだロード中でなければ消す
-        // （生産ロード中に企画へ切替→生産完了でhideしても、企画がまだ_loading中なら消さない）
         if(!this._loading[this.current]) $('loader').classList.add('hidden');
       }
     }
@@ -1773,7 +2417,7 @@ const App = {
   // 更新：今表示中のアプリだけ再取得（裏アプリのGASは叩かない＝SEQ-011全停止対策）
   async refreshCurrent(){
     const name=this.current;
-    const app=this.apps()[name];
+    const app=this.reg(name).ns();
     this._loading[name]=true;
     try{ await app.loadAll(); this._loaded[name]=true; }
     finally{ this._loading[name]=false; }
@@ -1786,22 +2430,19 @@ $('refreshBtn').addEventListener('click', function(){
 });
 
 // 自動更新：5分間隔・タブが見えてる時だけ・前回完了後・「今表示中のアプリだけ」
-// （裏アプリまで叩くとSEQ-011のGASカスケード再来。表示中のみに限定）
 let _bgBusy=false;
 setInterval(()=>{
   if(document.visibilityState!=='visible')return;
   if(_bgBusy)return;
   if(!App.current)return;
   _bgBusy=true;
-  // 自動更新は loader を出さない（バックグラウンド更新）
-  const app=App.apps()[App.current];
+  const app=App.reg(App.current).ns();
   Promise.resolve(app.loadAll()).finally(()=>{_bgBusy=false});
 },5*60*1000);
 
 // 初期表示：各アプリの init（イベント配線）→ 生産を開く（初回ロード発火）
 window.addEventListener('load', ()=>{
-  Prod.init();
-  Proj.init();
+  App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   App.current=null;
   App.nav('prod');
 });
