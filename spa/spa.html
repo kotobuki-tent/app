@@ -202,7 +202,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 /* 企画はSTAFFボタンが無いので、slogボタンを右寄せ起点に（生産は#prodTabsで無影響） */
 /* 右寄せ起点：生産はstaff-btnが起点（既定）。STAFFボタンを持たないアプリ（企画/在庫/今後追加分）は
    各slogボタンを margin-left:auto で起点にし、slog＋検索バーを右端に寄せる */
-#projSlogBtn, #invSlogBtn{margin-left:auto}
+/* STAFFボタンを持つのは生産だけ。それ以外（企画/在庫/車両/今後追加分）はslogボタンを右寄せ起点に。
+   ★アプリ追加時はここに #〇〇SlogBtn を必ず足すこと（横展開漏れ防止） */
+#projSlogBtn, #invSlogBtn, #vSlogBtn{margin-left:auto}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
 .slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
 .slog-btn.has-new .dot{display:block}
