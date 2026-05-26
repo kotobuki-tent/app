@@ -4984,7 +4984,7 @@ $('refreshBtn').addEventListener('click', function(){
   // 横スクロールする要素の上で始まったタッチは無視（表・グリッド・ナビを守る）
   function inScrollable(el){
     while(el && el!==document.body){
-      if(el.classList && (el.classList.contains('tbl-wrap')||el.classList.contains('gantt-wrap')||el.classList.contains('overview-grid')||el.classList.contains('sub-tabs')||el.classList.contains('day-grid'))) return true;
+      if(el.classList && (el.classList.contains('tbl-wrap')||el.classList.contains('gantt-wrap')||el.classList.contains('overview-grid')||el.classList.contains('sub-tabs'))) return true;
       el=el.parentElement;
     }
     return false;
