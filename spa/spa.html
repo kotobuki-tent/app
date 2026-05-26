@@ -1309,12 +1309,12 @@ table.jobs tr:last-child td{border-bottom:none}
 <!-- 生産/企画制作 = SPA内JS切替（App.nav）。他アプリ = 本番MPAへ通常リンク（試作中は本番が生きてる） -->
 <div class="hdr">
   <div class="hdr-inner">
-    <button class="nav-link home-link" id="navHome" onclick="App.nav('portal')"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</button>
+    <button class="nav-link home-link on" id="navHome" onclick="App.nav('portal')"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</button>
     <button class="nav-link" id="navDaily" onclick="App.nav('daily')">日報</button>
     <button class="nav-link" id="navOt" onclick="App.nav('ot')">時間外</button>
     <div class="nav-spacer"></div>
     <div class="nav-right">
-      <button class="nav-link on" id="navProd" onclick="App.nav('prod')">生産</button>
+      <button class="nav-link" id="navProd" onclick="App.nav('prod')">生産</button>
       <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
       <button class="nav-link" id="navSales" onclick="App.nav('sales')">販売</button>
       <button class="nav-link" id="navLabor" onclick="App.nav('labor')">工数</button>
@@ -1326,7 +1326,7 @@ table.jobs tr:last-child td{border-bottom:none}
 </div>
 
 <!-- ===== 生産 section（中身は移植フェーズで流し込む） ===== -->
-<section id="view-prod">
+<section id="view-prod" class="hidden">
   <div class="sub-tabs" id="prodTabs">
     <span class="subtab-date" id="prodPcDate"></span>
     <button class="sub-tab on" data-view="factory">工場ボード</button>
@@ -1981,7 +1981,7 @@ table.jobs tr:last-child td{border-bottom:none}
 </section>
 
 <!-- ===== ポータル section（入口・リンク集） ===== -->
-<section id="view-portal" class="hidden">
+<section id="view-portal">
   <div class="portal-wrap">
     <div class="portal-logo">寿テント</div>
     <div class="portal-sub">業務管理システム</div>
@@ -2017,10 +2017,6 @@ table.jobs tr:last-child td{border-bottom:none}
       <a class="portal-card" onclick="App.nav('veh')">
         <div class="portal-card-icon" style="background:#60a5fa;color:#1e3a8a">車</div>
         <div class="portal-card-body"><div class="portal-card-title">車両管理</div><div class="portal-card-desc">車検・保険期限アラート・メンテ履歴</div></div>
-      </a>
-      <a class="portal-card" href="../app/register.html">
-        <div class="portal-card-icon" style="background:#c084fc;color:#581c87">登</div>
-        <div class="portal-card-body"><div class="portal-card-title">台帳登録</div><div class="portal-card-desc">スマホ特化・商品追加専用</div></div>
       </a>
     </div>
     <div class="portal-footer">Built by iller with Claude — 2026</div>
@@ -4931,11 +4927,11 @@ setInterval(()=>{
   Promise.resolve(app.loadAll()).finally(()=>{_bgBusy=false});
 },5*60*1000);
 
-// 初期表示：各アプリの init（イベント配線）→ 生産を開く（初回ロード発火）
+// 初期表示：各アプリの init（イベント配線）→ ポータル（入口）を開く
 window.addEventListener('load', ()=>{
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   App.current=null;
-  App.nav('prod');
+  App.nav('portal');
 });
 </script>
 </body>
