@@ -3043,10 +3043,18 @@ const Inv = (function(){
   }
 
   // ===== Categories =====
+  // カテゴリの表示順：よく見るものを上に、残りは五十音順
+  const CAT_PRIORITY=['テント','横幕','テーブル','イス'];
+  function sortCategories(arr){
+    const set=new Set(arr);
+    const head=CAT_PRIORITY.filter(c=>set.has(c));
+    const rest=[...arr].filter(c=>!CAT_PRIORITY.includes(c)).sort();
+    return [...head,...rest];
+  }
   function getAllCategories(){
     const cats=new Set(DEFAULT_CATS);
     items.forEach(i=>{if(i.category)cats.add(i.category)});
-    return [...cats].sort();
+    return sortCategories([...cats]);
   }
   function populateCategoryFilters(){
     const cats=getAllCategories();
@@ -3324,7 +3332,14 @@ const Inv = (function(){
       });
       usage[key].used=max;usage[key].rent=maxRent;usage[key].maint=maxMaint;
     });
-    const entries=Object.values(usage).sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.item_name).localeCompare(String(b.item_name)));
+    const entries=Object.values(usage).sort((a,b)=>{
+      const ia=CAT_PRIORITY.indexOf(a.category), ib=CAT_PRIORITY.indexOf(b.category);
+      const ra=ia<0?CAT_PRIORITY.length:ia, rb=ib<0?CAT_PRIORITY.length:ib;
+      if(ra!==rb) return ra-rb;
+      const c=String(a.category).localeCompare(String(b.category));
+      if(c!==0) return c;
+      return String(a.item_name).localeCompare(String(b.item_name));
+    });
     if(!entries.length){body.innerHTML='<p class="empty-msg">商品が登録されていません。</p>';return}
     let html='';let lastCat='';
     entries.forEach(e=>{
