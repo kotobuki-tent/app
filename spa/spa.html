@@ -2092,6 +2092,7 @@ const Prod = (function(){
   let archiveSort={col:'deadline',asc:false};
   let slog=[];
   let slogUnread=0;
+  let _changingStatus=false;
   const SLOG_KEY='prod_status_snapshot';
   const SLOG_LIST_KEY='prod_status_log';
   const SLOG_UNREAD_KEY='prod_status_unread';
@@ -2385,7 +2386,7 @@ const Prod = (function(){
     $('prodViewContent').innerHTML=h;
     const tgl=$('stToggle'),opts=$('stOpts');
     if(tgl&&opts)tgl.onclick=()=>{tgl.classList.toggle('open');opts.classList.toggle('open')};
-    $('prodViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{const newSt=btn.dataset.st;if(d.status===newSt){tgl.classList.remove('open');opts.classList.remove('open');return}d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');viewProd(id);render()}});
+    $('prodViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){tgl.classList.remove('open');opts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProd(id);render()}});
     renderLinkedFiles(d);$('prodViewBg').classList.add('show')}
 
   // ===== 製作図ファイル =====
@@ -2513,6 +2514,7 @@ const Proj = (function(){
   let ganttStart=null,ganttDays=28;
   let slog=[];
   let slogUnread=0;
+  let _changingStatus=false;
   const SLOG_KEY='proj_status_snapshot';
   const SLOG_LIST_KEY='proj_status_log';
   const SLOG_UNREAD_KEY='proj_status_unread';
@@ -2819,7 +2821,7 @@ const Proj = (function(){
     $('projViewContent').innerHTML=h;
     const ptgl=$('projStToggle'),popts=$('projStOpts');
     if(ptgl&&popts)ptgl.onclick=()=>{ptgl.classList.toggle('open');popts.classList.toggle('open')};
-    $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}d.status=newSt;fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');viewProj(id);render()}});
+    $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProj(id);render()}});
     $('projViewBg').classList.add('show')}
 
   // ===== モーダル操作 =====
