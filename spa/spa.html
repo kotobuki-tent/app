@@ -2153,6 +2153,7 @@ const Prod = (function(){
       localStorage.setItem(SLOG_UNREAD_KEY,String(slogUnread));
     }
     localStorage.setItem(SLOG_KEY,JSON.stringify(curr));
+    updateSlogBtn();
   }
 
   function updateSlogBtn(){const b=$('prodSlogBtn');if(b)b.classList.toggle('has-new',slogUnread>0)}
@@ -2177,6 +2178,7 @@ const Prod = (function(){
     }
     slogUnread=0;
     localStorage.setItem(SLOG_UNREAD_KEY,'0');
+    updateSlogBtn();
     $('prodSlogBg').classList.add('show');
     if(curProdView==='factory')renderFactory();
   }
@@ -2190,6 +2192,7 @@ const Prod = (function(){
     slogUnread=0;
     localStorage.setItem(SLOG_LIST_KEY,'[]');
     localStorage.setItem(SLOG_UNREAD_KEY,'0');
+    updateSlogBtn();
     $('prodSlogList').innerHTML='<div class="empty-msg">変更履歴はまだありません</div>';
     if(curProdView==='factory')renderFactory();
   }
