@@ -2093,6 +2093,7 @@ const Prod = (function(){
   let slog=[];
   let slogUnread=0;
   let _changingStatus=false;
+  let _busyDel=false, _busyInv=false, _busyFile=false, _busyStaff=false;
   const SLOG_KEY='prod_status_snapshot';
   const SLOG_LIST_KEY='prod_status_log';
   const SLOG_UNREAD_KEY='prod_status_unread';
@@ -2361,10 +2362,13 @@ const Prod = (function(){
     el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}render()}});
   }
   function toggleInvoiced(id,checked){
+    if(_busyInv)return;
     const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;
+    _busyInv=true;
     d.invoiced=checked?'TRUE':'FALSE';
     fireAndForget({dept:'production',action:'save',id:id,invoiced:d.invoiced});
     toast(checked?'伝票済みにしました':'伝票未済に戻しました');
+    setTimeout(()=>{_busyInv=false},1500);
   }
   function changeStatus(id,newSt){
     const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;
@@ -2427,23 +2431,29 @@ const Prod = (function(){
   }
   function closeFilePicker(){$('filePickerBg').classList.remove('show')}
   function linkFile(fileId){
+    if(_busyFile)return;
     const d=prodData.find(x=>String(x.id)===String(currentViewId));if(!d)return;
     const ids=getLinkedFileIds(d);
     if(ids.includes(fileId))return;
+    _busyFile=true;
     ids.push(fileId);
     d.files=ids.join(',');
     fireAndForget({dept:'production',action:'save',id:d.id,files:d.files});
     toast('ファイルを追加しました');
     renderLinkedFiles(d);
     closeFilePicker();
+    setTimeout(()=>{_busyFile=false},1500);
   }
   function unlinkFile(fileId){
+    if(_busyFile)return;
     const d=prodData.find(x=>String(x.id)===String(currentViewId));if(!d)return;
+    _busyFile=true;
     const ids=getLinkedFileIds(d).filter(x=>x!==fileId);
     d.files=ids.join(',');
     fireAndForget({dept:'production',action:'save',id:d.id,files:d.files});
     toast('ファイルを解除しました');
     renderLinkedFiles(d);
+    setTimeout(()=>{_busyFile=false},1500);
   }
 
   // ===== モーダル操作 =====
@@ -2478,11 +2488,14 @@ const Prod = (function(){
 
   // ===== 削除（楽観的更新） =====
   function delProd(id){
+    if(_busyDel)return;
     if(!confirm('この案件を削除しますか？'))return;
+    _busyDel=true;
     prodData=prodData.filter(x=>String(x.id)!==String(id));
     fireAndForget({dept:'production',action:'delete',id:id});
     toast('削除しました');
     render();
+    setTimeout(()=>{_busyDel=false},1500);
   }
 
   // ===== サブタブ切替イベント（init時に1回配線） =====
@@ -2515,6 +2528,7 @@ const Proj = (function(){
   let slog=[];
   let slogUnread=0;
   let _changingStatus=false;
+  let _busyDel=false, _busyInv=false, _busyRental=false;
   const SLOG_KEY='proj_status_snapshot';
   const SLOG_LIST_KEY='proj_status_log';
   const SLOG_UNREAD_KEY='proj_status_unread';
@@ -2779,17 +2793,23 @@ const Proj = (function(){
     el.querySelectorAll('th[data-dcol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.dcol;if(projDoneSort.col===c)projDoneSort.asc=!projDoneSort.asc;else{projDoneSort.col=c;projDoneSort.asc=true}render()}});
   }
   function toggleProjInvoiced(id,checked){
+    if(_busyInv)return;
     const d=projData.find(x=>String(x.id)===String(id));if(!d)return;
+    _busyInv=true;
     d.invoiced=checked?'TRUE':'FALSE';
     fireAndForget({dept:'project',action:'save',id:id,invoiced:d.invoiced});
     toast(checked?'伝票済みにしました':'伝票未済に戻しました');
+    setTimeout(()=>{_busyInv=false},1500);
   }
   function changeProjStatus(id,newSt){
+    if(_changingStatus)return;
     const d=projData.find(x=>String(x.id)===String(id));if(!d)return;
+    _changingStatus=true;
     d.status=newSt;
     fireAndForget({dept:'project',action:'save',id:id,status:newSt});
     toast(newSt+'に変更しました');
     render();
+    setTimeout(()=>{_changingStatus=false},1500);
   }
   function projDoneFilter(q){q=q.toLowerCase();$('projDoneView').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
 
@@ -2870,11 +2890,14 @@ const Proj = (function(){
 
   // ===== 削除（楽観的更新） =====
   function delProj(id){
+    if(_busyDel)return;
     if(!confirm('この現場を削除しますか？'))return;
+    _busyDel=true;
     projData=projData.filter(x=>x.id!==id);
     fireAndForget({dept:'project',action:'delete',id:id});
     toast('削除しました');
     render();
+    setTimeout(()=>{_busyDel=false},1500);
   }
 
   // ===== レンタル品（在庫連携） =====
@@ -2898,6 +2921,7 @@ const Proj = (function(){
     $('rentalSaveBtnWrap').classList.remove('hidden');
   }
   function saveProjectRentals(projectName){
+    if(_busyRental)return;
     const rows=$('rentalAddRows').querySelectorAll('.rental-add-row');
     if(!rows.length){toast('追加する行がありません',true);return}
     const items=[];
@@ -2914,16 +2938,21 @@ const Proj = (function(){
       rentalsData.push({...rental,id:'tmp_'+Date.now()+'_'+Math.random().toString(36).slice(2,6)});
       fireAndForget({dept:'inventory',action:'save_rental',...rental});
     }
+    _busyRental=true;
     toast(items.length+'件登録しました');
     const d=projData.find(x=>x.project===projectName);
     if(d)viewProj(d.id);
+    setTimeout(()=>{_busyRental=false},1500);
   }
   function deleteProjectRental(id){
+    if(_busyRental)return;
     if(!confirm('このレンタル品を削除しますか？'))return;
+    _busyRental=true;
     rentalsData=rentalsData.filter(x=>x.id!==id);
     fireAndForget({dept:'inventory',action:'delete_rental',id:id});
     toast('削除しました');
     $('projViewBg').classList.remove('show');
+    setTimeout(()=>{_busyRental=false},1500);
   }
 
   // ===== init（サブタブ切替イベント・車両チェックボックス生成・日付セット） =====
@@ -2962,6 +2991,7 @@ const Inv = (function(){
   const ILOG_LIST_KEY='inv_status_log';
   const ILOG_UNREAD_KEY='inv_status_unread';
   let islog=[];
+  let _busyDel=false;
   let islogUnread=0;
 
   // ===== inventory方言ユーティリティ（共通土台と中身が違うため内部に保持） =====
@@ -3172,10 +3202,13 @@ const Inv = (function(){
     setTimeout(()=>{_savingItem=false},1500);
   }
   function deleteItem(id,name){
+    if(_busyDel)return;
     if(!confirm(name+' を削除しますか？'))return;
+    _busyDel=true;
     fireAndForget({action:'delete_item',id});
     items=items.filter(x=>x.id!==id);
     toast('削除しました');renderItems();renderAvail();
+    setTimeout(()=>{_busyDel=false},1500);
   }
 
   // ===== メンテ =====
@@ -3308,10 +3341,13 @@ const Inv = (function(){
     setTimeout(()=>{_savingRental=false},1500);
   }
   function deleteRental(id){
+    if(_busyDel)return;
     if(!confirm('この貸出/予約を削除しますか？'))return;
+    _busyDel=true;
     fireAndForget({action:'delete_rental',id});
     rentals=rentals.filter(x=>x.id!==id);
     toast('削除しました');renderRentals();renderMaint();renderAvail();
+    setTimeout(()=>{_busyDel=false},1500);
   }
 
   // ===== 在庫確認 =====
@@ -3422,6 +3458,7 @@ const Veh = (function(){
   const VLOG_LIST_KEY='vehicle_status_log';
   const VLOG_UNREAD_KEY='vehicle_status_unread';
   let vslog=[];
+  let _busyDel=false;
   let vslogUnread=0;
 
   // ===== 車両方言ユーティリティ（dateJPはM/D（曜）でDate引数の共通版と別物→内部保持） =====
@@ -3766,12 +3803,15 @@ const Veh = (function(){
     toast('メンテ履歴を追加しました');
   }
   function delMaintEntry(idx){
+    if(_busyDel)return;
     if(!confirm('このメンテ履歴を削除しますか？'))return;
     const v=vehicleData.find(x=>String(x.id)===String(currentViewId));if(!v)return;
+    _busyDel=true;
     v._maint.splice(idx,1);
     saveVehicleToAPI(v);
     renderMaintList(v);
     toast('削除しました');
+    setTimeout(()=>{_busyDel=false},1500);
   }
   function editFromView(){
     const id=currentViewId;
@@ -3847,11 +3887,14 @@ const Veh = (function(){
     fireAndForget(body);
   }
   function delVehicle(id){
+    if(_busyDel)return;
     if(!confirm('この車両を削除しますか？'))return;
+    _busyDel=true;
     vehicleData=vehicleData.filter(x=>String(x.id)!==String(id));
     fireAndForget({action:'delete',id});
     toast('削除しました');
     render();
+    setTimeout(()=>{_busyDel=false},1500);
   }
 
   // ===== アラート設定 =====
@@ -3925,6 +3968,7 @@ const Sales = (function(){
   let archiveSort={col:'created_at',asc:false};
   let slog=[];
   let slogUnread=0;
+  let _busyDel=false, _busyInv=false, _changingStatus=false;
   const SLOG_KEY='sales_status_snapshot';
   const SLOG_LIST_KEY='sales_status_log';
   const SLOG_UNREAD_KEY='sales_status_unread';
@@ -4258,26 +4302,35 @@ const Sales = (function(){
     setTimeout(()=>{_savingEntry=false},1500);
   }
   function changeStatus(id,newSt){
+    if(_changingStatus)return;
     const idx=allEntries.findIndex(x=>String(x.id)===String(id));if(idx<0)return;
+    _changingStatus=true;
     const today=fmtDate(new Date());
     allEntries[idx]={...allEntries[idx],status:newSt,updated_at:today};
     _setCache('sales',{entries:allEntries});
     apiPost({action:'save',id,status:newSt});
     render();toast('ステータスを更新しました');
+    setTimeout(()=>{_changingStatus=false},1500);
   }
   function toggleInvoiced(id,checked){
+    if(_busyInv)return;
     const idx=allEntries.findIndex(x=>String(x.id)===String(id));if(idx<0)return;
+    _busyInv=true;
     allEntries[idx].invoiced=checked?'TRUE':'FALSE';
     _setCache('sales',{entries:allEntries});
     apiPost({action:'save',id,invoiced:allEntries[idx].invoiced});
+    setTimeout(()=>{_busyInv=false},1500);
   }
   function delEntry(id){
+    if(_busyDel)return;
     const e=allEntries.find(x=>String(x.id)===String(id));if(!e)return;
     if(!confirm('この案件を削除しますか？\n'+(e.client||'')+' / '+(e.project||'')))return;
+    _busyDel=true;
     allEntries=allEntries.filter(x=>String(x.id)!==String(id));
     _setCache('sales',{entries:allEntries});
     apiPost({action:'delete',id});
     render();refreshDatalists();toast('削除しました');
+    setTimeout(()=>{_busyDel=false},1500);
   }
 
   // ===== init（末尾のsetView/loadDataをここへ。タブ切替配線） =====
@@ -4583,6 +4636,7 @@ const Daily = (function(){
     $('afMinutes').value=entry.minutes||'';
   }
   let _savingAddOne=false;
+  let _busyDel=false, _busyAbsence=false;
   function addOneEntry(){
     if(_savingAddOne) return;
     const w=getWho();if(!w){toast('氏名を選んでください',true);return}
@@ -4624,10 +4678,13 @@ const Daily = (function(){
     el.innerHTML=h;
   }
   function delEntry(id){
+    if(_busyDel)return;
     if(!confirm('この記録を削除しますか？'))return;
+    _busyDel=true;
     allReports=allReports.filter(x=>String(x.id)!==String(id));
     fireAndForget({dept:'daily',action:'delete',id:id});
     toast('削除しました');renderSavedEntries();
+    setTimeout(()=>{_busyDel=false},1500);
   }
 
   // ===== みんなの日報（viewContent→dailyViewContent） =====
@@ -4686,19 +4743,25 @@ const Daily = (function(){
     el.innerHTML=h;
   }
   function markAbsent(empNo,name){
+    if(_busyAbsence)return;
     if(!confirm(`${name}さんを休み（欠勤）にしますか？`))return;
+    _busyAbsence=true;
     const date=dateStr(viewingDate);const tmpId='abs_tmp_'+Date.now();
     absenceList.push({id:tmpId,date:date,employee_no:empNo});renderViewContent();
     fireAndForget({dept:'daily',action:'save_absence',date:date,employee_no:empNo});toast('休みに設定しました');
     setTimeout(async()=>{await loadAbsenceList(date);renderViewContent()},2500);
+    setTimeout(()=>{_busyAbsence=false},1500);
   }
   function unmarkAbsent(absId){
+    if(_busyAbsence)return;
     if(!confirm('休み設定を取り消しますか？'))return;
+    _busyAbsence=true;
     absenceList=absenceList.filter(a=>String(a.id)!==String(absId));renderViewContent();
     if(!String(absId).startsWith('abs_tmp_'))fireAndForget({dept:'daily',action:'delete_absence',id:absId});
     toast('取消しました');
     const date=dateStr(viewingDate);
     setTimeout(async()=>{await loadAbsenceList(date);renderViewContent()},2500);
+    setTimeout(()=>{_busyAbsence=false},1500);
   }
   function gotoEditFromView(id,dateStr2){
     if(dateStr2){const d=new Date(dateStr2+'T00:00:00');writeDate=d;writeDate.setHours(0,0,0,0)}
@@ -4870,11 +4933,12 @@ const Ot = (function(){
     staffList.forEach(s=>{const name=s.name;html+=`<div class="staff-list-item"><span>${oesc(name)}</span><button class="staff-del" onclick="Ot.removeStaff('${oesc(name)}')">削除</button></div>`});
     container.innerHTML=html;
   }
-  function addStaff(){const input=$('newStaffName');const name=input.value.trim();if(!name)return;if(staffList.some(s=>s.name===name)){toast('すでに登録されています');return}staffList.push({name:name,dept:'',employee_no:''});apiPost({action:'save_staff',name:name,active:true});input.value='';renderStaffView();renderStaffList();renderAdminView()}
-  function removeStaff(name){if(!confirm(name+' を削除しますか？'))return;staffList=staffList.filter(s=>s.name!==name);apiPost({action:'delete_staff',name:name});if(selectedStaff===name){selectedStaff='';localStorage.removeItem('ot_my_name')}renderStaffView();renderStaffList();renderAdminView()}
+  function addStaff(){if(_busyStaff)return;const input=$('newStaffName');const name=input.value.trim();if(!name)return;if(staffList.some(s=>s.name===name)){toast('すでに登録されています');return}_busyStaff=true;staffList.push({name:name,dept:'',employee_no:''});apiPost({action:'save_staff',name:name,active:true});input.value='';renderStaffView();renderStaffList();renderAdminView();setTimeout(()=>{_busyStaff=false},1500);}
+  function removeStaff(name){if(_busyStaff)return;if(!confirm(name+' を削除しますか？'))return;_busyStaff=true;staffList=staffList.filter(s=>s.name!==name);apiPost({action:'delete_staff',name:name});if(selectedStaff===name){selectedStaff='';localStorage.removeItem('ot_my_name')}renderStaffView();renderStaffList();renderAdminView();setTimeout(()=>{_busyStaff=false},1500);}
   function openRequestModal(){$('reqModalBg').classList.add('show');$('reqMessage').value=currentRequest&&currentRequest.active?currentRequest.message:''}
   function closeReqModal(){$('reqModalBg').classList.remove('show')}
   let _savingReq=false;
+  let _busyStaff=false;
   function submitRequest(){
     if(_savingReq) return;
     const msg=$('reqMessage').value.trim();
