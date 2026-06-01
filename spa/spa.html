@@ -4892,7 +4892,11 @@ const Ot = (function(){
   }
   function selectStaff(name){selectedStaff=name;localStorage.setItem('ot_my_name',name);render()}
   function onStaffSelectChange(){selectStaff($('otStaffSelect').value)}
+  let _lastToggle={k:'',t:0};
   function toggleTime(date,time){
+    const k=date+'|'+time;const now=Date.now();
+    if(k===_lastToggle.k && now-_lastToggle.t<1500)return;
+    _lastToggle={k,t:now};
     const entry=entries.find(e=>e.name===selectedStaff&&e.date===date);
     if(entry&&entry.until_time===time){entries=entries.filter(e=>!(e.name===selectedStaff&&e.date===date));render();apiPost({action:'delete_entry',name:selectedStaff,date:date})}
     else if(entry){entry.until_time=time;render();apiPost({action:'save_entry',name:selectedStaff,date:date,until_time:time,week_start:fmtDate(currentWeekStart),note:''})}
