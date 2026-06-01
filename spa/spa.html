@@ -4533,7 +4533,10 @@ const Daily = (function(){
       try{
         staffList=cached.staff||[];allReports=cached.reports||[];
         prodProjects=cached.prodProj||[];projProjects=cached.projProj||[];
-        absenceList=cached.absence||[];_absenceLoadedDate=cached.absenceDate||null;
+        absenceList=cached.absence||[];
+        // viewタブの欠勤データはキャッシュ信用せず、サーバから取り直す
+        // （誤って「欠勤」と一瞬出る現象を防ぐ。renderViewが「読み込み中」表示を出す）
+        _absenceLoadedDate=null;
         initWhoSelect();render();
       }catch(e){}
     }
@@ -4691,8 +4694,14 @@ const Daily = (function(){
   function renderView(){
     $('viewDate').value=dateStr(viewingDate);const d=viewingDate;
     $('viewDateLabel').textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
-    renderViewContent();
-    if(_absenceLoadedDate!==dateStr(viewingDate)){_absenceLoadedDate=dateStr(viewingDate);loadAbsenceList(dateStr(viewingDate)).then(()=>renderViewContent())}
+    if(_absenceLoadedDate!==dateStr(viewingDate)){
+      // この日付の欠勤データが未ロード：読み込み中表示にして、取得後に描画
+      $('dailyViewContent').innerHTML='<div class="empty-msg">読み込み中...</div>';
+      _absenceLoadedDate=dateStr(viewingDate);
+      loadAbsenceList(dateStr(viewingDate)).then(()=>renderViewContent());
+    }else{
+      renderViewContent();
+    }
   }
   function viewDateMove(n){viewingDate.setDate(viewingDate.getDate()+n);renderView()}
   function viewDateToday(){viewingDate=new Date();viewingDate.setHours(0,0,0,0);renderView()}
