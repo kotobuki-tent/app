@@ -2448,7 +2448,9 @@ const Prod = (function(){
   function editProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(d)openProdMo(d)}
 
   // ===== 保存（楽観的更新） =====
+  let _savingProd=false;
   function saveProd(){
+    if(_savingProd) return;
     const name=$('pf_project').value.trim();
     if(!name){toast('物件名を入力してください',true);return}
     const editId=$('pf_id').value;
@@ -2461,11 +2463,13 @@ const Prod = (function(){
       body.id='tmp_'+Date.now();
       prodData.push(body);
     }
+    _savingProd=true;
     fireAndForget(body);
     toast('保存しました');
     closeProdMo();
     render();
     if(isNew)setTimeout(loadAll,3000);
+    setTimeout(()=>{_savingProd=false},1500);
   }
 
   // ===== 削除（楽観的更新） =====
@@ -2833,7 +2837,9 @@ const Proj = (function(){
   function editProj(id){const d=projData.find(x=>x.id===id);if(d)openProjMo(d)}
 
   // ===== 保存（楽観的更新） =====
+  let _savingProj=false;
   function saveProj(){
+    if(_savingProj) return;
     const name=$('xf_project').value.trim();
     if(!name){toast('物件名を入力してください',true);return}
     const editId=$('xf_id').value;
@@ -2848,11 +2854,13 @@ const Proj = (function(){
       body.id='tmp_'+Date.now();
       projData.push(body);
     }
+    _savingProj=true;
     fireAndForget(body);
     toast('保存しました');
     closeProjMo();
     render();
     if(isNew)setTimeout(loadAll,3000);
+    setTimeout(()=>{_savingProj=false},1500);
   }
 
   // ===== 削除（楽観的更新） =====
@@ -2955,8 +2963,10 @@ const Inv = (function(){
   function dateJP(d){if(!d)return'';const dt=new Date(d+'T00:00:00');return(dt.getMonth()+1)+'/'+dt.getDate()}
   function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
   async function apiGet(params){
-    const url=API+'?dept=inventory&'+new URLSearchParams(params);
-    const r=await fetch(url);return r.json();
+    try{
+      const url=API+'?dept=inventory&'+new URLSearchParams(params);
+      const r=await fetch(url);return r.json();
+    }catch(e){console.error('apiGet失敗(inventory):',e);return null;}
   }
   function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})})}
 
@@ -3141,7 +3151,9 @@ const Inv = (function(){
   }
   function closeItemMo(){$('itemMoBg').classList.remove('show')}
   function editItem(id){const d=items.find(i=>i.id===id);if(d)openItemMo(d)}
+  let _savingItem=false;
   function saveItem(){
+    if(_savingItem) return;
     const cat=$('xf_item_newcat').value.trim()||$('xf_item_cat').value;
     const name=$('xf_item_name').value.trim();
     if(!cat||!name){toast('カテゴリと商品名は必須です',false);return}
@@ -3150,7 +3162,9 @@ const Inv = (function(){
     fireAndForget({action:'save_item',id:existingId||undefined,category:cat,item_name:name,total_qty:qty,notes});
     const local={id,category:cat,item_name:name,total_qty:Number(qty)||0,notes};
     if(existingId){const idx=items.findIndex(x=>x.id===existingId);if(idx>=0)items[idx]={...items[idx],...local};else items.push(local)}else{items.push(local)}
+    _savingItem=true;
     toast('保存しました');closeItemMo();populateCategoryFilters();renderItems();renderAvail();
+    setTimeout(()=>{_savingItem=false},1500);
   }
   function deleteItem(id,name){
     if(!confirm(name+' を削除しますか？'))return;
@@ -3264,7 +3278,9 @@ const Inv = (function(){
   }
   function closeRentalMo(){$('rentalMoBg').classList.remove('show')}
   function editRental(id){const d=rentals.find(r=>r.id===id);if(d)openRentalMo(d)}
+  let _savingRental=false;
   function saveRental(){
+    if(_savingRental) return;
     const cat=$('xf_r_cat').value;let itemName=$('xf_r_item').value;
     const start=$('xf_r_start').value;const end=$('xf_r_end').value;
     if(itemName==='__new__'){
@@ -3282,7 +3298,9 @@ const Inv = (function(){
     fireAndForget({action:'save_rental',id:existingId||undefined,category:cat,item_name:itemName,qty:qtyVal,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes});
     const local={id,category:cat,item_name:itemName,qty:Number(qtyVal)||1,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes};
     if(existingId){const idx=rentals.findIndex(x=>x.id===existingId);if(idx>=0)rentals[idx]={...rentals[idx],...local};else rentals.push(local)}else{rentals.push(local)}
+    _savingRental=true;
     toast('保存しました');closeRentalMo();renderRentals();renderMaint();renderAvail();
+    setTimeout(()=>{_savingRental=false},1500);
   }
   function deleteRental(id){
     if(!confirm('この貸出/予約を削除しますか？'))return;
@@ -3780,7 +3798,9 @@ const Veh = (function(){
   function editVehicle(id){const d=vehicleData.find(x=>String(x.id)===String(id));if(d)openVMo(d)}
 
   // ===== 保存 =====
+  let _savingVehicle=false;
   function saveVehicle(){
+    if(_savingVehicle) return;
     const name=$('vf_name').value.trim();
     if(!name){toast('車両名称を入力してください',true);return}
     const editId=$('vf_id').value;
@@ -3806,10 +3826,12 @@ const Veh = (function(){
       body._maint=[];
       vehicleData.push(body);
     }
+    _savingVehicle=true;
     fireAndForget(body);
     toast('保存しました');
     closeVMo();
     render();
+    setTimeout(()=>{_savingVehicle=false},1500);
   }
   function saveVehicleToAPI(v){
     const body={action:'save',id:v.id,name:v.name,plate:v.plate,type:v.type,usage:v.usage,
@@ -3845,7 +3867,9 @@ const Veh = (function(){
       </div>
       <div style="margin-top:16px"><button class="av-add" onclick="Veh.saveSettings()">設定を保存</button></div>`;
   }
+  let _savingSettings=false;
   function saveSettings(){
+    if(_savingSettings) return;
     const th={
       shaken:Number($('th_shaken').value)||60,
       jibaiseki:Number($('th_jibaiseki').value)||60,
@@ -3854,7 +3878,9 @@ const Veh = (function(){
       oil_days:Number($('th_oil_days').value)||180
     };
     saveThresholds(th);
+    _savingSettings=true;
     toast('設定を保存しました');
+    setTimeout(()=>{_savingSettings=false},1500);
   }
 
   // ===== init（タブ切替イベント配線） =====
@@ -3902,7 +3928,7 @@ const Sales = (function(){
   const ALL_ST=[...ACTIVE_ST,...ARCHIVE_ST];
 
   // ===== 販売方言ユーティリティ =====
-  async function apiGet(params){const u=API+'?dept='+DEPT+'&'+new URLSearchParams(params);const r=await fetch(u);return r.json()}
+  async function apiGet(params){try{const u=API+'?dept='+DEPT+'&'+new URLSearchParams(params);const r=await fetch(u);return r.json()}catch(e){console.error('apiGet失敗(sales):',e);return null}}
   function apiPost(body){body.dept=DEPT;fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
   function fmtDate(d){if(!d)return'';const dt=(d instanceof Date)?d:new Date(d);if(isNaN(dt))return String(d).slice(0,10);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')}
   function fmtDateJP(s){if(!s)return'';const dt=new Date(s);if(isNaN(dt))return String(s);return(dt.getMonth()+1)+'/'+dt.getDate()+'（'+dow[dt.getDay()]+'）'}
@@ -4201,7 +4227,9 @@ const Sales = (function(){
     $('moBg').classList.add('show');
   }
   function closeMo(){$('moBg').classList.remove('show')}
+  let _savingEntry=false;
   function saveEntry(){
+    if(_savingEntry) return;
     const id=$('f_id').value;
     const payload={project:$('f_project').value.trim(),our_person:$('f_our_person').value.trim(),estimate_no:$('f_estimate_no').value.trim(),order_no:$('f_order_no').value.trim(),client:$('f_client').value.trim(),person:$('f_person').value.trim(),supplier:$('f_supplier').value.trim(),amount:$('f_amount').value,created_at:$('f_created_at').value,deadline:$('f_deadline').value,status:$('f_status').value,notes:$('f_notes').value};
     if(!payload.project){toast('物件名は必須');$('f_project').focus();return}
@@ -4220,7 +4248,9 @@ const Sales = (function(){
       setTimeout(()=>{loadAll()},1500);
     }
     _setCache('sales',{entries:allEntries});
+    _savingEntry=true;
     closeMo();render();refreshDatalists();
+    setTimeout(()=>{_savingEntry=false},1500);
   }
   function changeStatus(id,newSt){
     const idx=allEntries.findIndex(x=>String(x.id)===String(id));if(idx<0)return;
@@ -4547,7 +4577,9 @@ const Daily = (function(){
     else{sel.value='__other__';$('afWorkCustomWrap').classList.remove('hidden');$('afWorkCustom').value=work}
     $('afMinutes').value=entry.minutes||'';
   }
+  let _savingAddOne=false;
   function addOneEntry(){
+    if(_savingAddOne) return;
     const w=getWho();if(!w){toast('氏名を選んでください',true);return}
     const projVal=$('afProj').value;let work=$('afWork').value;
     const minutesStr=$('afMinutes').value.trim();const minutes=parseInt(minutesStr,10);
@@ -4565,8 +4597,10 @@ const Daily = (function(){
     }
     if(editingId){body.id=editingId;const idx=allReports.findIndex(e=>String(e.id)===String(editingId));if(idx>=0)allReports[idx]={...allReports[idx],...body};fireAndForget(body);toast('更新しました')}
     else{allReports.push({...body,id:'tmp_'+Date.now()});fireAndForget(body);toast('追加しました')}
+    _savingAddOne=true;
     closeAddForm();renderSavedEntries();
     setTimeout(async()=>{await loadReports();renderSavedEntries();if(curView==='view')renderViewContent()},2500);
+    setTimeout(()=>{_savingAddOne=false},1500);
   }
   function renderSavedEntries(){
     const el=$('savedEntries');const w=getWho();
@@ -4715,7 +4749,7 @@ const Ot = (function(){
   function getHolidayName(ds){return HOLIDAYS[ds]||null}
   function todayStr(){return fmtDate(new Date())}
   function oesc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
-  async function apiGet(params){const qs=new URLSearchParams({dept:DEPT,...params}).toString();const r=await fetch(API+'?'+qs);return r.json()}
+  async function apiGet(params){try{const qs=new URLSearchParams({dept:DEPT,...params}).toString();const r=await fetch(API+'?'+qs);return r.json()}catch(e){console.error('apiGet失敗(daily):',e);return null}}
   function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',body:JSON.stringify({dept:DEPT,...body})});return{success:true}}
 
   function scheduleSyncFromServer(){
@@ -4835,13 +4869,17 @@ const Ot = (function(){
   function removeStaff(name){if(!confirm(name+' を削除しますか？'))return;staffList=staffList.filter(s=>s.name!==name);apiPost({action:'delete_staff',name:name});if(selectedStaff===name){selectedStaff='';localStorage.removeItem('ot_my_name')}renderStaffView();renderStaffList();renderAdminView()}
   function openRequestModal(){$('reqModalBg').classList.add('show');$('reqMessage').value=currentRequest&&currentRequest.active?currentRequest.message:''}
   function closeReqModal(){$('reqModalBg').classList.remove('show')}
+  let _savingReq=false;
   function submitRequest(){
+    if(_savingReq) return;
     const msg=$('reqMessage').value.trim();
     if(!msg){alert('メッセージを入力してください');return}
     if(currentRequest&&currentRequest.active&&currentRequest.id)apiPost({action:'close_request',id:currentRequest.id});
     apiPost({action:'save_request',week_start:fmtDate(currentWeekStart),message:msg});
     currentRequest={active:true,message:msg,id:'tmp_'+Date.now(),week_start:fmtDate(currentWeekStart)};
+    _savingReq=true;
     closeReqModal();renderStaffView();renderBanner();
+    setTimeout(()=>{_savingReq=false},1500);
   }
   function unifiedSearch(q){
     q=String(q||'').toLowerCase();
