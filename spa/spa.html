@@ -678,16 +678,24 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .st-検品中{background:#fef9c3;color:#a16207}
 .st-メンテ待ち{background:#ffedd5;color:#c2410c}
 .st-メンテ中{background:#fee2e2;color:#dc2626}
-.avail-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px;width:100%;box-sizing:border-box}
+.avail-bar{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:baseline;padding:10px 12px;border-bottom:1px solid #f0f1f5;width:100%;box-sizing:border-box}
+.avail-bar.empty{opacity:.45}
 .avail-date-row{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
-.avail-item-name{font-size:13px;font-weight:600;min-width:180px;color:var(--text);flex-shrink:0}
-.avail-meter{flex:1;min-width:0;height:22px;background:#f0f1f5;border-radius:6px;overflow:hidden}
-.avail-fill{height:100%;border-radius:6px;transition:.3s}
-.avail-fill.ok{background:#34d399}
-.avail-fill.warn{background:#fbbf24}
-.avail-fill.danger{background:#f87171}
-.avail-nums{font-size:12px;color:#888;min-width:120px;text-align:right;flex-shrink:0}
-.avail-cat-hd{margin-top:18px;margin-bottom:8px;font-size:13px;font-weight:700;color:var(--text-dim);padding-bottom:4px;border-bottom:1px solid var(--border)}
+.avail-item-name{font-size:14px;font-weight:600;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avail-remain{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;min-width:60px;text-align:right;letter-spacing:-0.02em}
+.avail-remain.ok{color:#059669}
+.avail-remain.warn{color:#d97706}
+.avail-remain.danger{color:#dc2626}
+.avail-remain.none{color:#9ca3af}
+.avail-remain .lbl{font-size:11px;font-weight:500;color:#9ca3af;margin-right:4px}
+.avail-usage{font-size:12px;color:#9ca3af;min-width:140px;text-align:right;font-variant-numeric:tabular-nums}
+.avail-cat-hd{margin-top:18px;margin-bottom:4px;font-size:13px;font-weight:700;color:var(--text-dim);padding:0 12px 6px;border-bottom:2px solid var(--border)}
+@media(max-width:768px){
+  .avail-bar{grid-template-columns:1fr auto;grid-template-areas:"name remain" "usage usage";gap:4px 12px;padding:10px}
+  .avail-item-name{grid-area:name;font-size:13px}
+  .avail-remain{grid-area:remain;font-size:17px}
+  .avail-usage{grid-area:usage;text-align:left;min-width:0;font-size:11px}
+}
 .filter-bar select,.filter-bar input{padding:7px 12px;background:#fff;border1px solid var(--border);border-radius:6px;color:var(--text);font:400 13px/1 'Noto Sans JP',sans-serif;outline:none}
 .filter-bar select:focus,.filter-bar input:focus{border-color:#6366f1}
 .avail-date-row label{font-size:12px;font-weight:600;color:#888}
@@ -3403,19 +3411,23 @@ const Inv = (function(){
     let html='';let lastCat='';
     entries.forEach(e=>{
       if(e.category!==lastCat){lastCat=e.category;html+=`<div class="avail-cat-hd">${esc(e.category)}</div>`}
-      const pct=e.total>0?Math.round((e.used/e.total)*100):0;
       const avail=e.total-e.used;
-      let cls='ok';if(pct>=100)cls='danger';else if(pct>=70)cls='warn';
-      let numColor='#059669';if(avail<=0)numColor='#dc2626';else if(avail<=Math.ceil(e.total*0.3))numColor='#d97706';
+      const isEmpty=(e.total<=0);
+      let remainCls='ok';
+      let remainTxt;
+      if(isEmpty){remainCls='none';remainTxt='-';}
+      else if(avail<=0){remainCls='danger';remainTxt=avail;}
+      else if(avail<=Math.ceil(e.total*0.3)){remainCls='warn';remainTxt=avail;}
+      else{remainTxt=avail;}
       let detail='';
       if(e.rent>0&&e.maint>0)detail='貸出'+e.rent+' + メンテ'+e.maint;
       else if(e.rent>0)detail='貸出'+e.rent;
       else if(e.maint>0)detail='メンテ'+e.maint;
-      const usedStr=detail?(detail+' = '+e.used):e.used;
-      html+=`<div class="avail-bar">
+      const usageTxt=isEmpty?'未登録':(detail?(detail+' / '+e.total):(e.used+' / '+e.total));
+      html+=`<div class="avail-bar${isEmpty?' empty':''}">
         <span class="avail-item-name">${esc(e.item_name)}</span>
-        <div class="avail-meter"><div class="avail-fill ${cls}" style="width:${Math.min(pct,100)}%"></div></div>
-        <span class="avail-nums">${usedStr} / ${e.total} 使用　残 <strong style="color:${numColor}">${avail}</strong></span>
+        <span class="avail-remain ${remainCls}"><span class="lbl">残</span>${remainTxt}</span>
+        <span class="avail-usage">${usageTxt}</span>
       </div>`;
     });
     body.innerHTML=html;
