@@ -329,6 +329,29 @@ tr:hover td{background:rgba(59,111,216,.03)}
   #prodArchive td[colspan]{display:block;text-align:center;padding:30px !important}
   #prodArchive td[colspan]::before{display:none}
 
+  /* === テーブル→カード化（アーカイブビュー） === */
+  #prodArchived .tbl-wrap{border:none;background:transparent;overflow:visible}
+  #prodArchived table,#prodArchived thead,#prodArchived tbody,#prodArchived tr,#prodArchived td{display:block;width:100%}
+  #prodArchived thead{display:none}
+  #prodArchived tr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  #prodArchived tr:hover td{background:transparent}
+  #prodArchived td{padding:5px 0;border:none;white-space:normal;font-size:13px;display:flex;align-items:center;gap:8px}
+  #prodArchived td::before{font-size:11px;font-weight:600;color:var(--text-dim);min-width:72px;flex-shrink:0}
+  #prodArchived td:nth-of-type(1){font-size:15px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--surface3);margin-bottom:6px;display:block}
+  #prodArchived td:nth-of-type(1)::before{display:none}
+  #prodArchived td:nth-of-type(2)::before{content:'担当'}
+  #prodArchived td:nth-of-type(3)::before{content:'見積'}
+  #prodArchived td:nth-of-type(4)::before{content:'受注'}
+  #prodArchived td:nth-of-type(5)::before{content:'得意先'}
+  #prodArchived td:nth-of-type(6)::before{content:'窓口'}
+  #prodArchived td:nth-of-type(7)::before{content:'納期'}
+  #prodArchived td:nth-of-type(8)::before{content:'状態'}
+  #prodArchived td:nth-of-type(9)::before{content:'操作'}
+  #prodArchived td:empty{display:none}
+  #prodArchived td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px}
+  #prodArchived td[colspan]{display:block;text-align:center;padding:30px !important}
+  #prodArchived td[colspan]::before{display:none}
+
   /* モーダル：入力欄調整（中央モーダルは販売と統一） */
   .mo-row{flex-direction:column;gap:12px;margin-bottom:12px}
   .mo-field input,.mo-field select,.mo-field textarea{padding:11px 12px;font-size:16px;min-height:44px}
@@ -556,6 +579,29 @@ tr:hover td{background:rgba(59,111,216,.03)}
   #projDoneView td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px}
   #projDoneView td[colspan]{display:block;text-align:center;padding:30px !important}
   #projDoneView td[colspan]::before{display:none}
+
+  /* === テーブル→カード化（アーカイブビュー、企画） === */
+  #projArchivedView .tbl-wrap{border:none;background:transparent;overflow:visible}
+  #projArchivedView table,#projArchivedView thead,#projArchivedView tbody,#projArchivedView tr,#projArchivedView td{display:block;width:100%}
+  #projArchivedView thead{display:none}
+  #projArchivedView tr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  #projArchivedView tr:hover td{background:transparent}
+  #projArchivedView td{padding:5px 0;border:none;white-space:normal;font-size:13px;display:flex;align-items:center;gap:8px}
+  #projArchivedView td::before{font-size:11px;font-weight:600;color:var(--text-dim);min-width:72px;flex-shrink:0}
+  #projArchivedView td:nth-of-type(1){font-size:15px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--surface3);margin-bottom:6px;display:block}
+  #projArchivedView td:nth-of-type(1)::before{display:none}
+  #projArchivedView td:nth-of-type(2)::before{content:'担当'}
+  #projArchivedView td:nth-of-type(3)::before{content:'見積'}
+  #projArchivedView td:nth-of-type(4)::before{content:'受注'}
+  #projArchivedView td:nth-of-type(5)::before{content:'得意先'}
+  #projArchivedView td:nth-of-type(6)::before{content:'窓口'}
+  #projArchivedView td:nth-of-type(7)::before{content:'完了日'}
+  #projArchivedView td:nth-of-type(8)::before{content:'状態'}
+  #projArchivedView td:nth-of-type(9)::before{content:'操作'}
+  #projArchivedView td:empty{display:none}
+  #projArchivedView td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px}
+  #projArchivedView td[colspan]{display:block;text-align:center;padding:30px !important}
+  #projArchivedView td[colspan]::before{display:none}
 
   /* === 管理テーブル→カード化（13列） === */
   #projAdminView .tbl-wrap{border:none;background:transparent;overflow:visible}
@@ -922,39 +968,39 @@ tr:hover td{background:rgba(59,111,216,.03)}
 }
 @media(max-width:768px){
   /* === テーブル→カード化（管理・完了ビュー） === */
-  #adminView .tbl-wrap,#archiveView .tbl-wrap{border:none;background:transparent;overflow:visible}
+  #adminView .tbl-wrap,#archiveView,#salesArchivedView .tbl-wrap{border:none;background:transparent;overflow:visible}
   #adminView table,#adminView thead,#adminView tbody,#adminView tr,#adminView td,
-  #archiveView table,#archiveView thead,#archiveView tbody,#archiveView tr,#archiveView td{display:block;width:100%}
-  #adminView thead,#archiveView thead{display:none}
-  #adminView tr,#archiveView tr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-  #adminView td,#archiveView td{padding:5px 0;border:none;white-space:normal;font-size:13px;display:flex;align-items:center;gap:8px;text-align:left !important}
-  #adminView td::before,#archiveView td::before{font-size:11px;font-weight:600;color:var(--text-dim);min-width:72px;flex-shrink:0}
+  #archiveView,#salesArchivedView table,#archiveView,#salesArchivedView thead,#archiveView,#salesArchivedView tbody,#archiveView,#salesArchivedView tr,#archiveView,#salesArchivedView td{display:block;width:100%}
+  #adminView thead,#archiveView,#salesArchivedView thead{display:none}
+  #adminView tr,#archiveView,#salesArchivedView tr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  #adminView td,#archiveView,#salesArchivedView td{padding:5px 0;border:none;white-space:normal;font-size:13px;display:flex;align-items:center;gap:8px;text-align:left !important}
+  #adminView td::before,#archiveView,#salesArchivedView td::before{font-size:11px;font-weight:600;color:var(--text-dim);min-width:72px;flex-shrink:0}
   /* 物件名（1列目）大きく、ラベル非表示 */
-  #adminView td:nth-of-type(1),#archiveView td:nth-of-type(1){font-size:15px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--surface3);margin-bottom:6px;display:block}
-  #adminView td:nth-of-type(1)::before,#archiveView td:nth-of-type(1)::before{display:none}
+  #adminView td:nth-of-type(1),#archiveView,#salesArchivedView td:nth-of-type(1){font-size:15px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--surface3);margin-bottom:6px;display:block}
+  #adminView td:nth-of-type(1)::before,#archiveView,#salesArchivedView td:nth-of-type(1)::before{display:none}
   /* 列ラベル（販売：物件名/担当者/見積/受注/得意先/窓口/仕入先/金額/納期/ステータス/伝票/操作） */
-  #adminView td:nth-of-type(2)::before,#archiveView td:nth-of-type(2)::before{content:'担当'}
-  #adminView td:nth-of-type(3)::before,#archiveView td:nth-of-type(3)::before{content:'見積'}
-  #adminView td:nth-of-type(4)::before,#archiveView td:nth-of-type(4)::before{content:'受注'}
-  #adminView td:nth-of-type(5)::before,#archiveView td:nth-of-type(5)::before{content:'得意先'}
-  #adminView td:nth-of-type(6)::before,#archiveView td:nth-of-type(6)::before{content:'窓口'}
-  #adminView td:nth-of-type(7)::before,#archiveView td:nth-of-type(7)::before{content:'仕入先'}
-  #adminView td:nth-of-type(8)::before,#archiveView td:nth-of-type(8)::before{content:'金額'}
-  #adminView td:nth-of-type(9)::before,#archiveView td:nth-of-type(9)::before{content:'納期'}
-  #adminView td:nth-of-type(10)::before,#archiveView td:nth-of-type(10)::before{content:'ステータス'}
-  #adminView td:nth-of-type(11)::before,#archiveView td:nth-of-type(11)::before{content:'伝票'}
-  #adminView td:nth-of-type(12)::before,#archiveView td:nth-of-type(12)::before{content:'操作'}
+  #adminView td:nth-of-type(2)::before,#archiveView,#salesArchivedView td:nth-of-type(2)::before{content:'担当'}
+  #adminView td:nth-of-type(3)::before,#archiveView,#salesArchivedView td:nth-of-type(3)::before{content:'見積'}
+  #adminView td:nth-of-type(4)::before,#archiveView,#salesArchivedView td:nth-of-type(4)::before{content:'受注'}
+  #adminView td:nth-of-type(5)::before,#archiveView,#salesArchivedView td:nth-of-type(5)::before{content:'得意先'}
+  #adminView td:nth-of-type(6)::before,#archiveView,#salesArchivedView td:nth-of-type(6)::before{content:'窓口'}
+  #adminView td:nth-of-type(7)::before,#archiveView,#salesArchivedView td:nth-of-type(7)::before{content:'仕入先'}
+  #adminView td:nth-of-type(8)::before,#archiveView,#salesArchivedView td:nth-of-type(8)::before{content:'金額'}
+  #adminView td:nth-of-type(9)::before,#archiveView,#salesArchivedView td:nth-of-type(9)::before{content:'納期'}
+  #adminView td:nth-of-type(10)::before,#archiveView,#salesArchivedView td:nth-of-type(10)::before{content:'ステータス'}
+  #adminView td:nth-of-type(11)::before,#archiveView,#salesArchivedView td:nth-of-type(11)::before{content:'伝票'}
+  #adminView td:nth-of-type(12)::before,#archiveView,#salesArchivedView td:nth-of-type(12)::before{content:'操作'}
   /* 空セルは隠す */
-  #adminView td:empty,#archiveView td:empty{display:none}
+  #adminView td:empty,#archiveView,#salesArchivedView td:empty{display:none}
   /* 金額の右寄せをカードでは左に */
-  #adminView td:nth-of-type(8),#archiveView td:nth-of-type(8){justify-content:flex-start}
+  #adminView td:nth-of-type(8),#archiveView,#salesArchivedView td:nth-of-type(8){justify-content:flex-start}
   /* selectとボタンを大きく */
   #adminView td select{flex:1;padding:8px 10px !important;font-size:13px !important;min-height:38px}
-  #adminView td .act-btn,#archiveView td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px;margin-right:4px}
+  #adminView td .act-btn,#archiveView,#salesArchivedView td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px;margin-right:4px}
   #adminView td .act-btn.del{color:var(--red)}
   /* 該当なし行は通常表示 */
-  #adminView td[colspan],#archiveView td[colspan]{display:block;text-align:center !important;padding:30px !important}
-  #adminView td[colspan]::before,#archiveView td[colspan]::before{display:none}
+  #adminView td[colspan],#archiveView,#salesArchivedView td[colspan]{display:block;text-align:center !important;padding:30px !important}
+  #adminView td[colspan]::before,#archiveView,#salesArchivedView td[colspan]::before{display:none}
 }
 
 @media(max-width:768px){
@@ -1356,6 +1402,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="prodPcDate"></span>
     <button class="sub-tab on" data-view="factory">工場ボード</button>
     <button class="sub-tab" data-view="archive">出荷済</button>
+    <button class="sub-tab" data-view="archived">アーカイブ</button>
     <button class="sub-tab" data-view="admin">管理</button>
     <button class="staff-btn" id="prodStaffBtn" onclick="Prod.openStaff()">STAFF <span class="count">-</span></button>
     <button class="slog-btn" id="prodSlogBtn" onclick="Prod.openSlog()">ステータスログ<span class="dot"></span></button>
@@ -1365,6 +1412,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div id="prodFactory" class="factory-view"></div>
     <div id="prodAdmin" class="admin-view hidden"></div>
     <div id="prodArchive" class="admin-view hidden"></div>
+    <div id="prodArchived" class="admin-view hidden"></div>
   </div>
 
   <!-- 案件登録/編集モーダル -->
@@ -1436,6 +1484,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="projPcDate"></span>
     <button class="sub-tab on" data-view="gantt">スケジュール</button>
     <button class="sub-tab" data-view="projDone">完了</button>
+    <button class="sub-tab" data-view="projArchived">アーカイブ</button>
     <button class="sub-tab" data-view="admin">管理</button>
     <button class="slog-btn" id="projSlogBtn" onclick="Proj.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="projPcSearch" placeholder="検索...">
@@ -1443,6 +1492,7 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="app">
     <div id="projGantt" class="proj-view"></div>
     <div id="projDoneView" class="proj-admin hidden"></div>
+    <div id="projArchivedView" class="proj-admin hidden"></div>
     <div id="projAdminView" class="proj-admin hidden"></div>
   </div>
 
@@ -1756,6 +1806,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="salesPcDate"></span>
     <button class="sub-tab on" data-view="board">一覧</button>
     <button class="sub-tab" data-view="archive">納品済</button>
+    <button class="sub-tab" data-view="archived">アーカイブ</button>
     <button class="sub-tab" data-view="admin">管理</button>
     <button class="slog-btn" id="salesSlogBtn" onclick="Sales.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="salesPcSearch" placeholder="検索..." oninput="Sales.unifiedSearch(this.value)">
@@ -1764,6 +1815,7 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="app">
     <div id="boardView" class="factory-view hidden"></div>
     <div id="archiveView" class="admin-view hidden"></div>
+    <div id="salesArchivedView" class="admin-view hidden"></div>
     <div id="salesAdminView" class="admin-view hidden"></div>
   </div>
 
@@ -2357,9 +2409,10 @@ const Prod = (function(){
 
   // ===== 描画 =====
   function render(){
-    if(curProdView==='factory'){$('prodFactory').classList.remove('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.add('hidden');renderFactory()}
-    else if(curProdView==='admin'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.remove('hidden');$('prodArchive').classList.add('hidden');renderProdAdmin()}
-    else if(curProdView==='archive'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.remove('hidden');renderArchive()}
+    if(curProdView==='factory'){$('prodFactory').classList.remove('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.add('hidden');$('prodArchived').classList.add('hidden');renderFactory()}
+    else if(curProdView==='admin'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.remove('hidden');$('prodArchive').classList.add('hidden');$('prodArchived').classList.add('hidden');renderProdAdmin()}
+    else if(curProdView==='archive'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.remove('hidden');$('prodArchived').classList.add('hidden');renderArchive()}
+    else if(curProdView==='archived'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.add('hidden');$('prodArchived').classList.remove('hidden');renderArchived()}
     updateSlogBtn();updateStaffBtnCount();
   }
 
@@ -2430,7 +2483,7 @@ const Prod = (function(){
   // ===== 出荷済アーカイブ =====
   function renderArchive(){
     const el=$('prodArchive');const ARCHIVE_ST=['出荷済'];
-    let items=prodData.filter(d=>ARCHIVE_ST.includes(d.status));
+    let items=prodData.filter(d=>ARCHIVE_ST.includes(d.status) && String(d.archived||'').toUpperCase()!=='TRUE');
     if(archiveSort.col)items.sort((a,b)=>{
       let va=a[archiveSort.col],vb=b[archiveSort.col];
       const ea=va==null||va==='',eb=vb==null||vb==='';
@@ -2444,9 +2497,52 @@ const Prod = (function(){
     cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}" style="cursor:pointer">${c.label}<span class="arrow">${a}</span></th>`});
     h+='<th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
     if(!items.length)h+='<tr><td colspan="10" class="empty-msg">該当する案件はありません</td></tr>';
-    items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';const chk=d.invoiced==='TRUE'||d.invoiced===true;h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="Prod.toggleInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="Prod.editProd(\''+d.id+'\')">編集</button></td></tr>'});
+    items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';const chk=d.invoiced==='TRUE'||d.invoiced===true;h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="Prod.toggleInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="Prod.editProd(\''+d.id+'\')">編集</button> <button class="act-btn" onclick="Prod.archiveProd(\''+d.id+'\')">アーカイブへ</button></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}render()}});
+  }
+  function renderArchived(){
+    const el=$('prodArchived');
+    let items=prodData.filter(d=>String(d.archived||'').toUpperCase()==='TRUE');
+    if(archiveSort.col)items.sort((a,b)=>{
+      let va=a[archiveSort.col],vb=b[archiveSort.col];
+      const ea=va==null||va==='',eb=vb==null||vb==='';
+      if(ea&&eb)return 0;if(ea)return 1;if(eb)return-1;
+      if(archiveSort.col==='deadline'){const da=parseD(va),db=parseD(vb);if(da&&db)return archiveSort.asc?da-db:db-da;if(!da)return 1;if(!db)return-1}
+      va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0
+    });
+    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'deadline',label:'納期'}];
+    let h='<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">アーカイブ済み案件（'+items.length+'件）</span></div>';
+    h+='<div class="tbl-wrap"><table><thead><tr>';
+    cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}" style="cursor:pointer">${c.label}<span class="arrow">${a}</span></th>`});
+    h+='<th>ステータス</th><th>操作</th></tr></thead><tbody>';
+    if(!items.length)h+='<tr><td colspan="9" class="empty-msg">アーカイブ済みの案件はありません</td></tr>';
+    items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="Prod.unarchiveProd(\''+d.id+'\')">戻す</button></td></tr>'});
+    h+='</tbody></table></div>';el.innerHTML=h;
+    el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}render()}});
+  }
+  let _busyArch=false;
+  function archiveProd(id){
+    if(_busyArch)return;
+    if(!confirm('この案件をアーカイブに送りますか？'))return;
+    _busyArch=true;
+    const d=prodData.find(x=>String(x.id)===String(id));if(d)d.archived='TRUE';
+    fireAndForget({dept:'production',action:'archive',id:id});
+    toast('アーカイブに送りました');
+    render();
+    setTimeout(loadAll,3000);
+    setTimeout(()=>{_busyArch=false},1500);
+  }
+  function unarchiveProd(id){
+    if(_busyArch)return;
+    if(!confirm('この案件をアーカイブから戻しますか？'))return;
+    _busyArch=true;
+    const d=prodData.find(x=>String(x.id)===String(id));if(d)d.archived='';
+    fireAndForget({dept:'production',action:'unarchive',id:id});
+    toast('アーカイブから戻しました');
+    render();
+    setTimeout(loadAll,3000);
+    setTimeout(()=>{_busyArch=false},1500);
   }
   function toggleInvoiced(id,checked){
     if(_busyInv)return;
@@ -2600,6 +2696,7 @@ const Prod = (function(){
     openStaff, closeStaff,
     openProdMo, closeProdMo, editProd, saveProd, delProd,
     changeStatus, toggleInvoiced,
+    archiveProd, unarchiveProd,
     viewProd, openFilePicker, closeFilePicker, linkFile, unlinkFile,
     unifiedSearch
   };
@@ -2737,9 +2834,10 @@ const Proj = (function(){
 
   // ===== 描画 =====
   function render(){
-    if(curProjView==='gantt'){$('projGantt').classList.remove('hidden');$('projDoneView').classList.add('hidden');$('projAdminView').classList.add('hidden');renderGantt()}
-    else if(curProjView==='projDone'){$('projGantt').classList.add('hidden');$('projDoneView').classList.remove('hidden');$('projAdminView').classList.add('hidden');renderProjDone()}
-    else{$('projGantt').classList.add('hidden');$('projDoneView').classList.add('hidden');$('projAdminView').classList.remove('hidden');renderProjAdmin()}
+    if(curProjView==='gantt'){$('projGantt').classList.remove('hidden');$('projDoneView').classList.add('hidden');$('projArchivedView').classList.add('hidden');$('projAdminView').classList.add('hidden');renderGantt()}
+    else if(curProjView==='projDone'){$('projGantt').classList.add('hidden');$('projDoneView').classList.remove('hidden');$('projArchivedView').classList.add('hidden');$('projAdminView').classList.add('hidden');renderProjDone()}
+    else if(curProjView==='projArchived'){$('projGantt').classList.add('hidden');$('projDoneView').classList.add('hidden');$('projArchivedView').classList.remove('hidden');$('projAdminView').classList.add('hidden');renderProjArchived()}
+    else{$('projGantt').classList.add('hidden');$('projDoneView').classList.add('hidden');$('projArchivedView').classList.add('hidden');$('projAdminView').classList.remove('hidden');renderProjAdmin()}
   }
 
   // ===== ガントチャート =====
@@ -2862,7 +2960,7 @@ const Proj = (function(){
   }
   function renderProjDone(){
     const el=$('projDoneView');
-    let items=projData.filter(d=>d.status==='完了');
+    let items=projData.filter(d=>d.status==='完了' && String(d.archived||'').toUpperCase()!=='TRUE');
     if(projDoneSort.col)items.sort((a,b)=>{
       if(projDoneSort.col==='_endDate'){const da=getEndDate(a),db=getEndDate(b);if(!da&&!db)return 0;if(!da)return 1;if(!db)return-1;return projDoneSort.asc?da-db:db-da}
       let va=a[projDoneSort.col],vb=b[projDoneSort.col];
@@ -2876,9 +2974,52 @@ const Proj = (function(){
     cols.forEach(c=>{const a=projDoneSort.col===c.key?(projDoneSort.asc?'▲':'▼'):'';h+='<th data-dcol="'+c.key+'" style="cursor:pointer">'+c.label+'<span class="arrow">'+a+'</span></th>'});
     h+='<th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
     if(!items.length)h+='<tr><td colspan="10" class="empty-msg">該当する現場はありません</td></tr>';
-    items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';const chk=String(d.invoiced||'').toUpperCase()==='TRUE';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="Proj.toggleProjInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="Proj.editProj(\''+d.id+'\')">編集</button></td></tr>'});
+    items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';const chk=String(d.invoiced||'').toUpperCase()==='TRUE';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="Proj.toggleProjInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="Proj.editProj(\''+d.id+'\')">編集</button> <button class="act-btn" onclick="Proj.archiveProj(\''+d.id+'\')">アーカイブへ</button></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-dcol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.dcol;if(projDoneSort.col===c)projDoneSort.asc=!projDoneSort.asc;else{projDoneSort.col=c;projDoneSort.asc=true}render()}});
+  }
+  function renderProjArchived(){
+    const el=$('projArchivedView');
+    let items=projData.filter(d=>String(d.archived||'').toUpperCase()==='TRUE');
+    if(projDoneSort.col)items.sort((a,b)=>{
+      if(projDoneSort.col==='_endDate'){const da=getEndDate(a),db=getEndDate(b);if(!da&&!db)return 0;if(!da)return 1;if(!db)return-1;return projDoneSort.asc?da-db:db-da}
+      let va=a[projDoneSort.col],vb=b[projDoneSort.col];
+      const ea=va==null||va==='',eb=vb==null||vb==='';
+      if(ea&&eb)return 0;if(ea)return 1;if(eb)return-1;
+      va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(projDoneSort.asc?-1:1):va>vb?(projDoneSort.asc?1:-1):0
+    });
+    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'_endDate',label:'完了日'}];
+    let h='<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">アーカイブ済み現場（'+items.length+'件）</span></div>';
+    h+='<div class="tbl-wrap"><table><thead><tr>';
+    cols.forEach(c=>{const a=projDoneSort.col===c.key?(projDoneSort.asc?'▲':'▼'):'';h+='<th data-dcol="'+c.key+'" style="cursor:pointer">'+c.label+'<span class="arrow">'+a+'</span></th>'});
+    h+='<th>ステータス</th><th>操作</th></tr></thead><tbody>';
+    if(!items.length)h+='<tr><td colspan="9" class="empty-msg">アーカイブ済みの現場はありません</td></tr>';
+    items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="Proj.unarchiveProj(\''+d.id+'\')">戻す</button></td></tr>'});
+    h+='</tbody></table></div>';el.innerHTML=h;
+    el.querySelectorAll('th[data-dcol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.dcol;if(projDoneSort.col===c)projDoneSort.asc=!projDoneSort.asc;else{projDoneSort.col=c;projDoneSort.asc=true}render()}});
+  }
+  let _busyArch=false;
+  function archiveProj(id){
+    if(_busyArch)return;
+    if(!confirm('この現場をアーカイブに送りますか？'))return;
+    _busyArch=true;
+    const d=projData.find(x=>String(x.id)===String(id));if(d)d.archived='TRUE';
+    fireAndForget({dept:'project',action:'archive',id:id});
+    toast('アーカイブに送りました');
+    render();
+    setTimeout(loadAll,3000);
+    setTimeout(()=>{_busyArch=false},1500);
+  }
+  function unarchiveProj(id){
+    if(_busyArch)return;
+    if(!confirm('この現場をアーカイブから戻しますか？'))return;
+    _busyArch=true;
+    const d=projData.find(x=>String(x.id)===String(id));if(d)d.archived='';
+    fireAndForget({dept:'project',action:'unarchive',id:id});
+    toast('アーカイブから戻しました');
+    render();
+    setTimeout(loadAll,3000);
+    setTimeout(()=>{_busyArch=false},1500);
   }
   function toggleProjInvoiced(id,checked){
     if(_busyInv)return;
@@ -3059,6 +3200,7 @@ const Proj = (function(){
     openSlog, closeSlog, clearSlog,
     openProjMo, closeProjMo, editProj, saveProj, delProj, toggleProjType,
     changeProjStatus, toggleProjInvoiced,
+    archiveProj, unarchiveProj,
     viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput,
     ganttMove, ganttToday, setGanttFilter, setGanttDays,
     unifiedSearch
@@ -4145,6 +4287,7 @@ const Sales = (function(){
     $('salesTabs').querySelectorAll('.sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
     $('boardView').classList.toggle('hidden',v!=='board');
     $('archiveView').classList.toggle('hidden',v!=='archive');
+    $('salesArchivedView').classList.toggle('hidden',v!=='archived');
     $('salesAdminView').classList.toggle('hidden',v!=='admin');
     render();
   }
@@ -4169,6 +4312,7 @@ const Sales = (function(){
   function render(){
     if(currentView==='board')renderBoard();
     else if(currentView==='archive')renderArchive();
+    else if(currentView==='archived')renderSalesArchived();
     else if(currentView==='admin')renderAdmin();
   }
 
@@ -4286,7 +4430,7 @@ const Sales = (function(){
   // ===== 納品済 =====
   function renderArchive(){
     const el=$('archiveView');
-    let items=allEntries.filter(e=>ARCHIVE_ST.includes(String(e.status||'').trim()));
+    let items=allEntries.filter(e=>ARCHIVE_ST.includes(String(e.status||'').trim()) && String(e.archived||'').toUpperCase()!=='TRUE');
     const kw=archiveSearch.trim().toLowerCase();
     if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||'')).toLowerCase();return blob.includes(kw)});
     items.sort((a,b)=>{
@@ -4314,12 +4458,74 @@ const Sales = (function(){
       });
       const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
       h+=`<td style="text-align:center"><input type="checkbox" ${chk?'checked':''} onchange="Sales.toggleInvoiced('${esc(d.id)}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td>`;
-      h+=`<td><button class="act-btn" onclick="Sales.openMo('${esc(d.id)}')">編集</button></td>`;
+      h+=`<td><button class="act-btn" onclick="Sales.openMo('${esc(d.id)}')">編集</button> <button class="act-btn" onclick="Sales.archiveSales('${esc(d.id)}')">アーカイブへ</button></td>`;
       h+='</tr>';
     });}
     h+='</tbody></table></div>';
     el.innerHTML=h;
     el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}renderArchive()}});
+  }
+
+  // ===== アーカイブビュー（販売） =====
+  function renderSalesArchived(){
+    const el=$('salesArchivedView');
+    let items=allEntries.filter(e=>String(e.archived||'').toUpperCase()==='TRUE');
+    const kw=archiveSearch.trim().toLowerCase();
+    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||'')).toLowerCase();return blob.includes(kw)});
+    items.sort((a,b)=>{
+      let va=a[archiveSort.col],vb=b[archiveSort.col];
+      const ea=va==null||va==='',eb=vb==null||vb==='';
+      if(ea&&eb)return 0;if(ea)return 1;if(eb)return-1;
+      if(archiveSort.col==='created_at'||archiveSort.col==='deadline'){va=String(va);vb=String(vb);return archiveSort.asc?va.localeCompare(vb):vb.localeCompare(va)}
+      if(archiveSort.col==='amount'){const na=Number(va)||0,nb=Number(vb)||0;return archiveSort.asc?na-nb:nb-na}
+      va=String(va).toLowerCase();vb=String(vb).toLowerCase();
+      return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0;
+    });
+    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'supplier',label:'仕入先'},{key:'amount',label:'金額'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
+    let h=`<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">アーカイブ済み案件（${items.length}件）</span></div>`;
+    h+='<div class="tbl-wrap"><table class="tbl"><thead><tr>';
+    cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
+    h+='<th>操作</th></tr></thead><tbody>';
+    if(items.length===0){h+='<tr><td colspan="'+(cols.length+1)+'" class="empty-msg">アーカイブ済みの案件はありません</td></tr>';}
+    else{items.forEach(d=>{
+      h+='<tr>';
+      cols.forEach(c=>{
+        let v=d[c.key]||'';
+        if(c.key==='deadline'){h+=`<td>${fmtDateJP(v)}</td>`;}
+        else if(c.key==='amount'){h+=`<td style="text-align:right;font-variant-numeric:tabular-nums">${fmtAmount(v)}</td>`;}
+        else{h+=`<td>${esc(v)}</td>`;}
+      });
+      h+=`<td><button class="act-btn" onclick="Sales.unarchiveSales('${esc(d.id)}')">戻す</button></td>`;
+      h+='</tr>';
+    });}
+    h+='</tbody></table></div>';
+    el.innerHTML=h;
+    el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}renderSalesArchived()}});
+  }
+  let _busyArch=false;
+  function archiveSales(id){
+    if(_busyArch)return;
+    if(!confirm('この案件をアーカイブに送りますか？'))return;
+    _busyArch=true;
+    const d=allEntries.find(x=>String(x.id)===String(id));if(d)d.archived='TRUE';
+    apiPost({action:'archive',id});
+    _setCache('sales',{entries:allEntries});
+    toast('アーカイブに送りました');
+    render();
+    setTimeout(loadAll,3000);
+    setTimeout(()=>{_busyArch=false},1500);
+  }
+  function unarchiveSales(id){
+    if(_busyArch)return;
+    if(!confirm('この案件をアーカイブから戻しますか？'))return;
+    _busyArch=true;
+    const d=allEntries.find(x=>String(x.id)===String(id));if(d)d.archived='';
+    apiPost({action:'unarchive',id});
+    _setCache('sales',{entries:allEntries});
+    toast('アーカイブから戻しました');
+    render();
+    setTimeout(loadAll,3000);
+    setTimeout(()=>{_busyArch=false},1500);
   }
 
   // ===== 詳細（salesStToggle/salesStOpts） =====
@@ -4445,7 +4651,8 @@ const Sales = (function(){
     loadAll, init,
     setView, setBoardFilter, openSlog, closeSlog, clearSlog,
     openView, closeView, openMo, closeMo, saveEntry,
-    changeStatus, toggleInvoiced, delEntry, unifiedSearch
+    changeStatus, toggleInvoiced, delEntry, unifiedSearch,
+    archiveSales, unarchiveSales
   };
 })();
 
