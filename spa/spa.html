@@ -2211,7 +2211,7 @@ async function safeRefresh(btn, fn){
 }
 function centerActiveNav(){
   try{
-    if(window.innerWidth>768)return;
+    if(window.innerWidth>480)return;
     const inner=document.querySelector('.hdr-inner');
     const on=document.querySelector('.hdr-inner .nav-link.on');
     if(inner&&on)on.scrollIntoView({inline:'center',block:'nearest'});
