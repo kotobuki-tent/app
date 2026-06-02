@@ -4744,8 +4744,11 @@ const Daily = (function(){
     if(!w){el.innerHTML='';return}
     const entries=getMyEntries();
     const isToday=dateStr(writeDate)===dateStr(today);const dateLabel=isToday?'今日':'この日';
+    // 合計分数の計算と表示文字列
+    const totalMin=entries.reduce((s,e)=>s+(parseInt(e.minutes,10)||0),0);
+    const fmtTotal=(m)=>{if(!m)return'';const h=Math.floor(m/60),r=m%60;const inner=h===0?(m+'分'):(m+'分 ('+h+'時間'+(r?r+'分':'')+')');return`<span style="font-size:12px;font-weight:500;color:var(--text-dim);margin-left:12px">合計 ${inner}</span>`};
     if(!entries.length){el.innerHTML=`<h3>${dateLabel}の記録</h3><div class="empty-msg" style="padding:20px">まだ${dateLabel}の記録はありません</div>`;return}
-    let h=`<h3>${dateLabel}の記録（${entries.length}件）</h3>`;
+    let h=`<h3>${dateLabel}の記録（${entries.length}件）${fmtTotal(totalMin)}</h3>`;
     entries.forEach(e=>{
       const mins=parseInt(e.minutes,10)||0;
       const minsLabel=mins?`<span style="color:var(--text-dim);font-size:12px;margin-left:8px">${mins}分</span>`:'';
