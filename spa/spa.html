@@ -5306,6 +5306,17 @@ const Portal = (function(){
    - _loaded フラグは App 側で集中管理（IIFE名前空間の内部状態に依存しない）
    - _loading ガード：初回ロード中の連打による二重発火・loader競合を防ぐ
    ======================================================================== */
+// 各アプリのナビ切替時、サブタブを「最初のタブ」にリセットする
+// 行って戻ると直前に開いていたサブタブが残ったままになる問題の対策
+function resetSubTab(name){
+  const tabsId={prod:'prodTabs',proj:'projTabs',sales:'salesTabs',labor:'laborTabs',veh:'vTabs',daily:'dailyTabs',ot:'otTabs',inv:'invTabs'}[name];
+  if(!tabsId)return;
+  const container=document.getElementById(tabsId);
+  if(!container)return;
+  const first=container.querySelector('.sub-tab');
+  if(first)first.click();
+}
+
 const App = {
   current:null,
   // アプリ登録：ここに {key, ns(IIFE), sectionId, navId} を足すだけで全機構が回る
@@ -5332,6 +5343,9 @@ const App = {
     });
     this.current=name;
     centerActiveNav();
+
+    // サブタブを最初のタブにリセット（行って戻ると直前のサブタブが残る問題の対策）
+    resetSubTab(name);
 
     // 遅延ロード：初回だけ。_loading ガードで二重発火防止
     const app = this.reg(name).ns();
