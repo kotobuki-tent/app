@@ -1508,7 +1508,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="mo-row full"><div class="mo-field"><label>物件名 *</label><input id="xf_project" placeholder="例: 鳥取砂丘音楽フェス2026"></div></div>
     <div class="type-toggle">
       <input type="checkbox" id="xf_is_rental" onclick="Proj.toggleProjType()">
-      <label for="xf_is_rental">レンタル（貸出・返却のみ）</label>
+      <label>レンタル（貸出・返却のみ）</label>
       <span class="hint">チェックすると設営関連の項目が無効になります</span>
     </div>
     <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="xf_our_person" placeholder="自社の担当者"></div></div>
@@ -3086,8 +3086,6 @@ const Proj = (function(){
   // ===== モーダル操作 =====
   function openProjMo(d){$('projMoTitle').textContent=d?'現場編集':'現場登録';$('xf_id').value=d?d.id:'';$('xf_project').value=d?d.project:'';$('xf_our_person').value=d?d.our_person||'':'';$('xf_estimate_no').value=d?d.estimate_no||'':'';$('xf_order_no').value=d?d.order_no||'':'';$('xf_client').value=d?d.client||'':'';$('xf_person').value=d?d.person||'':'';$('xf_venue').value=d?d.venue||'':'';$('xf_address').value=d?d.address||'':'';$('xf_status').value=d?d.status||'受注':'受注';['load_in','setup','event','teardown','rental_out','rental_return'].forEach(phase=>{const key='date_'+phase;const el=$('xf_dates_'+phase);el.innerHTML='';const vals=d&&d[key]?String(d[key]).split(',').map(s=>s.trim()).filter(Boolean):[];if(vals.length)vals.forEach(v=>addDateInput('xf_dates_'+phase,v));else addDateInput('xf_dates_'+phase)});$('xf_people_load_in').value=d?d.people_load_in||'':'';$('xf_people_setup').value=d?d.people_setup||'':'';$('xf_people_event').value=d?d.people_event||'':'';$('xf_people_teardown').value=d?d.people_teardown||'':'';$('xf_rentals').value=d?d.rentals||'':'';$('xf_notes').value=d?d.notes||'':'';VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));$('xf_is_rental').checked=(d&&d.type==='レンタル');applyProjTypeUI();$('projMoBg').classList.add('show')}
   function toggleProjType(){
-    const cb=$('xf_is_rental');
-    cb.checked=!cb.checked;
     applyProjTypeUI();
   }
   function applyProjTypeUI(){
