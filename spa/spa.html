@@ -5126,6 +5126,7 @@ $('refreshBtn').addEventListener('click', function(){
   safeRefresh(this, ()=>App.refreshCurrent());
 });
 
+let _bgBusy=false;
 setInterval(()=>{
   if(document.visibilityState!=='visible')return;
   if(_bgBusy)return;
@@ -5138,9 +5139,9 @@ setInterval(()=>{
 // 初期表示：各アプリの init（イベント配線）→ ポータル（入口）を開く
 window.addEventListener('load', ()=>{
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
+  initMobileFilters();
   App.current=null;
   App.nav('portal');
-  initMobileFilters();
 });
 </script>
 </body>
