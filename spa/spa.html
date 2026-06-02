@@ -397,8 +397,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 @media(max-width:480px){
   }
 @keyframes spin{to{transform:rotate(360deg)}}
-.type-toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;cursor:pointer;user-select:none}
-.type-toggle:hover{border-color:var(--accent)}
+.type-toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px}
 .type-toggle input{width:18px;height:18px;cursor:pointer}
 .type-toggle label{font-size:13px;font-weight:600;color:var(--text);cursor:pointer;margin:0}
 .type-toggle .hint{font-size:11px;color:var(--text-dim);margin-left:8px}
@@ -1507,8 +1506,8 @@ table.jobs tr:last-child td{border-bottom:none}
     <h2 id="projMoTitle">現場登録</h2>
     <input type="hidden" id="xf_id">
     <div class="mo-row full"><div class="mo-field"><label>物件名 *</label><input id="xf_project" placeholder="例: 鳥取砂丘音楽フェス2026"></div></div>
-    <div class="type-toggle" onclick="Proj.toggleProjType()">
-      <input type="checkbox" id="xf_is_rental" onclick="event.stopPropagation();Proj.toggleProjType()">
+    <div class="type-toggle">
+      <input type="checkbox" id="xf_is_rental" onclick="Proj.toggleProjType()">
       <label for="xf_is_rental">レンタル（貸出・返却のみ）</label>
       <span class="hint">チェックすると設営関連の項目が無効になります</span>
     </div>
