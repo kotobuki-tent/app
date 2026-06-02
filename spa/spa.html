@@ -1755,7 +1755,7 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="sub-tabs" id="salesTabs">
     <span class="subtab-date" id="salesPcDate"></span>
     <button class="sub-tab on" data-view="board">一覧</button>
-    <button class="sub-tab" data-view="archive">完了</button>
+    <button class="sub-tab" data-view="archive">納品済</button>
     <button class="sub-tab" data-view="admin">管理</button>
     <button class="slog-btn" id="salesSlogBtn" onclick="Sales.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="salesPcSearch" placeholder="検索..." oninput="Sales.unifiedSearch(this.value)">
@@ -1795,7 +1795,7 @@ table.jobs tr:last-child td{border-bottom:none}
           <select id="f_status">
             <option value="見積中">見積中</option><option value="受注">受注</option>
             <option value="発注済">発注済</option><option value="入荷済">入荷済</option>
-            <option value="納品済">納品済</option><option value="完了">完了</option>
+            <option value="納品済">納品済</option>
             <option value="見送り">見送り</option>
           </select>
         </div>
@@ -4071,8 +4071,8 @@ const Sales = (function(){
   const SLOG_KEY='sales_status_snapshot';
   const SLOG_LIST_KEY='sales_status_log';
   const SLOG_UNREAD_KEY='sales_status_unread';
-  const ACTIVE_ST=['見積中','受注','発注済','入荷済','納品済'];
-  const ARCHIVE_ST=['完了','見送り'];
+  const ACTIVE_ST=['見積中','受注','発注済','入荷済'];
+  const ARCHIVE_ST=['納品済','見送り'];
   const ALL_ST=[...ACTIVE_ST,...ARCHIVE_ST];
 
   // ===== 販売方言ユーティリティ =====
@@ -4172,7 +4172,7 @@ const Sales = (function(){
     else if(currentView==='admin')renderAdmin();
   }
 
-  function stColorVar(s){return{'見積中':'--purple','受注':'--blue','発注済':'--orange','入荷済':'--green','納品済':'--accent','完了':'--gray','見送り':'--red'}[s]||'--text'}
+  function stColorVar(s){return{'見積中':'--purple','受注':'--blue','発注済':'--orange','入荷済':'--green','納品済':'--accent','見送り':'--red'}[s]||'--text'}
 
   // ===== ボード =====
   function renderBoard(){
@@ -4283,7 +4283,7 @@ const Sales = (function(){
     el.querySelectorAll('[data-st]').forEach(btn=>{btn.onclick=()=>{const v=btn.dataset.st;adminStatusFilter=v||null;renderAdmin()}});
   }
 
-  // ===== 完了 =====
+  // ===== 納品済 =====
   function renderArchive(){
     const el=$('archiveView');
     let items=allEntries.filter(e=>ARCHIVE_ST.includes(String(e.status||'').trim()));
@@ -4299,11 +4299,11 @@ const Sales = (function(){
       return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0;
     });
     const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'supplier',label:'仕入先'},{key:'amount',label:'金額'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
-    let h=`<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">完了・見送りの案件（${items.length}件）</span></div>`;
+    let h=`<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">納品済・見送りの案件（${items.length}件）</span></div>`;
     h+='<div class="tbl-wrap"><table class="tbl"><thead><tr>';
     cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
     h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
-    if(items.length===0){h+='<tr><td colspan="'+(cols.length+2)+'" class="empty-msg">完了・見送り案件はありません</td></tr>';}
+    if(items.length===0){h+='<tr><td colspan="'+(cols.length+2)+'" class="empty-msg">納品済・見送り案件はありません</td></tr>';}
     else{items.forEach(d=>{
       h+='<tr>';
       cols.forEach(c=>{
