@@ -2533,6 +2533,7 @@ const Prod = (function(){
     _busyArch=true;
     const d=prodData.find(x=>String(x.id)===String(id));if(d)d.archived='TRUE';
     fireAndForget({dept:'production',action:'archive',id:id});
+    _setCache('index',{prod:prodData,att:attendance});
     toast('アーカイブに送りました');
     render();
     setTimeout(loadAll,3000);
@@ -2544,6 +2545,7 @@ const Prod = (function(){
     _busyArch=true;
     const d=prodData.find(x=>String(x.id)===String(id));if(d)d.archived='';
     fireAndForget({dept:'production',action:'unarchive',id:id});
+    _setCache('index',{prod:prodData,att:attendance});
     toast('アーカイブから戻しました');
     render();
     setTimeout(loadAll,3000);
@@ -2667,6 +2669,7 @@ const Prod = (function(){
     }
     _savingProd=true;
     fireAndForget(body);
+    _setCache('index',{prod:prodData,att:attendance});
     toast('保存しました');
     closeProdMo();
     render();
@@ -2681,6 +2684,7 @@ const Prod = (function(){
     _busyDel=true;
     prodData=prodData.filter(x=>String(x.id)!==String(id));
     fireAndForget({dept:'production',action:'delete',id:id});
+    _setCache('index',{prod:prodData,att:attendance});
     toast('削除しました');
     render();
     setTimeout(loadAll,3000);
@@ -3010,6 +3014,7 @@ const Proj = (function(){
     _busyArch=true;
     const d=projData.find(x=>String(x.id)===String(id));if(d)d.archived='TRUE';
     fireAndForget({dept:'project',action:'archive',id:id});
+    _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('アーカイブに送りました');
     render();
     setTimeout(loadAll,3000);
@@ -3021,6 +3026,7 @@ const Proj = (function(){
     _busyArch=true;
     const d=projData.find(x=>String(x.id)===String(id));if(d)d.archived='';
     fireAndForget({dept:'project',action:'unarchive',id:id});
+    _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('アーカイブから戻しました');
     render();
     setTimeout(loadAll,3000);
@@ -3115,6 +3121,7 @@ const Proj = (function(){
     }
     _savingProj=true;
     fireAndForget(body);
+    _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('保存しました');
     closeProjMo();
     render();
@@ -3129,6 +3136,7 @@ const Proj = (function(){
     _busyDel=true;
     projData=projData.filter(x=>x.id!==id);
     fireAndForget({dept:'project',action:'delete',id:id});
+    _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('削除しました');
     render();
     setTimeout(loadAll,3000);
@@ -4118,6 +4126,7 @@ const Veh = (function(){
     }
     _savingVehicle=true;
     fireAndForget(body);
+    _setCache('vehicle',{data:vehicleData});
     toast('保存しました');
     closeVMo();
     render();
@@ -4137,6 +4146,7 @@ const Veh = (function(){
     _busyDel=true;
     vehicleData=vehicleData.filter(x=>String(x.id)!==String(id));
     fireAndForget({action:'delete',id});
+    _setCache('vehicle',{data:vehicleData});
     toast('削除しました');
     render();
     setTimeout(loadAll,3000);
@@ -4971,6 +4981,7 @@ const Daily = (function(){
     }
     if(editingId){body.id=editingId;const idx=allReports.findIndex(e=>String(e.id)===String(editingId));if(idx>=0)allReports[idx]={...allReports[idx],...body};fireAndForget(body);toast('更新しました')}
     else{allReports.push({...body,id:'tmp_'+Date.now()});fireAndForget(body);toast('追加しました')}
+    _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
     _savingAddOne=true;
     closeAddForm();renderSavedEntries();
     setTimeout(async()=>{await loadReports();renderSavedEntries();if(curView==='view')renderViewContent()},2500);
@@ -5001,6 +5012,7 @@ const Daily = (function(){
     _busyDel=true;
     allReports=allReports.filter(x=>String(x.id)!==String(id));
     fireAndForget({dept:'daily',action:'delete',id:id});
+    _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
     toast('削除しました');renderSavedEntries();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyDel=false},1500);
