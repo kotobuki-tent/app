@@ -125,6 +125,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .factory-view{padding:16px}
 .fv-date{display:none}
 .fv-sum{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap;align-items:center}
+.fv-flt-mb{display:none}
+@media(max-width:768px){.fv-sum .av-add{display:none !important}}
 .fv-si{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:90px;text-align:center;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .fv-si:hover{border-color:var(--accent)}
 .fv-si.on{border-color:var(--accent);background:var(--accent-dim)}
@@ -251,6 +253,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 
   /* サマリー：文字ピル化（管理タブのフィルターと統一） */
   .fv-sum{display:none !important}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .fv-si{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;min-width:0;border-radius:999px;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
   .fv-si .n{font-size:13px;font-weight:700;line-height:1;margin:0;order:2}
   .fv-si .l{font-size:12px;font-weight:600;line-height:1;margin:0;color:inherit;order:1}
@@ -638,6 +641,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 @media(max-width:768px){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
   .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
   .fv-si .l{font-size:12px !important;font-weight:600;line-height:1;margin:0 !important;color:inherit;order:1}
@@ -658,6 +662,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .fv-sum{display:none !important}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .fv-si{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;min-width:0;border-radius:999px;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
   .fv-si .n{font-size:13px;font-weight:700;line-height:1;margin:0;order:2}
   .fv-si .l{font-size:12px;font-weight:600;line-height:1;margin:0;color:inherit;order:1}
@@ -742,6 +747,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .fv-sum{display:none !important}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .summary-bar{display:none !important}
   .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none !important;text-align:left}
   .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
@@ -953,6 +959,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 @media(max-width:768px){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
   .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
   .fv-si .l{font-size:12px !important;font-weight:600;line-height:1;margin:0 !important;color:inherit;order:1}
@@ -1032,6 +1039,7 @@ table.jobs tr:last-child td{border-bottom:none}
 @media(max-width:768px){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
   .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
   .fv-si .l{font-size:12px !important;font-weight:600;line-height:1;margin:0 !important;color:inherit;order:1}
@@ -2062,6 +2070,59 @@ function _setCache(key,data){
   try{sessionStorage.setItem('seq_'+key,JSON.stringify(data));}catch(e){}
 }
 function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+
+// モバイルフィルター：各.fv-sumの隣に<select>を自動生成。PCでは非表示、モバイル時のみ表示。
+// 各IIFEに手を入れず、.fv-sumの内容変化をMutationObserverで監視して同期する。
+function buildMobileFilter(sumEl){
+  if(!sumEl)return;
+  let sel=sumEl.nextElementSibling;
+  if(!sel || !sel.classList || !sel.classList.contains('fv-flt-mb')){
+    sel=document.createElement('select');
+    sel.className='fv-flt-mb';
+    sumEl.parentNode.insertBefore(sel, sumEl.nextSibling);
+    sel.addEventListener('change',()=>{
+      const f=sel.value;
+      const curOn=sumEl.querySelector('.fv-si.on');
+      if(curOn && curOn.dataset.f===f) return;
+      const target=sumEl.querySelector('[data-f="'+f.replace(/"/g,'\\"')+'"]');
+      if(target)target.click();
+    });
+  }
+  const chips=sumEl.querySelectorAll('.fv-si');
+  let html='';let curF='';
+  chips.forEach(c=>{
+    const f=c.dataset.f||'';
+    const l=(c.querySelector('.l')?.textContent||'').trim();
+    const n=(c.querySelector('.n')?.textContent||'').trim();
+    const isOn=c.classList.contains('on');
+    if(isOn)curF=f;
+    html+='<option value="'+f.replace(/"/g,'&quot;')+'"'+(isOn?' selected':'')+'>'+l+(n?' ('+n+')':'')+'</option>';
+  });
+  sel.innerHTML=html;
+  if(curF)sel.value=curF;
+}
+function initMobileFilters(){
+  const seen=new WeakSet();
+  function attach(sum){
+    if(seen.has(sum))return;
+    seen.add(sum);
+    buildMobileFilter(sum);
+    new MutationObserver(()=>buildMobileFilter(sum)).observe(sum,{childList:true,subtree:true,characterData:true});
+  }
+  // 既存の.fv-sumに対して設置
+  document.querySelectorAll('.fv-sum').forEach(attach);
+  // 新規生成された.fv-sumも捕捉（IIFEのrender関数がinnerHTMLで作る場合）
+  new MutationObserver(mut=>{
+    mut.forEach(m=>{
+      m.addedNodes.forEach(n=>{
+        if(n.nodeType!==1)return;
+        if(n.classList && n.classList.contains('fv-sum'))attach(n);
+        if(n.querySelectorAll)n.querySelectorAll('.fv-sum').forEach(attach);
+      });
+    });
+  }).observe(document.body,{childList:true,subtree:true});
+}
+
 function toast(msg,err){const t=$('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
 async function safeRefresh(btn, fn){
   if(!btn || btn.disabled) return;
@@ -5079,6 +5140,7 @@ window.addEventListener('load', ()=>{
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   App.current=null;
   App.nav('portal');
+  initMobileFilters();
 });
 </script>
 </body>
