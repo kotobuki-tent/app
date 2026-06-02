@@ -4742,7 +4742,7 @@ const Labor = (function(){
       chipHtml+='</div>';
     }
     if(!list.length){$('laborContent').innerHTML=chipHtml+'<div class="empty-msg">該当する案件がありません</div>';return}
-    let h=chipHtml+'<table class="jobs"><thead><tr>';
+    let h=chipHtml+'<div style="overflow-x:auto"><table class="jobs"><thead><tr>';
     h+='<th>見積番号</th><th>受注番号</th><th>案件名</th><th>ステータス</th><th>納期</th><th class="num">延べ工数</th><th class="num">人数</th>';
     h+='</tr></thead><tbody>';
     list.forEach(j=>{
@@ -4756,7 +4756,7 @@ const Labor = (function(){
         <td class="num">${j.people_count||0}人</td>
       </tr>`;
     });
-    h+='</tbody></table>';
+    h+='</tbody></table></div>';
     h+='<div class="job-cards">';
     list.forEach(j=>{
       const no=j.order_no||j.estimate_no||'';
