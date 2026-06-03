@@ -2615,6 +2615,7 @@ const Prod = (function(){
     fireAndForget({dept:'production',action:'archive',id:id});
     _setCache('index',{prod:prodData,att:attendance});
     toast('アーカイブに送りました');
+    closeProdMo();
     render();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyArch=false},1500);
@@ -2627,6 +2628,7 @@ const Prod = (function(){
     fireAndForget({dept:'production',action:'unarchive',id:id});
     _setCache('index',{prod:prodData,att:attendance});
     toast('アーカイブから戻しました');
+    closeProdMo();
     render();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyArch=false},1500);
@@ -2771,6 +2773,7 @@ const Prod = (function(){
     fireAndForget({dept:'production',action:'delete',id:id});
     _setCache('index',{prod:prodData,att:attendance});
     toast('削除しました');
+    closeProdMo();
     render();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyDel=false},1500);
@@ -3101,6 +3104,7 @@ const Proj = (function(){
     fireAndForget({dept:'project',action:'archive',id:id});
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('アーカイブに送りました');
+    closeProjMo();
     render();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyArch=false},1500);
@@ -3113,6 +3117,7 @@ const Proj = (function(){
     fireAndForget({dept:'project',action:'unarchive',id:id});
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('アーカイブから戻しました');
+    closeProjMo();
     render();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyArch=false},1500);
@@ -3226,6 +3231,7 @@ const Proj = (function(){
     fireAndForget({dept:'project',action:'delete',id:id});
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('削除しました');
+    closeProjMo();
     render();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyDel=false},1500);
@@ -4237,6 +4243,7 @@ const Veh = (function(){
     fireAndForget({action:'delete',id});
     _setCache('vehicle',{data:vehicleData});
     toast('削除しました');
+    closeVMo();
     render();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyDel=false},1500);
@@ -4615,6 +4622,7 @@ const Sales = (function(){
     apiPost({action:'archive',id});
     _setCache('sales',{entries:allEntries});
     toast('アーカイブに送りました');
+    closeMo();
     render();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyArch=false},1500);
@@ -4627,6 +4635,7 @@ const Sales = (function(){
     apiPost({action:'unarchive',id});
     _setCache('sales',{entries:allEntries});
     toast('アーカイブから戻しました');
+    closeMo();
     render();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyArch=false},1500);
@@ -4742,6 +4751,7 @@ const Sales = (function(){
     allEntries=allEntries.filter(x=>String(x.id)!==String(id));
     _setCache('sales',{entries:allEntries});
     apiPost({action:'delete',id});
+    closeMo();
     render();refreshDatalists();toast('削除しました');
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyDel=false},1500);
