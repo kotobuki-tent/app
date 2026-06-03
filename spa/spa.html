@@ -2329,7 +2329,7 @@ const Prod = (function(){
   const diffDays=(a,b)=>Math.round((a-b)/864e5);
 
   // ===== データ読み込み（loadAll本物化：production+attendanceの2本。driveは遅延取得のまま含めない） =====
-  async function loadProd(){try{const r=await fetch(API+'?action=read&dept=production');const j=await r.json();if(j.success){prodData=mergeWithTmp(j.data,prodData,r=>String(r.project||'')+'|'+String(r.order_no||''));detectStatusChanges()}}catch(e){toast('生産部データ取得エラー',true)}}
+  async function loadProd(){try{const r=await fetch(API+'?action=read&dept=production');const j=await r.json();if(j.success){const arr=Array.isArray(j.data)?j.data.slice().reverse():[];prodData=mergeWithTmp(arr,prodData,r=>String(r.project||'')+'|'+String(r.order_no||''));detectStatusChanges()}}catch(e){toast('生産部データ取得エラー',true)}}
   async function loadAttendance(){
     try{
       const d=new Date();const todayStr=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -2750,7 +2750,7 @@ const Prod = (function(){
       if(idx!==-1)prodData[idx]={...prodData[idx],...body};
     }else{
       body.id='tmp_'+Date.now();
-      prodData.push(body);
+      prodData.unshift(body);
     }
     _savingProd=true;
     fireAndForget(body);
@@ -2837,7 +2837,7 @@ const Proj = (function(){
   function ganttDateHeaders(dates){let h='';dates.forEach(d=>{const ds=dateStr(d);const isT=ds===dateStr(today);const dn=d.getDay();const hol=HOLIDAYS[ds];let cls='gantt-date-cell';if(isT)cls+=' today';if(dn===0||hol)cls+=' holiday';else if(dn===6)cls+=' sat';h+=`<div class="${cls}"><span class="dow">${hol||dow[dn]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`});return h}
 
   // ===== データ読み込み（loadAll本物化：project+rentals+inventoryの3本。rentals/inventoryはviewProj/ganttで即使うため起動時取得） =====
-  async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success){projData=mergeWithTmp(j.data,projData,r=>String(r.project||'')+'|'+String(r.estimate_no||''));detectStatusChanges()}}catch(e){toast('企画制作データ取得エラー',true)}}
+  async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success){const arr=Array.isArray(j.data)?j.data.slice().reverse():[];projData=mergeWithTmp(arr,projData,r=>String(r.project||'')+'|'+String(r.estimate_no||''));detectStatusChanges()}}catch(e){toast('企画制作データ取得エラー',true)}}
   async function loadRentals(){try{const r=await fetch(API+'?dept=inventory&action=rentals');const j=await r.json();rentalsData=j||[]}catch(e){rentalsData=[]}}
   async function loadInventoryItems(){try{const r=await fetch(API+'?dept=inventory&action=list');const j=await r.json();inventoryItems=j||[]}catch(e){inventoryItems=[]}}
   async function loadAll(){
@@ -3205,7 +3205,7 @@ const Proj = (function(){
       if(idx!==-1)projData[idx]={...projData[idx],...body};
     }else{
       body.id='tmp_'+Date.now();
-      projData.push(body);
+      projData.unshift(body);
     }
     _savingProj=true;
     fireAndForget(body);
@@ -4704,7 +4704,7 @@ const Sales = (function(){
       toast('更新しました');
     }else{
       const tempId='s_'+Date.now();
-      allEntries.push({id:tempId,...payload,updated_at:today});
+      allEntries.unshift({id:tempId,...payload,updated_at:today});
       apiPost({action:'save',...payload});
       toast('登録しました');
       setTimeout(()=>{loadAll()},1500);
