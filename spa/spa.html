@@ -5157,7 +5157,7 @@ const Daily = (function(){
     const isToday=dateStr(writeDate)===dateStr(today);const dateLabel=isToday?'今日':'この日';
     // 合計分数の計算と表示文字列
     const totalMin=entries.reduce((s,e)=>s+(parseInt(e.minutes,10)||0),0);
-    const fmtTotal=(m)=>{if(!m)return'';const h=Math.floor(m/60),r=m%60;const inner=h===0?(m+'分'):(m+'分 ('+h+'時間'+(r?r+'分':'')+')');return`<span style="font-size:15px;font-weight:600;color:var(--text);margin-left:12px">合計 ${inner}</span>`};
+    const fmtTotal=(m)=>{if(!m)return'';const h=Math.floor(m/60),r=m%60;const big=`<span style="font-size:16px">${m}</span>`;const inner=h===0?(big+'分'):(big+'分 ('+h+'時間'+(r?r+'分':'')+')');return`<span style="font-size:15px;font-weight:600;color:var(--text);margin-left:12px">合計 ${inner}</span>`};
     if(!entries.length){el.innerHTML=`<h3>${dateLabel}の記録</h3><div class="empty-msg" style="padding:20px">まだ${dateLabel}の記録はありません</div>`;return}
     let h=`<h3>${dateLabel}の記録（${entries.length}件）${fmtTotal(totalMin)}</h3>`;
     entries.forEach(e=>{
