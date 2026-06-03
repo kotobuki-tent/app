@@ -72,6 +72,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .mo-foot .cancel{background:var(--surface);color:var(--text-dim)}
 .mo-foot .save{background:var(--accent);color:#fff;border-color:var(--accent)}
 .mo-foot .save:hover{opacity:.85}
+.mo-foot .del-btn{background:var(--red);color:#fff;border-color:var(--red)}
+.mo-foot .del-btn:hover{opacity:.85}
+.mo-foot .arch-btn{background:var(--surface);color:var(--text-dim)}
+.mo-foot .arch-btn:hover{background:var(--surface2)}
 
 /* ===== テーブル（共通） ===== */
 .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
@@ -1376,6 +1380,73 @@ table.jobs tr:last-child td{border-bottom:none}
 @media(max-width:480px){.portal-grid{grid-template-columns:1fr}}
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
+
+/* ===== モバイル時：admin/archive/archived テーブルをカード化 工場ボード風コンパクト =====
+   行クリックで編集モーダル開く方式。操作列・伝票列・ステータスselect列は隠す。
+========================================================================== */
+@media(max-width:480px){
+  /* 対象セレクタ：3アプリ × 3ビュー = 9セレクタ */
+  #prodAdmin tr, #prodArchive tr, #prodArchived tr,
+  #projAdminView tr, #projDoneView tr, #projArchivedView tr,
+  #salesAdminView tr, #archiveView tr, #salesArchivedView tr {
+    cursor:pointer;
+    padding:12px 14px !important;
+  }
+  /* td全体を inline-flex 風に詰める。物件名(1列目)以外はタグ風コンパクト表示 */
+  #prodAdmin td, #prodArchive td, #prodArchived td,
+  #projAdminView td, #projDoneView td, #projArchivedView td,
+  #salesAdminView td, #archiveView td, #salesArchivedView td {
+    display:inline-flex !important;
+    align-items:center;
+    padding:2px 7px !important;
+    margin:2px 4px 2px 0 !important;
+    font-size:11px !important;
+    background:var(--surface2);
+    border-radius:5px;
+    border:none !important;
+    border-bottom:none !important;
+    color:var(--text-dim);
+    gap:0 !important;
+  }
+  #prodAdmin td::before, #prodArchive td::before, #prodArchived td::before,
+  #projAdminView td::before, #projDoneView td::before, #projArchivedView td::before,
+  #salesAdminView td::before, #archiveView td::before, #salesArchivedView td::before {
+    display:none !important;
+  }
+  /* 1列目（物件名）：大きく、ブロック表示 */
+  #prodAdmin td:first-child, #prodArchive td:first-child, #prodArchived td:first-child,
+  #projAdminView td:first-child, #projDoneView td:first-child, #projArchivedView td:first-child,
+  #salesAdminView td:first-child, #archiveView td:first-child, #salesArchivedView td:first-child {
+    display:block !important;
+    font-size:15px !important;
+    font-weight:700 !important;
+    color:var(--text) !important;
+    background:transparent !important;
+    padding:0 0 8px !important;
+    margin:0 0 6px !important;
+    border-bottom:1px solid var(--surface3) !important;
+    border-radius:0 !important;
+  }
+  /* 空値tdは隠す */
+  #prodAdmin td:empty, #prodArchive td:empty, #prodArchived td:empty,
+  #projAdminView td:empty, #projDoneView td:empty, #projArchivedView td:empty,
+  #salesAdminView td:empty, #archiveView td:empty, #salesArchivedView td:empty {
+    display:none !important;
+  }
+  /* ステータスselect / 伝票checkbox / 操作ボタンが入ったtdは非表示（モーダル経由で操作） */
+  #prodAdmin td:has(select), #prodArchive td:has(select), #prodArchived td:has(select),
+  #projAdminView td:has(select), #projDoneView td:has(select), #projArchivedView td:has(select),
+  #salesAdminView td:has(select), #archiveView td:has(select), #salesArchivedView td:has(select),
+  #prodAdmin td:has(input[type=checkbox]), #prodArchive td:has(input[type=checkbox]), #prodArchived td:has(input[type=checkbox]),
+  #projAdminView td:has(input[type=checkbox]), #projDoneView td:has(input[type=checkbox]), #projArchivedView td:has(input[type=checkbox]),
+  #salesAdminView td:has(input[type=checkbox]), #archiveView td:has(input[type=checkbox]), #salesArchivedView td:has(input[type=checkbox]),
+  #prodAdmin td:has(button), #prodArchive td:has(button), #prodArchived td:has(button),
+  #projAdminView td:has(button), #projDoneView td:has(button), #projArchivedView td:has(button),
+  #salesAdminView td:has(button), #archiveView td:has(button), #salesArchivedView td:has(button) {
+    display:none !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1435,7 +1506,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="mo-row full"><div class="mo-field"><label>外注先</label><input id="pf_subcontractor" placeholder="例: 丸正帆布工業"></div></div>
     <div class="mo-row"><div class="mo-field"><label>作業開始予定日</label><input type="date" id="pf_start_date"></div><div class="mo-field"><label>納期</label><input type="date" id="pf_deadline"></div></div>
     <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="pf_notes" placeholder="補足事項があれば"></textarea></div></div>
-    <div class="mo-foot"><button class="cancel" onclick="Prod.closeProdMo()">キャンセル</button><button class="save" onclick="Prod.saveProd()">保存</button></div>
+    <div class="mo-foot"><button class="cancel" onclick="Prod.closeProdMo()">キャンセル</button><button class="del-btn hidden" id="pfDel" onclick="Prod.delProd($('pf_id').value)">削除</button><button class="arch-btn hidden" id="pfArch" onclick="Prod.archiveProd($('pf_id').value)">アーカイブへ</button><button class="arch-btn hidden" id="pfUnarch" onclick="Prod.unarchiveProd($('pf_id').value)">戻す</button><button class="save" onclick="Prod.saveProd()">保存</button></div>
   </div>
   </div>
   <!-- 案件詳細モーダル -->
@@ -1544,7 +1615,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="phase-hd">レンタル品・備考</div>
     <div class="mo-row full"><div class="mo-field"><label>レンタル品</label><textarea id="xf_rentals" placeholder="例: テント3張、テーブル10台、椅子50脚"></textarea></div></div>
     <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="xf_notes" placeholder="補足事項があれば"></textarea></div></div>
-    <div class="mo-foot"><button class="cancel" onclick="Proj.closeProjMo()">キャンセル</button><button class="save" onclick="Proj.saveProj()">保存</button></div>
+    <div class="mo-foot"><button class="cancel" onclick="Proj.closeProjMo()">キャンセル</button><button class="del-btn hidden" id="xfDel" onclick="Proj.delProj($('xf_id').value)">削除</button><button class="arch-btn hidden" id="xfArch" onclick="Proj.archiveProj($('xf_id').value)">アーカイブへ</button><button class="arch-btn hidden" id="xfUnarch" onclick="Proj.unarchiveProj($('xf_id').value)">戻す</button><button class="save" onclick="Proj.saveProj()">保存</button></div>
   </div>
   </div>
   <!-- 現場詳細モーダル -->
@@ -1859,6 +1930,9 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="f_notes" placeholder="値引き・運賃・特記事項など"></textarea></div></div>
       <div class="mo-foot">
         <button class="cancel" onclick="Sales.closeMo()">キャンセル</button>
+        <button class="del-btn hidden" id="fDel" onclick="Sales.delEntry($('f_id').value)">削除</button>
+        <button class="arch-btn hidden" id="fArch" onclick="Sales.archiveSales($('f_id').value)">アーカイブへ</button>
+        <button class="arch-btn hidden" id="fUnarch" onclick="Sales.unarchiveSales($('f_id').value)">戻す</button>
         <button class="save" onclick="Sales.saveEntry()">保存</button>
       </div>
     </div>
@@ -2478,7 +2552,7 @@ const Prod = (function(){
     const stBtn=(label,val)=>{const on=adminStatusFilter===val?' on':'';const cnt=val?stCounts[val]||0:allCount;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`};
     let h=`<div class="fv-sum">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('製作中','製作中')}${stBtn('完成','完成')}<button class="av-add" style="margin-left:auto" onclick="Prod.openProdMo()">+ 新規登録</button></div>`;
     h+='<div class="tbl-wrap"><table><thead><tr>';cols.forEach(c=>{const a=prodSort.col===c.key?(prodSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
-    items.forEach(d=>{h+='<tr>';cols.forEach(c=>{let v=d[c.key]||'';if(c.key==='status'){const opts=['見積中','受注','製作中','完成','出荷済','見送り'];h+=`<td><select onchange="Prod.changeStatus('${d.id}',this.value)" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer">`;opts.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});h+='</select></td>'}else{if(c.key==='deadline'&&v){const dd=parseD(v);v=dd?`${dd.getMonth()+1}/${dd.getDate()}（${dow[dd.getDay()]}）`:v}h+=`<td>${esc(v)}</td>`}});const chk=String(d.invoiced||'').toUpperCase()==='TRUE';h+=`<td style="text-align:center"><input type="checkbox" ${chk?'checked':''} onchange="Prod.toggleInvoiced('${d.id}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="Prod.editProd('${d.id}')">編集</button> <button class="act-btn del" onclick="Prod.delProd('${d.id}')">削除</button></td></tr>`});
+    items.forEach(d=>{h+=`<tr data-id="${d.id}" onclick="Prod.editProd('${d.id}')" style="cursor:pointer">`;cols.forEach(c=>{let v=d[c.key]||'';if(c.key==='status'){const opts=['見積中','受注','製作中','完成','出荷済','見送り'];h+=`<td onclick="event.stopPropagation()"><select onchange="Prod.changeStatus('${d.id}',this.value)" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer">`;opts.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});h+='</select></td>'}else{if(c.key==='deadline'&&v){const dd=parseD(v);v=dd?`${dd.getMonth()+1}/${dd.getDate()}（${dow[dd.getDay()]}）`:v}h+=`<td>${esc(v)}</td>`}});const chk=String(d.invoiced||'').toUpperCase()==='TRUE';h+=`<td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" ${chk?'checked':''} onchange="Prod.toggleInvoiced('${d.id}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Prod.editProd('${d.id}')">編集</button> <button class="act-btn del" onclick="Prod.delProd('${d.id}')">削除</button></td></tr>`});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(prodSort.col===c)prodSort.asc=!prodSort.asc;else{prodSort.col=c;prodSort.asc=true}render()}});
     el.querySelectorAll('[data-st]').forEach(btn=>{btn.onclick=()=>{const v=btn.dataset.st;adminStatusFilter=v||null;render()}});
@@ -2501,7 +2575,7 @@ const Prod = (function(){
     cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}" style="cursor:pointer">${c.label}<span class="arrow">${a}</span></th>`});
     h+='<th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
     if(!items.length)h+='<tr><td colspan="10" class="empty-msg">該当する案件はありません</td></tr>';
-    items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';const chk=d.invoiced==='TRUE'||d.invoiced===true;h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="Prod.toggleInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="Prod.editProd(\''+d.id+'\')">編集</button> <button class="act-btn" onclick="Prod.archiveProd(\''+d.id+'\')">アーカイブへ</button></td></tr>'});
+    items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';const chk=d.invoiced==='TRUE'||d.invoiced===true;h+='<tr data-id="'+d.id+'" onclick="Prod.editProd(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" '+(chk?'checked':'')+' onchange="Prod.toggleInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Prod.editProd(\''+d.id+'\')">編集</button> <button class="act-btn" onclick="Prod.archiveProd(\''+d.id+'\')">アーカイブへ</button></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}render()}});
   }
@@ -2521,7 +2595,7 @@ const Prod = (function(){
     cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}" style="cursor:pointer">${c.label}<span class="arrow">${a}</span></th>`});
     h+='<th>ステータス</th><th>操作</th></tr></thead><tbody>';
     if(!items.length)h+='<tr><td colspan="9" class="empty-msg">アーカイブ済みの案件はありません</td></tr>';
-    items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="Prod.unarchiveProd(\''+d.id+'\')">戻す</button></td></tr>'});
+    items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';h+='<tr data-id="'+d.id+'" onclick="Prod.editProd(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Prod.unarchiveProd(\''+d.id+'\')">戻す</button></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}render()}});
   }
@@ -2646,7 +2720,12 @@ const Prod = (function(){
   }
 
   // ===== モーダル操作 =====
-  function openProdMo(d){$('prodMoTitle').textContent=d?'案件編集':'案件登録';$('pf_id').value=d?d.id:'';$('pf_project').value=d?d.project:'';$('pf_our_person').value=d?d.our_person||'':'';$('pf_estimate_no').value=d?d.estimate_no||'':'';$('pf_order_no').value=d?d.order_no||'':'';$('pf_client').value=d?d.client||'':'';$('pf_person').value=d?d.person||'':'';$('pf_section').value=d?d.section||'未定':'未定';$('pf_status').value=d?d.status||'受注':'受注';$('pf_subcontractor').value=d?d.subcontractor||'':'';$('pf_start_date').value=d?d.start_date||'':'';$('pf_deadline').value=d?d.deadline||'':'';$('pf_notes').value=d?d.notes||'':'';$('prodMoBg').classList.add('show')}
+  function openProdMo(d){$('prodMoTitle').textContent=d?'案件編集':'案件登録';$('pf_id').value=d?d.id:'';$('pf_project').value=d?d.project:'';$('pf_our_person').value=d?d.our_person||'':'';$('pf_estimate_no').value=d?d.estimate_no||'':'';$('pf_order_no').value=d?d.order_no||'':'';$('pf_client').value=d?d.client||'':'';$('pf_person').value=d?d.person||'':'';$('pf_section').value=d?d.section||'未定':'未定';$('pf_status').value=d?d.status||'受注':'受注';$('pf_subcontractor').value=d?d.subcontractor||'':'';$('pf_start_date').value=d?d.start_date||'':'';$('pf_deadline').value=d?d.deadline||'':'';$('pf_notes').value=d?d.notes||'':'';
+    const isEdit=!!d, isArch=isEdit&&String(d.archived||'').toUpperCase()==='TRUE';
+    $('pfDel').classList.toggle('hidden',!isEdit);
+    $('pfArch').classList.toggle('hidden',!isEdit||isArch);
+    $('pfUnarch').classList.toggle('hidden',!isEdit||!isArch);
+    $('prodMoBg').classList.add('show')}
   function closeProdMo(){$('prodMoBg').classList.remove('show')}
   function editProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(d)openProdMo(d)}
 
@@ -2982,7 +3061,7 @@ const Proj = (function(){
     cols.forEach(c=>{const a=projDoneSort.col===c.key?(projDoneSort.asc?'▲':'▼'):'';h+='<th data-dcol="'+c.key+'" style="cursor:pointer">'+c.label+'<span class="arrow">'+a+'</span></th>'});
     h+='<th>ステータス</th><th>伝票</th><th>操作</th></tr></thead><tbody>';
     if(!items.length)h+='<tr><td colspan="10" class="empty-msg">該当する現場はありません</td></tr>';
-    items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';const chk=String(d.invoiced||'').toUpperCase()==='TRUE';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center"><input type="checkbox" '+(chk?'checked':'')+' onchange="Proj.toggleProjInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="Proj.editProj(\''+d.id+'\')">編集</button> <button class="act-btn" onclick="Proj.archiveProj(\''+d.id+'\')">アーカイブへ</button></td></tr>'});
+    items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';const chk=String(d.invoiced||'').toUpperCase()==='TRUE';h+='<tr data-id="'+d.id+'" onclick="Proj.editProj(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" '+(chk?'checked':'')+' onchange="Proj.toggleProjInvoiced(\''+d.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Proj.editProj(\''+d.id+'\')">編集</button> <button class="act-btn" onclick="Proj.archiveProj(\''+d.id+'\')">アーカイブへ</button></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-dcol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.dcol;if(projDoneSort.col===c)projDoneSort.asc=!projDoneSort.asc;else{projDoneSort.col=c;projDoneSort.asc=true}render()}});
   }
@@ -3002,7 +3081,7 @@ const Proj = (function(){
     cols.forEach(c=>{const a=projDoneSort.col===c.key?(projDoneSort.asc?'▲':'▼'):'';h+='<th data-dcol="'+c.key+'" style="cursor:pointer">'+c.label+'<span class="arrow">'+a+'</span></th>'});
     h+='<th>ステータス</th><th>操作</th></tr></thead><tbody>';
     if(!items.length)h+='<tr><td colspan="9" class="empty-msg">アーカイブ済みの現場はありません</td></tr>';
-    items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';h+='<tr><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td><button class="act-btn" onclick="Proj.unarchiveProj(\''+d.id+'\')">戻す</button></td></tr>'});
+    items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';h+='<tr data-id="'+d.id+'" onclick="Proj.editProj(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Proj.unarchiveProj(\''+d.id+'\')">戻す</button></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-dcol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.dcol;if(projDoneSort.col===c)projDoneSort.asc=!projDoneSort.asc;else{projDoneSort.col=c;projDoneSort.asc=true}render()}});
   }
@@ -3063,7 +3142,7 @@ const Proj = (function(){
     const stBtn=(label,val)=>{const on=projAdminFilter===val?' on':'';const cnt=val?stCounts[val]||0:allCount;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`};
     let h=`<div class="fv-sum">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('準備中','準備中')}${stBtn('現場中','現場中')}${stBtn('レンタル中','レンタル中')}<button class="av-add" style="margin-left:auto" onclick="Proj.openProjMo()">+ 新規登録</button></div>`;
     h+='<div class="tbl-wrap"><table><thead><tr>';cols.forEach(c=>{const a=projSort.col===c.key?(projSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
-    items.forEach(d=>{h+='<tr>';cols.forEach(c=>{let v=d[c.key]||'';if(c.key==='status'){const opts=['見積中','受注','準備中','現場中','レンタル中','完了','見送り'];h+=`<td><select onchange="Proj.changeProjStatus('${d.id}',this.value)" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer">`;opts.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});h+='</select></td>'}else{if(c.key.startsWith('date_')&&v){v=String(v).split(',').map(s=>{const dd=parseD(s.trim());return dd?`${dd.getMonth()+1}/${dd.getDate()}`:s}).join(', ')}h+=`<td>${esc(v)}</td>`}});const chk=String(d.invoiced||'').toUpperCase()==='TRUE';h+=`<td style="text-align:center"><input type="checkbox" ${chk?'checked':''} onchange="Proj.toggleProjInvoiced('${d.id}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td><button class="act-btn" onclick="Proj.editProj('${d.id}')">編集</button> <button class="act-btn del" onclick="Proj.delProj('${d.id}')">削除</button></td></tr>`});
+    items.forEach(d=>{h+=`<tr data-id="${d.id}" onclick="Proj.editProj('${d.id}')" style="cursor:pointer">`;cols.forEach(c=>{let v=d[c.key]||'';if(c.key==='status'){const opts=['見積中','受注','準備中','現場中','レンタル中','完了','見送り'];h+=`<td onclick="event.stopPropagation()"><select onchange="Proj.changeProjStatus('${d.id}',this.value)" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer">`;opts.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});h+='</select></td>'}else{if(c.key.startsWith('date_')&&v){v=String(v).split(',').map(s=>{const dd=parseD(s.trim());return dd?`${dd.getMonth()+1}/${dd.getDate()}`:s}).join(', ')}h+=`<td>${esc(v)}</td>`}});const chk=String(d.invoiced||'').toUpperCase()==='TRUE';h+=`<td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" ${chk?'checked':''} onchange="Proj.toggleProjInvoiced('${d.id}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Proj.editProj('${d.id}')">編集</button> <button class="act-btn del" onclick="Proj.delProj('${d.id}')">削除</button></td></tr>`});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(projSort.col===c)projSort.asc=!projSort.asc;else{projSort.col=c;projSort.asc=true}render()}});
     el.querySelectorAll('[data-st]').forEach(btn=>{btn.onclick=()=>{const v=btn.dataset.st;projAdminFilter=v||null;render()}});
@@ -3084,7 +3163,12 @@ const Proj = (function(){
     $('projViewBg').classList.add('show')}
 
   // ===== モーダル操作 =====
-  function openProjMo(d){$('projMoTitle').textContent=d?'現場編集':'現場登録';$('xf_id').value=d?d.id:'';$('xf_project').value=d?d.project:'';$('xf_our_person').value=d?d.our_person||'':'';$('xf_estimate_no').value=d?d.estimate_no||'':'';$('xf_order_no').value=d?d.order_no||'':'';$('xf_client').value=d?d.client||'':'';$('xf_person').value=d?d.person||'':'';$('xf_venue').value=d?d.venue||'':'';$('xf_address').value=d?d.address||'':'';$('xf_status').value=d?d.status||'受注':'受注';['load_in','setup','event','teardown','rental_out','rental_return'].forEach(phase=>{const key='date_'+phase;const el=$('xf_dates_'+phase);el.innerHTML='';const vals=d&&d[key]?String(d[key]).split(',').map(s=>s.trim()).filter(Boolean):[];if(vals.length)vals.forEach(v=>addDateInput('xf_dates_'+phase,v));else addDateInput('xf_dates_'+phase)});$('xf_people_load_in').value=d?d.people_load_in||'':'';$('xf_people_setup').value=d?d.people_setup||'':'';$('xf_people_event').value=d?d.people_event||'':'';$('xf_people_teardown').value=d?d.people_teardown||'':'';$('xf_rentals').value=d?d.rentals||'':'';$('xf_notes').value=d?d.notes||'':'';VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));$('xf_is_rental').checked=(d&&d.type==='レンタル');applyProjTypeUI();$('projMoBg').classList.add('show')}
+  function openProjMo(d){$('projMoTitle').textContent=d?'現場編集':'現場登録';$('xf_id').value=d?d.id:'';$('xf_project').value=d?d.project:'';$('xf_our_person').value=d?d.our_person||'':'';$('xf_estimate_no').value=d?d.estimate_no||'':'';$('xf_order_no').value=d?d.order_no||'':'';$('xf_client').value=d?d.client||'':'';$('xf_person').value=d?d.person||'':'';$('xf_venue').value=d?d.venue||'':'';$('xf_address').value=d?d.address||'':'';$('xf_status').value=d?d.status||'受注':'受注';['load_in','setup','event','teardown','rental_out','rental_return'].forEach(phase=>{const key='date_'+phase;const el=$('xf_dates_'+phase);el.innerHTML='';const vals=d&&d[key]?String(d[key]).split(',').map(s=>s.trim()).filter(Boolean):[];if(vals.length)vals.forEach(v=>addDateInput('xf_dates_'+phase,v));else addDateInput('xf_dates_'+phase)});$('xf_people_load_in').value=d?d.people_load_in||'':'';$('xf_people_setup').value=d?d.people_setup||'':'';$('xf_people_event').value=d?d.people_event||'':'';$('xf_people_teardown').value=d?d.people_teardown||'':'';$('xf_rentals').value=d?d.rentals||'':'';$('xf_notes').value=d?d.notes||'':'';VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));$('xf_is_rental').checked=(d&&d.type==='レンタル');applyProjTypeUI();
+    const isEditP=!!d, isArchP=isEditP&&String(d.archived||'').toUpperCase()==='TRUE';
+    $('xfDel').classList.toggle('hidden',!isEditP);
+    $('xfArch').classList.toggle('hidden',!isEditP||isArchP);
+    $('xfUnarch').classList.toggle('hidden',!isEditP||!isArchP);
+    $('projMoBg').classList.add('show')}
   function toggleProjType(){
     applyProjTypeUI();
   }
@@ -4420,7 +4504,7 @@ const Sales = (function(){
     h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
     if(items.length===0){h+='<tr><td colspan="'+(cols.length+2)+'" class="empty-msg">該当する案件はありません</td></tr>';}
     else{items.forEach(d=>{
-      h+='<tr>';
+      h+=`<tr onclick="Sales.openMo('${esc(d.id)}')" style="cursor:pointer">`;
       cols.forEach(c=>{
         let v=d[c.key]||'';
         if(c.key==='status'){h+=`<td><select class="st-mini" onchange="Sales.changeStatus('${esc(d.id)}',this.value)">`;ALL_ST.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});h+='</select></td>';}
@@ -4429,8 +4513,8 @@ const Sales = (function(){
         else{h+=`<td>${esc(v)}</td>`;}
       });
       const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
-      h+=`<td style="text-align:center"><input type="checkbox" ${chk?'checked':''} onchange="Sales.toggleInvoiced('${esc(d.id)}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td>`;
-      h+=`<td><button class="act-btn" onclick="Sales.openMo('${esc(d.id)}')">編集</button> <button class="act-btn del" onclick="Sales.delEntry('${esc(d.id)}')">削除</button></td>`;
+      h+=`<td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" ${chk?'checked':''} onchange="Sales.toggleInvoiced('${esc(d.id)}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td>`;
+      h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Sales.openMo('${esc(d.id)}')">編集</button> <button class="act-btn del" onclick="Sales.delEntry('${esc(d.id)}')">削除</button></td>`;
       h+='</tr>';
     });}
     h+='</tbody></table></div>';
@@ -4461,7 +4545,7 @@ const Sales = (function(){
     h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
     if(items.length===0){h+='<tr><td colspan="'+(cols.length+2)+'" class="empty-msg">納品済・見送り案件はありません</td></tr>';}
     else{items.forEach(d=>{
-      h+='<tr>';
+      h+=`<tr onclick="Sales.openMo('${esc(d.id)}')" style="cursor:pointer">`;
       cols.forEach(c=>{
         let v=d[c.key]||'';
         if(c.key==='deadline'){h+=`<td>${fmtDateJP(v)}</td>`;}
@@ -4469,8 +4553,8 @@ const Sales = (function(){
         else{h+=`<td>${esc(v)}</td>`;}
       });
       const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
-      h+=`<td style="text-align:center"><input type="checkbox" ${chk?'checked':''} onchange="Sales.toggleInvoiced('${esc(d.id)}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td>`;
-      h+=`<td><button class="act-btn" onclick="Sales.openMo('${esc(d.id)}')">編集</button> <button class="act-btn" onclick="Sales.archiveSales('${esc(d.id)}')">アーカイブへ</button></td>`;
+      h+=`<td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" ${chk?'checked':''} onchange="Sales.toggleInvoiced('${esc(d.id)}',this.checked)" style="width:18px;height:18px;cursor:pointer"></td>`;
+      h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Sales.openMo('${esc(d.id)}')">編集</button> <button class="act-btn" onclick="Sales.archiveSales('${esc(d.id)}')">アーカイブへ</button></td>`;
       h+='</tr>';
     });}
     h+='</tbody></table></div>';
@@ -4500,14 +4584,14 @@ const Sales = (function(){
     h+='<th>操作</th></tr></thead><tbody>';
     if(items.length===0){h+='<tr><td colspan="'+(cols.length+1)+'" class="empty-msg">アーカイブ済みの案件はありません</td></tr>';}
     else{items.forEach(d=>{
-      h+='<tr>';
+      h+=`<tr onclick="Sales.openMo('${esc(d.id)}')" style="cursor:pointer">`;
       cols.forEach(c=>{
         let v=d[c.key]||'';
         if(c.key==='deadline'){h+=`<td>${fmtDateJP(v)}</td>`;}
         else if(c.key==='amount'){h+=`<td style="text-align:right;font-variant-numeric:tabular-nums">${fmtAmount(v)}</td>`;}
         else{h+=`<td>${esc(v)}</td>`;}
       });
-      h+=`<td><button class="act-btn" onclick="Sales.unarchiveSales('${esc(d.id)}')">戻す</button></td>`;
+      h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Sales.unarchiveSales('${esc(d.id)}')">戻す</button></td>`;
       h+='</tr>';
     });}
     h+='</tbody></table></div>';
@@ -4590,6 +4674,10 @@ const Sales = (function(){
     $('f_status').value=isEdit?(e.status||'見積中'):'見積中';
     $('f_notes').value=isEdit?(e.notes||''):'';
     refreshDatalists();
+    const isArchS=isEdit&&String(e.archived||'').toUpperCase()==='TRUE';
+    $('fDel').classList.toggle('hidden',!isEdit);
+    $('fArch').classList.toggle('hidden',!isEdit||isArchS);
+    $('fUnarch').classList.toggle('hidden',!isEdit||!isArchS);
     $('moBg').classList.add('show');
   }
   function closeMo(){$('moBg').classList.remove('show')}
