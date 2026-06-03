@@ -1391,12 +1391,17 @@ table.jobs tr:last-child td{border-bottom:none}
   #salesAdminView tr, #archiveView tr, #salesArchivedView tr {
     cursor:pointer;
     padding:12px 14px !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+    align-items:center;
   }
   /* td全体を inline-flex 風に詰める。物件名(1列目)以外はタグ風コンパクト表示 */
   #prodAdmin td, #prodArchive td, #prodArchived td,
   #projAdminView td, #projDoneView td, #projArchivedView td,
   #salesAdminView td, #archiveView td, #salesArchivedView td {
     display:inline-flex !important;
+    width:auto !important;
+    flex:0 0 auto !important;
     align-items:center;
     padding:2px 7px !important;
     margin:2px 4px 2px 0 !important;
@@ -1413,11 +1418,12 @@ table.jobs tr:last-child td{border-bottom:none}
   #salesAdminView td::before, #archiveView td::before, #salesArchivedView td::before {
     display:none !important;
   }
-  /* 1列目（物件名）：大きく、ブロック表示 */
+  /* 1列目（物件名）：大きく、ブロック表示、必ず改行 */
   #prodAdmin td:first-child, #prodArchive td:first-child, #prodArchived td:first-child,
   #projAdminView td:first-child, #projDoneView td:first-child, #projArchivedView td:first-child,
   #salesAdminView td:first-child, #archiveView td:first-child, #salesArchivedView td:first-child {
     display:block !important;
+    flex-basis:100% !important;
     font-size:15px !important;
     font-weight:700 !important;
     color:var(--text) !important;
