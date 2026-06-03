@@ -1514,7 +1514,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="mo-row full"><div class="mo-field"><label>外注先</label><input id="pf_subcontractor" placeholder="例: 丸正帆布工業"></div></div>
     <div class="mo-row"><div class="mo-field"><label>作業開始予定日</label><input type="date" id="pf_start_date"></div><div class="mo-field"><label>納期</label><input type="date" id="pf_deadline"></div></div>
     <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="pf_notes" placeholder="補足事項があれば"></textarea></div></div>
-    <div class="mo-foot"><button class="cancel" onclick="Prod.closeProdMo()">閉じる</button><button class="arch-btn hidden" id="pfArch" onclick="Prod.archiveProd($('pf_id').value)">アーカイブへ</button><button class="arch-btn hidden" id="pfUnarch" onclick="Prod.unarchiveProd($('pf_id').value)">戻す</button><button class="save" onclick="Prod.saveProd()">保存</button></div>
+    <div class="mo-foot"><button class="cancel" onclick="Prod.closeProdMo()">閉じる</button><button class="arch-btn hidden" id="pfArch" onclick="Prod.archiveProd($('pf_id').value)">アーカイブへ</button><button class="arch-btn hidden" id="pfUnarch" onclick="Prod.unarchiveProd($('pf_id').value)">アーカイブ解除</button><button class="save" onclick="Prod.saveProd()">保存</button></div>
   </div>
   </div>
   <!-- 案件詳細モーダル -->
@@ -1623,7 +1623,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="phase-hd">レンタル品・備考</div>
     <div class="mo-row full"><div class="mo-field"><label>レンタル品</label><textarea id="xf_rentals" placeholder="例: テント3張、テーブル10台、椅子50脚"></textarea></div></div>
     <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="xf_notes" placeholder="補足事項があれば"></textarea></div></div>
-    <div class="mo-foot"><button class="cancel" onclick="Proj.closeProjMo()">閉じる</button><button class="arch-btn hidden" id="xfArch" onclick="Proj.archiveProj($('xf_id').value)">アーカイブへ</button><button class="arch-btn hidden" id="xfUnarch" onclick="Proj.unarchiveProj($('xf_id').value)">戻す</button><button class="save" onclick="Proj.saveProj()">保存</button></div>
+    <div class="mo-foot"><button class="cancel" onclick="Proj.closeProjMo()">閉じる</button><button class="arch-btn hidden" id="xfArch" onclick="Proj.archiveProj($('xf_id').value)">アーカイブへ</button><button class="arch-btn hidden" id="xfUnarch" onclick="Proj.unarchiveProj($('xf_id').value)">アーカイブ解除</button><button class="save" onclick="Proj.saveProj()">保存</button></div>
   </div>
   </div>
   <!-- 現場詳細モーダル -->
@@ -1939,7 +1939,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-foot">
         <button class="cancel" onclick="Sales.closeMo()">閉じる</button>
         <button class="arch-btn hidden" id="fArch" onclick="Sales.archiveSales($('f_id').value)">アーカイブへ</button>
-        <button class="arch-btn hidden" id="fUnarch" onclick="Sales.unarchiveSales($('f_id').value)">戻す</button>
+        <button class="arch-btn hidden" id="fUnarch" onclick="Sales.unarchiveSales($('f_id').value)">アーカイブ解除</button>
         <button class="save" onclick="Sales.saveEntry()">保存</button>
       </div>
     </div>
@@ -2602,7 +2602,7 @@ const Prod = (function(){
     cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}" style="cursor:pointer">${c.label}<span class="arrow">${a}</span></th>`});
     h+='<th>ステータス</th><th>操作</th></tr></thead><tbody>';
     if(!items.length)h+='<tr><td colspan="9" class="empty-msg">アーカイブ済みの案件はありません</td></tr>';
-    items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';h+='<tr data-id="'+d.id+'" onclick="Prod.editProd(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Prod.unarchiveProd(\''+d.id+'\')">戻す</button></td></tr>'});
+    items.forEach(d=>{const dl=parseD(d.deadline);const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';h+='<tr data-id="'+d.id+'" onclick="Prod.editProd(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Prod.unarchiveProd(\''+d.id+'\')">アーカイブ解除</button></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}render()}});
   }
@@ -3088,7 +3088,7 @@ const Proj = (function(){
     cols.forEach(c=>{const a=projDoneSort.col===c.key?(projDoneSort.asc?'▲':'▼'):'';h+='<th data-dcol="'+c.key+'" style="cursor:pointer">'+c.label+'<span class="arrow">'+a+'</span></th>'});
     h+='<th>ステータス</th><th>操作</th></tr></thead><tbody>';
     if(!items.length)h+='<tr><td colspan="9" class="empty-msg">アーカイブ済みの現場はありません</td></tr>';
-    items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';h+='<tr data-id="'+d.id+'" onclick="Proj.editProj(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Proj.unarchiveProj(\''+d.id+'\')">戻す</button></td></tr>'});
+    items.forEach(d=>{const ed=getEndDate(d);const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';h+='<tr data-id="'+d.id+'" onclick="Proj.editProj(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Proj.unarchiveProj(\''+d.id+'\')">アーカイブ解除</button></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-dcol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.dcol;if(projDoneSort.col===c)projDoneSort.asc=!projDoneSort.asc;else{projDoneSort.col=c;projDoneSort.asc=true}render()}});
   }
@@ -4599,7 +4599,7 @@ const Sales = (function(){
         else if(c.key==='amount'){h+=`<td style="text-align:right;font-variant-numeric:tabular-nums">${fmtAmount(v)}</td>`;}
         else{h+=`<td>${esc(v)}</td>`;}
       });
-      h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Sales.unarchiveSales('${esc(d.id)}')">戻す</button></td>`;
+      h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Sales.unarchiveSales('${esc(d.id)}')">アーカイブ解除</button></td>`;
       h+='</tr>';
     });}
     h+='</tbody></table></div>';
