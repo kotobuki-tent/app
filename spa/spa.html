@@ -1390,7 +1390,8 @@ table.jobs tr:last-child td{border-bottom:none}
   /* 対象セレクタ：3アプリ × 3ビュー = 9セレクタ */
   #prodAdmin tr, #prodArchive tr, #prodArchived tr,
   #projAdminView tr, #projDoneView tr, #projArchivedView tr,
-  #salesAdminView tr, #archiveView tr, #salesArchivedView tr {
+  #salesAdminView tr, #archiveView tr, #salesArchivedView tr,
+  #view-veh #adminView tr {
     cursor:pointer;
     padding:12px 14px !important;
     display:flex !important;
@@ -1400,7 +1401,8 @@ table.jobs tr:last-child td{border-bottom:none}
   /* td全体を inline-flex 風に詰める。物件名(1列目)以外はタグ風コンパクト表示 */
   #prodAdmin td, #prodArchive td, #prodArchived td,
   #projAdminView td, #projDoneView td, #projArchivedView td,
-  #salesAdminView td, #archiveView td, #salesArchivedView td {
+  #salesAdminView td, #archiveView td, #salesArchivedView td,
+  #view-veh #adminView td {
     display:inline-flex !important;
     width:auto !important;
     flex:0 0 auto !important;
@@ -1417,13 +1419,15 @@ table.jobs tr:last-child td{border-bottom:none}
   }
   #prodAdmin td::before, #prodArchive td::before, #prodArchived td::before,
   #projAdminView td::before, #projDoneView td::before, #projArchivedView td::before,
-  #salesAdminView td::before, #archiveView td::before, #salesArchivedView td::before {
+  #salesAdminView td::before, #archiveView td::before, #salesArchivedView td::before,
+  #view-veh #adminView td::before {
     display:none !important;
   }
   /* 1列目（物件名）：大きく、ブロック表示、必ず改行 */
   #prodAdmin td:first-child, #prodArchive td:first-child, #prodArchived td:first-child,
   #projAdminView td:first-child, #projDoneView td:first-child, #projArchivedView td:first-child,
-  #salesAdminView td:first-child, #archiveView td:first-child, #salesArchivedView td:first-child {
+  #salesAdminView td:first-child, #archiveView td:first-child, #salesArchivedView td:first-child,
+  #view-veh #adminView td:first-child {
     display:block !important;
     flex-basis:100% !important;
     font-size:15px !important;
@@ -1438,13 +1442,15 @@ table.jobs tr:last-child td{border-bottom:none}
   /* 空値tdは隠す */
   #prodAdmin td:empty, #prodArchive td:empty, #prodArchived td:empty,
   #projAdminView td:empty, #projDoneView td:empty, #projArchivedView td:empty,
-  #salesAdminView td:empty, #archiveView td:empty, #salesArchivedView td:empty {
+  #salesAdminView td:empty, #archiveView td:empty, #salesArchivedView td:empty,
+  #view-veh #adminView td:empty {
     display:none !important;
   }
   /* ステータスselect / 伝票checkbox / 操作ボタンが入ったtdは非表示（モーダル経由で操作） */
   #prodAdmin td[onclick*="stopPropagation"], #prodArchive td[onclick*="stopPropagation"], #prodArchived td[onclick*="stopPropagation"],
   #projAdminView td[onclick*="stopPropagation"], #projDoneView td[onclick*="stopPropagation"], #projArchivedView td[onclick*="stopPropagation"],
-  #salesAdminView td[onclick*="stopPropagation"], #archiveView td[onclick*="stopPropagation"], #salesArchivedView td[onclick*="stopPropagation"] {
+  #salesAdminView td[onclick*="stopPropagation"], #archiveView td[onclick*="stopPropagation"], #salesArchivedView td[onclick*="stopPropagation"],
+  #view-veh #adminView td[onclick*="stopPropagation"] {
     display:none !important;
   }
 }
@@ -1794,7 +1800,7 @@ table.jobs tr:last-child td{border-bottom:none}
   <!-- 車両 登録/編集 モーダル -->
   <div class="mo-bg" id="vMoBg">
   <div class="mo">
-    <h2 id="vMoTitle">車両登録</h2>
+    <h2 id="vMoTitle"><span id="vMoTitleText">車両登録</span><button class="del-link hidden" id="vfDel" onclick="Veh.delVehicle($('vf_id').value)">削除</button></h2>
     <input type="hidden" id="vf_id">
     <div class="mo-row">
       <div class="mo-field"><label>車両名称 *</label><input id="vf_name" placeholder="例: ハイエース①"></div>
@@ -1830,7 +1836,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-field"><label>備考</label><textarea id="vf_notes" rows="2"></textarea></div>
     </div>
     <div class="mo-foot">
-      <button class="cancel" onclick="Veh.closeVMo()">キャンセル</button>
+      <button class="cancel" onclick="Veh.closeVMo()">閉じる</button>
       <button class="save" onclick="Veh.saveVehicle()">保存</button>
     </div>
   </div>
@@ -4030,14 +4036,14 @@ const Veh = (function(){
     cols.forEach(c=>{const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
     h+='<th>操作</th></tr></thead><tbody>';
     items.forEach(d=>{
-      h+='<tr>';
+      h+=`<tr onclick="Veh.editVehicle('${d.id}')" style="cursor:pointer">`;
       cols.forEach(c=>{
         let v=d[c.key]||'';
         if(c.key.endsWith('_date')&&v)v=dateJP(v);
         if(c.key==='current_km'&&v)v=fmtKm(v);
         h+=`<td>${esc(v)}</td>`;
       });
-      h+=`<td><button class="act-btn" onclick="Veh.editVehicle('${d.id}')">編集</button> <button class="act-btn del" onclick="Veh.delVehicle('${d.id}')">削除</button></td></tr>`;
+      h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Veh.editVehicle('${d.id}')">編集</button> <button class="act-btn del" onclick="Veh.delVehicle('${d.id}')">削除</button></td></tr>`;
     });
     h+='</tbody></table></div>';
     el.innerHTML=h;
@@ -4157,7 +4163,8 @@ const Veh = (function(){
 
   // ===== モーダル =====
   function openVMo(d){
-    $('vMoTitle').textContent=d?'車両編集':'車両登録';
+    $('vMoTitleText').textContent=d?'車両編集':'車両登録';
+    $('vfDel').classList.toggle('hidden',!d);
     $('vf_id').value=d?d.id:'';
     $('vf_name').value=d?d.name:'';
     $('vf_plate').value=d?d.plate||'':'';
