@@ -2405,9 +2405,9 @@ const Prod = (function(){
     slogUnread=0;
     localStorage.setItem(SLOG_UNREAD_KEY,'0');
     updateSlogBtn();
-    $('prodSlogBg').scrollTop=0;const _mo_prodSlogBg=$('prodSlogBg').querySelector('.mo');if(_mo_prodSlogBg)_mo_prodSlogBg.scrollTop=0;
-
     $('prodSlogBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('prodSlogBg').scrollTop=0;const _mo=$('prodSlogBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
     if(curProdView==='factory')renderFactory();
   }
   function closeSlog(){
@@ -2447,9 +2447,9 @@ const Prod = (function(){
   }
   function openStaff(){
     renderStaffGrid();
-    $('staffBg').scrollTop=0;const _mo_staffBg=$('staffBg').querySelector('.mo');if(_mo_staffBg)_mo_staffBg.scrollTop=0;
-
     $('staffBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('staffBg').scrollTop=0;const _mo=$('staffBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
   function closeStaff(){$('staffBg').classList.remove('show')}
   function renderStaffGrid(){
@@ -2667,8 +2667,8 @@ const Prod = (function(){
     const tgl=$('stToggle'),opts=$('stOpts');
     if(tgl&&opts)tgl.onclick=()=>{tgl.classList.toggle('open');opts.classList.toggle('open')};
     $('prodViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){tgl.classList.remove('open');opts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProd(id);render()}});
-    renderLinkedFiles(d);$('prodViewBg').scrollTop=0;const _mo_prodViewBg=$('prodViewBg').querySelector('.mo');if(_mo_prodViewBg)_mo_prodViewBg.scrollTop=0;
-$('prodViewBg').classList.add('show')}
+    renderLinkedFiles(d);$('prodViewBg').classList.add('show');
+requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
 
   // ===== 製作図ファイル =====
   function getLinkedFileIds(d){if(!d.files)return[];return String(d.files).split(',').map(s=>s.trim()).filter(Boolean)}
@@ -2689,9 +2689,9 @@ $('prodViewBg').classList.add('show')}
     try{const res=await fetch(API+'?dept=drive&action=list');const json=await res.json();driveFiles=json.files||[]}catch(e){console.error('Drive load error:',e);driveFiles=[]}
   }
   function openFilePicker(){
-    $('filePickerBg').scrollTop=0;const _mo_filePickerBg=$('filePickerBg').querySelector('.mo');if(_mo_filePickerBg)_mo_filePickerBg.scrollTop=0;
-
     $('filePickerBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('filePickerBg').scrollTop=0;const _mo=$('filePickerBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
     $('filePickerList').innerHTML='';
     $('filePickerLoading').classList.remove('hidden');
     loadDriveFiles().then(()=>{
@@ -2741,8 +2741,9 @@ $('prodViewBg').classList.add('show')}
     $('pfDel').classList.toggle('hidden',!isEdit);
     $('pfArch').classList.toggle('hidden',!isEdit||isArch);
     $('pfUnarch').classList.toggle('hidden',!isEdit||!isArch);
-    $('prodMoBg').scrollTop=0;$('prodMoBg').querySelector('.mo').scrollTop=0;
-    $('prodMoBg').classList.add('show')}
+    $('prodMoBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('prodMoBg').scrollTop=0;const _mo=$('prodMoBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
   function closeProdMo(){$('prodMoBg').classList.remove('show')}
   function editProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(d)openProdMo(d)}
 
@@ -2919,9 +2920,9 @@ const Proj = (function(){
     slogUnread=0;
     updateSlogBtn();
     localStorage.setItem(SLOG_UNREAD_KEY,'0');
-    $('projSlogBg').scrollTop=0;const _mo_projSlogBg=$('projSlogBg').querySelector('.mo');if(_mo_projSlogBg)_mo_projSlogBg.scrollTop=0;
-
     $('projSlogBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('projSlogBg').scrollTop=0;const _mo=$('projSlogBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
     if(curProjView==='gantt')renderGantt();
   }
   function closeSlog(){
@@ -3182,9 +3183,9 @@ const Proj = (function(){
     const ptgl=$('projStToggle'),popts=$('projStOpts');
     if(ptgl&&popts)ptgl.onclick=()=>{ptgl.classList.toggle('open');popts.classList.toggle('open')};
     $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProj(id);render()}});
-    $('projViewBg').scrollTop=0;const _mo_projViewBg=$('projViewBg').querySelector('.mo');if(_mo_projViewBg)_mo_projViewBg.scrollTop=0;
+    $('projViewBg').classList.add('show');
 
-    $('projViewBg').classList.add('show')}
+    requestAnimationFrame(()=>{$('projViewBg').scrollTop=0;const _mo=$('projViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
 
   // ===== モーダル操作 =====
   function openProjMo(d){$('projMoTitleText').textContent=d?'現場編集':'現場登録';$('xf_id').value=d?d.id:'';$('xf_project').value=d?d.project:'';$('xf_our_person').value=d?d.our_person||'':'';$('xf_estimate_no').value=d?d.estimate_no||'':'';$('xf_order_no').value=d?d.order_no||'':'';$('xf_client').value=d?d.client||'':'';$('xf_person').value=d?d.person||'':'';$('xf_venue').value=d?d.venue||'':'';$('xf_address').value=d?d.address||'':'';$('xf_status').value=d?d.status||'受注':'受注';['load_in','setup','event','teardown','rental_out','rental_return'].forEach(phase=>{const key='date_'+phase;const el=$('xf_dates_'+phase);el.innerHTML='';const vals=d&&d[key]?String(d[key]).split(',').map(s=>s.trim()).filter(Boolean):[];if(vals.length)vals.forEach(v=>addDateInput('xf_dates_'+phase,v));else addDateInput('xf_dates_'+phase)});$('xf_people_load_in').value=d?d.people_load_in||'':'';$('xf_people_setup').value=d?d.people_setup||'':'';$('xf_people_event').value=d?d.people_event||'':'';$('xf_people_teardown').value=d?d.people_teardown||'':'';$('xf_rentals').value=d?d.rentals||'':'';$('xf_notes').value=d?d.notes||'':'';VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));$('xf_is_rental').checked=(d&&d.type==='レンタル');applyProjTypeUI();
@@ -3192,8 +3193,9 @@ const Proj = (function(){
     $('xfDel').classList.toggle('hidden',!isEditP);
     $('xfArch').classList.toggle('hidden',!isEditP||isArchP);
     $('xfUnarch').classList.toggle('hidden',!isEditP||!isArchP);
-    $('projMoBg').scrollTop=0;$('projMoBg').querySelector('.mo').scrollTop=0;
-    $('projMoBg').classList.add('show')}
+    $('projMoBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('projMoBg').scrollTop=0;const _mo=$('projMoBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
   function toggleProjType(){
     applyProjTypeUI();
   }
@@ -3400,9 +3402,9 @@ const Inv = (function(){
       });
     }
     islogUnread=0;localStorage.setItem(ILOG_UNREAD_KEY,'0');updateSlogBtn();
-    $('invSlogBg').scrollTop=0;const _mo_invSlogBg=$('invSlogBg').querySelector('.mo');if(_mo_invSlogBg)_mo_invSlogBg.scrollTop=0;
-
     $('invSlogBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('invSlogBg').scrollTop=0;const _mo=$('invSlogBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
   function closeSlog(){$('invSlogBg').classList.remove('show')}
   function clearSlog(){
@@ -3538,9 +3540,9 @@ const Inv = (function(){
     $('xf_item_name').value=data?data.item_name:'';
     $('xf_item_qty').value=data?data.total_qty:0;
     $('xf_item_notes').value=data?data.notes||'':'';
-    $('itemMoBg').scrollTop=0;const _mo_itemMoBg=$('itemMoBg').querySelector('.mo');if(_mo_itemMoBg)_mo_itemMoBg.scrollTop=0;
-
     $('itemMoBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('itemMoBg').scrollTop=0;const _mo=$('itemMoBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
   function closeItemMo(){$('itemMoBg').classList.remove('show')}
   function editItem(id){const d=items.find(i=>i.id===id);if(d)openItemMo(d)}
@@ -3671,9 +3673,9 @@ const Inv = (function(){
     $('xf_r_project').value='';
     if(data&&data.client_name){const sel=$('xf_r_project');for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===data.client_name){sel.selectedIndex=i;break}}}
     $('xf_r_notes').value=data?data.notes||'':'';
-    $('rentalMoBg').scrollTop=0;const _mo_rentalMoBg=$('rentalMoBg').querySelector('.mo');if(_mo_rentalMoBg)_mo_rentalMoBg.scrollTop=0;
-
     $('rentalMoBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('rentalMoBg').scrollTop=0;const _mo=$('rentalMoBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
   function closeRentalMo(){$('rentalMoBg').classList.remove('show')}
   function editRental(id){const d=rentals.find(r=>r.id===id);if(d)openRentalMo(d)}
@@ -3885,9 +3887,9 @@ const Veh = (function(){
       });
     }
     vslogUnread=0;localStorage.setItem(VLOG_UNREAD_KEY,'0');updateSlogBtn();
-    $('vSlogBg').scrollTop=0;const _mo_vSlogBg=$('vSlogBg').querySelector('.mo');if(_mo_vSlogBg)_mo_vSlogBg.scrollTop=0;
-
     $('vSlogBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('vSlogBg').scrollTop=0;const _mo=$('vSlogBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
   function closeSlog(){$('vSlogBg').classList.remove('show')}
   function clearSlog(){
@@ -4137,9 +4139,9 @@ const Veh = (function(){
     $('maintAddArea').classList.add('hidden');
     $('ma_date').value=new Date().toISOString().slice(0,10);
     $('ma_km').value=v.current_km||'';
-    $('vViewBg').scrollTop=0;const _mo_vViewBg=$('vViewBg').querySelector('.mo');if(_mo_vViewBg)_mo_vViewBg.scrollTop=0;
-
     $('vViewBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('vViewBg').scrollTop=0;const _mo=$('vViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
   function renderMaintList(v){
     const el=$('maintList');
@@ -4208,8 +4210,9 @@ const Veh = (function(){
     $('vf_oil_km').value=d?d.oil_km||'':'';
     $('vf_tire_last').value=d?d.tire_last||'':'';
     $('vf_notes').value=d?d.notes||'':'';
-    $('vMoBg').scrollTop=0;$('vMoBg').querySelector('.mo').scrollTop=0;
     $('vMoBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('vMoBg').scrollTop=0;const _mo=$('vMoBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
   function closeVMo(){$('vMoBg').classList.remove('show')}
   function editVehicle(id){const d=vehicleData.find(x=>String(x.id)===String(id));if(d)openVMo(d)}
@@ -4404,9 +4407,9 @@ const Sales = (function(){
       });
     }
     slogUnread=0;localStorage.setItem(SLOG_UNREAD_KEY,'0');updateSlogBtn();
-    $('salesSlogBg').scrollTop=0;const _mo_salesSlogBg=$('salesSlogBg').querySelector('.mo');if(_mo_salesSlogBg)_mo_salesSlogBg.scrollTop=0;
-
     $('salesSlogBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('salesSlogBg').scrollTop=0;const _mo=$('salesSlogBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
   function closeSlog(){$('salesSlogBg').classList.remove('show')}
   function clearSlog(){
@@ -4694,9 +4697,9 @@ const Sales = (function(){
     $('viewContent').querySelectorAll('.st-opt').forEach(btn=>{
       btn.onclick=()=>{const newSt=btn.dataset.st;if(d.status===newSt){stgl.classList.remove('open');sopts.classList.remove('open');return}changeStatus(id,newSt);openView(id)};
     });
-    $('viewBg').scrollTop=0;const _mo_viewBg=$('viewBg').querySelector('.mo');if(_mo_viewBg)_mo_viewBg.scrollTop=0;
-
     $('viewBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('viewBg').scrollTop=0;const _mo=$('viewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
   function closeView(){$('viewBg').classList.remove('show')}
 
@@ -4723,8 +4726,9 @@ const Sales = (function(){
     $('fDel').classList.toggle('hidden',!isEdit);
     $('fArch').classList.toggle('hidden',!isEdit||isArchS);
     $('fUnarch').classList.toggle('hidden',!isEdit||!isArchS);
-    $('moBg').scrollTop=0;$('moBg').querySelector('.mo').scrollTop=0;
     $('moBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('moBg').scrollTop=0;const _mo=$('moBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
   function closeMo(){$('moBg').classList.remove('show')}
   let _savingEntry=false;
@@ -4858,9 +4862,9 @@ const Labor = (function(){
       el.innerHTML=h;
       el.querySelectorAll('.slog-item').forEach(it=>{if(it.dataset.del==='1')return;it.onclick=()=>{closeSlog();showDetail(it.dataset.id)}});
     }
-    $('laborSlogBg').scrollTop=0;const _mo_laborSlogBg=$('laborSlogBg').querySelector('.mo');if(_mo_laborSlogBg)_mo_laborSlogBg.scrollTop=0;
-
     $('laborSlogBg').classList.add('show');
+
+    requestAnimationFrame(()=>{$('laborSlogBg').scrollTop=0;const _mo=$('laborSlogBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
     try{localStorage.setItem(SLOG_UNREAD_KEY,'0')}catch(e){}
     const sb=$('laborSlogBtn');if(sb)sb.classList.remove('has-new');
   }
@@ -5395,8 +5399,8 @@ const Ot = (function(){
     $('overviewGrid').innerHTML=html;
   }
 
-  function openStaffModal(){$('staffModalBg').scrollTop=0;const _mo_staffModalBg=$('staffModalBg').querySelector('.mo');if(_mo_staffModalBg)_mo_staffModalBg.scrollTop=0;
-$('staffModalBg').classList.add('show');renderStaffList()}
+  function openStaffModal(){$('staffModalBg').classList.add('show');
+requestAnimationFrame(()=>{$('staffModalBg').scrollTop=0;const _mo=$('staffModalBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});renderStaffList()}
   function closeStaffModal(){$('staffModalBg').classList.remove('show')}
   function renderStaffList(){
     const container=$('staffListItems');
@@ -5407,8 +5411,8 @@ $('staffModalBg').classList.add('show');renderStaffList()}
   }
   function addStaff(){if(_busyStaff)return;const input=$('newStaffName');const name=input.value.trim();if(!name)return;if(staffList.some(s=>s.name===name)){toast('すでに登録されています');return}_busyStaff=true;staffList.push({name:name,dept:'',employee_no:''});apiPost({action:'save_staff',name:name,active:true});input.value='';renderStaffView();renderStaffList();renderAdminView();setTimeout(()=>{_busyStaff=false},1500);}
   function removeStaff(name){if(_busyStaff)return;if(!confirm(name+' を削除しますか？'))return;_busyStaff=true;staffList=staffList.filter(s=>s.name!==name);apiPost({action:'delete_staff',name:name});if(selectedStaff===name){selectedStaff='';localStorage.removeItem('ot_my_name')}renderStaffView();renderStaffList();renderAdminView();setTimeout(()=>{_busyStaff=false},1500);}
-  function openRequestModal(){$('reqModalBg').scrollTop=0;const _mo_reqModalBg=$('reqModalBg').querySelector('.mo');if(_mo_reqModalBg)_mo_reqModalBg.scrollTop=0;
-$('reqModalBg').classList.add('show');$('reqMessage').value=currentRequest&&currentRequest.active?currentRequest.message:''}
+  function openRequestModal(){$('reqModalBg').classList.add('show');
+requestAnimationFrame(()=>{$('reqModalBg').scrollTop=0;const _mo=$('reqModalBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});$('reqMessage').value=currentRequest&&currentRequest.active?currentRequest.message:''}
   function closeReqModal(){$('reqModalBg').classList.remove('show')}
   let _savingReq=false;
   let _busyStaff=false;
