@@ -1434,15 +1434,9 @@ table.jobs tr:last-child td{border-bottom:none}
     display:none !important;
   }
   /* ステータスselect / 伝票checkbox / 操作ボタンが入ったtdは非表示（モーダル経由で操作） */
-  #prodAdmin td:has(select), #prodArchive td:has(select), #prodArchived td:has(select),
-  #projAdminView td:has(select), #projDoneView td:has(select), #projArchivedView td:has(select),
-  #salesAdminView td:has(select), #archiveView td:has(select), #salesArchivedView td:has(select),
-  #prodAdmin td:has(input[type=checkbox]), #prodArchive td:has(input[type=checkbox]), #prodArchived td:has(input[type=checkbox]),
-  #projAdminView td:has(input[type=checkbox]), #projDoneView td:has(input[type=checkbox]), #projArchivedView td:has(input[type=checkbox]),
-  #salesAdminView td:has(input[type=checkbox]), #archiveView td:has(input[type=checkbox]), #salesArchivedView td:has(input[type=checkbox]),
-  #prodAdmin td:has(button), #prodArchive td:has(button), #prodArchived td:has(button),
-  #projAdminView td:has(button), #projDoneView td:has(button), #projArchivedView td:has(button),
-  #salesAdminView td:has(button), #archiveView td:has(button), #salesArchivedView td:has(button) {
+  #prodAdmin td[onclick*="stopPropagation"], #prodArchive td[onclick*="stopPropagation"], #prodArchived td[onclick*="stopPropagation"],
+  #projAdminView td[onclick*="stopPropagation"], #projDoneView td[onclick*="stopPropagation"], #projArchivedView td[onclick*="stopPropagation"],
+  #salesAdminView td[onclick*="stopPropagation"], #archiveView td[onclick*="stopPropagation"], #salesArchivedView td[onclick*="stopPropagation"] {
     display:none !important;
   }
 }
