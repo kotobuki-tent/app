@@ -2734,6 +2734,7 @@ const Prod = (function(){
     $('pfDel').classList.toggle('hidden',!isEdit);
     $('pfArch').classList.toggle('hidden',!isEdit||isArch);
     $('pfUnarch').classList.toggle('hidden',!isEdit||!isArch);
+    $('prodMoBg').scrollTop=0;$('prodMoBg').querySelector('.mo').scrollTop=0;
     $('prodMoBg').classList.add('show')}
   function closeProdMo(){$('prodMoBg').classList.remove('show')}
   function editProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(d)openProdMo(d)}
@@ -3180,6 +3181,7 @@ const Proj = (function(){
     $('xfDel').classList.toggle('hidden',!isEditP);
     $('xfArch').classList.toggle('hidden',!isEditP||isArchP);
     $('xfUnarch').classList.toggle('hidden',!isEditP||!isArchP);
+    $('projMoBg').scrollTop=0;$('projMoBg').querySelector('.mo').scrollTop=0;
     $('projMoBg').classList.add('show')}
   function toggleProjType(){
     applyProjTypeUI();
@@ -4185,6 +4187,7 @@ const Veh = (function(){
     $('vf_oil_km').value=d?d.oil_km||'':'';
     $('vf_tire_last').value=d?d.tire_last||'':'';
     $('vf_notes').value=d?d.notes||'':'';
+    $('vMoBg').scrollTop=0;$('vMoBg').querySelector('.mo').scrollTop=0;
     $('vMoBg').classList.add('show');
   }
   function closeVMo(){$('vMoBg').classList.remove('show')}
@@ -4695,6 +4698,7 @@ const Sales = (function(){
     $('fDel').classList.toggle('hidden',!isEdit);
     $('fArch').classList.toggle('hidden',!isEdit||isArchS);
     $('fUnarch').classList.toggle('hidden',!isEdit||!isArchS);
+    $('moBg').scrollTop=0;$('moBg').querySelector('.mo').scrollTop=0;
     $('moBg').classList.add('show');
   }
   function closeMo(){$('moBg').classList.remove('show')}
