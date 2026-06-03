@@ -5047,8 +5047,33 @@ const Daily = (function(){
     const sel=$('afProj');if(!sel)return;
     let h='<option value="">-- 案件を選ぶ --</option><option value="other">その他(自由記述)</option>';
     const w=getWho();const me=staffList.find(s=>String(s.employee_no)===String(w));const myDept=me?me.dept:'';
-    const prodGroup=()=>{let s='<optgroup label="生産部">';prodProjects.forEach(p=>{s+=`<option value="prod:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});return s+'</optgroup>'};
-    const projGroup=()=>{let s='<optgroup label="企画制作部">';projProjects.forEach(p=>{s+=`<option value="proj:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});return s+'</optgroup>'};
+    const PROD_ST_ORDER={'製作中':0,'完成':1,'受注':2,'見積中':3};
+    const PROJ_ST_ORDER={'現場中':0,'レンタル中':1,'準備中':2,'受注':3,'見積中':4};
+    // 企画は複数の日付候補から「今日以降で最も近い日付」を取得（無ければ最も古いもの）
+    const getProjNearestDate=(p)=>{
+      const keys=['date_load_in','date_setup','date_event','date_teardown','date_rental_out','date_rental_return'];
+      const dates=[];
+      keys.forEach(k=>{if(p[k])String(p[k]).split(',').forEach(s=>{const d=parseD(s.trim());if(d)dates.push(d)})});
+      if(!dates.length)return null;
+      const t=today.getTime();
+      const future=dates.filter(d=>d.getTime()>=t).sort((a,b)=>a-b);
+      if(future.length)return future[0];
+      // 全部過去なら一番直近の過去
+      return dates.sort((a,b)=>b-a)[0];
+    };
+    const sortByStAndDate=(arr,orderMap,getDateFn)=>{
+      return arr.slice().sort((a,b)=>{
+        const sa=orderMap[a.status]??99, sb=orderMap[b.status]??99;
+        if(sa!==sb)return sa-sb;
+        const da=getDateFn(a), db=getDateFn(b);
+        if(da&&db)return da-db;
+        if(da)return -1;
+        if(db)return 1;
+        return 0;
+      });
+    };
+    const prodGroup=()=>{let s='<optgroup label="生産部">';sortByStAndDate(prodProjects,PROD_ST_ORDER,p=>parseD(p.deadline)).forEach(p=>{s+=`<option value="prod:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});return s+'</optgroup>'};
+    const projGroup=()=>{let s='<optgroup label="企画制作部">';sortByStAndDate(projProjects,PROJ_ST_ORDER,getProjNearestDate).forEach(p=>{s+=`<option value="proj:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});return s+'</optgroup>'};
     if(myDept==='企画制作部')h+=projGroup()+prodGroup();else h+=prodGroup()+projGroup();
     sel.innerHTML=h;
   }
