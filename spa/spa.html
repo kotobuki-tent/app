@@ -65,6 +65,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .mo-row{display:flex;gap:14px;margin-bottom:14px}
 .mo-row.full{display:block;margin-bottom:14px}
 .mo-field{flex:1;display:flex;flex-direction:column;gap:5px}
+/* pair: モバイルでも横並び維持（縦積みしない）/ f7・f3: 7:3 比率 */
+.mo-row.pair{flex-direction:row;gap:10px}
+.mo-row.pair .mo-field{min-width:0}
+.mo-field.f7{flex:7}.mo-field.f3{flex:3}
 .mo-field label{font-size:12px;font-weight:600;color:var(--text-dim)}
 .mo-field input,.mo-field select,.mo-field textarea{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.4 'Noto Sans JP',sans-serif;background:var(--surface2);width:100%}
 .mo-field textarea{min-height:70px;resize:vertical}
@@ -1503,13 +1507,13 @@ table.jobs tr:last-child td{border-bottom:none}
 
   <!-- 案件登録/編集モーダル -->
   <div class="mo-bg" id="prodMoBg">
-  <div class="mo">
+  <div class="mo" style="max-width:640px">
     <h2 id="prodMoTitle"><span id="prodMoTitleText">案件登録</span><button class="del-link hidden" id="pfDel" onclick="Prod.delProd($('pf_id').value)">削除</button></h2>
     <input type="hidden" id="pf_id">
     <div class="mo-row full"><div class="mo-field"><label>物件名 *</label><input id="pf_project" placeholder="例: アルコネクト10m 主幕・妻幕"></div></div>
     <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="pf_our_person" placeholder="自社の担当者"></div></div>
-    <div class="mo-row"><div class="mo-field"><label>見積番号</label><input id="pf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="pf_order_no"></div></div>
-    <div class="mo-row"><div class="mo-field"><label>得意先</label><input id="pf_client" placeholder="例: 帝都エージェンシー"></div><div class="mo-field"><label>窓口</label><input id="pf_person" placeholder="例: 纐纈"></div></div>
+    <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="pf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="pf_order_no"></div></div>
+    <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="pf_client" placeholder="例: 帝都エージェンシー"></div><div class="mo-field f3"><label>窓口</label><input id="pf_person" placeholder="例: 纐纈"></div></div>
     <div class="mo-row">
       <div class="mo-field"><label>作業場所</label><select id="pf_section"><option>未定</option><option>2F工場</option><option>1F工場</option><option>出力関係</option><option>外注</option><option>その他</option></select></div>
       <div class="mo-field"><label>ステータス</label><select id="pf_status"><option>見積中</option><option>受注</option><option>製作中</option><option>完成</option><option>出荷済</option><option>見送り</option></select></div>
@@ -1594,8 +1598,8 @@ table.jobs tr:last-child td{border-bottom:none}
       <span class="hint">チェックすると設営関連の項目が無効になります</span>
     </div>
     <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="xf_our_person" placeholder="自社の担当者"></div></div>
-    <div class="mo-row"><div class="mo-field"><label>見積番号</label><input id="xf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="xf_order_no"></div></div>
-    <div class="mo-row"><div class="mo-field"><label>得意先</label><input id="xf_client" placeholder="例: 鳥取県観光局"></div><div class="mo-field"><label>窓口</label><input id="xf_person" placeholder="例: 纐纈"></div></div>
+    <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="xf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="xf_order_no"></div></div>
+    <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="xf_client" placeholder="例: 鳥取県観光局"></div><div class="mo-field f3"><label>窓口</label><input id="xf_person" placeholder="例: 纐纈"></div></div>
     <div class="mo-row"><div class="mo-field"><label>会場名</label><input id="xf_venue" placeholder="例: 鳥取砂丘特設会場"></div><div class="mo-field"><label>ステータス</label><select id="xf_status"><option>見積中</option><option>受注</option><option>準備中</option><option>現場中</option><option>レンタル中</option><option>完了</option><option>見送り</option></select></div></div>
     <div class="mo-row full"><div class="mo-field"><label>住所</label><input id="xf_address" placeholder="例: 鳥取県鳥取市福部町"></div></div>
     <div class="phase-hd">日程</div>
@@ -1907,18 +1911,18 @@ table.jobs tr:last-child td{border-bottom:none}
 
   <!-- 案件登録/編集モーダル -->
   <div class="mo-bg" id="moBg">
-    <div class="mo">
+    <div class="mo" style="max-width:640px">
       <h2 id="moTitle"><span id="moTitleText">案件登録</span><button class="del-link hidden" id="fDel" onclick="Sales.delEntry($('f_id').value)">削除</button></h2>
       <input type="hidden" id="f_id">
       <div class="mo-row full"><div class="mo-field"><label>物件名 *</label><input id="f_project" placeholder="例：かんたんてんと 販売"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="f_our_person" placeholder="自社の担当者"></div></div>
-      <div class="mo-row">
+      <div class="mo-row pair">
         <div class="mo-field"><label>見積番号</label><input id="f_estimate_no"></div>
         <div class="mo-field"><label>受注番号</label><input id="f_order_no"></div>
       </div>
-      <div class="mo-row">
-        <div class="mo-field"><label>得意先</label><input id="f_client" list="salesCustomerList" placeholder="例: ㈱○○ / 現金客 / ○○さん"></div>
-        <div class="mo-field"><label>窓口</label><input id="f_person"></div>
+      <div class="mo-row pair">
+        <div class="mo-field f7"><label>得意先</label><input id="f_client" list="salesCustomerList" placeholder="例: ㈱○○ / 現金客 / ○○さん"></div>
+        <div class="mo-field f3"><label>窓口</label><input id="f_person"></div>
       </div>
       <div class="mo-row">
         <div class="mo-field"><label>仕入先</label><input id="f_supplier" list="salesSupplierList"></div>
