@@ -42,6 +42,12 @@ Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every
 - **Writes**: `no-cors` POST (`fireAndForget`) — response is opaque, so writes use **optimistic update**: mutate the local array immediately, then `setTimeout(loadAll, 3000)` to reconcile with GAS's real ID assignment. `mergeWithTmp(...)` reconciles optimistic temp rows against server data by a composite key.
 - Google Sheets are the DB; sheet/column layout is documented in `README.md`. Google Drive integration (`dept=drive`) links 製作図 files to 生産 orders.
 
+### GAS infrastructure & failure modes
+
+- **`keepAlive` trigger**: a 5-min time-based GAS trigger calls a no-op (`getSpreadsheet().getName()`) to keep the script warm. **Never delete it** — without it the first request each morning hits a cold start and the whole app is very slow. If mornings are slow, check this trigger first (an auth lapse can disable all triggers → re-authorize).
+- **API URL is hardcoded** in `spa/spa.html` (`const API=...exec`). All 9 screens depend on this single GAS endpoint, so if it dies everything dies at once. Update GAS via "deploy a new version of the **existing** deployment" only — recreating the deployment changes the URL. If the URL ever does change, rewrite the `API` constant in `spa/spa.html` to the new URL (top priority to restore service).
+- **Failure triage**: slow only in the morning → cold start, suspect `keepAlive`. No response at all hours → suspect the GAS deployment / URL.
+
 ### Conventions baked into the code (preserve these)
 
 - **Double-tap guard**: all write actions (save/delete/伝票check/status change — ~32 sites) set a 1.5s flag to prevent duplicate submissions. Match this when adding write buttons.
@@ -54,6 +60,8 @@ Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every
 - **Never edit `sw.js`.** `CACHE_VERSION` is managed manually by iller. Do not touch the file, do not bump the version, and do not ask whether it was pushed.
 - **Edit by diff, not by rewrite.** Change only the affected lines. Never do a wholesale clear-and-paste of an entire file.
 - **Two separate manifests — always confirm which one.** `spa/manifest.json` (SPA, `start_url`=`spa.html`) and root `manifest.json` (MPA, `start_url`=`portal.html`) are different files. Conflating them has broken `start_url` before. Check which manifest you mean before editing either.
+- **Never touch in the Google Sheet**: row 1 (the header row) or column A (the `id` column) of any sheet — the GAS handlers key off these. Corrupting them breaks reads/writes app-wide.
+- **Never delete the `.hidden` CSS rule** (`display:none!important`) — section switching and show/hide logic across the SPA depend on it.
 - **Working with iller**: be terse — no preamble, no option menus. Don't unilaterally split work into stages or down-prioritize it with "is this worth the effort?" reasoning. If told to do something, do it. Don't slap a "low real-world impact" label on a bug on your own judgment.
 
 ## Reference
