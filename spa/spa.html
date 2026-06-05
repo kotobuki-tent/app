@@ -44,7 +44,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 12px;border-radius:999px;cursor:pointer;transition:.15s;min-width:60px;text-align:center;white-space:nowrap}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#dbeafe;color:#1e40af}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
@@ -123,7 +123,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .hdr-btn:hover{color:#4a0e1f;border-color:rgba(255,255,255,.5)}
 .nav-spacer{flex:1}
 .nav-right{display:contents}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .nav-spacer{display:none}
   .nav-right{display:contents}
   .hdr-inner{padding:6px 8px 0 8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -132,7 +132,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .hdr-btn{flex-shrink:0;font-size:11px;padding:0 11px;margin-left:8px}
   .hdr::after{content:'';position:absolute;top:0;right:0;width:22px;height:48px;background:linear-gradient(to right,transparent,#fb7185);pointer-events:none;z-index:1}
 }
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   html{font-size:14px}
 }
 
@@ -144,7 +144,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .fv-sum{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap;align-items:center}
 .fv-flt-mb{display:none}
 .tmp-badge{display:inline-block;font-size:10px;font-weight:600;color:#fff;background:#94a3b8;padding:2px 8px;border-radius:10px;margin-left:6px;letter-spacing:.02em;vertical-align:middle}
-@media(max-width:480px){.fv-sum .av-add{display:none !important}}
+@media(max-width:480px),(orientation:portrait){.fv-sum .av-add{display:none !important}}
 .fv-si{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:90px;text-align:center;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .fv-si:hover{border-color:var(--accent)}
 .fv-si.on{border-color:var(--accent);background:var(--accent-dim)}
@@ -258,7 +258,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .staff-cell .pos{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.75}
 
 /* ===== 生産固有CSS モバイル（#prodAdmin/#prodArchive カード化等） ===== */
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   html{font-size:14px}
   /* ヘッダー：タイトル縮小、ナビ横スクロール */
 
@@ -401,7 +401,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 
 /* ===== 企画制作 固有CSS（ガント/レンタル/日付入力/車両/詳細） ===== */
 .mobile-date{display:none}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .mobile-date{display:none!important}
   .subtab-date{display:none}
   .subtab-search{display:none}
@@ -411,7 +411,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   }
 @keyframes spin{to{transform:rotate(360deg)}}
 .type-toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px}
@@ -522,7 +522,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .rental-existing .re-del:hover{text-decoration:underline}
 .nav-menu-btn{background:rgba(255,255,255,.08);border:none;color:#4a0e1f;font-size:20px;line-height:1;padding:0 12px;border-radius:6px;cursor:pointer;height:32px;align-self:center;display:none}
 .nav-menu-btn:hover{background:rgba(255,255,255,.18)}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .nav-spacer{display:none}
   .nav-right{display:contents}
   .nav-menu-btn{display:none}
@@ -534,7 +534,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 }
 
 
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   html{font-size:14px}
 
   /* ヘッダー：横スクロール */
@@ -703,7 +703,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 
 
 
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
   .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
@@ -717,7 +717,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 /* ===== 在庫 固有CSS（在庫バー/ステータスバッジ/テーブルアクション） ===== */
 .main{padding:16px 16px 40px}
 .cat-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#f0f1f5;color:var(--text-dim)}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .mobile-date{display:none!important}
   .subtab-date{display:none}
   .subtab-search{display:none}
@@ -734,7 +734,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   }
 .tbl-actions{display:flex;gap:6px}
 .tbl-actions a{font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
@@ -760,7 +760,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .avail-remain .lbl{font-size:11px;font-weight:500;color:#9ca3af;margin-right:4px}
 .avail-usage{font-size:12px;color:#9ca3af;min-width:140px;text-align:right;font-variant-numeric:tabular-nums}
 .avail-cat-hd{margin-top:18px;margin-bottom:4px;font-size:13px;font-weight:700;color:var(--text-dim);padding:0 12px 6px;border-bottom:2px solid var(--border)}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .avail-bar{grid-template-columns:1fr auto;grid-template-areas:"name remain" "usage usage";gap:4px 12px;padding:10px}
   .avail-item-name{grid-area:name;font-size:13px}
   .avail-remain{grid-area:remain;font-size:17px}
@@ -775,7 +775,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .section p.desc{font-size:12px;color:#999;margin-bottom:16px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .overdue-badge{font-size:10px;font-weight:600;color:#dc2626;background:#fee2e2;padding:2px 6px;border-radius:4px;margin-left:4px}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .nav-spacer{display:none}
   .nav-right{display:contents}
   .nav-menu-btn{display:none}
@@ -804,7 +804,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .vlist{padding:16px}
 .summary-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
 .settings-view{padding:16px;max-width:600px}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .mobile-date{display:none!important}
   .subtab-date{display:none}
   .subtab-search{display:none}
@@ -821,7 +821,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   }
 @keyframes spin{to{transform:rotate(360deg)}}
 .dash-date{display:none}
@@ -887,7 +887,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .setting-row label{font-size:13px;min-width:160px;color:var(--text-dim)}
 .setting-row input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;width:100px;text-align:center}
 .setting-row span{font-size:12px;color:var(--text-faint)}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .av-search{display:none}
   .nav-spacer{display:none}
   .nav-right{display:contents}
@@ -943,7 +943,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .badge.s-納品済{color:var(--accent);background:var(--accent-dim)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .st-mini{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .mobile-date{display:none!important}
   .subtab-date{display:none!important}
   .subtab-search{display:none}
@@ -958,7 +958,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .hdr::after{content:'';position:absolute;top:0;right:0;width:22px;height:48px;background:linear-gradient(to right,transparent,#fb7185);pointer-events:none;z-index:1}
 }
 
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .factory-view,.admin-view{padding:0 0 12px}
   .fv-cards{grid-template-columns:1fr;gap:10px}
   .fv-card{padding:14px 13px}
@@ -979,13 +979,13 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .st-change-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .st-btn{padding:12px 8px;font-size:13px;min-height:46px}
 }
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   /* === テーブル→カード化（管理・完了ビュー） === */
   #adminView .tbl-wrap,#archiveView,#salesArchivedView .tbl-wrap{border:none;background:transparent;overflow:visible}
   #adminView table,#adminView thead,#adminView tbody,#adminView tr,#adminView td,
@@ -1022,7 +1022,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   #adminView td[colspan]::before,#archiveView,#salesArchivedView td[colspan]::before{display:none}
 }
 
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
   .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
@@ -1041,7 +1041,7 @@ table.jobs tr:hover td{background:var(--accent-dim)}
 table.jobs tr:last-child td{border-bottom:none}
 .job-cards{display:none}
 #view-labor .app{padding:16px;overflow-x:hidden}
-@media(max-width:480px){#view-labor .app{padding:14px 10px}}
+@media(max-width:480px),(orientation:portrait){#view-labor .app{padding:14px 10px}}
 @media(min-width:481px) and (max-width:1100px){
   table.jobs th{padding:8px 6px;font-size:11px}
   table.jobs td{padding:8px 6px;font-size:12px}
@@ -1076,7 +1076,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .mb-row .mb-name{font-weight:600;color:var(--text)}
 .mb-row .mb-mins{font-variant-numeric:tabular-nums;color:var(--text-dim)}
 .mb-row .mb-mins strong{color:var(--text);font-weight:700}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .mobile-date{display:none!important}
   .subtab-date{display:none!important}
   .subtab-search{display:none}
@@ -1092,13 +1092,13 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 
 
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .app{padding:14px 10px}
   .av-search{display:none}
   table.jobs{display:none}
   .job-cards{display:block}
 }
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
@@ -1107,7 +1107,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
 
 
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
   .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
@@ -1122,8 +1122,8 @@ table.jobs tr:last-child td{border-bottom:none}
 .entries-wrap{margin-top:16px}
 .today-date{font-size:18px;font-weight:700;color:var(--text)}
 #view-daily .app{padding:16px}
-@media(max-width:480px){#view-daily .app{padding:14px 10px}}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){#view-daily .app{padding:14px 10px}}
+@media(max-width:480px),(orientation:portrait){
   .mobile-date{display:none!important}
   .subtab-date{display:none}
   .subtab-search{display:none}
@@ -1132,7 +1132,7 @@ table.jobs tr:last-child td{border-bottom:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   }
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -1207,7 +1207,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .member-entry .me-proj{flex:2;font-weight:600;color:var(--text)}
 .member-entry .me-action{flex:1;color:var(--accent);font-weight:600}
 .member-entry .me-note{flex:2;color:var(--text-dim);font-size:12px;font-style:italic}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .nav-spacer{display:none}
   .nav-right{display:contents}
   .nav-menu-btn{display:none}
@@ -1219,7 +1219,7 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 
 
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   html{font-size:14px}
   .app{padding:14px 10px}
   .card{padding:14px;border-radius:10px}
@@ -1236,7 +1236,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
 /* ===== 時間外 固有CSS ===== */
 .overview-grid{display:flex;flex-direction:column;gap:2px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .mobile-date{display:none!important}
   .subtab-date{display:none}
   .subtab-search{display:none}
@@ -1245,7 +1245,7 @@ table.jobs tr:last-child td{border-bottom:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   }
 .week-bar{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
 .week-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:var(--radius);font:500 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
@@ -1300,7 +1300,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .staff-del{background:none;border:none;color:var(--red);font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;padding:4px 8px}
 .staff-del:hover{text-decoration:underline}
 @keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   .nav-spacer{display:none}
   .nav-right{display:contents}
   .nav-menu-btn{display:none}
@@ -1312,7 +1312,7 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 
 
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   html{font-size:14px}
   body{padding-bottom:40px}
 
@@ -1392,14 +1392,14 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-card-title{font-size:15px;font-weight:700;margin-bottom:4px}
 .portal-card-desc{font-size:12px;color:var(--text-dim);line-height:1.5}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
-@media(max-width:480px){.portal-grid{grid-template-columns:1fr}}
+@media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:1fr}}
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
 
 /* ===== モバイル時：admin/archive/archived テーブルをカード化 工場ボード風コンパクト =====
    行クリックで編集モーダル開く方式。操作列・伝票列・ステータスselect列は隠す。
 ========================================================================== */
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   /* 対象セレクタ：3アプリ × 3ビュー = 9セレクタ */
   #prodAdmin tr, #prodArchive tr, #prodArchived tr,
   #projAdminView tr, #projDoneView tr, #projArchivedView tr,
@@ -1492,7 +1492,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-ot .overview-grid{border:1px solid var(--border-light)}
 #view-ot .ov-header{background:linear-gradient(180deg,#243044,#1e293b)}
 /* 日報モバイル：氏名を上・日付＋今日を下に縦積み */
-@media(max-width:480px){
+@media(max-width:480px),(orientation:portrait){
   #view-daily .card-head{flex-direction:column;align-items:stretch;gap:12px}
   #view-daily .card-head .dr-who{order:1}
   #view-daily .card-head .dr-date{order:2}
