@@ -1491,6 +1491,12 @@ table.jobs tr:last-child td{border-bottom:none}
 /* 管理グリッド：枠を角丸カード化、ヘッダーを締まったグラデに */
 #view-ot .overview-grid{border:1px solid var(--border-light)}
 #view-ot .ov-header{background:linear-gradient(180deg,#243044,#1e293b)}
+/* 日報モバイル：氏名を上・日付＋今日を下に縦積み */
+@media(max-width:480px){
+  #view-daily .card-head{flex-direction:column;align-items:stretch;gap:12px}
+  #view-daily .card-head .field{order:1;max-width:none}
+  #view-daily .card-head .dr-date{order:2}
+}
 
 /* ===== 資材（入出荷） 固有CSS ===== */
 .finv-view{padding:8px 0}
@@ -2070,7 +2076,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div id="writeView" class="hidden">
       <div class="card">
         <div class="card-head">
-          <div style="flex:1">
+          <div class="dr-date" style="flex:1">
             <div class="today-hint" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
               <span style="white-space:nowrap">日付：</span>
               <input type="date" id="writeDate" onchange="Daily.onWriteDateChange()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:500 13px/1 'Noto Sans JP',sans-serif;min-width:0">
@@ -2078,7 +2084,7 @@ table.jobs tr:last-child td{border-bottom:none}
             </div>
           </div>
           <div class="field" style="max-width:240px">
-            <label>氏名（50音順）</label>
+            <label>自分を選択（50音順）</label>
             <select id="whoSelect" onchange="Daily.onWhoChange()"></select>
           </div>
         </div>
