@@ -1494,7 +1494,7 @@ table.jobs tr:last-child td{border-bottom:none}
 /* 日報モバイル：氏名を上・日付＋今日を下に縦積み */
 @media(max-width:480px){
   #view-daily .card-head{flex-direction:column;align-items:stretch;gap:12px}
-  #view-daily .card-head .field{order:1;max-width:none}
+  #view-daily .card-head .dr-who{order:1}
   #view-daily .card-head .dr-date{order:2}
 }
 
@@ -2083,10 +2083,7 @@ table.jobs tr:last-child td{border-bottom:none}
               <button onclick="Daily.setWriteDateToday()" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0">今日</button>
             </div>
           </div>
-          <div class="field" style="max-width:240px">
-            <label>自分を選択（50音順）</label>
-            <select id="whoSelect" onchange="Daily.onWhoChange()"></select>
-          </div>
+          <label class="dr-who" style="flex:1;min-width:0;font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px">自分を選択（50音順）：<select id="whoSelect" onchange="Daily.onWhoChange()" style="flex:1;min-width:0;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 'Noto Sans JP',sans-serif;background:var(--surface)"></select></label>
         </div>
         <div class="saved-entries" id="savedEntries"></div>
         <!-- 入力フォーム -->
@@ -5472,8 +5469,8 @@ const Ot = (function(){
 
   function renderStaffView(){
     const container=$('staffChips');
-    let html='<label style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%">自分を選択（50音順）：';
-    html+='<select id="otStaffSelect" onchange="Ot.onStaffSelectChange()" style="flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 \'Noto Sans JP\',sans-serif;background:var(--surface)">';
+    let html='<label style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px;width:100%">自分を選択（50音順）：';
+    html+='<select id="otStaffSelect" onchange="Ot.onStaffSelectChange()" style="flex:1;min-width:0;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 \'Noto Sans JP\',sans-serif;background:var(--surface)">';
     html+='<option value="">-- 氏名を選んでください --</option>';
     staffList.forEach(s=>{const sel=s.name===selectedStaff?' selected':'';html+=`<option value="${oesc(s.name)}"${sel}>${oesc(s.name)}</option>`});
     html+='</select></label>';
