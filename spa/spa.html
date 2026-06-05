@@ -4651,7 +4651,7 @@ const Sales = (function(){
       h+=`<tr onclick="Sales.openMo('${esc(d.id)}')" style="cursor:pointer">`;
       cols.forEach(c=>{
         let v=d[c.key]||'';
-        if(c.key==='status'){h+=`<td><select class="st-mini" onchange="Sales.changeStatus('${esc(d.id)}',this.value)">`;ALL_ST.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});h+='</select></td>';}
+        if(c.key==='status'){h+=`<td onclick="event.stopPropagation()"><select class="st-mini" onchange="Sales.changeStatus('${esc(d.id)}',this.value)">`;ALL_ST.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});h+='</select></td>';}
         else if(c.key==='deadline'){h+=`<td>${fmtDateJP(v)}</td>`;}
         else if(c.key==='amount'){h+=`<td style="text-align:right;font-variant-numeric:tabular-nums">${fmtAmount(v)}</td>`;}
         else{h+=`<td>${esc(v)}</td>`;}
