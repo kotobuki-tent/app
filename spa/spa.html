@@ -5398,8 +5398,8 @@ const Daily = (function(){
 
 const Ot = (function(){
   const DEPT='overtime';
-  const TIME_SLOTS=['18:00','18:30','19:00','19:30','20:00'];
-  const HOLIDAY_SLOTS=['午前','午後','終日'];
+  const TIME_SLOTS=['18:00','18:30','19:00','19:30','20:00','20:30'];
+  const HOLIDAY_SLOTS=['午前','午後'];
   const DAY_NAMES=['日','月','火','水','木','金','土'];
   const HOLIDAYS={
     '2025-01-01':'元日','2025-01-13':'成人の日','2025-02-11':'建国記念の日','2025-02-23':'天皇誕生日','2025-02-24':'振替休日','2025-03-20':'春分の日','2025-04-29':'昭和の日','2025-05-03':'憲法記念日','2025-05-04':'みどりの日','2025-05-05':'こどもの日','2025-05-06':'振替休日','2025-07-21':'海の日','2025-08-11':'山の日','2025-09-15':'敬老の日','2025-09-23':'秋分の日','2025-10-13':'スポーツの日','2025-11-03':'文化の日','2025-11-23':'勤労感謝の日','2025-11-24':'振替休日',
@@ -5482,10 +5482,12 @@ const Ot = (function(){
       let rowCls=isHoliday?'holiday-row':'';
       const entry=entries.find(e=>e.name===selectedStaff&&e.date===ds);
       const selectedTime=entry?entry.until_time:'';
-      const slots=isHoliday?HOLIDAY_SLOTS:TIME_SLOTS;
-      const chipCls=isHoliday?'holiday-chip':'';
       dhtml+=`<div class="day-row ${rowCls}"><div class="day-label ${labelCls}">${dayName}曜日<div class="date">${d.getMonth()+1}/${d.getDate()}${isToday?' (今日)':''}</div>${holidayName?`<div class="holiday-name">${holidayName}</div>`:''}</div><div class="time-chips">`;
-      slots.forEach(t=>{const sel=t===selectedTime?'selected':'';dhtml+=`<button class="time-chip ${chipCls} ${sel}" onclick="Ot.toggleTime('${ds}','${t}')">${t}</button>`});
+      if(isHoliday){
+        HOLIDAY_SLOTS.forEach(h=>{const sel=(selectedTime===h||selectedTime==='終日')?'selected':'';dhtml+=`<button class="time-chip holiday-chip ${sel}" onclick="Ot.toggleHoliday('${ds}','${h}')">${h}</button>`});
+      }else{
+        TIME_SLOTS.forEach(t=>{const sel=t===selectedTime?'selected':'';dhtml+=`<button class="time-chip ${sel}" onclick="Ot.toggleTime('${ds}','${t}')">${t}</button>`});
+      }
       dhtml+=`</div>`;
       if(selectedTime)dhtml+=`<button class="day-clear" onclick="Ot.clearDay('${ds}')">取消</button>`;
       dhtml+=`</div>`;
@@ -5499,6 +5501,18 @@ const Ot = (function(){
     if(entry&&entry.until_time===time){entries=entries.filter(e=>!(e.name===selectedStaff&&e.date===date));render();apiPost({action:'delete_entry',name:selectedStaff,date:date})}
     else if(entry){entry.until_time=time;render();apiPost({action:'save_entry',name:selectedStaff,date:date,until_time:time,week_start:fmtDate(currentWeekStart),note:''})}
     else{entries.push({name:selectedStaff,date:date,until_time:time,week_start:fmtDate(currentWeekStart),note:''});render();apiPost({action:'save_entry',name:selectedStaff,date:date,until_time:time,week_start:fmtDate(currentWeekStart),note:''})}
+    scheduleSyncFromServer();
+  }
+  // 土日：午前/午後を独立トグル。両方=終日、片方=午前/午後、無=削除（until_timeは従来通り単一値で保存）
+  function toggleHoliday(date,half){
+    const entry=entries.find(e=>e.name===selectedStaff&&e.date===date);
+    const cur=entry?entry.until_time:'';
+    let am=(cur==='午前'||cur==='終日'),pm=(cur==='午後'||cur==='終日');
+    if(half==='午前')am=!am;else pm=!pm;
+    const val=(am&&pm)?'終日':am?'午前':pm?'午後':'';
+    if(!val){entries=entries.filter(e=>!(e.name===selectedStaff&&e.date===date));render();apiPost({action:'delete_entry',name:selectedStaff,date:date})}
+    else if(entry){entry.until_time=val;render();apiPost({action:'save_entry',name:selectedStaff,date:date,until_time:val,week_start:fmtDate(currentWeekStart),note:''})}
+    else{entries.push({name:selectedStaff,date:date,until_time:val,week_start:fmtDate(currentWeekStart),note:''});render();apiPost({action:'save_entry',name:selectedStaff,date:date,until_time:val,week_start:fmtDate(currentWeekStart),note:''})}
     scheduleSyncFromServer();
   }
   function clearDay(date){entries=entries.filter(e=>!(e.name===selectedStaff&&e.date===date));render();apiPost({action:'delete_entry',name:selectedStaff,date:date});scheduleSyncFromServer()}
@@ -5569,7 +5583,7 @@ requestAnimationFrame(()=>{$('reqModalBg').scrollTop=0;const _mo=$('reqModalBg')
   return {
     loadAll, init,
     switchTab, changeWeek, goThisWeek,
-    onStaffSelectChange, toggleTime, clearDay,
+    onStaffSelectChange, toggleTime, toggleHoliday, clearDay,
     openStaffModal, closeStaffModal, addStaff, removeStaff,
     openRequestModal, closeReqModal, submitRequest, unifiedSearch
   };
