@@ -1462,6 +1462,19 @@ table.jobs tr:last-child td{border-bottom:none}
   }
 }
 
+/* ===== 資材（入出荷） 固有CSS ===== */
+.finv-view{padding:8px 0}
+.finv-actbar{padding:12px}
+.finv-bigbtn{width:100%;padding:14px;font-size:15px;font-weight:700;border:none;border-radius:10px;background:var(--accent);color:#fff;cursor:pointer}
+.finv-bigbtn:hover{opacity:.9}
+.finv-sec{padding:4px 14px 6px;font-size:13px;color:var(--text-dim)}
+.finv-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin:0 12px 10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.finv-card .fc-title{font-size:15px;font-weight:700;color:var(--text)}
+.finv-card .fc-qty{font-size:13px;font-weight:600;color:var(--accent);margin-left:4px}
+.finv-card .fc-meta{font-size:12px;color:var(--text-dim);margin-top:4px}
+.finv-card .act-btn{padding:7px 12px;font-size:13px;background:var(--surface2);border-radius:6px}
+.finv-card .act-btn.del{color:var(--red)}
+#finvHistory{padding:12px}
 </style>
 </head>
 <body>
@@ -1481,6 +1494,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <button class="nav-link" id="navLabor" onclick="App.nav('labor')">工数</button>
       <button class="nav-link" id="navInv" onclick="App.nav('inv')">在庫</button>
       <button class="nav-link" id="navVeh" onclick="App.nav('veh')">車両</button>
+      <button class="nav-link" id="navFinv" onclick="App.nav('finv')">資材</button>
     </div>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
@@ -2147,6 +2161,56 @@ table.jobs tr:last-child td{border-bottom:none}
       </div>
     </div>
   </div>
+</section>
+
+<!-- ===== 資材（入出荷） section ===== -->
+<section id="view-finv" class="hidden">
+  <div class="sub-tabs" id="finvTabs">
+    <button class="sub-tab on" data-view="receive">入荷受付</button>
+    <button class="sub-tab" data-view="pending">入荷待ち</button>
+    <button class="sub-tab" data-view="unknown">発注者不明 <span id="finvUnkDot" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--red);margin-left:3px;vertical-align:middle"></span></button>
+    <button class="sub-tab" data-view="history">履歴</button>
+    <input class="subtab-search" id="finvSearch" placeholder="品番・品名で検索..." oninput="FInv.search(this.value)">
+  </div>
+  <div class="app">
+    <div id="finvReceive" class="finv-view hidden"></div>
+    <div id="finvPending" class="finv-view hidden"></div>
+    <div id="finvUnknown" class="finv-view hidden"></div>
+    <div id="finvHistory" class="admin-view hidden"></div>
+  </div>
+
+  <!-- 入荷フォーム -->
+  <div class="mo-bg" id="finvInBg"><div class="mo">
+    <h2 id="finvInTitle">入荷を記録</h2>
+    <input type="hidden" id="fi_id"><input type="hidden" id="fi_created_at">
+    <div class="mo-row full"><div class="mo-field"><label>品名 *</label><input id="fi_item" placeholder="例: ターポリン生地 白 50m原反"></div></div>
+    <div class="mo-row pair"><div class="mo-field f7"><label>数量 *</label><input type="number" id="fi_qty" min="0" step="any"></div><div class="mo-field f3"><label>単位</label><input id="fi_unit" placeholder="本/m/個"></div></div>
+    <div class="mo-row pair"><div class="mo-field f7"><label>仕入先</label><input id="fi_supplier" placeholder="納品書の仕入先"></div><div class="mo-field f3"><label>単価(任意)</label><input type="number" id="fi_unit_price" min="0" step="any"></div></div>
+    <div class="mo-row pair"><div class="mo-field"><label>発注者</label><select id="fi_orderer"></select></div><div class="mo-field"><label>受取者</label><select id="fi_receiver"></select></div></div>
+    <div class="mo-row full"><div class="mo-field"><label>用途・案件（任意）</label><input id="fi_use_note" placeholder="例: 砂丘フェス向け"></div></div>
+    <div class="mo-row full"><div class="mo-field"><label>メモ</label><textarea id="fi_note"></textarea></div></div>
+    <div class="mo-foot"><button class="cancel" onclick="FInv.closeIn()">閉じる</button><button class="save" onclick="FInv.saveIn()">入荷を記録</button></div>
+  </div></div>
+
+  <!-- 発注フォーム -->
+  <div class="mo-bg" id="finvOrderBg"><div class="mo">
+    <h2 id="finvOrderTitle">発注を記録</h2>
+    <input type="hidden" id="fo_id"><input type="hidden" id="fo_created_at">
+    <div class="mo-row full"><div class="mo-field"><label>品名 *</label><input id="fo_item" placeholder="例: ターポリン生地 白 50m原反"></div></div>
+    <div class="mo-row pair"><div class="mo-field f7"><label>数量</label><input type="number" id="fo_qty" min="0" step="any"></div><div class="mo-field f3"><label>単位</label><input id="fo_unit" placeholder="本/m/個"></div></div>
+    <div class="mo-row pair"><div class="mo-field"><label>発注者 *</label><select id="fo_orderer"></select></div><div class="mo-field"><label>仕入先</label><input id="fo_supplier"></div></div>
+    <div class="mo-row pair"><div class="mo-field f7"><label>用途・案件（任意）</label><input id="fo_use_note"></div><div class="mo-field f3"><label>着予定</label><input type="date" id="fo_eta"></div></div>
+    <div class="mo-foot"><button class="cancel" onclick="FInv.closeOrder()">閉じる</button><button class="save" onclick="FInv.saveOrder()">発注を記録</button></div>
+  </div></div>
+
+  <!-- これ俺（発注者を入れる） -->
+  <div class="mo-bg" id="finvClaimBg"><div class="mo" style="max-width:420px">
+    <h2>発注者を入れる</h2>
+    <input type="hidden" id="fc_id">
+    <div id="fc_item" style="font-weight:700;margin-bottom:12px"></div>
+    <div class="mo-row full"><div class="mo-field"><label>発注者</label><select id="fc_orderer"></select></div></div>
+    <div class="mo-foot"><button class="cancel" onclick="FInv.closeClaim()">閉じる</button><button class="save" onclick="FInv.saveClaim()">確定</button></div>
+  </div></div>
 </section>
 
 <!-- ===== ポータル section（入口・リンク集） ===== -->
@@ -5500,13 +5564,169 @@ const Portal = (function(){
 // 各アプリのナビ切替時、サブタブを「最初のタブ」にリセットする
 // 行って戻ると直前に開いていたサブタブが残ったままになる問題の対策
 function resetSubTab(name){
-  const tabsId={prod:'prodTabs',proj:'projTabs',sales:'salesTabs',labor:'laborTabs',veh:'vTabs',daily:'dailyTabs',ot:'otTabs',inv:'invTabs'}[name];
+  const tabsId={prod:'prodTabs',proj:'projTabs',sales:'salesTabs',labor:'laborTabs',veh:'vTabs',daily:'dailyTabs',ot:'otTabs',inv:'invTabs',finv:'finvTabs'}[name];
   if(!tabsId)return;
   const container=document.getElementById(tabsId);
   if(!container)return;
   const first=container.querySelector('.sub-tab');
   if(first)first.click();
 }
+
+const FInv = (function(){
+  let items=[], staff=[], currentView='receive', kw='';
+  let _busy=false;
+  function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
+  async function apiGet(params){try{const u=API+'?dept=factory&'+new URLSearchParams(params);const r=await fetch(u);return r.json()}catch(e){console.error('apiGet失敗(factory):',e);return null}}
+  function apiPost(body){body.dept='factory';fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+
+  async function loadAll(){
+    try{const j=await apiGet({action:'read'});if(j&&j.success)items=mergeWithTmp(j.data||[],items,r=>String(r.item||'')+'|'+String(r.created_at||''))}catch(e){console.warn('finv load',e)}
+    try{const s=await apiGet({action:'staff'});const arr=Array.isArray(s)?s:(s&&s.data?s.data:[]);const ns=arr.map(x=>typeof x==='string'?x:(x.name||x.employee_name||'')).filter(Boolean);if(ns.length)staff=ns}catch(e){}
+    render();
+  }
+
+  function staffOptions(selected,withUnknown){
+    let o='<option value=""></option>';
+    if(withUnknown)o+='<option value="不明"'+(selected==='不明'?' selected':'')+'>不明</option>';
+    staff.forEach(n=>{o+='<option'+(selected===n?' selected':'')+'>'+esc(n)+'</option>'});
+    return o;
+  }
+  function fmtD(s){if(!s)return'';const d=parseD(String(s).slice(0,10));return d?((d.getMonth()+1)+'/'+d.getDate()):''}
+  function blob(d){return (String(d.item||'')+' '+String(d.supplier||'')+' '+String(d.orderer||'')+' '+String(d.use_note||'')+' '+String(d.receiver||'')).toLowerCase()}
+  function search(v){kw=(v||'').trim().toLowerCase();render()}
+
+  function setView(v){
+    currentView=v;
+    $('finvTabs').querySelectorAll('.sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+    $('finvReceive').classList.toggle('hidden',v!=='receive');
+    $('finvPending').classList.toggle('hidden',v!=='pending');
+    $('finvUnknown').classList.toggle('hidden',v!=='unknown');
+    $('finvHistory').classList.toggle('hidden',v!=='history');
+    render();
+  }
+  function render(){
+    const unk=items.filter(d=>d.status==='着荷'&&(!d.orderer||d.orderer==='不明')).length;
+    const dot=$('finvUnkDot');if(dot)dot.style.display=unk?'inline-block':'none';
+    if(currentView==='receive')renderReceive();
+    else if(currentView==='pending')renderPending();
+    else if(currentView==='unknown')renderUnknown();
+    else renderHistory();
+  }
+
+  function pendCard(d,receiveMode){
+    const meta=[d.orderer?('発注:'+esc(d.orderer)):'発注者未記入',esc(d.supplier||''),d.eta?(fmtD(d.eta)+'着予定'):''].filter(Boolean).join(' / ');
+    const act=receiveMode
+      ? '<div style="font-size:11px;color:var(--accent);margin-top:6px">タップで着荷 →</div>'
+      : '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button class="act-btn" onclick="event.stopPropagation();FInv.openReceive(\''+d.id+'\')">着荷にする</button><button class="act-btn" onclick="event.stopPropagation();FInv.openOrder(\''+d.id+'\')">編集</button><button class="act-btn del" onclick="event.stopPropagation();FInv.delRow(\''+d.id+'\')">取消</button></div>';
+    const click=receiveMode?(' onclick="FInv.openReceive(\''+d.id+'\')" style="cursor:pointer"'):'';
+    return '<div class="finv-card"'+click+'><div class="fc-title">'+esc(d.item||'')+' <span class="fc-qty">'+esc(d.qty||'')+esc(d.unit||'')+'</span></div><div class="fc-meta">'+meta+'</div>'+act+'</div>';
+  }
+  function renderReceive(){
+    const el=$('finvReceive');
+    const pend=items.filter(d=>d.status==='発注中');
+    let h='<div class="finv-actbar"><button class="finv-bigbtn" onclick="FInv.openIn()">＋ 入荷を記録</button></div>';
+    if(pend.length){h+='<div class="finv-sec">入荷待ち（タップで着荷）</div>';pend.forEach(d=>h+=pendCard(d,true));}
+    else h+='<div class="empty-msg" style="padding:20px">入荷待ちはありません。届いたら「入荷を記録」から。</div>';
+    el.innerHTML=h;
+  }
+  function renderPending(){
+    const el=$('finvPending');
+    let pend=items.filter(d=>d.status==='発注中');if(kw)pend=pend.filter(d=>blob(d).includes(kw));
+    let h='<div class="finv-actbar"><button class="finv-bigbtn" onclick="FInv.openOrder()">＋ 発注を記録</button></div>';
+    if(!pend.length)h+='<div class="empty-msg" style="padding:20px">入荷待ちはありません</div>';
+    pend.forEach(d=>h+=pendCard(d,false));
+    el.innerHTML=h;
+  }
+  function renderUnknown(){
+    const el=$('finvUnknown');
+    let unk=items.filter(d=>d.status==='着荷'&&(!d.orderer||d.orderer==='不明'));if(kw)unk=unk.filter(d=>blob(d).includes(kw));
+    let h='<div class="finv-sec">発注者不明（心当たりがあれば「これ俺」）</div>';
+    if(!unk.length)h+='<div class="empty-msg" style="padding:20px">発注者不明はありません 👍</div>';
+    unk.forEach(d=>{
+      const meta=[esc(d.supplier||''),d.arrived_date?(fmtD(d.arrived_date)+'着'):'',d.receiver?('受取:'+esc(d.receiver)):''].filter(Boolean).join(' / ');
+      h+='<div class="finv-card"><div class="fc-title">'+esc(d.item||'')+' <span class="fc-qty">'+esc(d.qty||'')+esc(d.unit||'')+'</span></div><div class="fc-meta">'+meta+'</div><div style="margin-top:8px"><button class="act-btn" onclick="FInv.openClaim(\''+d.id+'\')">これ俺（発注者を入れる）</button></div></div>';
+    });
+    el.innerHTML=h;
+  }
+  function renderHistory(){
+    const el=$('finvHistory');
+    let rows=items.slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+    if(kw)rows=rows.filter(d=>blob(d).includes(kw));
+    let h='<div class="tbl-wrap"><table><thead><tr><th>日付</th><th>品名</th><th>数量</th><th>仕入先</th><th>発注者</th><th>受取者</th><th>状態</th><th>単価</th></tr></thead><tbody>';
+    if(!rows.length)h+='<tr><td colspan="8" class="empty-msg">記録はありません</td></tr>';
+    rows.forEach(d=>{
+      const dt=d.arrived_date||d.order_date||d.created_at;
+      h+='<tr data-id="'+d.id+'" onclick="FInv.openRow(\''+d.id+'\')" style="cursor:pointer"><td>'+fmtD(dt)+'</td><td>'+esc(d.item||'')+'</td><td>'+esc(d.qty||'')+esc(d.unit||'')+'</td><td>'+esc(d.supplier||'')+'</td><td>'+esc(d.orderer||'')+'</td><td>'+esc(d.receiver||'')+'</td><td>'+esc(d.status||'')+'</td><td>'+(d.unit_price?('¥'+esc(d.unit_price)):'')+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+    el.innerHTML=h;
+  }
+
+  function openIn(row){
+    $('fi_id').value=row?row.id:'';$('fi_created_at').value=row?(row.created_at||''):'';
+    $('fi_item').value=row?row.item||'':'';$('fi_qty').value=row?row.qty||'':'';$('fi_unit').value=row?row.unit||'':'';
+    $('fi_supplier').value=row?row.supplier||'':'';$('fi_unit_price').value=row?row.unit_price||'':'';
+    $('fi_orderer').innerHTML=staffOptions(row?row.orderer:'',true);$('fi_receiver').innerHTML=staffOptions(row?row.receiver:'',false);
+    $('fi_use_note').value=row?row.use_note||'':'';$('fi_note').value=row?row.note||'':'';
+    $('finvInTitle').textContent=row?'着荷を記録':'入荷を記録';
+    $('finvInBg').classList.add('show');
+  }
+  function openReceive(id){const d=items.find(x=>String(x.id)===String(id));if(d)openIn(d)}
+  function closeIn(){$('finvInBg').classList.remove('show')}
+  function saveIn(){
+    if(guard())return;
+    const item=$('fi_item').value.trim(),qty=$('fi_qty').value.trim();
+    if(!item||!qty){toast('品名と数量は必須です',true);_busy=false;return}
+    const id=$('fi_id').value||('tmp_'+Date.now());const ca=$('fi_created_at').value||new Date().toISOString();
+    const row={id,item,qty,unit:$('fi_unit').value.trim(),supplier:$('fi_supplier').value.trim(),unit_price:$('fi_unit_price').value.trim(),orderer:$('fi_orderer').value,receiver:$('fi_receiver').value,use_note:$('fi_use_note').value.trim(),note:$('fi_note').value.trim(),status:'着荷',arrived_date:dateStr(today),created_at:ca};
+    const i=items.findIndex(x=>String(x.id)===String(id));if(i>=0)items[i]={...items[i],...row};else items.unshift(row);
+    apiPost({action:'save',...row});closeIn();render();toast('入荷を記録しました');setTimeout(loadAll,3000);
+  }
+
+  function openOrder(id){
+    const d=id?items.find(x=>String(x.id)===String(id)):null;
+    $('fo_id').value=d?d.id:'';$('fo_created_at').value=d?(d.created_at||''):'';
+    $('fo_item').value=d?d.item||'':'';$('fo_qty').value=d?d.qty||'':'';$('fo_unit').value=d?d.unit||'':'';
+    $('fo_orderer').innerHTML=staffOptions(d?d.orderer:'',false);$('fo_supplier').value=d?d.supplier||'':'';
+    $('fo_use_note').value=d?d.use_note||'':'';$('fo_eta').value=d?d.eta||'':'';
+    $('finvOrderTitle').textContent=d?'発注を編集':'発注を記録';
+    $('finvOrderBg').classList.add('show');
+  }
+  function closeOrder(){$('finvOrderBg').classList.remove('show')}
+  function saveOrder(){
+    if(guard())return;
+    const item=$('fo_item').value.trim(),orderer=$('fo_orderer').value;
+    if(!item||!orderer){toast('品名と発注者は必須です',true);_busy=false;return}
+    const id=$('fo_id').value||('tmp_'+Date.now());const ca=$('fo_created_at').value||new Date().toISOString();
+    const row={id,item,qty:$('fo_qty').value.trim(),unit:$('fo_unit').value.trim(),orderer,supplier:$('fo_supplier').value.trim(),use_note:$('fo_use_note').value.trim(),eta:$('fo_eta').value,status:'発注中',order_date:dateStr(today),created_at:ca};
+    const i=items.findIndex(x=>String(x.id)===String(id));if(i>=0)items[i]={...items[i],...row};else items.unshift(row);
+    apiPost({action:'save',...row});closeOrder();render();toast('発注を記録しました');setTimeout(loadAll,3000);
+  }
+
+  function openClaim(id){const d=items.find(x=>String(x.id)===String(id));if(!d)return;$('fc_id').value=d.id;$('fc_item').textContent=d.item||'';$('fc_orderer').innerHTML=staffOptions('',false);$('finvClaimBg').classList.add('show')}
+  function closeClaim(){$('finvClaimBg').classList.remove('show')}
+  function saveClaim(){
+    if(guard())return;
+    const id=$('fc_id').value,orderer=$('fc_orderer').value;
+    if(!orderer){toast('発注者を選んでください',true);_busy=false;return}
+    const i=items.findIndex(x=>String(x.id)===String(id));if(i>=0)items[i].orderer=orderer;
+    apiPost({action:'save',id,orderer});closeClaim();render();toast('発注者を記録しました');setTimeout(loadAll,3000);
+  }
+
+  function openRow(id){const d=items.find(x=>String(x.id)===String(id));if(!d)return;d.status==='発注中'?openOrder(id):openIn(d)}
+  function delRow(id){
+    if(guard())return;
+    if(!confirm('この記録を取り消しますか？')){_busy=false;return}
+    items=items.filter(x=>String(x.id)!==String(id));apiPost({action:'delete',id});render();toast('取り消しました');setTimeout(loadAll,3000);
+  }
+
+  function init(){
+    $('finvTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;setView(t.dataset.view)});
+    setView('receive');
+  }
+
+  return { loadAll, init, setView, search, openIn, closeIn, saveIn, openReceive, openOrder, closeOrder, saveOrder, openClaim, closeClaim, saveClaim, openRow, delRow };
+})();
 
 const App = {
   current:null,
@@ -5516,6 +5736,7 @@ const App = {
     {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj'},
     {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv'},
     {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh'},
+    {key:'finv', ns:()=>FInv, section:'view-finv', nav:'navFinv'},
     {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales'},
     {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor'},
     {key:'daily',ns:()=>Daily,section:'view-daily',nav:'navDaily'},
