@@ -25,6 +25,12 @@
   --green:#2a9d5a;--green-dim:rgba(42,157,90,.1);
   --purple:#8b5cf6;--purple-dim:rgba(139,92,246,.1);
   --cyan:#0891b2;--cyan-dim:rgba(8,145,178,.1);
+  /* 旧MPAから未移植だったトークン（時間外で使用）を定義 */
+  --radius:10px;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 12px rgba(16,24,40,.05);
+  --accent-light:rgba(59,130,246,.10);
+  --green-light:rgba(42,157,90,.12);
+  --orange-light:rgba(245,158,11,.14);
 }
 html{font-size:15px;scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;overscroll-behavior-y:none}
@@ -1461,6 +1467,30 @@ table.jobs tr:last-child td{border-bottom:none}
     display:none !important;
   }
 }
+
+/* ===== 日報・時間外 ビジュアル調整（#view-daily / #view-ot 限定） ===== */
+/* 日報：書くカードに奥行き・角丸大きめ・ラベル上品に */
+#view-daily .card{border:1px solid var(--border-light);border-radius:16px;padding:22px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 22px rgba(16,24,40,.05)}
+#view-daily .field label,#view-daily .af-field label,#view-daily .entry-field label{letter-spacing:.04em}
+/* 保存済みエントリ：浮きカード＋左アクセント＋ホバーで持ち上げ */
+#view-daily .saved-entry{background:var(--surface);border:1px solid var(--border-light);border-left:3px solid var(--accent);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.04);transition:box-shadow .16s,transform .16s}
+#view-daily .saved-entry:hover{box-shadow:0 6px 18px rgba(16,24,40,.09);transform:translateY(-1px)}
+/* みんなの日報：グループを浮かせ、見出しにアクセントバー＆淡いグラデ */
+#view-daily .member-group{border:1px solid var(--border-light);border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 6px 16px rgba(16,24,40,.05)}
+#view-daily .member-group h3{background:linear-gradient(90deg,var(--accent-dim),transparent);border-left:3px solid var(--accent)}
+#view-daily .status-section.status-notwritten{background:var(--red-dim);border-radius:12px}
+#view-daily .status-item{border-radius:10px}
+
+/* 時間外：週バー・日行に奥行き、チップに滑らかさと選択時の浮き */
+#view-ot .week-bar{border-bottom:none;box-shadow:0 1px 2px rgba(16,24,40,.05);position:relative;z-index:1}
+#view-ot .day-row{border:1px solid var(--border-light);transition:box-shadow .16s,transform .16s}
+#view-ot .day-row:hover{box-shadow:0 6px 18px rgba(16,24,40,.08)}
+#view-ot .time-chip,#view-ot .staff-chip{transition:.16s;box-shadow:0 1px 1px rgba(16,24,40,.03)}
+#view-ot .time-chip.selected{box-shadow:0 2px 8px rgba(42,157,90,.32)}
+#view-ot .staff-chip.selected{box-shadow:0 3px 10px rgba(59,130,246,.32)}
+/* 管理グリッド：枠を角丸カード化、ヘッダーを締まったグラデに */
+#view-ot .overview-grid{border:1px solid var(--border-light)}
+#view-ot .ov-header{background:linear-gradient(180deg,#243044,#1e293b)}
 
 /* ===== 資材（入出荷） 固有CSS ===== */
 .finv-view{padding:8px 0}
