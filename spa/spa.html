@@ -2167,7 +2167,7 @@ table.jobs tr:last-child td{border-bottom:none}
 <section id="view-finv" class="hidden">
   <div class="sub-tabs" id="finvTabs">
     <button class="sub-tab on" data-view="receive">入荷受付</button>
-    <button class="sub-tab" data-view="pending">発注済み</button>
+    <button class="sub-tab" data-view="pending">発注</button>
     <button class="sub-tab" data-view="unknown">発注者不明 <span id="finvUnkDot" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--red);margin-left:3px;vertical-align:middle"></span></button>
     <button class="sub-tab" data-view="history">入荷済</button>
     <input class="subtab-search" id="finvSearch" placeholder="品番・品名で検索..." oninput="FInv.search(this.value)">
@@ -2184,7 +2184,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <h2 id="finvInTitle">入荷を記録</h2>
     <input type="hidden" id="fi_id"><input type="hidden" id="fi_created_at">
     <div class="mo-row full"><div class="mo-field"><label>品名 *</label><input id="fi_item" placeholder="例: ターポリン生地 白 50m原反"></div></div>
-    <div class="mo-row"><div class="mo-field"><label>長さ(m/本・任意)</label><input type="number" id="fi_length" min="0" step="any" placeholder="例:50"></div><div class="mo-field"><label>数量 *</label><input type="number" id="fi_qty" min="0" step="any"></div><div class="mo-field"><label>単位</label><input id="fi_unit" placeholder="本/個"></div></div>
+    <div class="mo-row pair"><div class="mo-field f7"><label>数量 *</label><input type="number" id="fi_qty" min="0" step="any"></div><div class="mo-field f3"><label>単位</label><input id="fi_unit" placeholder="本/m/個/kg"></div></div>
     <div class="mo-row pair"><div class="mo-field f7"><label>仕入先</label><input id="fi_supplier" placeholder="納品書の仕入先"></div><div class="mo-field f3"><label>単価(任意)</label><input type="number" id="fi_unit_price" min="0" step="any"></div></div>
     <div class="mo-row pair"><div class="mo-field"><label>発注者</label><select id="fi_orderer"></select></div><div class="mo-field"><label>受取者</label><select id="fi_receiver"></select></div></div>
     <div class="mo-row full"><div class="mo-field"><label>用途・案件（任意）</label><input id="fi_use_note" placeholder="例: 砂丘フェス向け"></div></div>
@@ -2197,7 +2197,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <h2 id="finvOrderTitle">発注を記録</h2>
     <input type="hidden" id="fo_id"><input type="hidden" id="fo_created_at">
     <div class="mo-row full"><div class="mo-field"><label>品名 *</label><input id="fo_item" placeholder="例: ターポリン生地 白 50m原反"></div></div>
-    <div class="mo-row"><div class="mo-field"><label>長さ(m/本・任意)</label><input type="number" id="fo_length" min="0" step="any" placeholder="例:50"></div><div class="mo-field"><label>数量</label><input type="number" id="fo_qty" min="0" step="any"></div><div class="mo-field"><label>単位</label><input id="fo_unit" placeholder="本/個"></div></div>
+    <div class="mo-row pair"><div class="mo-field f7"><label>数量</label><input type="number" id="fo_qty" min="0" step="any"></div><div class="mo-field f3"><label>単位</label><input id="fo_unit" placeholder="本/m/個/kg"></div></div>
     <div class="mo-row pair"><div class="mo-field"><label>発注者 *</label><select id="fo_orderer"></select></div><div class="mo-field"><label>仕入先</label><input id="fo_supplier"></div></div>
     <div class="mo-row pair"><div class="mo-field f7"><label>用途・案件（任意）</label><input id="fo_use_note"></div><div class="mo-field f3"><label>着予定</label><input type="date" id="fo_eta"></div></div>
     <div class="mo-foot"><button class="cancel" onclick="FInv.closeOrder()">閉じる</button><button class="save" onclick="FInv.saveOrder()">発注を記録</button></div>
@@ -5591,7 +5591,7 @@ const FInv = (function(){
     (list||[]).forEach(n=>{o+='<option'+(selected===n?' selected':'')+'>'+esc(n)+'</option>'});
     return o;
   }
-  function qtyLabel(d){const u=esc(d.unit||''),q=esc(d.qty||'');return d.length?(esc(d.length)+'m×'+q+u):(q+u)}
+  function qtyLabel(d){return esc(d.qty||'')+esc(d.unit||'')}
   function fmtD(s){if(!s)return'';const d=parseD(String(s).slice(0,10));return d?((d.getMonth()+1)+'/'+d.getDate()):''}
   function blob(d){return (String(d.item||'')+' '+String(d.supplier||'')+' '+String(d.orderer||'')+' '+String(d.use_note||'')+' '+String(d.receiver||'')).toLowerCase()}
   function search(v){kw=(v||'').trim().toLowerCase();render()}
@@ -5626,7 +5626,7 @@ const FInv = (function(){
     const el=$('finvReceive');
     const pend=items.filter(d=>d.status==='発注中');
     let h='<div class="finv-actbar"><button class="finv-bigbtn" onclick="FInv.openIn()">＋ 入荷を記録</button></div>';
-    if(pend.length){h+='<div class="finv-sec">発注済み（タップで着荷）</div>';pend.forEach(d=>h+=pendCard(d,true));}
+    if(pend.length){h+='<div class="finv-sec">発注（タップで着荷）</div>';pend.forEach(d=>h+=pendCard(d,true));}
     else h+='<div class="empty-msg" style="padding:20px">未着の発注はありません。届いたら「入荷を記録」から。</div>';
     el.innerHTML=h;
   }
@@ -5665,7 +5665,7 @@ const FInv = (function(){
 
   function openIn(row){
     $('fi_id').value=row?row.id:'';$('fi_created_at').value=row?(row.created_at||''):'';
-    $('fi_item').value=row?row.item||'':'';$('fi_length').value=row?row.length||'':'';$('fi_qty').value=row?row.qty||'':'';$('fi_unit').value=row?row.unit||'':'';
+    $('fi_item').value=row?row.item||'':'';$('fi_qty').value=row?row.qty||'':'';$('fi_unit').value=row?row.unit||'':'';
     $('fi_supplier').value=row?row.supplier||'':'';$('fi_unit_price').value=row?row.unit_price||'':'';
     $('fi_orderer').innerHTML=staffOptions(staffOrder,row?row.orderer:'',['事務所','不明']);$('fi_receiver').innerHTML=staffOptions(staffRecv,row?row.receiver:'',[]);
     $('fi_use_note').value=row?row.use_note||'':'';$('fi_note').value=row?row.note||'':'';
@@ -5679,7 +5679,7 @@ const FInv = (function(){
     const item=$('fi_item').value.trim(),qty=$('fi_qty').value.trim();
     if(!item||!qty){toast('品名と数量は必須です',true);_busy=false;return}
     const id=$('fi_id').value||('tmp_'+Date.now());const ca=$('fi_created_at').value||new Date().toISOString();
-    const row={id,item,length:$('fi_length').value.trim(),qty,unit:$('fi_unit').value.trim(),supplier:$('fi_supplier').value.trim(),unit_price:$('fi_unit_price').value.trim(),orderer:$('fi_orderer').value,receiver:$('fi_receiver').value,use_note:$('fi_use_note').value.trim(),note:$('fi_note').value.trim(),status:'着荷',arrived_date:dateStr(today),created_at:ca};
+    const row={id,item,qty,unit:$('fi_unit').value.trim(),supplier:$('fi_supplier').value.trim(),unit_price:$('fi_unit_price').value.trim(),orderer:$('fi_orderer').value,receiver:$('fi_receiver').value,use_note:$('fi_use_note').value.trim(),note:$('fi_note').value.trim(),status:'着荷',arrived_date:dateStr(today),created_at:ca};
     const i=items.findIndex(x=>String(x.id)===String(id));if(i>=0)items[i]={...items[i],...row};else items.unshift(row);
     apiPost({action:'save',...row});closeIn();render();toast('入荷を記録しました');setTimeout(loadAll,3000);
   }
@@ -5687,7 +5687,7 @@ const FInv = (function(){
   function openOrder(id){
     const d=id?items.find(x=>String(x.id)===String(id)):null;
     $('fo_id').value=d?d.id:'';$('fo_created_at').value=d?(d.created_at||''):'';
-    $('fo_item').value=d?d.item||'':'';$('fo_length').value=d?d.length||'':'';$('fo_qty').value=d?d.qty||'':'';$('fo_unit').value=d?d.unit||'':'';
+    $('fo_item').value=d?d.item||'':'';$('fo_qty').value=d?d.qty||'':'';$('fo_unit').value=d?d.unit||'':'';
     $('fo_orderer').innerHTML=staffOptions(staffOrder,d?d.orderer:'',['事務所','不明']);$('fo_supplier').value=d?d.supplier||'':'';
     $('fo_use_note').value=d?d.use_note||'':'';$('fo_eta').value=d?d.eta||'':'';
     $('finvOrderTitle').textContent=d?'発注を編集':'発注を記録';
@@ -5699,7 +5699,7 @@ const FInv = (function(){
     const item=$('fo_item').value.trim(),orderer=$('fo_orderer').value;
     if(!item||!orderer){toast('品名と発注者は必須です',true);_busy=false;return}
     const id=$('fo_id').value||('tmp_'+Date.now());const ca=$('fo_created_at').value||new Date().toISOString();
-    const row={id,item,length:$('fo_length').value.trim(),qty:$('fo_qty').value.trim(),unit:$('fo_unit').value.trim(),orderer,supplier:$('fo_supplier').value.trim(),use_note:$('fo_use_note').value.trim(),eta:$('fo_eta').value,status:'発注中',order_date:dateStr(today),created_at:ca};
+    const row={id,item,qty:$('fo_qty').value.trim(),unit:$('fo_unit').value.trim(),orderer,supplier:$('fo_supplier').value.trim(),use_note:$('fo_use_note').value.trim(),eta:$('fo_eta').value,status:'発注中',order_date:dateStr(today),created_at:ca};
     const i=items.findIndex(x=>String(x.id)===String(id));if(i>=0)items[i]={...items[i],...row};else items.unshift(row);
     apiPost({action:'save',...row});closeOrder();render();toast('発注を記録しました');setTimeout(loadAll,3000);
   }
