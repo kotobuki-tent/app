@@ -2071,10 +2071,10 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="card">
         <div class="card-head">
           <div style="flex:1">
-            <div class="today-hint" style="display:flex;align-items:center;gap:10px">
-              <span>日付：</span>
-              <input type="date" id="writeDate" onchange="Daily.onWriteDateChange()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:500 13px/1 'Noto Sans JP',sans-serif">
-              <button onclick="Daily.setWriteDateToday()" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer">今日</button>
+            <div class="today-hint" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <span style="white-space:nowrap">日付：</span>
+              <input type="date" id="writeDate" onchange="Daily.onWriteDateChange()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:500 13px/1 'Noto Sans JP',sans-serif;min-width:0">
+              <button onclick="Daily.setWriteDateToday()" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0">今日</button>
             </div>
           </div>
           <div class="field" style="max-width:240px">
