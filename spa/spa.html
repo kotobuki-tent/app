@@ -2032,6 +2032,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="laborPcDate"></span>
     <button class="sub-tab on" data-view="active">工場ボード</button>
     <button class="sub-tab" data-view="archive">出荷済</button>
+    <button class="sub-tab" data-view="archived">アーカイブ</button>
     <button class="slog-btn" id="laborSlogBtn" onclick="Labor.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="laborPcSearch" placeholder="検索...">
   </div>
@@ -2057,7 +2058,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <h3 id="dmTitle"></h3>
       <div class="mh-sub" id="dmSub"></div>
       <div id="dmBody"></div>
-      <div class="mo-foot"><button class="cancel" onclick="Labor.closeDetail()">閉じる</button></div>
+      <div class="mo-foot"><button class="cancel" onclick="Labor.closeDetail()">閉じる</button><button class="arch-btn" id="dmArchiveBtn" onclick="Labor.toggleArchive()">アーカイブへ</button></div>
     </div>
   </div>
 </section>
@@ -4917,6 +4918,8 @@ const Labor = (function(){
   let currentView='active';
   let stFilter='';
   let slog=[];
+  let detailId=null;
+  let _arcBusy=false;
   const stOrderActive={'完成':1,'製作中':2,'受注':3,'見積中':4,'見送り':5};
   const stOrderArchive={'出荷済':1};
   const SLOG_LIST_KEY='prod_status_log';
@@ -4929,7 +4932,7 @@ const Labor = (function(){
   function setView(v){
     currentView=v;
     $('laborTabs').querySelectorAll('.sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
-    if(v==='archive')stFilter='';
+    if(v==='archive'||v==='archived')stFilter='';
     renderTable();
   }
   function setStFilter(v){stFilter=v;renderTable()}
@@ -4979,20 +4982,23 @@ const Labor = (function(){
   function renderTable(){
     const kw=($('laborPcSearch')?$('laborPcSearch').value:'').trim().toLowerCase();
     const isArchive=currentView==='archive';
-    const allActive=allJobs.filter(j=>j.status!=='出荷済');
+    const isLaborArc=currentView==='archived';
+    const isLA=j=>String(j.labor_archived||'').toUpperCase()==='TRUE';
+    const allActive=allJobs.filter(j=>j.status!=='出荷済'&&!isLA(j));
     const cnt={};ACTIVE_ST.forEach(s=>cnt[s]=0);
     allActive.forEach(j=>{if(cnt[j.status]!==undefined)cnt[j.status]++});
     const total=allActive.length;
     let list=allJobs.filter(j=>{
-      if(isArchive){if(j.status!=='出荷済')return false}
-      else{if(j.status==='出荷済')return false;if(stFilter&&j.status!==stFilter)return false}
+      if(isLaborArc){if(!isLA(j))return false}
+      else if(isArchive){if(j.status!=='出荷済'||isLA(j))return false}
+      else{if(j.status==='出荷済'||isLA(j))return false;if(stFilter&&j.status!==stFilter)return false}
       if(kw){const target=(j.project+' '+j.order_no+' '+j.estimate_no).toLowerCase();if(!target.includes(kw))return false}
       return true;
     });
     const stOrder=isArchive?stOrderArchive:stOrderActive;
     list.sort((a,b)=>{const so=(stOrder[a.status]||99)-(stOrder[b.status]||99);if(so)return so;const ad=a.deadline||'',bd=b.deadline||'';if(!ad&&!bd)return 0;if(!ad)return 1;if(!bd)return-1;return bd.localeCompare(ad)});
     let chipHtml='';
-    if(!isArchive){
+    if(!isArchive&&!isLaborArc){
       chipHtml='<div class="fv-sum">';
       chipHtml+=`<div class="fv-si${stFilter===''?' on':''}" onclick="Labor.setStFilter('')"><div class="n">${total}</div><div class="l">すべて</div></div>`;
       ACTIVE_ST.forEach(s=>{chipHtml+=`<div class="fv-si${stFilter===s?' on':''}" onclick="Labor.setStFilter('${s}')"><div class="n" style="color:var(${stColorVar(s)})">${cnt[s]||0}</div><div class="l">${s}</div></div>`});
@@ -5038,7 +5044,7 @@ const Labor = (function(){
 
   // ===== 詳細モーダル =====
   function showDetail(id){
-    const job=allJobs.find(x=>String(x.id)===String(id));if(!job)return;
+    const job=allJobs.find(x=>String(x.id)===String(id));if(!job)return;detailId=id;
     const no=job.order_no||job.estimate_no;
     $('dmTitle').textContent=(no?'#'+no+' ':'')+job.project;
     $('dmSub').innerHTML=`<span class="st-badge st-${esc(job.status)}">${esc(job.status)}</span>${job.deadline?' 　納期 '+esc(job.deadline):''}`;
@@ -5049,9 +5055,20 @@ const Labor = (function(){
       h+='</div>';
     }else{h+='<div class="empty-msg">工数の記録はまだありません</div>'}
     $('dmBody').innerHTML=h;
+    const _la=String(job.labor_archived||'').toUpperCase()==='TRUE';const _b=$('dmArchiveBtn');if(_b)_b.textContent=_la?'アーカイブ解除':'アーカイブへ';
     $('detailModal').classList.add('show');
   }
   function closeDetail(){$('detailModal').classList.remove('show')}
+  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+  function toggleArchive(){
+    if(_arcBusy)return;_arcBusy=true;setTimeout(()=>_arcBusy=false,1500);
+    const job=allJobs.find(x=>String(x.id)===String(detailId));if(!job){_arcBusy=false;return}
+    const on=!(String(job.labor_archived||'').toUpperCase()==='TRUE');
+    job.labor_archived=on?'TRUE':'';
+    fireAndForget({dept:'labor',action:on?'archive':'unarchive',id:job.id});
+    closeDetail();renderTable();toast(on?'工数アーカイブへ移動しました':'アーカイブ解除しました');
+    setTimeout(loadAll,3000);
+  }
 
   // ===== init =====
   function init(){
@@ -5064,7 +5081,7 @@ const Labor = (function(){
   return {
     loadAll, init,
     setView, setStFilter, openSlog, closeSlog,
-    showDetail, closeDetail, renderTable
+    showDetail, closeDetail, toggleArchive, renderTable
   };
 })();
 
