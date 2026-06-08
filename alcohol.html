@@ -253,6 +253,15 @@ function pad(n){return n<10?'0'+n:''+n;}
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function monthStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);}
 function nowHHMM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes());}
+// GASがtimeを時刻値として返すと "1899-12-30T..." のISOになる事がある。HH:mmへ正規化。
+function fmtTime(t){
+  if(!t)return'';
+  t=String(t);
+  if(/^\d{1,2}:\d{2}/.test(t))return t.slice(0,5);
+  const d=new Date(t);
+  if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);
+  return t;
+}
 
 async function apiGet(params){const url=API+'?dept=alcohol&'+new URLSearchParams(params);const r=await fetch(url);return r.json();}
 function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'alcohol',...body})});}
@@ -308,7 +317,7 @@ function renderRecList(){
     return `<div class="rec${r._optimistic?' optimistic':''}" onclick="openEdit('${r.id}')">
       <span class="ph ${pre?'pre':'post'}">${esc(r.phase)}</span>
       <span class="nm">${esc(r.driver)}</span>
-      <span class="tm">${esc(r.time||'')}</span>
+      <span class="tm">${esc(fmtTime(r.time))}</span>
       <span class="al ${ng?'ng':'ok'}">酒気${esc(r.alcohol||'無')}</span>
     </div>`;
   }).join('');
@@ -349,7 +358,7 @@ function openEdit(id){
   curEdit=r;
   $('m_sub').textContent=`${r.driver}　${(r.date||'').replace(/-/g,'/')}`;
   segSet('m_phase',r.phase);
-  $('m_time').value=r.time||'';
+  $('m_time').value=fmtTime(r.time);
   $('m_vehicle').value=r.vehicle||'';
   segSet('m_alcohol',r.alcohol||'無');
   $('m_checker').value=r.checker||checkerDefault;
@@ -399,7 +408,7 @@ function renderMatrix(data){
   const cell=r=>{
     if(!r)return '<td class="cell-none">—</td>';
     const ng=r.alcohol==='有';
-    return `<td class="cell-done ${ng?'ng':'ok'}">${esc(r.time||'✓')}<span class="small">酒気${esc(r.alcohol||'無')}</span></td>`;
+    return `<td class="cell-done ${ng?'ng':'ok'}">${esc(fmtTime(r.time)||'✓')}<span class="small">酒気${esc(r.alcohol||'無')}</span></td>`;
   };
   el.innerHTML=`<table class="mtx"><thead><tr><th>運転者</th><th>運転前</th><th>運転後</th><th>確認者</th></tr></thead><tbody>${
     names.map(n=>{const d=byDriver[n];const chk=(d['運転前']||d['運転後']||{}).checker||'';
@@ -417,7 +426,7 @@ async function exportCsv(){
   if(!data.length){toast('この月の記録はありません',false);return;}
   data.sort((a,b)=>String(a.date+a.time).localeCompare(String(b.date+b.time)));
   const head=['日付','運転者','車両','区分','時刻','確認者','検知器の使用','確認方法','対面以外の方法','酒気帯びの有無','指示事項','その他'];
-  const rows=data.map(r=>[r.date,r.driver,r.vehicle,r.phase,r.time,r.checker,r.detector_used,r.face,r.method,r.alcohol,r.instruction,r.note]);
+  const rows=data.map(r=>[r.date,r.driver,r.vehicle,r.phase,fmtTime(r.time),r.checker,r.detector_used,r.face,r.method,r.alcohol,r.instruction,r.note]);
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
   const csv='﻿'+[head,...rows].map(row=>row.map(q).join(',')).join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
