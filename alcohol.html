@@ -11,97 +11,101 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:16px;scrollbar-gutter:stable}
-body{font-family:'Noto Sans JP',sans-serif;background:#f4f6f7;color:#16201f;min-height:100vh;min-height:100dvh}
+body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-height:100vh;min-height:100dvh}
 
 /* Header */
-.hdr{background:#0d9488;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
-.hdr h1{font-size:16px;font-weight:900;color:#042f2c;letter-spacing:.04em}
-.hdr .right{display:flex;align-items:center;gap:10px}
-.hdr .today{font:600 12px/1 'Noto Sans JP',sans-serif;color:rgba(4,47,44,.8)}
-.hdr .refresh{background:rgba(4,47,44,.12);border:1px solid rgba(4,47,44,.25);color:#042f2c;font:600 12px/1 'Noto Sans JP';border-radius:7px;padding:7px 11px;cursor:pointer}
+.hdr{background:#0d9488;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.hdr h1{font-size:19px;font-weight:900;color:#042f2c;letter-spacing:.04em}
+.hdr .right{display:flex;align-items:center;gap:14px}
+.hdr .today{font:700 15px/1 'Noto Sans JP';color:rgba(4,47,44,.85)}
+.hdr .refresh{background:rgba(4,47,44,.12);border:1px solid rgba(4,47,44,.25);color:#042f2c;font:700 14px/1 'Noto Sans JP';border-radius:8px;padding:9px 14px;cursor:pointer}
 .hdr .refresh:active{transform:scale(.96)}
 
-/* Tabs */
-.tabs{display:flex;background:#fff;border-bottom:1px solid #e3e7e8;position:sticky;top:48px;z-index:19}
-.tab{flex:1;text-align:center;padding:13px 0;font:700 14px/1 'Noto Sans JP';color:#90a0a0;cursor:pointer;border-bottom:3px solid transparent}
-.tab.on{color:#0d9488;border-bottom-color:#0d9488}
+/* Kiosk 2-pane */
+.kiosk{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;max-width:1320px;margin:0 auto;padding:16px;align-items:start}
+@media(max-width:840px),(orientation:portrait){.kiosk{grid-template-columns:1fr}}
+.pane{background:#fff;border-radius:16px;padding:18px 18px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.pane h2{font-size:15px;font-weight:800;color:#2a3a39;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 
-.main{padding:16px 14px 110px;max-width:760px;margin:0 auto}
-.card{background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:14px}
-.card h2{font-size:14px;font-weight:700;color:#2a3a39;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+/* Selected driver banner */
+.selbar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:#f0faf8;border:2px solid #cdeae5;margin-bottom:14px;min-height:60px}
+.selbar.none{background:#fafbfb;border-color:#e6eaea;border-style:dashed}
+.selbar .lab{font-size:13px;font-weight:600;color:#7c8c8b}
+.selbar .who{font-size:24px;font-weight:900;color:#0d9488;flex:1}
+.selbar.none .who{font-size:16px;font-weight:600;color:#9aa8a7}
+.selbar .clr{font:600 13px/1 'Noto Sans JP';color:#90a0a0;cursor:pointer;padding:6px 10px;border:1px solid #e0e6e5;border-radius:7px;background:#fff}
 
-.field{margin-bottom:14px}
-.field label{display:block;font-size:12px;font-weight:600;color:#7c8c8b;margin-bottom:5px;letter-spacing:.02em}
-.field input,.field select,.field textarea{width:100%;padding:13px 14px;border:2px solid #e6eaea;border-radius:10px;font:400 16px/1.4 'Noto Sans JP';color:#16201f;background:#fafcfc;-webkit-appearance:none;appearance:none;transition:.15s}
-.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#0d9488;background:#fff;box-shadow:0 0 0 4px rgba(13,148,136,.1)}
-.field textarea{min-height:64px;resize:vertical}
-.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' fill='none' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
-.row2{display:flex;gap:10px}
-.row2>.field{flex:1;margin-bottom:14px}
+/* Name grid */
+.gl{font-size:12px;font-weight:700;color:#9aa8a7;margin:10px 2px 6px}
+.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.namebtn{padding:15px 6px;border:2px solid #e6eaea;border-radius:11px;background:#fafcfc;font:700 16px/1.2 'Noto Sans JP';color:#27302f;cursor:pointer;transition:.1s;text-align:center;position:relative}
+.namebtn.proj{border-color:#a7ddd6;background:#eefbf8}
+.namebtn.sel{background:#0d9488;color:#fff;border-color:#0d9488;box-shadow:0 4px 12px rgba(13,148,136,.35)}
+.namebtn:active{transform:scale(.96)}
+.namebtn .st{position:absolute;top:4px;right:6px;font-size:11px;font-weight:700}
+.namebtn .st.full{color:#15803d}.namebtn.sel .st.full{color:#bbf7d0}
+.namebtn .st.half{color:#d97706}.namebtn.sel .st.half{color:#fde68a}
 
 /* Segmented */
-.seg{display:flex;gap:0;border:2px solid #e6eaea;border-radius:10px;overflow:hidden}
-.seg button{flex:1;padding:12px 0;border:none;background:#fafcfc;font:700 14px/1 'Noto Sans JP';color:#7c8c8b;cursor:pointer;transition:.12s}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:700;color:#7c8c8b;margin-bottom:6px}
+.field input,.field select{width:100%;padding:13px 14px;border:2px solid #e6eaea;border-radius:10px;font:400 16px/1.4 'Noto Sans JP';color:#16201f;background:#fafcfc;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus{outline:none;border-color:#0d9488;background:#fff;box-shadow:0 0 0 4px rgba(13,148,136,.1)}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' fill='none' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.row2{display:flex;gap:10px}.row2>.field{flex:1}
+.seg{display:flex;border:2px solid #e6eaea;border-radius:11px;overflow:hidden}
+.seg button{flex:1;padding:14px 0;border:none;background:#fafcfc;font:800 16px/1 'Noto Sans JP';color:#7c8c8b;cursor:pointer;transition:.12s}
 .seg button+button{border-left:2px solid #e6eaea}
 .seg button.on{background:#0d9488;color:#fff}
 .seg.danger button.on{background:#dc2626}
+.seg.big button{padding:18px 0;font-size:20px}
 
-.detail-toggle{font-size:12px;font-weight:600;color:#0d9488;cursor:pointer;display:inline-block;margin:2px 0 12px}
+.detail-toggle{font-size:13px;font-weight:700;color:#0d9488;cursor:pointer;display:inline-block;margin:6px 0 12px}
 .detail-toggle:hover{text-decoration:underline}
-#detailBox{display:none}
-#detailBox.open{display:block}
+#detailBox{display:none}#detailBox.open{display:block}
+.hide{display:none!important}
 
-/* Commit buttons */
-.commit{display:flex;gap:10px;margin-top:4px}
-.commit button{flex:1;padding:16px 0;border:none;border-radius:12px;font:800 16px/1 'Noto Sans JP';cursor:pointer;letter-spacing:.04em;transition:.12s;color:#fff}
-.commit .pre{background:#0d9488}
-.commit .post{background:#0369a1}
+/* Commit */
+.commit{display:flex;gap:12px;margin-top:8px}
+.commit button{flex:1;padding:24px 0;border:none;border-radius:14px;font:900 22px/1 'Noto Sans JP';cursor:pointer;letter-spacing:.04em;transition:.12s;color:#fff}
+.commit .pre{background:#0d9488}.commit .post{background:#0369a1}
 .commit button:active{transform:scale(.97)}
 .commit button:disabled{background:#bcc8c7;cursor:not-allowed}
 
-/* Record cards */
-.rec{display:flex;align-items:center;gap:10px;padding:11px 12px;background:#fafcfc;border:1px solid #e6eaea;border-radius:10px;margin-bottom:8px;cursor:pointer}
-.rec.optimistic{opacity:.65;border-style:dashed}
-.rec .ph{font:700 11px/1 'Noto Sans JP';padding:4px 7px;border-radius:5px;white-space:nowrap;color:#fff}
-.rec .ph.pre{background:#0d9488}.rec .ph.post{background:#0369a1}
-.rec .nm{font-size:14px;font-weight:600;color:#27302f;flex:1}
-.rec .tm{font-size:12px;color:#90a0a0}
-.rec .al{font:700 11px/1 'Noto Sans JP';padding:4px 7px;border-radius:5px;white-space:nowrap}
-.rec .al.ok{background:#dcfce7;color:#15803d}
-.rec .al.ng{background:#fee2e2;color:#b91c1c}
-
 /* Matrix */
-.mtx{width:100%;border-collapse:collapse;font-size:13px}
-.mtx th,.mtx td{border:1px solid #e3e7e8;padding:9px 8px;text-align:center}
-.mtx th{background:#f0f4f4;color:#5c6c6b;font-weight:700;font-size:12px}
-.mtx td.nm{text-align:left;font-weight:600;color:#27302f;white-space:nowrap}
-.mtx .cell-done{font-weight:700}
-.mtx .cell-done.ng{color:#b91c1c}
+.dayhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.dayhead .field{margin:0;flex:1}
+.mtx{width:100%;border-collapse:collapse;font-size:15px}
+.mtx th,.mtx td{border:1px solid #e3e7e8;padding:11px 8px;text-align:center}
+.mtx th{background:#f0f4f4;color:#5c6c6b;font-weight:700;font-size:13px}
+.mtx td.nm{text-align:left;font-weight:700;color:#27302f;white-space:nowrap}
+.mtx td.proj{color:#0d9488}
+.mtx .cell-done{font-weight:800;cursor:pointer}
+.mtx .cell-done.ng{color:#b91c1c;background:#fef2f2}
 .mtx .cell-done.ok{color:#0d9488}
 .mtx .cell-none{color:#cdd6d5}
-.mtx .small{display:block;font-size:10px;font-weight:400;color:#90a0a0}
+.mtx .small{display:block;font-size:11px;font-weight:500;color:#90a0a0}
+.empty{text-align:center;padding:26px;color:#b6c0bf;font-size:14px}
 
-.empty{text-align:center;padding:22px;color:#b6c0bf;font-size:13px}
+.divider{height:1px;background:#eaeeed;margin:18px 0}
 .csvbar{display:flex;gap:10px;align-items:flex-end}
-.csvbar .field{flex:1;margin-bottom:0}
-.btn{padding:13px 16px;border:none;border-radius:10px;font:700 14px/1 'Noto Sans JP';cursor:pointer;background:#0d9488;color:#fff;white-space:nowrap}
-.btn:active{transform:scale(.97)}
-.btn.gray{background:#64748b}
+.csvbar .field{flex:1;margin:0}
+.btn{padding:14px 18px;border:none;border-radius:10px;font:800 15px/1 'Noto Sans JP';cursor:pointer;background:#0d9488;color:#fff;white-space:nowrap}
+.btn:active{transform:scale(.97)}.btn.gray{background:#64748b}
+.note{font-size:12px;color:#90a0a0;margin-top:10px;line-height:1.6}
 
 /* Modal */
 .ovl{position:fixed;inset:0;background:rgba(10,20,19,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:18px}
 .ovl.show{display:flex}
-.modal{background:#fff;border-radius:16px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;padding:20px 18px}
-.modal h3{font-size:15px;font-weight:800;color:#27302f;margin-bottom:4px}
-.modal .sub{font-size:12px;color:#90a0a0;margin-bottom:16px}
-.modal .acts{display:flex;gap:10px;margin-top:18px}
-.modal .acts .btn{flex:1;text-align:center}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;padding:22px 20px}
+.modal h3{font-size:16px;font-weight:800;color:#27302f;margin-bottom:4px}
+.modal .sub{font-size:13px;color:#90a0a0;margin-bottom:16px}
+.modal .acts{display:flex;gap:10px;margin-top:18px}.modal .acts .btn{flex:1;text-align:center}
 
 /* Toast */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:13px 26px;border-radius:12px;font:600 14px/1 'Noto Sans JP';z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:15px 30px;border-radius:12px;font:700 16px/1 'Noto Sans JP';z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.18)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{background:#0d9488;color:#fff}.toast.err{background:#dc2626;color:#fff}
-.hide{display:none!important}
 </style>
 </head>
 <body>
@@ -114,87 +118,82 @@ body{font-family:'Noto Sans JP',sans-serif;background:#f4f6f7;color:#16201f;min-
   </div>
 </div>
 
-<div class="tabs">
-  <div class="tab on" id="tabRec" onclick="switchTab('rec')">記録</div>
-  <div class="tab" id="tabList" onclick="switchTab('list')">一覧・出力</div>
-</div>
+<div class="kiosk">
 
-<!-- ===== 記録タブ ===== -->
-<div class="main" id="viewRec">
-  <div class="card">
+  <!-- ===== 左：記録 ===== -->
+  <div class="pane">
     <h2>🍶 チェックを記録</h2>
-    <div class="row2">
-      <div class="field"><label>日付</label><input type="date" id="f_date" onchange="loadDay($('f_date').value)"></div>
-      <div class="field"><label>運転者</label><select id="f_driver"><option value="">選択</option></select></div>
-    </div>
-    <div class="field"><label>車両（任意）</label><select id="f_vehicle"><option value="">－</option></select></div>
 
-    <div class="field">
+    <div class="selbar none" id="selbar">
+      <span class="lab">運転者</span>
+      <span class="who" id="selWho">下から名前を選んでください</span>
+      <span class="clr hide" id="selClr" onclick="clearSel()">変更</span>
+    </div>
+
+    <div id="driverGrid"><div class="empty">読み込み中...</div></div>
+
+    <div class="field" style="margin-top:16px">
       <label>酒気帯び</label>
-      <div class="seg danger" id="segAlcohol">
+      <div class="seg danger big" id="segAlcohol">
         <button type="button" class="on" data-v="無" onclick="segPick('segAlcohol',this)">無</button>
         <button type="button" data-v="有" onclick="segPick('segAlcohol',this)">有</button>
       </div>
     </div>
 
-    <span class="detail-toggle" onclick="toggleDetail()">＋ 詳細（検知器・対面・指示）</span>
+    <span class="detail-toggle" onclick="toggleDetail()">＋ 詳細（車両・確認者・検知器・対面・指示）</span>
     <div id="detailBox">
-      <div class="field">
-        <label>確認者</label>
-        <select id="f_checker"></select>
+      <div class="row2">
+        <div class="field"><label>車両（任意）</label><select id="f_vehicle"><option value="">－</option></select></div>
+        <div class="field"><label>確認者</label><select id="f_checker"></select></div>
       </div>
-      <div class="field">
-        <label>アルコール検知器の使用</label>
-        <div class="seg" id="segDetector">
-          <button type="button" class="on" data-v="有" onclick="segPick('segDetector',this)">有</button>
-          <button type="button" data-v="無" onclick="segPick('segDetector',this)">無</button>
+      <div class="row2">
+        <div class="field"><label>検知器の使用</label>
+          <div class="seg" id="segDetector">
+            <button type="button" class="on" data-v="有" onclick="segPick('segDetector',this)">有</button>
+            <button type="button" data-v="無" onclick="segPick('segDetector',this)">無</button>
+          </div>
         </div>
-      </div>
-      <div class="field">
-        <label>確認方法</label>
-        <div class="seg" id="segFace">
-          <button type="button" class="on" data-v="対面" onclick="segPick('segFace',this);onFaceChange()">対面</button>
-          <button type="button" data-v="非対面" onclick="segPick('segFace',this);onFaceChange()">非対面</button>
+        <div class="field"><label>確認方法</label>
+          <div class="seg" id="segFace">
+            <button type="button" class="on" data-v="対面" onclick="segPick('segFace',this);onFaceChange()">対面</button>
+            <button type="button" data-v="非対面" onclick="segPick('segFace',this);onFaceChange()">非対面</button>
+          </div>
         </div>
       </div>
       <div class="field hide" id="methodField"><label>対面以外の具体的方法</label><input id="f_method" placeholder="例: 電話＋検知器の写真確認"></div>
       <div class="field"><label>指示事項</label><input id="f_instruction" placeholder="酒気帯び時など"></div>
-      <div class="field"><label>その他・備考</label><input id="f_note" placeholder=""></div>
+      <div class="field"><label>その他・備考</label><input id="f_note"></div>
     </div>
 
     <div class="commit">
-      <button class="pre" id="btnPre" onclick="record('運転前')">運転前を記録</button>
-      <button class="post" id="btnPost" onclick="record('運転後')">運転後を記録</button>
+      <button class="pre" id="btnPre" onclick="record('運転前')">運転前</button>
+      <button class="post" id="btnPost" onclick="record('運転後')">運転後</button>
     </div>
   </div>
 
-  <div class="card">
-    <h2>📋 <span id="recDayLabel">本日</span>の記録</h2>
-    <div id="recList"><div class="empty">読み込み中...</div></div>
-  </div>
-</div>
+  <!-- ===== 右：本日の状況 ===== -->
+  <div class="pane">
+    <h2>📋 実施状況</h2>
+    <div class="dayhead">
+      <div class="field"><label>表示日</label><input type="date" id="f_date" onchange="loadDay($('f_date').value)"></div>
+    </div>
+    <div id="dayMtx"><div class="empty">読み込み中...</div></div>
 
-<!-- ===== 一覧タブ ===== -->
-<div class="main hide" id="viewList">
-  <div class="card">
-    <h2>📅 日別の実施状況</h2>
-    <div class="field"><label>日付</label><input type="date" id="l_date" onchange="loadMatrix($('l_date').value)"></div>
-    <div id="matrixBox"><div class="empty">読み込み中...</div></div>
-  </div>
-  <div class="card">
+    <div class="divider"></div>
     <h2>📤 月次CSV出力（保存用）</h2>
     <div class="csvbar">
-      <div class="field"><label>対象月</label><input type="month" id="l_month"></div>
+      <div class="field"><label>対象月</label><input type="month" id="f_month"></div>
       <button class="btn" onclick="exportCsv()">CSV出力</button>
     </div>
-    <p style="font-size:11px;color:#90a0a0;margin-top:10px">法定記録事項（確認者・運転者・車両・日時・確認方法・酒気帯びの有無・指示事項）を含みます。1年間保存してください。</p>
+    <p class="note">法定記録事項（確認者・運転者・車両・日時・確認方法・酒気帯びの有無・指示事項）を含みます。1年間保存してください。</p>
   </div>
+
 </div>
 
 <!-- 編集モーダル -->
 <div class="ovl" id="editOvl">
   <div class="modal">
-    <h3 id="m_title">記録の編集</h3>
+    <h3>記録の編集</h3>
     <div class="sub" id="m_sub"></div>
     <div class="row2">
       <div class="field"><label>区分</label>
@@ -243,9 +242,9 @@ const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO8
 const $=id=>document.getElementById(id);
 
 let drivers=[], vehicles=[], checkerDefault='杉山雄一';
-let records=[];        // 記録タブの対象日
-let curEdit=null;      // 編集中レコード
-let busy=false;        // 連打防止
+let records=[];      // 表示日の記録
+let selDriver=null;  // 選択中の運転者
+let curEdit=null, busy=false;
 
 function toast(msg,ok=true){const t=$('toast');t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(()=>t.classList.remove('show'),2300);}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -253,88 +252,111 @@ function pad(n){return n<10?'0'+n:''+n;}
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function monthStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);}
 function nowHHMM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes());}
-// GASがtimeを時刻値として返すと "1899-12-30T..." のISOになる事がある。HH:mmへ正規化。
-function fmtTime(t){
-  if(!t)return'';
-  t=String(t);
-  if(/^\d{1,2}:\d{2}/.test(t))return t.slice(0,5);
-  const d=new Date(t);
-  if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);
-  return t;
-}
+function fmtTime(t){if(!t)return'';t=String(t);if(/^\d{1,2}:\d{2}/.test(t))return t.slice(0,5);const d=new Date(t);if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return t;}
 
 async function apiGet(params){const url=API+'?dept=alcohol&'+new URLSearchParams(params);const r=await fetch(url);return r.json();}
 function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'alcohol',...body})});}
 
-/* segmented control */
 function segPick(segId,btn){[...$(segId).children].forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
 function segVal(segId){const on=$(segId).querySelector('.on');return on?on.dataset.v:'';}
 function segSet(segId,v){[...$(segId).children].forEach(b=>b.classList.toggle('on',b.dataset.v===v));}
-
 function toggleDetail(){$('detailBox').classList.toggle('open');}
 function onFaceChange(){$('methodField').classList.toggle('hide',segVal('segFace')!=='非対面');}
-
-function fillSelect(sel,arr,blank){
-  const v=sel.value;
-  sel.innerHTML=(blank?'<option value="">'+blank+'</option>':'')+arr.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
-  if([...sel.options].some(o=>o.value===v))sel.value=v;
-}
+function fillSelect(sel,arr,blank){const v=sel.value;sel.innerHTML=(blank?'<option value="">'+blank+'</option>':'')+arr.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');if([...sel.options].some(o=>o.value===v))sel.value=v;}
 
 async function boot(){
   $('f_date').value=todayStr();
-  $('l_date').value=todayStr();
-  $('l_month').value=monthStr();
+  $('f_month').value=monthStr();
   $('hdrDate').textContent=todayStr().replace(/-/g,'/');
   try{
     const b=await apiGet({action:'bootstrap'});
-    drivers=b.drivers||[]; vehicles=b.vehicles||[]; checkerDefault=b.checker||'杉山雄一';
+    drivers=(b.drivers||[]).map(d=>typeof d==='string'?{name:d,proj:1}:d);
+    vehicles=b.vehicles||[]; checkerDefault=b.checker||'杉山雄一';
   }catch(e){drivers=[];vehicles=[];}
   const vehNames=vehicles.map(v=>v.plate?`${v.name}（${v.plate}）`:v.name);
-  const checkerOpts=Array.from(new Set([checkerDefault,...drivers]));
-  fillSelect($('f_driver'),drivers,'選択');
+  const checkerOpts=Array.from(new Set([checkerDefault,...drivers.map(d=>d.name)]));
   fillSelect($('f_vehicle'),vehNames,'－');
   fillSelect($('f_checker'),checkerOpts,'');
   fillSelect($('m_vehicle'),vehNames,'－');
   fillSelect($('m_checker'),checkerOpts,'');
   $('f_checker').value=checkerDefault;
-  loadDay($('f_date').value);
+  await loadDay($('f_date').value);
 }
 
 async function loadDay(date){
-  $('recDayLabel').textContent=(date===todayStr())?'本日':date.replace(/-/g,'/');
-  $('recList').innerHTML='<div class="empty">読み込み中...</div>';
+  $('dayMtx').innerHTML='<div class="empty">読み込み中...</div>';
   try{const r=await apiGet({action:'list',date});records=(r.data||[]);}catch(e){records=[];}
-  renderRecList();
+  renderDrivers(); renderToday();
 }
 
-function renderRecList(){
-  const el=$('recList');
-  if(!records.length){el.innerHTML='<div class="empty">まだ記録がありません</div>';return;}
-  const sorted=[...records].sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
-  el.innerHTML=sorted.map(r=>{
-    const pre=r.phase==='運転前';
+// 当日の各運転者の達成状況（前/後）を返す
+function statusOf(name){
+  let pre=false,post=false;
+  records.forEach(r=>{if(r.driver===name){if(r.phase==='運転前')pre=true;if(r.phase==='運転後')post=true;}});
+  return pre&&post?'full':(pre||post?'half':'');
+}
+
+function renderDrivers(){
+  const el=$('driverGrid');
+  if(!drivers.length){el.innerHTML='<div class="empty">運転者がいません</div>';return;}
+  const proj=drivers.filter(d=>d.proj===0), other=drivers.filter(d=>d.proj!==0);
+  const btn=d=>{
+    const st=statusOf(d.name);
+    const mark=st==='full'?'<span class="st full">✓</span>':(st==='half'?'<span class="st half">•</span>':'');
+    return `<button class="namebtn${d.proj===0?' proj':''}${selDriver===d.name?' sel':''}" onclick="selectDriver('${esc(d.name)}')">${esc(d.name)}${mark}</button>`;
+  };
+  let html='';
+  if(proj.length){html+=`<div class="gl">企画制作部</div><div class="ngrid">${proj.map(btn).join('')}</div>`;}
+  if(other.length){html+=`<div class="gl">その他</div><div class="ngrid">${other.map(btn).join('')}</div>`;}
+  el.innerHTML=html;
+}
+
+function selectDriver(name){
+  selDriver=name;
+  $('selbar').classList.remove('none');
+  $('selWho').textContent=name;
+  $('selClr').classList.remove('hide');
+  renderDrivers();
+}
+function clearSel(){
+  selDriver=null;
+  $('selbar').classList.add('none');
+  $('selWho').textContent='下から名前を選んでください';
+  $('selClr').classList.add('hide');
+  segSet('segAlcohol','無');$('f_instruction').value='';$('f_note').value='';
+  renderDrivers();
+}
+
+function renderToday(){
+  const el=$('dayMtx');
+  if(!records.length){el.innerHTML='<div class="empty">この日の記録はまだありません</div>';return;}
+  const byD={};
+  records.forEach(r=>{(byD[r.driver]=byD[r.driver]||{})[r.phase]=r;});
+  const order=drivers.map(d=>d.name);
+  const projSet=new Set(drivers.filter(d=>d.proj===0).map(d=>d.name));
+  const names=Object.keys(byD).sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?999:ia)-(ib<0?999:ib);});
+  const cell=r=>{
+    if(!r)return '<td class="cell-none">—</td>';
     const ng=r.alcohol==='有';
-    return `<div class="rec${r._optimistic?' optimistic':''}" onclick="openEdit('${r.id}')">
-      <span class="ph ${pre?'pre':'post'}">${esc(r.phase)}</span>
-      <span class="nm">${esc(r.driver)}</span>
-      <span class="tm">${esc(fmtTime(r.time))}</span>
-      <span class="al ${ng?'ng':'ok'}">酒気${esc(r.alcohol||'無')}</span>
-    </div>`;
-  }).join('');
+    return `<td class="cell-done ${ng?'ng':'ok'}" onclick="openEdit('${r.id}')">${esc(fmtTime(r.time)||'✓')}<span class="small">酒気${esc(r.alcohol||'無')}</span></td>`;
+  };
+  el.innerHTML=`<table class="mtx"><thead><tr><th>運転者</th><th>運転前</th><th>運転後</th><th>確認者</th></tr></thead><tbody>${
+    names.map(n=>{const d=byD[n];const chk=(d['運転前']||d['運転後']||{}).checker||'';
+      return `<tr><td class="nm${projSet.has(n)?' proj':''}">${esc(n)}</td>${cell(d['運転前'])}${cell(d['運転後'])}<td>${esc(chk)}</td></tr>`;}).join('')
+  }</tbody></table>`;
 }
 
 function record(phase){
   if(busy)return;
-  const driver=$('f_driver').value;
-  if(!driver){toast('運転者を選択してください',false);return;}
+  if(!selDriver){toast('運転者を選んでください',false);return;}
   const alcohol=segVal('segAlcohol');
   if(alcohol==='有' && !$('f_instruction').value.trim()){
-    $('detailBox').classList.add('open');
-    $('f_instruction').focus();
+    $('detailBox').classList.add('open');$('f_instruction').focus();
     toast('酒気帯び「有」です。指示事項を入力してください',false);return;
   }
   busy=true;setTimeout(()=>busy=false,1500);
   const date=$('f_date').value||todayStr();
+  const driver=selDriver;
   const tmpId='tmp_'+Date.now();
   const rec={id:tmpId,date,driver,vehicle:$('f_vehicle').value,phase,time:nowHHMM(),
     checker:$('f_checker').value||checkerDefault,detector_used:segVal('segDetector'),
@@ -342,11 +364,9 @@ function record(phase){
     alcohol,instruction:$('f_instruction').value.trim(),note:$('f_note').value.trim()};
   apiPost({action:'save',...rec});
   records.push({...rec,_optimistic:true});
-  renderRecList();
   toast(`${driver}・${phase}を記録`);
-  // 次の人へ（運転者と酒気帯び・指示はリセット、日付/確認者は維持）
-  $('f_driver').value='';$('f_vehicle').value='';
-  segSet('segAlcohol','無');$('f_instruction').value='';$('f_note').value='';
+  clearSel();              // 次の人へ
+  renderToday();
   setTimeout(()=>loadDay($('f_date').value),3000);
 }
 
@@ -379,7 +399,7 @@ function saveEdit(){
     instruction:$('m_instruction').value.trim(),note:$('m_note').value.trim()};
   apiPost({action:'save',...upd});
   Object.assign(curEdit,upd);
-  renderRecList();closeEdit();toast('更新しました');
+  renderDrivers();renderToday();closeEdit();toast('更新しました');
   setTimeout(()=>loadDay($('f_date').value),3000);
 }
 function delRecord(){
@@ -388,37 +408,13 @@ function delRecord(){
   busy=true;setTimeout(()=>busy=false,1500);
   apiPost({action:'delete',id:curEdit.id});
   records=records.filter(x=>x.id!==curEdit.id);
-  renderRecList();closeEdit();toast('削除しました');
+  renderDrivers();renderToday();closeEdit();toast('削除しました');
   setTimeout(()=>loadDay($('f_date').value),3000);
-}
-
-/* ===== 一覧（マトリクス） ===== */
-async function loadMatrix(date){
-  $('matrixBox').innerHTML='<div class="empty">読み込み中...</div>';
-  let data=[];
-  try{const r=await apiGet({action:'list',date});data=r.data||[];}catch(e){}
-  renderMatrix(data);
-}
-function renderMatrix(data){
-  const el=$('matrixBox');
-  if(!data.length){el.innerHTML='<div class="empty">この日の記録はありません</div>';return;}
-  const byDriver={};
-  data.forEach(r=>{(byDriver[r.driver]=byDriver[r.driver]||{})[r.phase]=r;});
-  const names=Object.keys(byDriver).sort((a,b)=>a.localeCompare(b,'ja'));
-  const cell=r=>{
-    if(!r)return '<td class="cell-none">—</td>';
-    const ng=r.alcohol==='有';
-    return `<td class="cell-done ${ng?'ng':'ok'}">${esc(fmtTime(r.time)||'✓')}<span class="small">酒気${esc(r.alcohol||'無')}</span></td>`;
-  };
-  el.innerHTML=`<table class="mtx"><thead><tr><th>運転者</th><th>運転前</th><th>運転後</th><th>確認者</th></tr></thead><tbody>${
-    names.map(n=>{const d=byDriver[n];const chk=(d['運転前']||d['運転後']||{}).checker||'';
-      return `<tr><td class="nm">${esc(n)}</td>${cell(d['運転前'])}${cell(d['運転後'])}<td>${esc(chk)}</td></tr>`;}).join('')
-  }</tbody></table>`;
 }
 
 /* ===== CSV ===== */
 async function exportCsv(){
-  const ym=$('l_month').value;
+  const ym=$('f_month').value;
   if(!ym){toast('対象月を選んでください',false);return;}
   toast('集計中...');
   let data=[];
@@ -430,23 +426,12 @@ async function exportCsv(){
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
   const csv='﻿'+[head,...rows].map(row=>row.map(q).join(',')).join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='アルコールチェック_'+ym+'.csv';
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='アルコールチェック_'+ym+'.csv';
   document.body.appendChild(a);a.click();a.remove();
   toast('CSVを出力しました（'+data.length+'件）');
 }
 
-/* ===== タブ ===== */
-function switchTab(t){
-  $('tabRec').classList.toggle('on',t==='rec');
-  $('tabList').classList.toggle('on',t==='list');
-  $('viewRec').classList.toggle('hide',t!=='rec');
-  $('viewList').classList.toggle('hide',t!=='list');
-  if(t==='list')loadMatrix($('l_date').value);
-}
-function reloadAll(){boot();if(!$('viewList').classList.contains('hide'))loadMatrix($('l_date').value);toast('更新しました');}
-
+function reloadAll(){boot();toast('更新しました');}
 boot();
 </script>
 </body>
