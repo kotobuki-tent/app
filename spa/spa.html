@@ -5006,7 +5006,7 @@ const Labor = (function(){
     }
     if(!list.length){$('laborContent').innerHTML=chipHtml+'<div class="empty-msg">該当する案件がありません</div>';return}
     let h=chipHtml+'<div style="overflow-x:auto"><table class="jobs"><thead><tr>';
-    h+='<th>見積番号</th><th>受注番号</th><th>案件名</th><th>ステータス</th><th>納期</th><th class="num">延べ工数</th><th class="num">人数</th>';
+    h+='<th>見積番号</th><th>受注番号</th><th>案件名</th><th>ステータス</th><th>納期</th><th class="num">延べ工数</th><th class="num">人数</th>'+((isArchive||isLaborArc)?'<th>操作</th>':'');
     h+='</tr></thead><tbody>';
     list.forEach(j=>{
       h+=`<tr onclick="Labor.showDetail('${esc(j.id)}')">
@@ -5017,6 +5017,7 @@ const Labor = (function(){
         <td>${esc(j.deadline||'')}</td>
         <td class="num"><strong>${fmtMin(j.total_minutes)}</strong></td>
         <td class="num">${j.people_count||0}人</td>
+        ${(isArchive||isLaborArc)?`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="event.stopPropagation();Labor.setArchive('${esc(j.id)}',${isLaborArc?'false':'true'})">${isLaborArc?'アーカイブ解除':'アーカイブへ'}</button></td>`:''}
       </tr>`;
     });
     h+='</tbody></table></div>';
@@ -5036,6 +5037,7 @@ const Labor = (function(){
           <span class="jc-mins">${fmtMin(j.total_minutes)}<small>延べ工数</small></span>
           <span class="jc-ppl">${j.people_count||0}人</span>
         </div>
+        ${(isArchive||isLaborArc)?`<div style="margin-top:8px"><button class="act-btn" onclick="event.stopPropagation();Labor.setArchive('${esc(j.id)}',${isLaborArc?'false':'true'})">${isLaborArc?'アーカイブ解除':'アーカイブへ'}</button></div>`:''}
       </div>`;
     });
     h+='</div>';
@@ -5060,14 +5062,18 @@ const Labor = (function(){
   }
   function closeDetail(){$('detailModal').classList.remove('show')}
   function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
-  function toggleArchive(){
+  function setArchive(id,on){
     if(_arcBusy)return;_arcBusy=true;setTimeout(()=>_arcBusy=false,1500);
-    const job=allJobs.find(x=>String(x.id)===String(detailId));if(!job){_arcBusy=false;return}
-    const on=!(String(job.labor_archived||'').toUpperCase()==='TRUE');
+    const job=allJobs.find(x=>String(x.id)===String(id));if(!job){_arcBusy=false;return}
     job.labor_archived=on?'TRUE':'';
     fireAndForget({dept:'labor',action:on?'archive':'unarchive',id:job.id});
-    closeDetail();renderTable();toast(on?'工数アーカイブへ移動しました':'アーカイブ解除しました');
+    renderTable();toast(on?'工数アーカイブへ移動しました':'アーカイブ解除しました');
     setTimeout(loadAll,3000);
+  }
+  function toggleArchive(){
+    const job=allJobs.find(x=>String(x.id)===String(detailId));if(!job)return;
+    const on=!(String(job.labor_archived||'').toUpperCase()==='TRUE');
+    closeDetail();setArchive(detailId,on);
   }
 
   // ===== init =====
@@ -5081,7 +5087,7 @@ const Labor = (function(){
   return {
     loadAll, init,
     setView, setStFilter, openSlog, closeSlog,
-    showDetail, closeDetail, toggleArchive, renderTable
+    showDetail, closeDetail, toggleArchive, setArchive, renderTable
   };
 })();
 
