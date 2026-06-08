@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>アルコールチェック – 業務管理</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='56' fill='%230d9488'/><text x='90' y='132' text-anchor='middle' font-family='serif' font-weight='900' font-size='104' fill='%23042f2c'>酒</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='10' fill='%230d9488'/><text x='16' y='24' text-anchor='middle' font-family='serif' font-weight='900' font-size='19' fill='%23042f2c'>酒</text></svg>">
+<meta name="theme-color" content="#0d9488">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;scrollbar-gutter:stable}
+body{font-family:'Noto Sans JP',sans-serif;background:#f4f6f7;color:#16201f;min-height:100vh;min-height:100dvh}
+
+/* Header */
+.hdr{background:#0d9488;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.hdr h1{font-size:16px;font-weight:900;color:#042f2c;letter-spacing:.04em}
+.hdr .right{display:flex;align-items:center;gap:10px}
+.hdr .today{font:600 12px/1 'Noto Sans JP',sans-serif;color:rgba(4,47,44,.8)}
+.hdr .refresh{background:rgba(4,47,44,.12);border:1px solid rgba(4,47,44,.25);color:#042f2c;font:600 12px/1 'Noto Sans JP';border-radius:7px;padding:7px 11px;cursor:pointer}
+.hdr .refresh:active{transform:scale(.96)}
+
+/* Tabs */
+.tabs{display:flex;background:#fff;border-bottom:1px solid #e3e7e8;position:sticky;top:48px;z-index:19}
+.tab{flex:1;text-align:center;padding:13px 0;font:700 14px/1 'Noto Sans JP';color:#90a0a0;cursor:pointer;border-bottom:3px solid transparent}
+.tab.on{color:#0d9488;border-bottom-color:#0d9488}
+
+.main{padding:16px 14px 110px;max-width:760px;margin:0 auto}
+.card{background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:14px}
+.card h2{font-size:14px;font-weight:700;color:#2a3a39;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:#7c8c8b;margin-bottom:5px;letter-spacing:.02em}
+.field input,.field select,.field textarea{width:100%;padding:13px 14px;border:2px solid #e6eaea;border-radius:10px;font:400 16px/1.4 'Noto Sans JP';color:#16201f;background:#fafcfc;-webkit-appearance:none;appearance:none;transition:.15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#0d9488;background:#fff;box-shadow:0 0 0 4px rgba(13,148,136,.1)}
+.field textarea{min-height:64px;resize:vertical}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' fill='none' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.row2{display:flex;gap:10px}
+.row2>.field{flex:1;margin-bottom:14px}
+
+/* Segmented */
+.seg{display:flex;gap:0;border:2px solid #e6eaea;border-radius:10px;overflow:hidden}
+.seg button{flex:1;padding:12px 0;border:none;background:#fafcfc;font:700 14px/1 'Noto Sans JP';color:#7c8c8b;cursor:pointer;transition:.12s}
+.seg button+button{border-left:2px solid #e6eaea}
+.seg button.on{background:#0d9488;color:#fff}
+.seg.danger button.on{background:#dc2626}
+
+.detail-toggle{font-size:12px;font-weight:600;color:#0d9488;cursor:pointer;display:inline-block;margin:2px 0 12px}
+.detail-toggle:hover{text-decoration:underline}
+#detailBox{display:none}
+#detailBox.open{display:block}
+
+/* Commit buttons */
+.commit{display:flex;gap:10px;margin-top:4px}
+.commit button{flex:1;padding:16px 0;border:none;border-radius:12px;font:800 16px/1 'Noto Sans JP';cursor:pointer;letter-spacing:.04em;transition:.12s;color:#fff}
+.commit .pre{background:#0d9488}
+.commit .post{background:#0369a1}
+.commit button:active{transform:scale(.97)}
+.commit button:disabled{background:#bcc8c7;cursor:not-allowed}
+
+/* Record cards */
+.rec{display:flex;align-items:center;gap:10px;padding:11px 12px;background:#fafcfc;border:1px solid #e6eaea;border-radius:10px;margin-bottom:8px;cursor:pointer}
+.rec.optimistic{opacity:.65;border-style:dashed}
+.rec .ph{font:700 11px/1 'Noto Sans JP';padding:4px 7px;border-radius:5px;white-space:nowrap;color:#fff}
+.rec .ph.pre{background:#0d9488}.rec .ph.post{background:#0369a1}
+.rec .nm{font-size:14px;font-weight:600;color:#27302f;flex:1}
+.rec .tm{font-size:12px;color:#90a0a0}
+.rec .al{font:700 11px/1 'Noto Sans JP';padding:4px 7px;border-radius:5px;white-space:nowrap}
+.rec .al.ok{background:#dcfce7;color:#15803d}
+.rec .al.ng{background:#fee2e2;color:#b91c1c}
+
+/* Matrix */
+.mtx{width:100%;border-collapse:collapse;font-size:13px}
+.mtx th,.mtx td{border:1px solid #e3e7e8;padding:9px 8px;text-align:center}
+.mtx th{background:#f0f4f4;color:#5c6c6b;font-weight:700;font-size:12px}
+.mtx td.nm{text-align:left;font-weight:600;color:#27302f;white-space:nowrap}
+.mtx .cell-done{font-weight:700}
+.mtx .cell-done.ng{color:#b91c1c}
+.mtx .cell-done.ok{color:#0d9488}
+.mtx .cell-none{color:#cdd6d5}
+.mtx .small{display:block;font-size:10px;font-weight:400;color:#90a0a0}
+
+.empty{text-align:center;padding:22px;color:#b6c0bf;font-size:13px}
+.csvbar{display:flex;gap:10px;align-items:flex-end}
+.csvbar .field{flex:1;margin-bottom:0}
+.btn{padding:13px 16px;border:none;border-radius:10px;font:700 14px/1 'Noto Sans JP';cursor:pointer;background:#0d9488;color:#fff;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn.gray{background:#64748b}
+
+/* Modal */
+.ovl{position:fixed;inset:0;background:rgba(10,20,19,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:18px}
+.ovl.show{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;padding:20px 18px}
+.modal h3{font-size:15px;font-weight:800;color:#27302f;margin-bottom:4px}
+.modal .sub{font-size:12px;color:#90a0a0;margin-bottom:16px}
+.modal .acts{display:flex;gap:10px;margin-top:18px}
+.modal .acts .btn{flex:1;text-align:center}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:13px 26px;border-radius:12px;font:600 14px/1 'Noto Sans JP';z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#0d9488;color:#fff}.toast.err{background:#dc2626;color:#fff}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>アルコールチェック</h1>
+  <div class="right">
+    <span class="today" id="hdrDate"></span>
+    <button class="refresh" onclick="reloadAll()">↻ 更新</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab on" id="tabRec" onclick="switchTab('rec')">記録</div>
+  <div class="tab" id="tabList" onclick="switchTab('list')">一覧・出力</div>
+</div>
+
+<!-- ===== 記録タブ ===== -->
+<div class="main" id="viewRec">
+  <div class="card">
+    <h2>🍶 チェックを記録</h2>
+    <div class="row2">
+      <div class="field"><label>日付</label><input type="date" id="f_date" onchange="loadDay($('f_date').value)"></div>
+      <div class="field"><label>運転者</label><select id="f_driver"><option value="">選択</option></select></div>
+    </div>
+    <div class="field"><label>車両（任意）</label><select id="f_vehicle"><option value="">－</option></select></div>
+
+    <div class="field">
+      <label>酒気帯び</label>
+      <div class="seg danger" id="segAlcohol">
+        <button type="button" class="on" data-v="無" onclick="segPick('segAlcohol',this)">無</button>
+        <button type="button" data-v="有" onclick="segPick('segAlcohol',this)">有</button>
+      </div>
+    </div>
+
+    <span class="detail-toggle" onclick="toggleDetail()">＋ 詳細（検知器・対面・指示）</span>
+    <div id="detailBox">
+      <div class="field">
+        <label>確認者</label>
+        <select id="f_checker"></select>
+      </div>
+      <div class="field">
+        <label>アルコール検知器の使用</label>
+        <div class="seg" id="segDetector">
+          <button type="button" class="on" data-v="有" onclick="segPick('segDetector',this)">有</button>
+          <button type="button" data-v="無" onclick="segPick('segDetector',this)">無</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>確認方法</label>
+        <div class="seg" id="segFace">
+          <button type="button" class="on" data-v="対面" onclick="segPick('segFace',this);onFaceChange()">対面</button>
+          <button type="button" data-v="非対面" onclick="segPick('segFace',this);onFaceChange()">非対面</button>
+        </div>
+      </div>
+      <div class="field hide" id="methodField"><label>対面以外の具体的方法</label><input id="f_method" placeholder="例: 電話＋検知器の写真確認"></div>
+      <div class="field"><label>指示事項</label><input id="f_instruction" placeholder="酒気帯び時など"></div>
+      <div class="field"><label>その他・備考</label><input id="f_note" placeholder=""></div>
+    </div>
+
+    <div class="commit">
+      <button class="pre" id="btnPre" onclick="record('運転前')">運転前を記録</button>
+      <button class="post" id="btnPost" onclick="record('運転後')">運転後を記録</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📋 <span id="recDayLabel">本日</span>の記録</h2>
+    <div id="recList"><div class="empty">読み込み中...</div></div>
+  </div>
+</div>
+
+<!-- ===== 一覧タブ ===== -->
+<div class="main hide" id="viewList">
+  <div class="card">
+    <h2>📅 日別の実施状況</h2>
+    <div class="field"><label>日付</label><input type="date" id="l_date" onchange="loadMatrix($('l_date').value)"></div>
+    <div id="matrixBox"><div class="empty">読み込み中...</div></div>
+  </div>
+  <div class="card">
+    <h2>📤 月次CSV出力（保存用）</h2>
+    <div class="csvbar">
+      <div class="field"><label>対象月</label><input type="month" id="l_month"></div>
+      <button class="btn" onclick="exportCsv()">CSV出力</button>
+    </div>
+    <p style="font-size:11px;color:#90a0a0;margin-top:10px">法定記録事項（確認者・運転者・車両・日時・確認方法・酒気帯びの有無・指示事項）を含みます。1年間保存してください。</p>
+  </div>
+</div>
+
+<!-- 編集モーダル -->
+<div class="ovl" id="editOvl">
+  <div class="modal">
+    <h3 id="m_title">記録の編集</h3>
+    <div class="sub" id="m_sub"></div>
+    <div class="row2">
+      <div class="field"><label>区分</label>
+        <div class="seg" id="m_phase">
+          <button type="button" data-v="運転前" onclick="segPick('m_phase',this)">運転前</button>
+          <button type="button" data-v="運転後" onclick="segPick('m_phase',this)">運転後</button>
+        </div>
+      </div>
+      <div class="field"><label>時刻</label><input id="m_time" placeholder="HH:MM"></div>
+    </div>
+    <div class="field"><label>車両</label><select id="m_vehicle"><option value="">－</option></select></div>
+    <div class="field"><label>酒気帯び</label>
+      <div class="seg danger" id="m_alcohol">
+        <button type="button" data-v="無" onclick="segPick('m_alcohol',this)">無</button>
+        <button type="button" data-v="有" onclick="segPick('m_alcohol',this)">有</button>
+      </div>
+    </div>
+    <div class="field"><label>確認者</label><select id="m_checker"></select></div>
+    <div class="field"><label>検知器の使用</label>
+      <div class="seg" id="m_detector">
+        <button type="button" data-v="有" onclick="segPick('m_detector',this)">有</button>
+        <button type="button" data-v="無" onclick="segPick('m_detector',this)">無</button>
+      </div>
+    </div>
+    <div class="field"><label>確認方法</label>
+      <div class="seg" id="m_face">
+        <button type="button" data-v="対面" onclick="segPick('m_face',this)">対面</button>
+        <button type="button" data-v="非対面" onclick="segPick('m_face',this)">非対面</button>
+      </div>
+    </div>
+    <div class="field"><label>対面以外の方法</label><input id="m_method"></div>
+    <div class="field"><label>指示事項</label><input id="m_instruction"></div>
+    <div class="field"><label>その他・備考</label><input id="m_note"></div>
+    <div class="acts">
+      <button class="btn gray" onclick="delRecord()">削除</button>
+      <button class="btn" onclick="saveEdit()">保存</button>
+    </div>
+    <div style="text-align:center;margin-top:12px"><span class="detail-toggle" onclick="closeEdit()">閉じる</span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+const $=id=>document.getElementById(id);
+
+let drivers=[], vehicles=[], checkerDefault='杉山雄一';
+let records=[];        // 記録タブの対象日
+let curEdit=null;      // 編集中レコード
+let busy=false;        // 連打防止
+
+function toast(msg,ok=true){const t=$('toast');t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(()=>t.classList.remove('show'),2300);}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function pad(n){return n<10?'0'+n:''+n;}
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function monthStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);}
+function nowHHMM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes());}
+
+async function apiGet(params){const url=API+'?dept=alcohol&'+new URLSearchParams(params);const r=await fetch(url);return r.json();}
+function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'alcohol',...body})});}
+
+/* segmented control */
+function segPick(segId,btn){[...$(segId).children].forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+function segVal(segId){const on=$(segId).querySelector('.on');return on?on.dataset.v:'';}
+function segSet(segId,v){[...$(segId).children].forEach(b=>b.classList.toggle('on',b.dataset.v===v));}
+
+function toggleDetail(){$('detailBox').classList.toggle('open');}
+function onFaceChange(){$('methodField').classList.toggle('hide',segVal('segFace')!=='非対面');}
+
+function fillSelect(sel,arr,blank){
+  const v=sel.value;
+  sel.innerHTML=(blank?'<option value="">'+blank+'</option>':'')+arr.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+  if([...sel.options].some(o=>o.value===v))sel.value=v;
+}
+
+async function boot(){
+  $('f_date').value=todayStr();
+  $('l_date').value=todayStr();
+  $('l_month').value=monthStr();
+  $('hdrDate').textContent=todayStr().replace(/-/g,'/');
+  try{
+    const b=await apiGet({action:'bootstrap'});
+    drivers=b.drivers||[]; vehicles=b.vehicles||[]; checkerDefault=b.checker||'杉山雄一';
+  }catch(e){drivers=[];vehicles=[];}
+  const vehNames=vehicles.map(v=>v.plate?`${v.name}（${v.plate}）`:v.name);
+  const checkerOpts=Array.from(new Set([checkerDefault,...drivers]));
+  fillSelect($('f_driver'),drivers,'選択');
+  fillSelect($('f_vehicle'),vehNames,'－');
+  fillSelect($('f_checker'),checkerOpts,'');
+  fillSelect($('m_vehicle'),vehNames,'－');
+  fillSelect($('m_checker'),checkerOpts,'');
+  $('f_checker').value=checkerDefault;
+  loadDay($('f_date').value);
+}
+
+async function loadDay(date){
+  $('recDayLabel').textContent=(date===todayStr())?'本日':date.replace(/-/g,'/');
+  $('recList').innerHTML='<div class="empty">読み込み中...</div>';
+  try{const r=await apiGet({action:'list',date});records=(r.data||[]);}catch(e){records=[];}
+  renderRecList();
+}
+
+function renderRecList(){
+  const el=$('recList');
+  if(!records.length){el.innerHTML='<div class="empty">まだ記録がありません</div>';return;}
+  const sorted=[...records].sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
+  el.innerHTML=sorted.map(r=>{
+    const pre=r.phase==='運転前';
+    const ng=r.alcohol==='有';
+    return `<div class="rec${r._optimistic?' optimistic':''}" onclick="openEdit('${r.id}')">
+      <span class="ph ${pre?'pre':'post'}">${esc(r.phase)}</span>
+      <span class="nm">${esc(r.driver)}</span>
+      <span class="tm">${esc(r.time||'')}</span>
+      <span class="al ${ng?'ng':'ok'}">酒気${esc(r.alcohol||'無')}</span>
+    </div>`;
+  }).join('');
+}
+
+function record(phase){
+  if(busy)return;
+  const driver=$('f_driver').value;
+  if(!driver){toast('運転者を選択してください',false);return;}
+  const alcohol=segVal('segAlcohol');
+  if(alcohol==='有' && !$('f_instruction').value.trim()){
+    $('detailBox').classList.add('open');
+    $('f_instruction').focus();
+    toast('酒気帯び「有」です。指示事項を入力してください',false);return;
+  }
+  busy=true;setTimeout(()=>busy=false,1500);
+  const date=$('f_date').value||todayStr();
+  const tmpId='tmp_'+Date.now();
+  const rec={id:tmpId,date,driver,vehicle:$('f_vehicle').value,phase,time:nowHHMM(),
+    checker:$('f_checker').value||checkerDefault,detector_used:segVal('segDetector'),
+    face:segVal('segFace'),method:segVal('segFace')==='非対面'?$('f_method').value.trim():'',
+    alcohol,instruction:$('f_instruction').value.trim(),note:$('f_note').value.trim()};
+  apiPost({action:'save',...rec});
+  records.push({...rec,_optimistic:true});
+  renderRecList();
+  toast(`${driver}・${phase}を記録`);
+  // 次の人へ（運転者と酒気帯び・指示はリセット、日付/確認者は維持）
+  $('f_driver').value='';$('f_vehicle').value='';
+  segSet('segAlcohol','無');$('f_instruction').value='';$('f_note').value='';
+  setTimeout(()=>loadDay($('f_date').value),3000);
+}
+
+/* ===== 編集 ===== */
+function openEdit(id){
+  const r=records.find(x=>String(x.id)===String(id));
+  if(!r)return;
+  if(String(id).indexOf('tmp_')===0){toast('同期中です。数秒後に編集できます',false);return;}
+  curEdit=r;
+  $('m_sub').textContent=`${r.driver}　${(r.date||'').replace(/-/g,'/')}`;
+  segSet('m_phase',r.phase);
+  $('m_time').value=r.time||'';
+  $('m_vehicle').value=r.vehicle||'';
+  segSet('m_alcohol',r.alcohol||'無');
+  $('m_checker').value=r.checker||checkerDefault;
+  segSet('m_detector',r.detector_used||'有');
+  segSet('m_face',r.face||'対面');
+  $('m_method').value=r.method||'';
+  $('m_instruction').value=r.instruction||'';
+  $('m_note').value=r.note||'';
+  $('editOvl').classList.add('show');
+}
+function closeEdit(){$('editOvl').classList.remove('show');curEdit=null;}
+function saveEdit(){
+  if(busy||!curEdit)return;busy=true;setTimeout(()=>busy=false,1500);
+  const upd={id:curEdit.id,date:curEdit.date,driver:curEdit.driver,
+    phase:segVal('m_phase'),time:$('m_time').value.trim(),vehicle:$('m_vehicle').value,
+    alcohol:segVal('m_alcohol'),checker:$('m_checker').value,detector_used:segVal('m_detector'),
+    face:segVal('m_face'),method:segVal('m_face')==='非対面'?$('m_method').value.trim():'',
+    instruction:$('m_instruction').value.trim(),note:$('m_note').value.trim()};
+  apiPost({action:'save',...upd});
+  Object.assign(curEdit,upd);
+  renderRecList();closeEdit();toast('更新しました');
+  setTimeout(()=>loadDay($('f_date').value),3000);
+}
+function delRecord(){
+  if(busy||!curEdit)return;
+  if(!confirm(`${curEdit.driver}・${curEdit.phase}の記録を削除しますか？`))return;
+  busy=true;setTimeout(()=>busy=false,1500);
+  apiPost({action:'delete',id:curEdit.id});
+  records=records.filter(x=>x.id!==curEdit.id);
+  renderRecList();closeEdit();toast('削除しました');
+  setTimeout(()=>loadDay($('f_date').value),3000);
+}
+
+/* ===== 一覧（マトリクス） ===== */
+async function loadMatrix(date){
+  $('matrixBox').innerHTML='<div class="empty">読み込み中...</div>';
+  let data=[];
+  try{const r=await apiGet({action:'list',date});data=r.data||[];}catch(e){}
+  renderMatrix(data);
+}
+function renderMatrix(data){
+  const el=$('matrixBox');
+  if(!data.length){el.innerHTML='<div class="empty">この日の記録はありません</div>';return;}
+  const byDriver={};
+  data.forEach(r=>{(byDriver[r.driver]=byDriver[r.driver]||{})[r.phase]=r;});
+  const names=Object.keys(byDriver).sort((a,b)=>a.localeCompare(b,'ja'));
+  const cell=r=>{
+    if(!r)return '<td class="cell-none">—</td>';
+    const ng=r.alcohol==='有';
+    return `<td class="cell-done ${ng?'ng':'ok'}">${esc(r.time||'✓')}<span class="small">酒気${esc(r.alcohol||'無')}</span></td>`;
+  };
+  el.innerHTML=`<table class="mtx"><thead><tr><th>運転者</th><th>運転前</th><th>運転後</th><th>確認者</th></tr></thead><tbody>${
+    names.map(n=>{const d=byDriver[n];const chk=(d['運転前']||d['運転後']||{}).checker||'';
+      return `<tr><td class="nm">${esc(n)}</td>${cell(d['運転前'])}${cell(d['運転後'])}<td>${esc(chk)}</td></tr>`;}).join('')
+  }</tbody></table>`;
+}
+
+/* ===== CSV ===== */
+async function exportCsv(){
+  const ym=$('l_month').value;
+  if(!ym){toast('対象月を選んでください',false);return;}
+  toast('集計中...');
+  let data=[];
+  try{const r=await apiGet({action:'month',ym});data=r.data||[];}catch(e){toast('取得に失敗しました',false);return;}
+  if(!data.length){toast('この月の記録はありません',false);return;}
+  data.sort((a,b)=>String(a.date+a.time).localeCompare(String(b.date+b.time)));
+  const head=['日付','運転者','車両','区分','時刻','確認者','検知器の使用','確認方法','対面以外の方法','酒気帯びの有無','指示事項','その他'];
+  const rows=data.map(r=>[r.date,r.driver,r.vehicle,r.phase,r.time,r.checker,r.detector_used,r.face,r.method,r.alcohol,r.instruction,r.note]);
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const csv='﻿'+[head,...rows].map(row=>row.map(q).join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='アルコールチェック_'+ym+'.csv';
+  document.body.appendChild(a);a.click();a.remove();
+  toast('CSVを出力しました（'+data.length+'件）');
+}
+
+/* ===== タブ ===== */
+function switchTab(t){
+  $('tabRec').classList.toggle('on',t==='rec');
+  $('tabList').classList.toggle('on',t==='list');
+  $('viewRec').classList.toggle('hide',t!=='rec');
+  $('viewList').classList.toggle('hide',t!=='list');
+  if(t==='list')loadMatrix($('l_date').value);
+}
+function reloadAll(){boot();if(!$('viewList').classList.contains('hide'))loadMatrix($('l_date').value);toast('更新しました');}
+
+boot();
+</script>
+</body>
+</html>
