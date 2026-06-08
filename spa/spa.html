@@ -5037,7 +5037,6 @@ const Labor = (function(){
           <span class="jc-mins">${fmtMin(j.total_minutes)}<small>延べ工数</small></span>
           <span class="jc-ppl">${j.people_count||0}人</span>
         </div>
-        ${(isArchive||isLaborArc)?`<div style="margin-top:8px"><button class="act-btn" onclick="event.stopPropagation();Labor.setArchive('${esc(j.id)}',${isLaborArc?'false':'true'})">${isLaborArc?'アーカイブ解除':'アーカイブへ'}</button></div>`:''}
       </div>`;
     });
     h+='</div>';
