@@ -5066,6 +5066,7 @@ const Labor = (function(){
     if(_arcBusy)return;_arcBusy=true;setTimeout(()=>_arcBusy=false,1500);
     const job=allJobs.find(x=>String(x.id)===String(id));if(!job){_arcBusy=false;return}
     job.labor_archived=on?'TRUE':'';
+    _setCache('labor',{jobs:allJobs});
     fireAndForget({dept:'labor',action:on?'archive':'unarchive',id:job.id});
     renderTable();toast(on?'工数アーカイブへ移動しました':'アーカイブ解除しました');
     setTimeout(loadAll,3000);
