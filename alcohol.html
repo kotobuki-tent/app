@@ -120,6 +120,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:15px 30px;border-radius:12px;font:700 16px/1 'Noto Sans JP';z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.18)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{background:#3aa3a6;color:#fff}.toast.err{background:#dc2626;color:#fff}
+.toast .undo{margin-left:16px;background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.6);color:#fff;font:700 14px/1 'Noto Sans JP';padding:9px 15px;border-radius:9px;cursor:pointer}
+.toast .undo:active{transform:scale(.96)}
 </style>
 </head>
 <body>
@@ -284,9 +286,33 @@ let drivers=[], vehicles=[], checkerDefault='杉山雄一';
 let records=[];      // 表示日の記録
 let selDriver=null;  // 選択中の運転者
 let showExtra=false; // 普段運転しない人を表示中か
+let pendingUndo=null; // 取り消し待ち（tmpのままサーバ未確定の記録）
 let curEdit=null, busy=false;
 
-function toast(msg,ok=true){const t=$('toast');t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(()=>t.classList.remove('show'),2300);}
+function toast(msg,ok=true){const t=$('toast');t.style.pointerEvents='none';t.textContent=msg;t.className='toast show '+(ok?'ok':'err');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2300);}
+// 「取り消す」ボタン付きトースト
+function toastUndo(msg,fn){
+  const t=$('toast');
+  t.innerHTML=esc(msg)+' <button class="undo" id="undoBtn">取り消す</button>';
+  t.className='toast show ok';t.style.pointerEvents='auto';
+  $('undoBtn').onclick=()=>{t.classList.remove('show');t.style.pointerEvents='none';fn();};
+  clearTimeout(t._t);t._t=setTimeout(()=>{t.classList.remove('show');t.style.pointerEvents='none';},6000);
+}
+function undoRecord(ctx){
+  // 既に実IDで確定している場合は直接削除
+  const real=records.find(r=>String(r.id).indexOf('tmp_')!==0 && r.date===ctx.date && r.driver===ctx.driver && r.phase===ctx.phase && fmtTime(r.time)===ctx.hhmm);
+  if(real){
+    apiPost({action:'delete',id:real.id});
+    records=records.filter(r=>r.id!==real.id);
+    renderToday();renderDrivers();toast('記録を取り消しました');
+    setTimeout(()=>loadDay($('f_date').value,true),3000);
+    return;
+  }
+  // まだtmp（サーバ未確定）：ローカルから消し、次の再取得でサーバ側も削除
+  records=records.filter(r=>r.id!==ctx.tmpId);
+  pendingUndo=ctx;
+  renderToday();renderDrivers();toast('記録を取り消しました');
+}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function pad(n){return n<10?'0'+n:''+n;}
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
@@ -333,6 +359,14 @@ async function boot(){
 async function loadDay(date,silent){
   if(!silent)$('dayMtx').innerHTML='<div class="empty">読み込み中...</div>';
   try{const r=await apiGet({action:'list',date});records=(r.data||[]);}catch(e){records=[];}
+  // 取り消し待ち：サーバに確定した該当行を削除
+  if(pendingUndo){
+    const c=pendingUndo;
+    const hit=records.find(r=>r.date===c.date&&r.driver===c.driver&&r.phase===c.phase&&fmtTime(r.time)===c.hhmm);
+    if(hit){apiPost({action:'delete',id:hit.id});records=records.filter(r=>r.id!==hit.id);pendingUndo=null;}
+    else if(!c._retry){c._retry=1;setTimeout(()=>loadDay(date,true),3000);} // まだ届いてなければ一度だけ再試行
+    else{pendingUndo=null;}
+  }
   renderDrivers(); renderToday();
 }
 
@@ -415,7 +449,8 @@ function record(phase){
     alcohol,value:alcohol==='有'?$('f_value').value:'',instruction:$('f_instruction').value.trim(),note:$('f_note').value.trim()};
   apiPost({action:'save',...rec});
   records.push({...rec,_optimistic:true});
-  toast(`${driver}・${phase}を記録`);
+  const ctx={tmpId,date,driver,phase,hhmm:rec.time};
+  toastUndo(`${driver}・${phase}を記録`,()=>undoRecord(ctx));
   clearSel();              // 次の人へ
   renderToday();
   setTimeout(()=>loadDay($('f_date').value,true),3000);
