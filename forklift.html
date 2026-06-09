@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>フォークリフト始業前点検 – 業務管理</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='56' fill='%23416079'/><text x='90' y='134' text-anchor='middle' font-family='serif' font-weight='900' font-size='104' fill='%23ffffff'>点</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='10' fill='%23416079'/><text x='16' y='24' text-anchor='middle' font-family='serif' font-weight='900' font-size='20' fill='%23ffffff'>点</text></svg>">
+<meta name="theme-color" content="#416079">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;scrollbar-gutter:stable}
+body{font-family:'Noto Sans JP',sans-serif;background:#eef1f3;color:#1a2228;min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+.hdr{background:#416079;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.hdr h1{font-size:18px;font-weight:900;color:#fff;letter-spacing:.03em}
+.hdr .right{display:flex;align-items:center;gap:14px}
+.hdr .today{font:700 15px/1 'Noto Sans JP';color:rgba(255,255,255,.85)}
+.hdr .refresh{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);color:#fff;font:700 14px/1 'Noto Sans JP';border-radius:8px;padding:9px 14px;cursor:pointer}
+
+.kiosk{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;max-width:1340px;margin:0 auto;padding:16px;align-items:start}
+@media(max-width:860px),(orientation:portrait){.kiosk{grid-template-columns:1fr}}
+.pane{background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.pane h2{font-size:15px;font-weight:800;color:#2a3742;margin-bottom:13px;display:flex;align-items:center;gap:8px}
+
+.gl{font-size:12px;font-weight:700;color:#94a3b0;margin:14px 2px 7px}
+.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+.namebtn{padding:15px 8px;border:1.5px solid #d5dde2;border-radius:12px;background:#fff;font:600 16px/1.2 'Noto Sans JP';color:#33404a;cursor:pointer;transition:.12s;text-align:center}
+.namebtn:hover{border-color:#416079;background:#f5f8fa}
+.namebtn.sel{background:#416079;color:#fff;border-color:#416079;font-weight:700;box-shadow:0 3px 10px rgba(65,96,121,.28)}
+.namebtn .sub{display:block;font-size:11px;font-weight:600;opacity:.7;margin-top:3px}
+
+.inspgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.inspgrid .namebtn{font-size:15px;padding:13px 6px}
+
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;font-weight:700;color:#7a8893;margin-bottom:6px}
+.field input{width:100%;padding:13px 14px;border:2px solid #e2e8ec;border-radius:10px;font:400 16px/1.4 'Noto Sans JP';color:#1a2228;background:#fafcfd}
+.field input:focus{outline:none;border-color:#416079;background:#fff;box-shadow:0 0 0 4px rgba(65,96,121,.1)}
+
+/* チェックリスト */
+.ckwrap{margin-top:8px}
+.ck-item{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid #eef2f4}
+.ck-label{flex:1;font-size:14.5px;font-weight:600;color:#2a3742;line-height:1.4}
+.ck-seg{display:flex;gap:8px;flex-shrink:0}
+.ck-seg button{width:62px;padding:11px 0;border:2px solid #dde4e8;border-radius:10px;background:#fff;font:700 15px/1 'Noto Sans JP';color:#9aa7b0;cursor:pointer;transition:.1s}
+.ck-seg .ck-ok.on{background:#0f9d6e;border-color:#0f9d6e;color:#fff}
+.ck-seg .ck-ng.on{background:#dc2626;border-color:#dc2626;color:#fff}
+.ck-seg button:active{transform:scale(.95)}
+.ck-memo{width:100%;margin:0 0 6px;padding:11px 13px;border:2px solid #f0b4b4;border-radius:9px;font:400 15px/1.4 'Noto Sans JP';background:#fff6f6}
+.ck-memo:focus{outline:none;border-color:#dc2626;box-shadow:0 0 0 4px rgba(220,38,38,.08)}
+.ck-hint{padding:24px;text-align:center;color:#9aa7b0;font-size:14px}
+
+.summary{display:flex;align-items:center;gap:12px;margin-top:14px;padding:13px 15px;border-radius:12px;background:#f0f7f3;border:1.5px solid #bfe3d3}
+.summary.ng{background:#fef2f2;border-color:#f7c0c0}
+.summary .s-txt{flex:1;font-size:14px;font-weight:700;color:#157a52}
+.summary.ng .s-txt{color:#b91c1c}
+.btn-rec{width:100%;margin-top:14px;padding:20px 0;border:none;border-radius:14px;font:700 20px/1 'Noto Sans JP';color:#fff;background:#416079;cursor:pointer;letter-spacing:.04em}
+.btn-rec:active{transform:scale(.98)}
+.btn-rec:disabled{background:#c2cbd1;cursor:not-allowed}
+
+.lastbar{display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;background:#fff7ed;border:1.5px solid #fdba74;border-radius:12px}
+.lastbar .lb-txt{flex:1;font-size:14px;font-weight:700;color:#9a3412}
+.lastbar .lb-undo{background:#dc2626;color:#fff;border:none;border-radius:10px;font:700 15px/1 'Noto Sans JP';padding:12px 18px;cursor:pointer;white-space:nowrap}
+
+/* 右ペイン記録 */
+.dayhead{margin-bottom:12px}
+.rec{display:flex;align-items:center;gap:10px;padding:12px 13px;background:#fafcfd;border:1px solid #e2e8ec;border-radius:11px;margin-bottom:9px}
+.rec.optimistic{opacity:.65;border-style:dashed}
+.rec .mc{font-size:15px;font-weight:700;color:#2a3742;flex:1}
+.rec .jd{font:700 12px/1 'Noto Sans JP';padding:5px 9px;border-radius:6px;white-space:nowrap}
+.rec .jd.ok{background:#dcfce7;color:#15803d}
+.rec .jd.ng{background:#fee2e2;color:#b91c1c}
+.rec .ins{font-size:12px;color:#94a3b0;white-space:nowrap}
+.rec .rdel{background:#fff;border:1px solid #e3c2c2;color:#c0392b;font:700 12px/1 'Noto Sans JP';padding:8px 11px;border-radius:8px;cursor:pointer}
+.rec-ng{font-size:12px;color:#b91c1c;margin:-4px 2px 10px;line-height:1.5}
+
+.divider{height:1px;background:#eaeef0;margin:18px 0}
+.csvbar{display:flex;gap:10px;align-items:flex-end}
+.csvbar .field{flex:1;margin:0}
+.btn{padding:14px 18px;border:none;border-radius:10px;font:800 15px/1 'Noto Sans JP';cursor:pointer;background:#416079;color:#fff;white-space:nowrap}
+.note{font-size:12px;color:#94a3b0;margin-top:10px;line-height:1.6}
+.empty{text-align:center;padding:24px;color:#aab4bc;font-size:14px}
+.hide{display:none!important}
+
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:15px 30px;border-radius:12px;font:700 16px/1 'Noto Sans JP';z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.18)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#416079;color:#fff}.toast.err{background:#dc2626;color:#fff}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>フォークリフト始業前点検</h1>
+  <div class="right">
+    <span class="today" id="hdrDate"></span>
+    <button class="refresh" onclick="reloadAll()">↻ 更新</button>
+  </div>
+</div>
+
+<div class="kiosk">
+  <!-- 左：点検 -->
+  <div class="pane">
+    <h2>🚜 点検する</h2>
+    <div class="gl">機体</div>
+    <div class="ngrid" id="machineGrid"></div>
+
+    <div id="afterMachine" class="hide">
+      <div class="gl">点検者</div>
+      <div class="inspgrid" id="inspGrid"><div class="empty">読み込み中...</div></div>
+
+      <div class="gl" style="margin-top:16px">点検項目（既定すべて「良」。異常のみ「否」）</div>
+      <div class="ckwrap" id="checklist"></div>
+
+      <div class="summary" id="summary"><span class="s-txt" id="sumTxt">すべて良</span></div>
+      <button class="btn-rec" id="btnRec" onclick="record()">点検を記録</button>
+
+      <div id="lastBar" class="lastbar hide">
+        <span class="lb-txt" id="lastTxt"></span>
+        <button class="lb-undo" id="lastUndo">取り消す</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右：当日状況 -->
+  <div class="pane">
+    <h2>📋 点検状況</h2>
+    <div class="dayhead"><div class="field" style="margin:0"><label>表示日</label><input type="date" id="f_date" onchange="hideLastBar();loadDay($('f_date').value)"></div></div>
+    <div id="dayList"><div class="empty">読み込み中...</div></div>
+    <div class="divider"></div>
+    <h2>📤 月次CSV出力（保存用）</h2>
+    <div class="csvbar">
+      <div class="field"><label>対象月</label><input type="month" id="f_month"></div>
+      <button class="btn" onclick="exportCsv()">CSV出力</button>
+    </div>
+    <p class="note">点検者・機体・判定・否の項目・内容を含みます。記録は保存してください。</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+const $=id=>document.getElementById(id);
+
+const MACHINES=[
+  {id:'フォークリフトA',type:'battery',tag:'バッテリー'},
+  {id:'フォークリフトB',type:'engine',tag:'エンジン'},
+  {id:'フォークリフトC',type:'engine',tag:'エンジン'}
+];
+// t: all=全機種 / engine=エンジンのみ / battery=バッテリーのみ
+const ITEMS=[
+  {n:1,g:'始業前',t:'all',label:'前日の不具合箇所は直っているか'},
+  {n:2,g:'始業前',t:'all',label:'バックミラーの取付・損傷はないか'},
+  {n:3,g:'始業前',t:'all',label:'バックレスト／ヘッドガードに損傷はないか'},
+  {n:4,g:'始業前',t:'all',label:'フォーク／アタッチメントの取付・損傷はないか'},
+  {n:5,g:'始業前',t:'all',label:'マスト／リフトブラケットの変形・損傷はないか'},
+  {n:6,g:'始業前',t:'all',label:'タイヤ取付ボルト・ナットのゆるみはないか'},
+  {n:7,g:'始業前',t:'all',label:'タイヤ空気圧・異常摩耗・損傷はないか'},
+  {n:8,g:'始業前',t:'engine',label:'エンジンオイルの量・汚れ'},
+  {n:9,g:'始業前',t:'engine',label:'エンジン冷却水の量'},
+  {n:10,g:'始業前',t:'all',label:'作動油の量・汚れ'},
+  {n:11,g:'始業前',t:'battery',label:'バッテリー液量は適量か'},
+  {n:12,g:'始業前',t:'battery',label:'充電コードの損傷はないか'},
+  {n:13,g:'始業前',t:'battery',label:'タイマースイッチ作動・充電完了'},
+  {n:16,g:'始業前',t:'all',label:'リフレクター（反射板）の取付'},
+  {n:17,g:'始業前',t:'all',label:'ナンバー（登録番号標）の取付'},
+  {n:18,g:'始業前',t:'all',label:'番号灯・方向指示器等'},
+  {n:19,g:'作動',t:'all',label:'ハンドル・ペダル・レバーの遊び'},
+  {n:20,g:'作動',t:'engine',label:'排気の色は正常か'},
+  {n:21,g:'作動',t:'all',label:'ハンドルの切れ・操作具合'},
+  {n:22,g:'作動',t:'all',label:'各ランプ点灯・計器類の作動'},
+  {n:23,g:'作動',t:'all',label:'ホーン・バックブザーの鳴り'},
+  {n:24,g:'作動',t:'all',label:'チェーンの張りは左右均等か'},
+  {n:25,g:'作動',t:'all',label:'各シリンダ・ホースの損傷・油漏れ'},
+  {n:26,g:'作動',t:'all',label:'マスト上下・前後傾（リーチ）の作動'},
+  {n:27,g:'走行',t:'all',label:'ブレーキの踏み代・効き'},
+  {n:29,g:'走行',t:'all',label:'駐車ブレーキの効き'},
+  {n:30,g:'走行',t:'all',label:'異音・異常振動はないか'}
+];
+const GROUPS={'始業前':'① 始業前点検','作動':'② 作動点検','走行':'③ 走行点検'};
+
+let inspectors=[], records=[];
+let machine=null, machineType=null, inspector=null;
+let itemState={};      // {n:{status,memo}}
+let pendingUndo=null, busy=false;
+
+function toast(msg,ok=true){const t=$('toast');t.style.pointerEvents='none';t.textContent=msg;t.className='toast show '+(ok?'ok':'err');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2300);}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function pad(n){return n<10?'0'+n:''+n;}
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function monthStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);}
+function nowHHMM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes());}
+
+async function apiGet(params){const url=API+'?dept=forklift&'+new URLSearchParams(params);const r=await fetch(url);return r.json();}
+function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'forklift',...body})});}
+
+async function boot(){
+  $('f_date').value=todayStr();$('f_month').value=monthStr();
+  $('hdrDate').textContent=todayStr().replace(/-/g,'/');
+  renderMachines();
+  try{const b=await apiGet({action:'bootstrap'});inspectors=b.inspectors||[];}catch(e){inspectors=[];}
+  renderInspectors();
+  await loadDay($('f_date').value);
+}
+
+function renderMachines(){
+  $('machineGrid').innerHTML=MACHINES.map(m=>
+    `<button class="namebtn${machine===m.id?' sel':''}" onclick="selectMachine('${esc(m.id)}')">${esc(m.id)}<span class="sub">${esc(m.tag)}</span></button>`
+  ).join('');
+}
+function selectMachine(id){
+  const m=MACHINES.find(x=>x.id===id);if(!m)return;
+  machine=m.id;machineType=m.type;
+  itemState={};
+  ITEMS.filter(it=>it.t==='all'||it.t===machineType).forEach(it=>itemState[it.n]={status:'良',memo:''});
+  renderMachines();
+  $('afterMachine').classList.remove('hide');
+  renderChecklist();updateSummary();
+}
+function renderInspectors(){
+  if(!inspectors.length){$('inspGrid').innerHTML='<div class="empty">点検者がいません</div>';return;}
+  $('inspGrid').innerHTML=inspectors.map(n=>
+    `<button class="namebtn${inspector===n?' sel':''}" onclick="selectInspector('${esc(n)}')">${esc(n)}</button>`
+  ).join('');
+}
+function selectInspector(n){inspector=n;renderInspectors();}
+
+function renderChecklist(){
+  const items=ITEMS.filter(it=>it.t==='all'||it.t===machineType);
+  let html='',lastG=null;
+  items.forEach(it=>{
+    if(it.g!==lastG){html+=`<div class="gl">${GROUPS[it.g]||it.g}</div>`;lastG=it.g;}
+    const st=itemState[it.n];
+    html+=`<div class="ck-item" data-n="${it.n}">
+      <span class="ck-label">${esc(it.label)}</span>
+      <div class="ck-seg">
+        <button class="ck-ok${st.status==='良'?' on':''}" onclick="setItem(${it.n},'良')">良</button>
+        <button class="ck-ng${st.status==='否'?' on':''}" onclick="setItem(${it.n},'否')">否</button>
+      </div>
+    </div>
+    <input class="ck-memo${st.status==='否'?'':' hide'}" data-n="${it.n}" placeholder="不具合の内容" value="${esc(st.memo)}" oninput="itemState[${it.n}].memo=this.value">`;
+  });
+  $('checklist').innerHTML=html;
+}
+function setItem(n,v){
+  itemState[n].status=v;
+  const row=document.querySelector(`.ck-item[data-n="${n}"]`);
+  row.querySelector('.ck-ok').classList.toggle('on',v==='良');
+  row.querySelector('.ck-ng').classList.toggle('on',v==='否');
+  const memo=document.querySelector(`.ck-memo[data-n="${n}"]`);
+  memo.classList.toggle('hide',v!=='否');
+  if(v==='否')setTimeout(()=>memo.focus(),0);
+  updateSummary();
+}
+function ngList(){return Object.keys(itemState).filter(n=>itemState[n].status==='否').map(n=>{
+  const it=ITEMS.find(x=>x.n==n);return {n:Number(n),label:it?it.label:('項目'+n),memo:itemState[n].memo||''};
+});}
+function updateSummary(){
+  const ng=ngList();
+  const s=$('summary');
+  if(ng.length){s.classList.add('ng');$('sumTxt').textContent='否 '+ng.length+'件 ／ 不具合は使用中止してサービス窓口へ';}
+  else{s.classList.remove('ng');$('sumTxt').textContent='すべて良';}
+  $('btnRec').textContent=ng.length?('否ありで記録（'+ng.length+'件）'):'点検を記録';
+}
+
+function record(){
+  if(busy)return;
+  if(!machine){toast('機体を選んでください',false);return;}
+  if(!inspector){toast('点検者を選んでください',false);return;}
+  const ng=ngList();
+  for(const x of ng){if(!x.memo.trim()){toast('否の項目に内容を入力してください',false);
+    const m=document.querySelector(`.ck-memo[data-n="${x.n}"]`);if(m)m.focus();return;}}
+  busy=true;setTimeout(()=>busy=false,1500);
+  const date=$('f_date').value||todayStr();
+  const tmpId='tmp_'+Date.now();
+  const rec={id:tmpId,date,machine,inspector,status:ng.length?'否':'良',
+    ng:JSON.stringify(ng),note:'',time:nowHHMM(),_optimistic:true};
+  apiPost({action:'save',...rec});
+  records.push(rec);
+  const ctx={tmpId,date,machine,inspector};
+  toast(`${machine}を記録`);
+  showLastBar(ctx);
+  // 次の機体へ
+  machine=null;machineType=null;inspector=null;itemState={};
+  $('afterMachine').classList.add('hide');
+  renderMachines();renderDayList();
+  setTimeout(()=>loadDay($('f_date').value,true),3000);
+}
+
+/* 直前の取り消し */
+function showLastBar(ctx){
+  $('lastTxt').textContent='直前の記録：'+ctx.machine;
+  $('lastUndo').onclick=()=>undoRecord(ctx);
+  $('lastBar').classList.remove('hide');
+}
+function hideLastBar(){$('lastBar').classList.add('hide');}
+function undoRecord(ctx){
+  hideLastBar();
+  const real=records.find(r=>String(r.id).indexOf('tmp_')!==0 && r.date===ctx.date && r.machine===ctx.machine);
+  if(real){apiPost({action:'delete',id:real.id});records=records.filter(r=>r.id!==real.id);renderDayList();toast('記録を取り消しました');setTimeout(()=>loadDay($('f_date').value,true),3000);return;}
+  records=records.filter(r=>r.id!==ctx.tmpId);
+  pendingUndo=ctx;renderDayList();toast('記録を取り消しました');
+}
+
+async function loadDay(date,silent){
+  if(!silent)$('dayList').innerHTML='<div class="empty">読み込み中...</div>';
+  try{const r=await apiGet({action:'list',date});records=(r.data||[]);}catch(e){records=[];}
+  if(pendingUndo){
+    const c=pendingUndo,hit=records.find(r=>r.date===c.date&&r.machine===c.machine);
+    if(hit){apiPost({action:'delete',id:hit.id});records=records.filter(r=>r.id!==hit.id);pendingUndo=null;}
+    else if(!c._retry){c._retry=1;setTimeout(()=>loadDay(date,true),3000);}else{pendingUndo=null;}
+  }
+  renderDayList();
+}
+function renderDayList(){
+  const el=$('dayList');
+  if(!records.length){el.innerHTML='<div class="empty">この日の点検はまだありません</div>';return;}
+  const order=MACHINES.map(m=>m.id);
+  const sorted=[...records].sort((a,b)=>order.indexOf(a.machine)-order.indexOf(b.machine));
+  el.innerHTML=sorted.map(r=>{
+    let ng=[];try{ng=JSON.parse(r.ng||'[]');}catch(e){}
+    const isNg=r.status==='否';
+    const ngLine=isNg&&ng.length?`<div class="rec-ng">否：${ng.map(x=>esc(x.label)+(x.memo?'（'+esc(x.memo)+'）':'')).join('／')}</div>`:'';
+    return `<div class="rec${r._optimistic?' optimistic':''}">
+        <span class="mc">${esc(r.machine)}</span>
+        <span class="jd ${isNg?'ng':'ok'}">${isNg?'否あり':'良'}</span>
+        <span class="ins">${esc(r.inspector||'')}</span>
+        <button class="rdel" onclick="delById('${r.id}')">取消</button>
+      </div>${ngLine}`;
+  }).join('');
+}
+function delById(id){
+  const r=records.find(x=>String(x.id)===String(id));if(!r)return;
+  if(String(id).indexOf('tmp_')===0){toast('同期中です。数秒後にどうぞ',false);return;}
+  if(!confirm(`${r.machine}（${r.inspector||''}）の点検記録を取り消しますか？`))return;
+  if(busy)return;busy=true;setTimeout(()=>busy=false,1500);
+  apiPost({action:'delete',id:r.id});
+  records=records.filter(x=>x.id!==r.id);renderDayList();toast('取り消しました');
+  setTimeout(()=>loadDay($('f_date').value,true),3000);
+}
+
+async function exportCsv(){
+  const ym=$('f_month').value;if(!ym){toast('対象月を選んでください',false);return;}
+  toast('集計中...');
+  let data=[];try{const r=await apiGet({action:'month',ym});data=r.data||[];}catch(e){toast('取得に失敗しました',false);return;}
+  if(!data.length){toast('この月の記録はありません',false);return;}
+  data.sort((a,b)=>String(a.date+a.machine).localeCompare(String(b.date+b.machine)));
+  const head=['日付','機体','点検者','判定','否の項目','備考'];
+  const rows=data.map(r=>{let ng=[];try{ng=JSON.parse(r.ng||'[]');}catch(e){}
+    const ngStr=ng.map(x=>x.label+(x.memo?'('+x.memo+')':'')).join('；');
+    return [r.date,r.machine,r.inspector,r.status,ngStr,r.note];});
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const csv='﻿'+[head,...rows].map(row=>row.map(q).join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='フォークリフト点検_'+ym+'.csv';
+  document.body.appendChild(a);a.click();a.remove();
+  toast('CSVを出力しました（'+data.length+'件）');
+}
+
+function reloadAll(){boot();toast('更新しました');}
+boot();
+</script>
+</body>
+</html>

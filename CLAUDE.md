@@ -22,7 +22,7 @@ There is no build or test tooling. To work here:
 ### Two parallel codebases — know which one you're editing
 
 1. **`spa/spa.html`** — the **live product**. A single ~360KB file containing all 9 screens. This is what the public URL serves and what almost all changes target.
-2. **Root `*.html`** (`index.html`=生産, `project.html`=企画制作, `sales.html`, `inventory.html`, `vehicle.html`, `overtime.html`, `labor.html`, `daily.html`, `portal.html`) — **legacy standalone MPA pages**, the pre-SPA single-screen versions. Still precached by `sw.js` as a fallback. **Slated for deletion (~1 month out).** Do not invest in them, do not make new edits — the SPA is canonical. **`register.html` is NOT slated for deletion** — it's an independent mobile-only product-add tool that stays. **`alcohol.html` is likewise an independent standalone tool** (アルコールチェック記録 — 安全運転管理者制度; `dept=alcohol`, sheet `alcohol_checks`), not part of the SPA. Both are root-level single-purpose pages distributed by their own URL/home-screen icon.
+2. **Root `*.html`** (`index.html`=生産, `project.html`=企画制作, `sales.html`, `inventory.html`, `vehicle.html`, `overtime.html`, `labor.html`, `daily.html`, `portal.html`) — **legacy standalone MPA pages**, the pre-SPA single-screen versions. Still precached by `sw.js` as a fallback. **Slated for deletion (~1 month out).** Do not invest in them, do not make new edits — the SPA is canonical. **`register.html` is NOT slated for deletion** — it's an independent mobile-only product-add tool that stays. **`alcohol.html`** (アルコールチェック記録 — 安全運転管理者制度; `dept=alcohol`, sheet `alcohol_checks`) **and `forklift.html`** (フォークリフト始業前点検; `dept=forklift`, sheet `forklift_checks`) **are likewise independent standalone tools**, not part of the SPA. These root-level single-purpose pages are distributed by their own URL/home-screen icon.
    - When the legacy MPA pages are eventually deleted, their entries in `sw.js`'s `PRECACHE_URLS` must also be removed — but **iller edits `sw.js` manually** (see Operational rules); flag it, don't touch the file.
 
 ### SPA structure (`spa/spa.html`)
@@ -36,7 +36,7 @@ The **`App` registry** (search `const App = {`) is the orchestrator:
 
 ### Backend: one GAS endpoint, `?dept=` routing
 
-Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every request carries a `dept` param routing to a department handler (`production`/`project`/`sales`/`inventory`/`overtime`/`vehicle`/`daily`/`labor`/`attendance`/`drive`/`factory`/`alcohol`). Each IIFE has its **own** `apiGet`/`apiPost`/`fireAndForget` with its `dept` baked in — they are intentionally duplicated per-namespace, not shared.
+Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every request carries a `dept` param routing to a department handler (`production`/`project`/`sales`/`inventory`/`overtime`/`vehicle`/`daily`/`labor`/`attendance`/`drive`/`factory`/`alcohol`/`forklift`). Each IIFE has its **own** `apiGet`/`apiPost`/`fireAndForget` with its `dept` baked in — they are intentionally duplicated per-namespace, not shared.
 
 - **Reads**: `fetch(API+'?dept=...&action=...')` → JSON.
 - **Writes**: `no-cors` POST (`fireAndForget`) — response is opaque, so writes use **optimistic update**: mutate the local array immediately, then `setTimeout(loadAll, 3000)` to reconcile with GAS's real ID assignment. `mergeWithTmp(...)` reconciles optimistic temp rows against server data by a composite key.
