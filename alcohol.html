@@ -94,9 +94,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .mtx th,.mtx td{border:1px solid #e3e7e8;padding:11px 8px;text-align:center}
 .mtx th{background:#f0f4f4;color:#5c6c6b;font-weight:700;font-size:13px}
 .mtx td.nm{text-align:left;font-weight:700;color:#27302f;white-space:nowrap}
-.mtx .cell-done{font-weight:800;cursor:pointer}
+.mtx .cell-done{font-weight:800;padding:8px 6px}
 .mtx .cell-done.ng{color:#b91c1c;background:#fef2f2}
 .mtx .cell-done.ok{color:#3aa3a6}
+.mtx .ct{cursor:pointer;display:block}
+.mtx .celldel{margin-top:6px;background:#fff;border:1px solid #e3c2c2;color:#c0392b;font:700 11px/1 'Noto Sans JP';padding:5px 10px;border-radius:7px;cursor:pointer}
+.mtx .celldel:hover{background:#fdecec}
+.mtx .celldel:active{transform:scale(.95)}
 .mtx .cell-none{color:#cdd6d5}
 .mtx .small{display:block;font-size:11px;font-weight:500;color:#90a0a0}
 .empty{text-align:center;padding:26px;color:#b6c0bf;font-size:14px}
@@ -431,7 +435,10 @@ function renderToday(){
   const cell=r=>{
     if(!r)return '<td class="cell-none">—</td>';
     const ng=r.alcohol==='有';
-    return `<td class="cell-done ${ng?'ng':'ok'}" onclick="openEdit('${r.id}')">${esc(fmtTime(r.time)||'✓')}<span class="small">酒気${esc(r.alcohol||'無')}</span></td>`;
+    return `<td class="cell-done ${ng?'ng':'ok'}">
+      <span class="ct" onclick="openEdit('${r.id}')">${esc(fmtTime(r.time)||'✓')}<span class="small">酒気${esc(r.alcohol||'無')}</span></span>
+      <button class="celldel" onclick="delById('${r.id}')">取消</button>
+    </td>`;
   };
   el.innerHTML=`<table class="mtx"><thead><tr><th>運転者</th><th>運転前</th><th>運転後</th><th>確認者</th></tr></thead><tbody>${
     names.map(n=>{const d=byD[n];const chk=(d['運転前']||d['運転後']||{}).checker||'';
@@ -496,6 +503,18 @@ function saveEdit(){
   apiPost({action:'save',...upd});
   Object.assign(curEdit,upd);
   renderDrivers();renderToday();closeEdit();toast('更新しました');
+  setTimeout(()=>loadDay($('f_date').value,true),3000);
+}
+// 右マトリクスの各記録から直接取り消し
+function delById(id){
+  const r=records.find(x=>String(x.id)===String(id));
+  if(!r)return;
+  if(String(id).indexOf('tmp_')===0){toast('同期中です。数秒後にどうぞ',false);return;}
+  if(!confirm(`${r.driver}・${r.phase}（${fmtTime(r.time)}）の記録を取り消しますか？`))return;
+  if(busy)return;busy=true;setTimeout(()=>busy=false,1500);
+  apiPost({action:'delete',id:r.id});
+  records=records.filter(x=>x.id!==r.id);
+  renderDrivers();renderToday();toast('取り消しました');
   setTimeout(()=>loadDay($('f_date').value,true),3000);
 }
 function delRecord(){
