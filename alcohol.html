@@ -61,6 +61,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .seg.alc button[data-v="無"].on{background:#0f9d6e;color:#fff}
 .seg.alc button[data-v="有"].on{background:#dc2626;color:#fff}
 .seg.big button{padding:18px 0;font-size:20px}
+/* 酒気帯び：離した独立ボタン */
+.alc2{display:flex;gap:12px}
+.alc2 button{flex:1;padding:18px 0;border:2px solid #dce3e2;border-radius:12px;background:#fff;font:800 20px/1 'Noto Sans JP';color:#8a9897;cursor:pointer;transition:.12s}
+.alc2 button[data-v="無"].on{background:#0f9d6e;border-color:#0f9d6e;color:#fff}
+.alc2 button[data-v="有"].on{background:#dc2626;border-color:#dc2626;color:#fff}
+.alc2 button:active{transform:scale(.97)}
 
 .detail-toggle{font-size:13px;font-weight:700;color:#0d9488;cursor:pointer;display:inline-block;margin:6px 0 12px}
 .detail-toggle:hover{text-decoration:underline}
@@ -135,7 +141,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 
     <div class="field" style="margin-top:16px">
       <label>酒気帯び</label>
-      <div class="seg alc big" id="segAlcohol">
+      <div class="alc2" id="segAlcohol">
         <button type="button" class="on" data-v="無" onclick="segPick('segAlcohol',this)">無</button>
         <button type="button" data-v="有" onclick="segPick('segAlcohol',this)">有</button>
       </div>
