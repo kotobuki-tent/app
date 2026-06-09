@@ -6,7 +6,7 @@
 <title>アルコールチェック – 業務管理</title>
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='56' fill='%230d9488'/><text x='90' y='132' text-anchor='middle' font-family='serif' font-weight='900' font-size='104' fill='%23042f2c'>酒</text></svg>">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='10' fill='%230d9488'/><text x='16' y='24' text-anchor='middle' font-family='serif' font-weight='900' font-size='19' fill='%23042f2c'>酒</text></svg>">
-<meta name="theme-color" content="#0d9488">
+<meta name="theme-color" content="#3aa3a6">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -14,7 +14,7 @@ html{font-size:16px;scrollbar-gutter:stable}
 body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-height:100vh;min-height:100dvh}
 
 /* Header */
-.hdr{background:#0d9488;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.hdr{background:#3aa3a6;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
 .hdr h1{font-size:19px;font-weight:900;color:#042f2c;letter-spacing:.04em}
 .hdr .right{display:flex;align-items:center;gap:14px}
 .hdr .today{font:700 15px/1 'Noto Sans JP';color:rgba(4,47,44,.85)}
@@ -31,17 +31,17 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .selbar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:#f0faf8;border:2px solid #cdeae5;margin-bottom:14px;min-height:60px}
 .selbar.none{background:#fafbfb;border-color:#e6eaea;border-style:dashed}
 .selbar .lab{font-size:13px;font-weight:600;color:#7c8c8b}
-.selbar .who{font-size:24px;font-weight:900;color:#0d9488;flex:1}
+.selbar .who{font-size:24px;font-weight:900;color:#3aa3a6;flex:1}
 .selbar.none .who{font-size:16px;font-weight:600;color:#9aa8a7}
 .selbar .clr{font:600 13px/1 'Noto Sans JP';color:#90a0a0;cursor:pointer;padding:6px 10px;border:1px solid #e0e6e5;border-radius:7px;background:#fff}
 
 /* Name grid */
-.moretoggle{font-size:13px;font-weight:700;color:#0d9488;cursor:pointer;display:inline-block;margin:14px 2px 6px}
+.moretoggle{font-size:13px;font-weight:700;color:#3aa3a6;cursor:pointer;display:inline-block;margin:14px 2px 6px}
 .moretoggle:hover{text-decoration:underline}
 .ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:9px}
 .namebtn{padding:16px 8px;border:1.5px solid #dce3e2;border-radius:12px;background:#fff;font:600 16px/1.2 'Noto Sans JP';color:#33403f;cursor:pointer;transition:.12s;text-align:center;position:relative}
-.namebtn:hover{border-color:#0d9488;background:#f6fbfa}
-.namebtn.sel{background:#0d9488;color:#fff;border-color:#0d9488;font-weight:700;box-shadow:0 3px 10px rgba(13,148,136,.28)}
+.namebtn:hover{border-color:#3aa3a6;background:#f6fbfa}
+.namebtn.sel{background:#3aa3a6;color:#fff;border-color:#3aa3a6;font-weight:700;box-shadow:0 3px 10px rgba(13,148,136,.28)}
 .namebtn:active{transform:scale(.96)}
 .namebtn .st{position:absolute;top:4px;right:6px;font-size:11px;font-weight:700}
 .namebtn .st.full{color:#15803d}.namebtn.sel .st.full{color:#bbf7d0}
@@ -51,24 +51,24 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .field{margin-bottom:14px}
 .field label{display:block;font-size:13px;font-weight:700;color:#7c8c8b;margin-bottom:6px}
 .field input,.field select{width:100%;padding:13px 14px;border:2px solid #e6eaea;border-radius:10px;font:400 16px/1.4 'Noto Sans JP';color:#16201f;background:#fafcfc;-webkit-appearance:none;appearance:none}
-.field input:focus,.field select:focus{outline:none;border-color:#0d9488;background:#fff;box-shadow:0 0 0 4px rgba(13,148,136,.1)}
+.field input:focus,.field select:focus{outline:none;border-color:#3aa3a6;background:#fff;box-shadow:0 0 0 4px rgba(13,148,136,.1)}
 .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' fill='none' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
 .row2{display:flex;gap:10px}.row2>.field{flex:1}
 .seg{display:flex;border:2px solid #e6eaea;border-radius:11px;overflow:hidden}
 .seg button{flex:1;padding:14px 0;border:none;background:#fafcfc;font:800 16px/1 'Noto Sans JP';color:#7c8c8b;cursor:pointer;transition:.12s}
 .seg button+button{border-left:2px solid #e6eaea}
-.seg button.on{background:#0d9488;color:#fff}
-.seg.alc button[data-v="無"].on{background:#0f9d6e;color:#fff}
+.seg button.on{background:#3aa3a6;color:#fff}
+.seg.alc button[data-v="無"].on{background:#3bb389;color:#fff}
 .seg.alc button[data-v="有"].on{background:#dc2626;color:#fff}
 .seg.big button{padding:18px 0;font-size:20px}
 /* 酒気帯び：離した独立ボタン */
 .alc2{display:flex;gap:12px}
 .alc2 button{flex:1;padding:18px 0;border:2px solid #dce3e2;border-radius:12px;background:#fff;font:800 20px/1 'Noto Sans JP';color:#8a9897;cursor:pointer;transition:.12s}
-.alc2 button[data-v="無"].on{background:#0f9d6e;border-color:#0f9d6e;color:#fff}
+.alc2 button[data-v="無"].on{background:#3bb389;border-color:#3bb389;color:#fff}
 .alc2 button[data-v="有"].on{background:#dc2626;border-color:#dc2626;color:#fff}
 .alc2 button:active{transform:scale(.97)}
 
-.detail-toggle{font-size:13px;font-weight:700;color:#0d9488;cursor:pointer;display:inline-block;margin:6px 0 12px}
+.detail-toggle{font-size:13px;font-weight:700;color:#3aa3a6;cursor:pointer;display:inline-block;margin:6px 0 12px}
 .detail-toggle:hover{text-decoration:underline}
 #detailBox{display:none}#detailBox.open{display:block}
 .hide{display:none!important}
@@ -76,7 +76,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 /* Commit */
 .commit{display:flex;gap:12px;margin-top:8px}
 .commit button{flex:1;padding:24px 0;border:none;border-radius:14px;font:900 22px/1 'Noto Sans JP';cursor:pointer;letter-spacing:.04em;transition:.12s;color:#fff}
-.commit .pre{background:#0d9488}.commit .post{background:#33627a}
+.commit .pre{background:#3aa3a6}.commit .post{background:#33627a}
 .commit button:active{transform:scale(.97)}
 .commit button:disabled{background:#bcc8c7;cursor:not-allowed}
 
@@ -89,7 +89,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .mtx td.nm{text-align:left;font-weight:700;color:#27302f;white-space:nowrap}
 .mtx .cell-done{font-weight:800;cursor:pointer}
 .mtx .cell-done.ng{color:#b91c1c;background:#fef2f2}
-.mtx .cell-done.ok{color:#0d9488}
+.mtx .cell-done.ok{color:#3aa3a6}
 .mtx .cell-none{color:#cdd6d5}
 .mtx .small{display:block;font-size:11px;font-weight:500;color:#90a0a0}
 .empty{text-align:center;padding:26px;color:#b6c0bf;font-size:14px}
@@ -97,7 +97,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .divider{height:1px;background:#eaeeed;margin:18px 0}
 .csvbar{display:flex;gap:10px;align-items:flex-end}
 .csvbar .field{flex:1;margin:0}
-.btn{padding:14px 18px;border:none;border-radius:10px;font:800 15px/1 'Noto Sans JP';cursor:pointer;background:#0d9488;color:#fff;white-space:nowrap}
+.btn{padding:14px 18px;border:none;border-radius:10px;font:800 15px/1 'Noto Sans JP';cursor:pointer;background:#3aa3a6;color:#fff;white-space:nowrap}
 .btn:active{transform:scale(.97)}.btn.gray{background:#64748b}
 .note{font-size:12px;color:#90a0a0;margin-top:10px;line-height:1.6}
 
@@ -112,7 +112,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 /* Toast */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:15px 30px;border-radius:12px;font:700 16px/1 'Noto Sans JP';z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.18)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.ok{background:#0d9488;color:#fff}.toast.err{background:#dc2626;color:#fff}
+.toast.ok{background:#3aa3a6;color:#fff}.toast.err{background:#dc2626;color:#fff}
 </style>
 </head>
 <body>
