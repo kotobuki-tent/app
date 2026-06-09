@@ -33,6 +33,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef1f3;color:#1a2228;min-
 
 .inspgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 .inspgrid .namebtn{font-size:15px;padding:13px 6px}
+.moretoggle{font-size:13px;font-weight:700;color:#416079;cursor:pointer;display:inline-block;margin:6px 2px}
+.moretoggle:hover{text-decoration:underline}
 
 .field{margin-bottom:12px}
 .field label{display:block;font-size:13px;font-weight:700;color:#7a8893;margin-bottom:6px}
@@ -182,7 +184,7 @@ const ITEMS=[
 const GROUPS={'始業前':'① 始業前点検','作動':'② 作動点検','走行':'③ 走行点検'};
 
 let inspectors=[], records=[];
-let machine=null, machineType=null, inspector=null;
+let machine=null, machineType=null, inspector=null, showExtraIns=false;
 let itemState={};      // {n:{status,memo}}
 let pendingUndo=null, busy=false;
 
@@ -200,7 +202,7 @@ async function boot(){
   $('f_date').value=todayStr();$('f_month').value=monthStr();
   $('hdrDate').textContent=todayStr().replace(/-/g,'/');
   renderMachines();
-  try{const b=await apiGet({action:'bootstrap'});inspectors=b.inspectors||[];}catch(e){inspectors=[];}
+  try{const b=await apiGet({action:'bootstrap'});inspectors=(b.inspectors||[]).map(x=>typeof x==='string'?{name:x,reg:true}:x);}catch(e){inspectors=[];}
   renderInspectors();
   await loadDay($('f_date').value);
 }
@@ -221,10 +223,17 @@ function selectMachine(id){
 }
 function renderInspectors(){
   if(!inspectors.length){$('inspGrid').innerHTML='<div class="empty">点検者がいません</div>';return;}
-  $('inspGrid').innerHTML=inspectors.map(n=>
-    `<button class="namebtn${inspector===n?' sel':''}" onclick="selectInspector('${esc(n)}')">${esc(n)}</button>`
-  ).join('');
+  const btn=d=>`<button class="namebtn${inspector===d.name?' sel':''}" onclick="selectInspector('${esc(d.name)}')">${esc(d.name)}</button>`;
+  const reg=inspectors.filter(d=>d.reg!==false);
+  const extra=inspectors.filter(d=>d.reg===false);
+  let html=reg.map(btn).join('');
+  if(extra.length){
+    html+=`<div style="grid-column:1/-1"><span class="moretoggle" onclick="toggleExtraIns()">${showExtraIns?'− 控えを隠す':'＋ その他の人'}</span></div>`;
+    if(showExtraIns)html+=extra.map(btn).join('');
+  }
+  $('inspGrid').innerHTML=html;
 }
+function toggleExtraIns(){showExtraIns=!showExtraIns;renderInspectors();}
 function selectInspector(n){inspector=n;renderInspectors();}
 
 function renderChecklist(){
