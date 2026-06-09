@@ -67,6 +67,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .alc2 button[data-v="無"].on{background:#3bb389;border-color:#3bb389;color:#fff}
 .alc2 button[data-v="有"].on{background:#dc2626;border-color:#dc2626;color:#fff}
 .alc2 button:active{transform:scale(.97)}
+/* 指示事項プリセットチップ */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px}
+.chips button{padding:9px 13px;border:1.5px solid #dce3e2;border-radius:18px;background:#fff;font:600 13px/1 'Noto Sans JP';color:#4a5957;cursor:pointer;transition:.1s}
+.chips button:hover{border-color:#3aa3a6;color:#2a767e}
+.chips button:active{transform:scale(.96)}
+#alcOnBlock{border-left:3px solid #fca5a5;padding-left:13px;margin:2px 0 14px}
 
 .detail-toggle{font-size:13px;font-weight:700;color:#3aa3a6;cursor:pointer;display:inline-block;margin:6px 0 12px}
 .detail-toggle:hover{text-decoration:underline}
@@ -143,8 +149,23 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
     <div class="field" style="margin-top:16px">
       <label>酒気帯び</label>
       <div class="alc2" id="segAlcohol">
-        <button type="button" class="on" data-v="無" onclick="segPick('segAlcohol',this)">無</button>
-        <button type="button" data-v="有" onclick="segPick('segAlcohol',this)">有</button>
+        <button type="button" class="on" data-v="無" onclick="segPick('segAlcohol',this);onAlcoholChange()">無</button>
+        <button type="button" data-v="有" onclick="segPick('segAlcohol',this);onAlcoholChange()">有</button>
+      </div>
+    </div>
+
+    <div id="alcOnBlock" class="hide">
+      <div class="field"><label>測定値（mg/L）</label><input id="f_value" type="number" step="0.01" min="0" inputmode="decimal" placeholder="例: 0.15"></div>
+      <div class="field"><label>指示事項</label>
+        <div class="chips">
+          <button type="button" onclick="addInstr('運転禁止')">運転禁止</button>
+          <button type="button" onclick="addInstr('内勤')">内勤</button>
+          <button type="button" onclick="addInstr('帰宅・休養')">帰宅・休養</button>
+          <button type="button" onclick="addInstr('代理運転者を手配')">代理運転者を手配</button>
+          <button type="button" onclick="addInstr('再測定')">再測定</button>
+          <button type="button" onclick="addInstr('公共交通機関で移動')">公共交通機関で移動</button>
+        </div>
+        <input id="f_instruction" placeholder="自由記述（チップ＋追記も可）">
       </div>
     </div>
 
@@ -169,7 +190,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
         </div>
       </div>
       <div class="field hide" id="methodField"><label>対面以外の具体的方法</label><input id="f_method" placeholder="例: 電話＋検知器の写真確認"></div>
-      <div class="field"><label>指示事項</label><input id="f_instruction" placeholder="酒気帯び時など"></div>
       <div class="field"><label>その他・備考</label><input id="f_note"></div>
     </div>
 
@@ -219,6 +239,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
         <button type="button" data-v="有" onclick="segPick('m_alcohol',this)">有</button>
       </div>
     </div>
+    <div class="field"><label>測定値（mg/L）</label><input id="m_value" type="number" step="0.01" min="0" inputmode="decimal" placeholder="例: 0.15"></div>
     <div class="field"><label>確認者</label><select id="m_checker"></select></div>
     <div class="field"><label>検知器の使用</label>
       <div class="seg" id="m_detector">
@@ -233,7 +254,17 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
       </div>
     </div>
     <div class="field"><label>対面以外の方法</label><input id="m_method"></div>
-    <div class="field"><label>指示事項</label><input id="m_instruction"></div>
+    <div class="field"><label>指示事項</label>
+      <div class="chips">
+        <button type="button" onclick="addInstr('運転禁止','m_instruction')">運転禁止</button>
+        <button type="button" onclick="addInstr('内勤','m_instruction')">内勤</button>
+        <button type="button" onclick="addInstr('帰宅・休養','m_instruction')">帰宅・休養</button>
+        <button type="button" onclick="addInstr('代理運転者を手配','m_instruction')">代理運転者を手配</button>
+        <button type="button" onclick="addInstr('再測定','m_instruction')">再測定</button>
+        <button type="button" onclick="addInstr('公共交通機関で移動','m_instruction')">公共交通機関で移動</button>
+      </div>
+      <input id="m_instruction">
+    </div>
     <div class="field"><label>その他・備考</label><input id="m_note"></div>
     <div class="acts">
       <button class="btn gray" onclick="delRecord()">削除</button>
@@ -271,6 +302,13 @@ function segVal(segId){const on=$(segId).querySelector('.on');return on?on.datas
 function segSet(segId,v){[...$(segId).children].forEach(b=>b.classList.toggle('on',b.dataset.v===v));}
 function toggleDetail(){$('detailBox').classList.toggle('open');}
 function onFaceChange(){$('methodField').classList.toggle('hide',segVal('segFace')!=='非対面');}
+function onAlcoholChange(){
+  const on=segVal('segAlcohol')==='有';
+  $('alcOnBlock').classList.toggle('hide',!on);
+  if(on){setTimeout(()=>$('f_value').focus(),0);}else{$('f_value').value='';}
+}
+// 指示事項に「、」区切りで追記（重複は無視）。id省略時は記録フォーム。
+function addInstr(t,id){const el=$(id||'f_instruction');const parts=el.value.trim()?el.value.split('、').map(s=>s.trim()).filter(Boolean):[];if(!parts.includes(t))parts.push(t);el.value=parts.join('、');}
 function fillSelect(sel,arr,blank){const v=sel.value;sel.innerHTML=(blank?'<option value="">'+blank+'</option>':'')+arr.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');if([...sel.options].some(o=>o.value===v))sel.value=v;}
 
 async function boot(){
@@ -337,7 +375,7 @@ function clearSel(){
   $('selbar').classList.add('none');
   $('selWho').textContent='下から名前を選んでください';
   $('selClr').classList.add('hide');
-  segSet('segAlcohol','無');$('f_instruction').value='';$('f_note').value='';
+  segSet('segAlcohol','無');onAlcoholChange();$('f_instruction').value='';$('f_note').value='';$('f_value').value='';
   renderDrivers();
 }
 
@@ -374,7 +412,7 @@ function record(phase){
   const rec={id:tmpId,date,driver,vehicle:$('f_vehicle').value,phase,time:nowHHMM(),
     checker:$('f_checker').value||checkerDefault,detector_used:segVal('segDetector'),
     face:segVal('segFace'),method:segVal('segFace')==='非対面'?$('f_method').value.trim():'',
-    alcohol,instruction:$('f_instruction').value.trim(),note:$('f_note').value.trim()};
+    alcohol,value:alcohol==='有'?$('f_value').value:'',instruction:$('f_instruction').value.trim(),note:$('f_note').value.trim()};
   apiPost({action:'save',...rec});
   records.push({...rec,_optimistic:true});
   toast(`${driver}・${phase}を記録`);
@@ -394,6 +432,7 @@ function openEdit(id){
   $('m_time').value=fmtTime(r.time);
   $('m_vehicle').value=r.vehicle||'';
   segSet('m_alcohol',r.alcohol||'無');
+  $('m_value').value=r.value||'';
   $('m_checker').value=r.checker||checkerDefault;
   segSet('m_detector',r.detector_used||'有');
   segSet('m_face',r.face||'対面');
@@ -407,7 +446,7 @@ function saveEdit(){
   if(busy||!curEdit)return;busy=true;setTimeout(()=>busy=false,1500);
   const upd={id:curEdit.id,date:curEdit.date,driver:curEdit.driver,
     phase:segVal('m_phase'),time:$('m_time').value.trim(),vehicle:$('m_vehicle').value,
-    alcohol:segVal('m_alcohol'),checker:$('m_checker').value,detector_used:segVal('m_detector'),
+    alcohol:segVal('m_alcohol'),value:segVal('m_alcohol')==='有'?$('m_value').value:'',checker:$('m_checker').value,detector_used:segVal('m_detector'),
     face:segVal('m_face'),method:segVal('m_face')==='非対面'?$('m_method').value.trim():'',
     instruction:$('m_instruction').value.trim(),note:$('m_note').value.trim()};
   apiPost({action:'save',...upd});
@@ -434,8 +473,8 @@ async function exportCsv(){
   try{const r=await apiGet({action:'month',ym});data=r.data||[];}catch(e){toast('取得に失敗しました',false);return;}
   if(!data.length){toast('この月の記録はありません',false);return;}
   data.sort((a,b)=>String(a.date+a.time).localeCompare(String(b.date+b.time)));
-  const head=['日付','運転者','車両','区分','時刻','確認者','検知器の使用','確認方法','対面以外の方法','酒気帯びの有無','指示事項','その他'];
-  const rows=data.map(r=>[r.date,r.driver,r.vehicle,r.phase,fmtTime(r.time),r.checker,r.detector_used,r.face,r.method,r.alcohol,r.instruction,r.note]);
+  const head=['日付','運転者','車両','区分','時刻','確認者','検知器の使用','確認方法','対面以外の方法','酒気帯びの有無','測定値(mg/L)','指示事項','その他'];
+  const rows=data.map(r=>[r.date,r.driver,r.vehicle,r.phase,fmtTime(r.time),r.checker,r.detector_used,r.face,r.method,r.alcohol,r.value,r.instruction,r.note]);
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
   const csv='﻿'+[head,...rows].map(row=>row.map(q).join(',')).join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
