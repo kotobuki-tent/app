@@ -36,12 +36,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .selbar .clr{font:600 13px/1 'Noto Sans JP';color:#90a0a0;cursor:pointer;padding:6px 10px;border:1px solid #e0e6e5;border-radius:7px;background:#fff}
 
 /* Name grid */
-.gl{font-size:12px;font-weight:700;color:#9aa8a7;margin:10px 2px 6px}
 .moretoggle{font-size:13px;font-weight:700;color:#0d9488;cursor:pointer;display:inline-block;margin:14px 2px 6px}
 .moretoggle:hover{text-decoration:underline}
 .ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 .namebtn{padding:15px 6px;border:2px solid #e6eaea;border-radius:11px;background:#fafcfc;font:700 16px/1.2 'Noto Sans JP';color:#27302f;cursor:pointer;transition:.1s;text-align:center;position:relative}
-.namebtn.proj{border-color:#a7ddd6;background:#eefbf8}
 .namebtn.sel{background:#0d9488;color:#fff;border-color:#0d9488;box-shadow:0 4px 12px rgba(13,148,136,.35)}
 .namebtn:active{transform:scale(.96)}
 .namebtn .st{position:absolute;top:4px;right:6px;font-size:11px;font-weight:700}
@@ -81,7 +79,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .mtx th,.mtx td{border:1px solid #e3e7e8;padding:11px 8px;text-align:center}
 .mtx th{background:#f0f4f4;color:#5c6c6b;font-weight:700;font-size:13px}
 .mtx td.nm{text-align:left;font-weight:700;color:#27302f;white-space:nowrap}
-.mtx td.proj{color:#0d9488}
 .mtx .cell-done{font-weight:800;cursor:pointer}
 .mtx .cell-done.ng{color:#b91c1c;background:#fef2f2}
 .mtx .cell-done.ok{color:#0d9488}
@@ -273,7 +270,7 @@ async function boot(){
   $('hdrDate').textContent=todayStr().replace(/-/g,'/');
   try{
     const b=await apiGet({action:'bootstrap'});
-    drivers=(b.drivers||[]).map(d=>typeof d==='string'?{name:d,proj:1}:d);
+    drivers=(b.drivers||[]).map(d=>typeof d==='string'?{name:d,reg:true}:d);
     vehicles=b.vehicles||[]; checkerDefault=b.checker||'杉山雄一';
   }catch(e){drivers=[];vehicles=[];}
   const vehNames=vehicles.map(v=>v.plate?`${v.name}（${v.plate}）`:v.name);
@@ -305,14 +302,12 @@ function renderDrivers(){
   const btn=d=>{
     const st=statusOf(d.name);
     const mark=st==='full'?'<span class="st full">✓</span>':(st==='half'?'<span class="st half">•</span>':'');
-    return `<button class="namebtn${d.proj===0?' proj':''}${selDriver===d.name?' sel':''}" onclick="selectDriver('${esc(d.name)}')">${esc(d.name)}${mark}</button>`;
+    return `<button class="namebtn${selDriver===d.name?' sel':''}" onclick="selectDriver('${esc(d.name)}')">${esc(d.name)}${mark}</button>`;
   };
   const reg=drivers.filter(d=>d.reg!==false);    // 普段表示（運転する人）
   const extra=drivers.filter(d=>d.reg===false);  // 普段運転しない人（控え）
-  const proj=reg.filter(d=>d.proj===0), other=reg.filter(d=>d.proj!==0);
   let html='';
-  if(proj.length){html+=`<div class="gl">企画制作部</div><div class="ngrid">${proj.map(btn).join('')}</div>`;}
-  if(other.length){html+=`<div class="gl">その他</div><div class="ngrid">${other.map(btn).join('')}</div>`;}
+  if(reg.length){html+=`<div class="ngrid">${reg.map(btn).join('')}</div>`;}
   if(extra.length){
     html+=`<div><span class="moretoggle" onclick="toggleExtra()">${showExtra?'− 控えを隠す':'＋ その他の人（普段運転しない人）'}</span></div>`;
     if(showExtra)html+=`<div class="ngrid">${extra.map(btn).join('')}</div>`;
@@ -343,7 +338,6 @@ function renderToday(){
   const byD={};
   records.forEach(r=>{(byD[r.driver]=byD[r.driver]||{})[r.phase]=r;});
   const order=drivers.map(d=>d.name);
-  const projSet=new Set(drivers.filter(d=>d.proj===0).map(d=>d.name));
   const names=Object.keys(byD).sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?999:ia)-(ib<0?999:ib);});
   const cell=r=>{
     if(!r)return '<td class="cell-none">—</td>';
@@ -352,7 +346,7 @@ function renderToday(){
   };
   el.innerHTML=`<table class="mtx"><thead><tr><th>運転者</th><th>運転前</th><th>運転後</th><th>確認者</th></tr></thead><tbody>${
     names.map(n=>{const d=byD[n];const chk=(d['運転前']||d['運転後']||{}).checker||'';
-      return `<tr><td class="nm${projSet.has(n)?' proj':''}">${esc(n)}</td>${cell(d['運転前'])}${cell(d['運転後'])}<td>${esc(chk)}</td></tr>`;}).join('')
+      return `<tr><td class="nm">${esc(n)}</td>${cell(d['運転前'])}${cell(d['運転後'])}<td>${esc(chk)}</td></tr>`;}).join('')
   }</tbody></table>`;
 }
 
