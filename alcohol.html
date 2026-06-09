@@ -330,8 +330,8 @@ async function boot(){
   await loadDay($('f_date').value);
 }
 
-async function loadDay(date){
-  $('dayMtx').innerHTML='<div class="empty">読み込み中...</div>';
+async function loadDay(date,silent){
+  if(!silent)$('dayMtx').innerHTML='<div class="empty">読み込み中...</div>';
   try{const r=await apiGet({action:'list',date});records=(r.data||[]);}catch(e){records=[];}
   renderDrivers(); renderToday();
 }
@@ -418,7 +418,7 @@ function record(phase){
   toast(`${driver}・${phase}を記録`);
   clearSel();              // 次の人へ
   renderToday();
-  setTimeout(()=>loadDay($('f_date').value),3000);
+  setTimeout(()=>loadDay($('f_date').value,true),3000);
 }
 
 /* ===== 編集 ===== */
@@ -452,7 +452,7 @@ function saveEdit(){
   apiPost({action:'save',...upd});
   Object.assign(curEdit,upd);
   renderDrivers();renderToday();closeEdit();toast('更新しました');
-  setTimeout(()=>loadDay($('f_date').value),3000);
+  setTimeout(()=>loadDay($('f_date').value,true),3000);
 }
 function delRecord(){
   if(busy||!curEdit)return;
@@ -461,7 +461,7 @@ function delRecord(){
   apiPost({action:'delete',id:curEdit.id});
   records=records.filter(x=>x.id!==curEdit.id);
   renderDrivers();renderToday();closeEdit();toast('削除しました');
-  setTimeout(()=>loadDay($('f_date').value),3000);
+  setTimeout(()=>loadDay($('f_date').value,true),3000);
 }
 
 /* ===== CSV ===== */
