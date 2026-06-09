@@ -37,6 +37,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 
 /* Name grid */
 .gl{font-size:12px;font-weight:700;color:#9aa8a7;margin:10px 2px 6px}
+.moretoggle{font-size:13px;font-weight:700;color:#0d9488;cursor:pointer;display:inline-block;margin:14px 2px 6px}
+.moretoggle:hover{text-decoration:underline}
 .ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 .namebtn{padding:15px 6px;border:2px solid #e6eaea;border-radius:11px;background:#fafcfc;font:700 16px/1.2 'Noto Sans JP';color:#27302f;cursor:pointer;transition:.1s;text-align:center;position:relative}
 .namebtn.proj{border-color:#a7ddd6;background:#eefbf8}
@@ -244,6 +246,7 @@ const $=id=>document.getElementById(id);
 let drivers=[], vehicles=[], checkerDefault='杉山雄一';
 let records=[];      // 表示日の記録
 let selDriver=null;  // 選択中の運転者
+let showExtra=false; // 普段運転しない人を表示中か
 let curEdit=null, busy=false;
 
 function toast(msg,ok=true){const t=$('toast');t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(()=>t.classList.remove('show'),2300);}
@@ -299,17 +302,24 @@ function statusOf(name){
 function renderDrivers(){
   const el=$('driverGrid');
   if(!drivers.length){el.innerHTML='<div class="empty">運転者がいません</div>';return;}
-  const proj=drivers.filter(d=>d.proj===0), other=drivers.filter(d=>d.proj!==0);
   const btn=d=>{
     const st=statusOf(d.name);
     const mark=st==='full'?'<span class="st full">✓</span>':(st==='half'?'<span class="st half">•</span>':'');
     return `<button class="namebtn${d.proj===0?' proj':''}${selDriver===d.name?' sel':''}" onclick="selectDriver('${esc(d.name)}')">${esc(d.name)}${mark}</button>`;
   };
+  const reg=drivers.filter(d=>d.reg!==false);    // 普段表示（運転する人）
+  const extra=drivers.filter(d=>d.reg===false);  // 普段運転しない人（控え）
+  const proj=reg.filter(d=>d.proj===0), other=reg.filter(d=>d.proj!==0);
   let html='';
   if(proj.length){html+=`<div class="gl">企画制作部</div><div class="ngrid">${proj.map(btn).join('')}</div>`;}
   if(other.length){html+=`<div class="gl">その他</div><div class="ngrid">${other.map(btn).join('')}</div>`;}
+  if(extra.length){
+    html+=`<div><span class="moretoggle" onclick="toggleExtra()">${showExtra?'− 控えを隠す':'＋ その他の人（普段運転しない人）'}</span></div>`;
+    if(showExtra)html+=`<div class="ngrid">${extra.map(btn).join('')}</div>`;
+  }
   el.innerHTML=html;
 }
+function toggleExtra(){showExtra=!showExtra;renderDrivers();}
 
 function selectDriver(name){
   selDriver=name;
