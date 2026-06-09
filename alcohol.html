@@ -38,9 +38,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 /* Name grid */
 .moretoggle{font-size:13px;font-weight:700;color:#0d9488;cursor:pointer;display:inline-block;margin:14px 2px 6px}
 .moretoggle:hover{text-decoration:underline}
-.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
-.namebtn{padding:15px 6px;border:2px solid #e6eaea;border-radius:11px;background:#fafcfc;font:700 16px/1.2 'Noto Sans JP';color:#27302f;cursor:pointer;transition:.1s;text-align:center;position:relative}
-.namebtn.sel{background:#0d9488;color:#fff;border-color:#0d9488;box-shadow:0 4px 12px rgba(13,148,136,.35)}
+.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:9px}
+.namebtn{padding:16px 8px;border:1.5px solid #dce3e2;border-radius:12px;background:#fff;font:600 16px/1.2 'Noto Sans JP';color:#33403f;cursor:pointer;transition:.12s;text-align:center;position:relative}
+.namebtn:hover{border-color:#0d9488;background:#f6fbfa}
+.namebtn.sel{background:#0d9488;color:#fff;border-color:#0d9488;font-weight:700;box-shadow:0 3px 10px rgba(13,148,136,.28)}
 .namebtn:active{transform:scale(.96)}
 .namebtn .st{position:absolute;top:4px;right:6px;font-size:11px;font-weight:700}
 .namebtn .st.full{color:#15803d}.namebtn.sel .st.full{color:#bbf7d0}
@@ -57,7 +58,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .seg button{flex:1;padding:14px 0;border:none;background:#fafcfc;font:800 16px/1 'Noto Sans JP';color:#7c8c8b;cursor:pointer;transition:.12s}
 .seg button+button{border-left:2px solid #e6eaea}
 .seg button.on{background:#0d9488;color:#fff}
-.seg.danger button.on{background:#dc2626}
+.seg.alc button[data-v="無"].on{background:#0f9d6e;color:#fff}
+.seg.alc button[data-v="有"].on{background:#dc2626;color:#fff}
 .seg.big button{padding:18px 0;font-size:20px}
 
 .detail-toggle{font-size:13px;font-weight:700;color:#0d9488;cursor:pointer;display:inline-block;margin:6px 0 12px}
@@ -68,7 +70,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 /* Commit */
 .commit{display:flex;gap:12px;margin-top:8px}
 .commit button{flex:1;padding:24px 0;border:none;border-radius:14px;font:900 22px/1 'Noto Sans JP';cursor:pointer;letter-spacing:.04em;transition:.12s;color:#fff}
-.commit .pre{background:#0d9488}.commit .post{background:#0369a1}
+.commit .pre{background:#0d9488}.commit .post{background:#33627a}
 .commit button:active{transform:scale(.97)}
 .commit button:disabled{background:#bcc8c7;cursor:not-allowed}
 
@@ -133,7 +135,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 
     <div class="field" style="margin-top:16px">
       <label>酒気帯び</label>
-      <div class="seg danger big" id="segAlcohol">
+      <div class="seg alc big" id="segAlcohol">
         <button type="button" class="on" data-v="無" onclick="segPick('segAlcohol',this)">無</button>
         <button type="button" data-v="有" onclick="segPick('segAlcohol',this)">有</button>
       </div>
@@ -205,7 +207,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
     </div>
     <div class="field"><label>車両</label><select id="m_vehicle"><option value="">－</option></select></div>
     <div class="field"><label>酒気帯び</label>
-      <div class="seg danger" id="m_alcohol">
+      <div class="seg alc" id="m_alcohol">
         <button type="button" data-v="無" onclick="segPick('m_alcohol',this)">無</button>
         <button type="button" data-v="有" onclick="segPick('m_alcohol',this)">有</button>
       </div>
