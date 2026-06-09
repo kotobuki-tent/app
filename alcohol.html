@@ -11,7 +11,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:16px;scrollbar-gutter:stable}
-body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-height:100vh;min-height:100dvh}
+body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 
 /* Header */
 .hdr{background:#3aa3a6;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
@@ -63,7 +63,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .seg.big button{padding:18px 0;font-size:20px}
 /* 酒気帯び：離した独立ボタン */
 .alc2{display:flex;gap:12px}
-.alc2 button{flex:1;padding:18px 0;border:2px solid #dce3e2;border-radius:12px;background:#fff;font:800 20px/1 'Noto Sans JP';color:#8a9897;cursor:pointer;transition:.12s}
+.alc2 button{flex:1;padding:18px 0;border:2px solid #dce3e2;border-radius:12px;background:#fff;font:700 20px/1 'Noto Sans JP';color:#8a9897;cursor:pointer;transition:.12s}
 .alc2 button[data-v="無"].on{background:#3bb389;border-color:#3bb389;color:#fff}
 .alc2 button[data-v="有"].on{background:#dc2626;border-color:#dc2626;color:#fff}
 .alc2 button:active{transform:scale(.97)}
@@ -75,7 +75,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 
 /* Commit */
 .commit{display:flex;gap:12px;margin-top:8px}
-.commit button{flex:1;padding:24px 0;border:none;border-radius:14px;font:900 22px/1 'Noto Sans JP';cursor:pointer;letter-spacing:.04em;transition:.12s;color:#fff}
+.commit button{flex:1;padding:24px 0;border:none;border-radius:14px;font:700 22px/1 'Noto Sans JP';cursor:pointer;letter-spacing:.06em;transition:.12s;color:#fff}
 .commit .pre{background:#3aa3a6}.commit .post{background:#33627a}
 .commit button:active{transform:scale(.97)}
 .commit button:disabled{background:#bcc8c7;cursor:not-allowed}
