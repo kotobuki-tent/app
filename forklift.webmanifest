@@ -1,0 +1,12 @@
+{
+  "name": "フォークリフト始業前点検",
+  "short_name": "リフト点検",
+  "start_url": "forklift.html",
+  "display": "standalone",
+  "background_color": "#eef1f3",
+  "theme_color": "#416079",
+  "icons": [
+    { "src": "icons/forklift-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/forklift-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
