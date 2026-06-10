@@ -9,6 +9,7 @@
 <link rel="manifest" href="forklift.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#416079">
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('kiosk-sw.js',{scope:'forklift.html'}).catch(()=>{});}</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
