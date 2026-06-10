@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>安全点検 – 業務管理</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='56' fill='%231f2c38'/><text x='90' y='134' text-anchor='middle' font-family='serif' font-weight='900' font-size='100' fill='%23ffffff'>安</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='10' fill='%231f2c38'/><text x='16' y='24' text-anchor='middle' font-family='serif' font-weight='900' font-size='20' fill='%23ffffff'>安</text></svg>">
+<meta name="theme-color" content="#1f2c38">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{font-family:'Noto Sans JP',sans-serif;background:#eef1f3;color:#1a2228;min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex;flex-direction:column}
+.hdr{background:#1f2c38;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.hdr h1{font-size:19px;font-weight:900;color:#fff;letter-spacing:.06em}
+.hdr .today{font:700 15px/1 'Noto Sans JP';color:rgba(255,255,255,.8)}
+.wrap{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:980px;width:100%;margin:0 auto;padding:32px 24px;align-content:center}
+@media(max-width:720px),(orientation:portrait){.wrap{grid-template-columns:1fr}}
+.card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:48px 24px;border-radius:22px;text-decoration:none;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.12);transition:.12s;min-height:240px}
+.card:active{transform:scale(.98)}
+.card.al{background:linear-gradient(150deg,#46b0b3,#3aa3a6)}
+.card.fk{background:linear-gradient(150deg,#4a6e8a,#416079)}
+.card .ic{font-family:serif;font-weight:900;font-size:84px;line-height:1;width:120px;height:120px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.16);border-radius:28px}
+.card .ttl{font-size:24px;font-weight:800;letter-spacing:.03em}
+.card .sub{font-size:14px;font-weight:500;opacity:.85}
+.foot{text-align:center;color:#9aa7b0;font-size:12px;padding:14px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>安全点検</h1>
+  <span class="today" id="today"></span>
+</div>
+<div class="wrap">
+  <a class="card al" href="alcohol.html">
+    <div class="ic">検</div>
+    <div class="ttl">アルコールチェック</div>
+    <div class="sub">運転前・運転後の酒気帯び確認</div>
+  </a>
+  <a class="card fk" href="forklift.html">
+    <div class="ic">点</div>
+    <div class="ttl">フォークリフト始業前点検</div>
+    <div class="sub">機体ごとの始業前チェック</div>
+  </a>
+</div>
+<div class="foot">寿テント 安全点検</div>
+<script>
+const d=new Date();
+document.getElementById('today').textContent=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+</script>
+</body>
+</html>
