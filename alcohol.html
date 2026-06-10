@@ -97,15 +97,17 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .mtx th,.mtx td{border:1px solid #e3e7e8;padding:11px 8px;text-align:center}
 .mtx th{background:#f0f4f4;color:#5c6c6b;font-weight:700;font-size:13px}
 .mtx td.nm{text-align:left;font-weight:700;color:#27302f;white-space:nowrap}
-.mtx .cell-done{font-weight:800;padding:8px 6px}
-.mtx .cell-done.ng{color:#b91c1c;background:#fef2f2}
-.mtx .cell-done.ok{color:#3aa3a6}
+.mtx .cell-done{padding:8px 6px}
+.mtx .cell-done.ng{background:#fef2f2}
 .mtx .ct{cursor:pointer;display:block}
-.mtx .celldel{margin-top:6px;background:#fff;border:1px solid #e3c2c2;color:#c0392b;font:700 11px/1 'Noto Sans JP';padding:5px 10px;border-radius:7px;cursor:pointer}
-.mtx .celldel:hover{background:#fdecec}
+.mtx .al-st{display:block;font-weight:800;font-size:15px}
+.mtx .cell-done.ok .al-st{color:#0f9d6e}
+.mtx .cell-done.ng .al-st{color:#b91c1c}
+.mtx .al-tm{display:block;font-size:11px;font-weight:500;color:#9aa7af;margin-top:3px}
+.mtx .celldel{margin-top:8px;background:transparent;border:1px solid #d7dde1;color:#8a97a0;font:600 11px/1 'Noto Sans JP';padding:6px 11px;border-radius:7px;cursor:pointer}
+.mtx .celldel:hover{border-color:#c0392b;color:#c0392b}
 .mtx .celldel:active{transform:scale(.95)}
 .mtx .cell-none{color:#cdd6d5}
-.mtx .small{display:block;font-size:11px;font-weight:500;color:#90a0a0}
 .empty{text-align:center;padding:26px;color:#b6c0bf;font-size:14px}
 
 .divider{height:1px;background:#eaeeed;margin:18px 0}
@@ -321,15 +323,9 @@ function onAlcoholChange(){
 function addInstr(t,id){const el=$(id||'f_instruction');const parts=el.value.trim()?el.value.split('、').map(s=>s.trim()).filter(Boolean):[];if(!parts.includes(t))parts.push(t);el.value=parts.join('、');}
 function fillSelect(sel,arr,blank){const v=sel.value;sel.innerHTML=(blank?'<option value="">'+blank+'</option>':'')+arr.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');if([...sel.options].some(o=>o.value===v))sel.value=v;}
 
-async function boot(){
-  $('f_date').value=todayStr();
-  $('f_month').value=monthStr();
-  $('hdrDate').textContent=todayStr().replace(/-/g,'/');
-  try{
-    const b=await apiGet({action:'bootstrap'});
-    drivers=(b.drivers||[]).map(d=>typeof d==='string'?{name:d,reg:true}:d);
-    vehicles=b.vehicles||[]; checkerDefault=b.checker||'杉山雄一';
-  }catch(e){drivers=[];vehicles=[];}
+function applyBoot(b){
+  drivers=(b.drivers||[]).map(d=>typeof d==='string'?{name:d,reg:true}:d);
+  vehicles=b.vehicles||[]; checkerDefault=b.checker||'杉山雄一';
   const vehNames=vehicles.map(v=>v.plate?`${v.name}（${v.plate}）`:v.name);
   const checkerOpts=Array.from(new Set([checkerDefault,...drivers.map(d=>d.name)]));
   fillSelect($('f_vehicle'),vehNames,'－');
@@ -337,6 +333,20 @@ async function boot(){
   fillSelect($('m_vehicle'),vehNames,'－');
   fillSelect($('m_checker'),checkerOpts,'');
   $('f_checker').value=checkerDefault;
+  renderDrivers();
+}
+async function boot(){
+  $('f_date').value=todayStr();
+  $('f_month').value=monthStr();
+  $('hdrDate').textContent=todayStr().replace(/-/g,'/');
+  // キャッシュを即適用（名前が一瞬で出る）→ 裏で最新取得して差し替え
+  const cached=localStorage.getItem('alc_boot');
+  if(cached){try{applyBoot(JSON.parse(cached));}catch(e){}}
+  try{
+    const b=await apiGet({action:'bootstrap'});
+    applyBoot(b);
+    try{localStorage.setItem('alc_boot',JSON.stringify(b));}catch(e){}
+  }catch(e){}
   await loadDay($('f_date').value);
 }
 
@@ -400,7 +410,7 @@ function renderToday(){
     if(!r)return '<td class="cell-none">—</td>';
     const ng=r.alcohol==='有';
     return `<td class="cell-done ${ng?'ng':'ok'}">
-      <span class="ct" onclick="openEdit('${r.id}')">${esc(fmtTime(r.time)||'✓')}<span class="small">酒気${esc(r.alcohol||'無')}</span></span>
+      <span class="ct" onclick="openEdit('${r.id}')"><span class="al-st">酒気${esc(r.alcohol||'無')}</span><span class="al-tm">${esc(fmtTime(r.time)||'✓')}</span></span>
       <button class="celldel" onclick="delById('${r.id}')">取消</button>
     </td>`;
   };
