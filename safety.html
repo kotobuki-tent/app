@@ -12,19 +12,18 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:16px}
 body{font-family:'Noto Sans JP',sans-serif;background:#eef1f3;color:#1a2228;min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex;flex-direction:column}
-.hdr{background:#1f2c38;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
-.hdr h1{font-size:19px;font-weight:900;color:#fff;letter-spacing:.06em}
+.hdr{background:#1f2c38;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.hdr h1{font-size:19px;font-weight:900;color:#fff;letter-spacing:.08em}
 .hdr .today{font:700 15px/1 'Noto Sans JP';color:rgba(255,255,255,.8)}
-.wrap{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:980px;width:100%;margin:0 auto;padding:32px 24px;align-content:center}
-@media(max-width:720px),(orientation:portrait){.wrap{grid-template-columns:1fr}}
-.card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:48px 24px;border-radius:22px;text-decoration:none;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.12);transition:.12s;min-height:240px}
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:28px 22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;width:100%;max-width:1080px}
+.card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px 22px;border-radius:22px;text-decoration:none;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.12);transition:.12s;min-height:220px}
 .card:active{transform:scale(.98)}
-.card.al{background:linear-gradient(150deg,#46b0b3,#3aa3a6)}
-.card.fk{background:linear-gradient(150deg,#4a6e8a,#416079)}
-.card .ic{font-family:serif;font-weight:900;font-size:84px;line-height:1;width:120px;height:120px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.16);border-radius:28px}
-.card .ttl{font-size:24px;font-weight:800;letter-spacing:.03em}
-.card .sub{font-size:14px;font-weight:500;opacity:.85}
-.foot{text-align:center;color:#9aa7b0;font-size:12px;padding:14px}
+.card:hover{box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.card .ic{font-family:serif;font-weight:900;font-size:72px;line-height:1;width:108px;height:108px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.16);border-radius:26px}
+.card .ttl{font-size:22px;font-weight:800;letter-spacing:.02em;text-align:center}
+.card .sub{font-size:13.5px;font-weight:500;opacity:.85;text-align:center}
+.foot{text-align:center;color:#9aa7b0;font-size:12px;padding:16px}
 </style>
 </head>
 <body>
@@ -32,20 +31,21 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef1f3;color:#1a2228;min-
   <h1>安全点検</h1>
   <span class="today" id="today"></span>
 </div>
-<div class="wrap">
-  <a class="card al" href="alcohol.html">
-    <div class="ic">検</div>
-    <div class="ttl">アルコールチェック</div>
-    <div class="sub">運転前・運転後の酒気帯び確認</div>
-  </a>
-  <a class="card fk" href="forklift.html">
-    <div class="ic">点</div>
-    <div class="ttl">フォークリフト始業前点検</div>
-    <div class="sub">機体ごとの始業前チェック</div>
-  </a>
-</div>
+<div class="wrap"><div class="grid" id="grid"></div></div>
 <div class="foot">寿テント 安全点検</div>
 <script>
+// ここに1行足すだけでメニューが増える
+const TOOLS=[
+  { ic:'検', title:'アルコールチェック',        sub:'運転前・運転後の酒気帯び確認', href:'alcohol.html',  grad:['#46b0b3','#3aa3a6'] },
+  { ic:'点', title:'フォークリフト始業前点検',  sub:'機体ごとの始業前チェック',     href:'forklift.html', grad:['#4a6e8a','#416079'] }
+];
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+document.getElementById('grid').innerHTML=TOOLS.map(t=>
+  `<a class="card" href="${esc(t.href)}" style="background:linear-gradient(150deg,${t.grad[0]},${t.grad[1]})">
+     <div class="ic">${esc(t.ic)}</div>
+     <div class="ttl">${esc(t.title)}</div>
+     <div class="sub">${esc(t.sub)}</div>
+   </a>`).join('');
 const d=new Date();
 document.getElementById('today').textContent=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
 </script>
