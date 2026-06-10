@@ -100,10 +100,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef2f2;color:#16201f;min-
 .mtx .cell-done{padding:8px 6px}
 .mtx .cell-done.ng{background:#fef2f2}
 .mtx .ct{cursor:pointer;display:block}
+.mtx .al-tm{display:block;font-size:11px;font-weight:500;color:#9aa7af;margin-bottom:3px}
 .mtx .al-st{display:block;font-weight:800;font-size:15px}
 .mtx .cell-done.ok .al-st{color:#0f9d6e}
 .mtx .cell-done.ng .al-st{color:#b91c1c}
-.mtx .al-tm{display:block;font-size:11px;font-weight:500;color:#9aa7af;margin-top:3px}
 .mtx .celldel{margin-top:8px;background:transparent;border:1px solid #d7dde1;color:#8a97a0;font:600 11px/1 'Noto Sans JP';padding:6px 11px;border-radius:7px;cursor:pointer}
 .mtx .celldel:hover{border-color:#c0392b;color:#c0392b}
 .mtx .celldel:active{transform:scale(.95)}
@@ -410,7 +410,7 @@ function renderToday(){
     if(!r)return '<td class="cell-none">—</td>';
     const ng=r.alcohol==='有';
     return `<td class="cell-done ${ng?'ng':'ok'}">
-      <span class="ct" onclick="openEdit('${r.id}')"><span class="al-st">酒気${esc(r.alcohol||'無')}</span><span class="al-tm">${esc(fmtTime(r.time)||'✓')}</span></span>
+      <span class="ct" onclick="openEdit('${r.id}')"><span class="al-tm">${esc(fmtTime(r.time)||'✓')}</span><span class="al-st">酒気${esc(r.alcohol||'無')}</span></span>
       <button class="celldel" onclick="delById('${r.id}')">取消</button>
     </td>`;
   };
