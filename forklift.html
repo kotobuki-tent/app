@@ -65,9 +65,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef1f3;color:#1a2228;min-
 .btn-rec:active{transform:scale(.98)}
 .btn-rec:disabled{background:#c2cbd1;cursor:not-allowed}
 
-.lastbar{display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;background:#fff7ed;border:1.5px solid #fdba74;border-radius:12px}
-.lastbar .lb-txt{flex:1;font-size:14px;font-weight:700;color:#9a3412}
-.lastbar .lb-undo{background:#dc2626;color:#fff;border:none;border-radius:10px;font:700 15px/1 'Noto Sans JP';padding:12px 18px;cursor:pointer;white-space:nowrap}
 
 /* 右ペイン記録 */
 .dayhead{margin-bottom:12px}
@@ -122,18 +119,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef1f3;color:#1a2228;min-
 
       <div class="summary" id="summary"><span class="s-txt" id="sumTxt">すべて良</span></div>
       <button class="btn-rec" id="btnRec" onclick="record()">点検を記録</button>
-
-      <div id="lastBar" class="lastbar hide">
-        <span class="lb-txt" id="lastTxt"></span>
-        <button class="lb-undo" id="lastUndo">取り消す</button>
-      </div>
     </div>
   </div>
 
   <!-- 右：当日状況 -->
   <div class="pane">
     <h2>📋 点検状況</h2>
-    <div class="dayhead"><div class="field" style="margin:0"><label>表示日</label><input type="date" id="f_date" onchange="hideLastBar();loadDay($('f_date').value)"></div></div>
+    <div class="dayhead"><div class="field" style="margin:0"><label>表示日</label><input type="date" id="f_date" onchange="loadDay($('f_date').value)"></div></div>
     <div id="dayList"><div class="empty">読み込み中...</div></div>
     <div class="divider"></div>
     <h2>📤 月次CSV出力（保存用）</h2>
@@ -191,7 +183,7 @@ const GROUPS={'始業前':'① 始業前点検','作動':'② 作動点検','走
 let inspectors=[], records=[];
 let machine=null, machineType=null, inspector=null, showExtraIns=false;
 let itemState={};      // {n:{status,memo}}
-let pendingUndo=null, busy=false;
+let busy=false;
 
 function toast(msg,ok=true){const t=$('toast');t.style.pointerEvents='none';t.textContent=msg;t.className='toast show '+(ok?'ok':'err');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2300);}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -293,9 +285,7 @@ function record(){
     ng:JSON.stringify(ng),note:'',time:nowHHMM(),_optimistic:true};
   apiPost({action:'save',...rec});
   records.push(rec);
-  const ctx={tmpId,date,machine,inspector};
   toast(`${machine}を記録`);
-  showLastBar(ctx);
   // 次の機体へ
   machine=null;machineType=null;inspector=null;itemState={};
   $('afterMachine').classList.add('hide');
@@ -303,29 +293,9 @@ function record(){
   setTimeout(()=>loadDay($('f_date').value,true),3000);
 }
 
-/* 直前の取り消し */
-function showLastBar(ctx){
-  $('lastTxt').textContent='直前の記録：'+ctx.machine;
-  $('lastUndo').onclick=()=>undoRecord(ctx);
-  $('lastBar').classList.remove('hide');
-}
-function hideLastBar(){$('lastBar').classList.add('hide');}
-function undoRecord(ctx){
-  hideLastBar();
-  const real=records.find(r=>String(r.id).indexOf('tmp_')!==0 && r.date===ctx.date && r.machine===ctx.machine);
-  if(real){apiPost({action:'delete',id:real.id});records=records.filter(r=>r.id!==real.id);renderDayList();toast('記録を取り消しました');setTimeout(()=>loadDay($('f_date').value,true),3000);return;}
-  records=records.filter(r=>r.id!==ctx.tmpId);
-  pendingUndo=ctx;renderDayList();toast('記録を取り消しました');
-}
-
 async function loadDay(date,silent){
   if(!silent)$('dayList').innerHTML='<div class="empty">読み込み中...</div>';
   try{const r=await apiGet({action:'list',date});records=(r.data||[]);}catch(e){records=[];}
-  if(pendingUndo){
-    const c=pendingUndo,hit=records.find(r=>r.date===c.date&&r.machine===c.machine);
-    if(hit){apiPost({action:'delete',id:hit.id});records=records.filter(r=>r.id!==hit.id);pendingUndo=null;}
-    else if(!c._retry){c._retry=1;setTimeout(()=>loadDay(date,true),3000);}else{pendingUndo=null;}
-  }
   renderDayList();
 }
 function renderDayList(){
