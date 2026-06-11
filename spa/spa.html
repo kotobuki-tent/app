@@ -1552,6 +1552,11 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cases-foot{display:flex;justify-content:flex-end;margin:6px 0 12px}
   #view-cases .cases-foot .save{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px 30px;font:700 15px/1 'Noto Sans JP',sans-serif;cursor:pointer}
   #view-cases .cases-foot .save:active{transform:scale(.98)}
+  #view-cases .cf-hide{display:none}
+  #view-cases .cf-toggle{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--text);cursor:pointer;user-select:none}
+  #view-cases .cf-toggle input{width:18px;height:18px;cursor:pointer;accent-color:var(--accent)}
+  #view-cases .cases-card.off{opacity:.6}
+  #view-cases .cases-hint{font-size:12px;color:var(--text-dim);margin:-4px 2px 12px}
   </style>
   <div id="casesBody" style="padding:16px 14px 80px;max-width:1000px;margin:0 auto"></div>
 </section>
@@ -5822,50 +5827,66 @@ const Cases = (function(){
       <div class="cases-card">
         <div class="mo-row pair"><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div></div>
         <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="cf_client" placeholder="例: ○○町内会"></div><div class="mo-field f3"><label>窓口</label><input id="cf_person"></div></div>
-        <div class="mo-row pair"><div class="mo-field f7"><label>案件名（物件名）</label><input id="cf_project" placeholder="例: ○○町内会 盆踊り大会"></div><div class="mo-field f3"><label>担当</label><input id="cf_our_person"></div></div>
+        <div class="mo-row pair"><div class="mo-field f7"><label>案件名（物件名）</label><input id="cf_project" placeholder="例: アルコネクト 6K×10K 主幕・横幕"></div><div class="mo-field f3"><label>担当</label><input id="cf_our_person"></div></div>
         <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="cf_notes"></textarea></div></div>
       </div>
-      <div class="cases-card">
-        <div class="cases-sec-hd"><span>製作（→ 生産へ）</span><button class="cases-add" onclick="Cases.addProd()">＋ 制作物</button></div>
-        <div id="cf_prodRows"></div>
+      <div class="cases-hint">この案件がどこで動くかを選ぶ（両方でも可）。工場で製作→自社施工なら両方にチェック。</div>
+      <div class="cases-card off" id="cf_prodCard">
+        <div class="cases-sec-hd">
+          <label class="cf-toggle"><input type="checkbox" id="cf_useProd" onchange="Cases.toggle('prod')"> 生産（工場で製作）</label>
+          <button class="cases-add cf-hide" id="cf_prodAddBtn" onclick="Cases.addProd()">＋ 制作物</button>
+        </div>
+        <div id="cf_prodWrap" class="cf-hide"><div id="cf_prodRows"></div></div>
       </div>
-      <div class="cases-card">
-        <div class="cases-sec-hd"><span>施工・レンタル・納品（→ 企画制作へ）</span><button class="cases-add" onclick="Cases.addProj()">＋ 追加</button></div>
-        <div id="cf_projRows"></div>
+      <div class="cases-card off" id="cf_projCard">
+        <div class="cases-sec-hd">
+          <label class="cf-toggle"><input type="checkbox" id="cf_useProj" onchange="Cases.toggle('proj')"> 企画制作（施工・レンタル・納品）</label>
+          <button class="cases-add cf-hide" id="cf_projAddBtn" onclick="Cases.addProj()">＋ 追加</button>
+        </div>
+        <div id="cf_projWrap" class="cf-hide"><div id="cf_projRows"></div></div>
       </div>
       <div class="cases-foot"><button class="save" onclick="Cases.save()">案件を登録</button></div>`;
-    refreshEmpty();
   }
 
-  function refreshEmpty(){
-    const p=$('cf_prodRows'), j=$('cf_projRows');
-    if(p && !p.querySelector('.cf-row')) p.innerHTML='<div class="cf-empty">製作物が無ければ空のままでOK（生産には作られません）</div>';
-    if(j && !j.querySelector('.cf-row')) j.innerHTML='<div class="cf-empty">施工/レンタル/納品が無ければ空のままでOK（企画制作には作られません）</div>';
+  // 生産/企画制作のON/OFF。ONにしたら既定で1行（案件名でプリフィル）出す。
+  function toggle(which){
+    const on=$(which==='prod'?'cf_useProd':'cf_useProj').checked;
+    $(which==='prod'?'cf_prodWrap':'cf_projWrap').classList.toggle('cf-hide',!on);
+    $(which==='prod'?'cf_prodAddBtn':'cf_projAddBtn').classList.toggle('cf-hide',!on);
+    $(which==='prod'?'cf_prodCard':'cf_projCard').classList.toggle('off',!on);
+    if(on){
+      const rows=$(which==='prod'?'cf_prodRows':'cf_projRows');
+      if(!rows.querySelector('.cf-row')){
+        which==='prod'?addProd():addProj();
+        const nm=$('cf_project').value.trim();
+        if(nm){ const inp=rows.querySelector(which==='prod'?'.cf-pname':'.cf-jname'); if(inp&&!inp.value) inp.value=nm; }
+      }
+    }
   }
 
   function addProd(){
-    const wrap=$('cf_prodRows'); const e=wrap.querySelector('.cf-empty'); if(e)e.remove();
+    const wrap=$('cf_prodRows');
     const div=document.createElement('div'); div.className='cf-row';
-    div.innerHTML=`<input class="cf-pname" placeholder="品名（例: ステージバック幕）" style="flex:2">
+    div.innerHTML=`<input class="cf-pname" placeholder="制作物名（空なら案件名）" style="flex:2">
       <input type="date" class="cf-pdeadline" title="納期" style="flex:0 0 150px">
       <select class="cf-psection" style="flex:1">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select>
       <input class="cf-psub" placeholder="外注先" style="flex:1">
       <button class="cf-del" onclick="Cases.delRow(this)">×</button>`;
-    wrap.appendChild(div); div.querySelector('.cf-pname').focus();
+    wrap.appendChild(div);
   }
 
   function addProj(){
-    const wrap=$('cf_projRows'); const e=wrap.querySelector('.cf-empty'); if(e)e.remove();
+    const wrap=$('cf_projRows');
     const div=document.createElement('div'); div.className='cf-row';
     div.innerHTML=`<select class="cf-jtype" style="flex:0 0 110px">${PTYPES.map(s=>`<option>${s}</option>`).join('')}</select>
       <input class="cf-jname" placeholder="物件名（空なら案件名）" style="flex:2">
       <input class="cf-jvenue" placeholder="会場" style="flex:1">
       <input class="cf-jnote" placeholder="備考" style="flex:1">
       <button class="cf-del" onclick="Cases.delRow(this)">×</button>`;
-    wrap.appendChild(div); div.querySelector('.cf-jname').focus();
+    wrap.appendChild(div);
   }
 
-  function delRow(btn){ const r=btn.closest('.cf-row'); if(r){ r.remove(); refreshEmpty(); } }
+  function delRow(btn){ const r=btn.closest('.cf-row'); if(r) r.remove(); }
 
   function newCaseId(){
     const u=(self.crypto&&crypto.randomUUID)?crypto.randomUUID().replace(/-/g,''):(Date.now().toString(36)+Math.random().toString(36).slice(2));
@@ -5877,19 +5898,22 @@ const Cases = (function(){
     const order_no=$('cf_order_no').value.trim();
     const projectName=$('cf_project').value.trim();
     if(!order_no && !projectName){ toast('受注番号か案件名を入れてください',true); return; }
-    const prodLines=[...document.querySelectorAll('#cf_prodRows .cf-row')].map(r=>({
-      name:r.querySelector('.cf-pname').value.trim(),
+    const useProd=$('cf_useProd').checked, useProj=$('cf_useProj').checked;
+    if(!useProd && !useProj){ toast('生産か企画制作にチェックを入れてください',true); return; }
+    // 名前が空なら案件名で補完（チェックされた側は最低1件作る）
+    const prodLines=!useProd?[]:[...document.querySelectorAll('#cf_prodRows .cf-row')].map(r=>({
+      name:r.querySelector('.cf-pname').value.trim()||projectName,
       deadline:r.querySelector('.cf-pdeadline').value,
       section:r.querySelector('.cf-psection').value,
       sub:r.querySelector('.cf-psub').value.trim()
     })).filter(x=>x.name);
-    const projLines=[...document.querySelectorAll('#cf_projRows .cf-row')].map(r=>({
+    const projLines=!useProj?[]:[...document.querySelectorAll('#cf_projRows .cf-row')].map(r=>({
       type:r.querySelector('.cf-jtype').value,
-      name:r.querySelector('.cf-jname').value.trim(),
+      name:r.querySelector('.cf-jname').value.trim()||projectName,
       venue:r.querySelector('.cf-jvenue').value.trim(),
       note:r.querySelector('.cf-jnote').value.trim()
-    }));
-    if(prodLines.length===0 && projLines.length===0){ toast('製作 か 施工/レンタル/納品 を1行以上追加してください',true); return; }
+    })).filter(x=>x.name);
+    if(prodLines.length===0 && projLines.length===0){ toast('案件名を入れるか、明細を追加してください',true); return; }
     _busy=true; setTimeout(()=>_busy=false,1500);
 
     const case_id=newCaseId();
@@ -5907,7 +5931,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, addProd, addProj, delRow, save };
+  return { loadAll, render, init, toggle, addProd, addProj, delRow, save };
 })();
 
 const App = {
