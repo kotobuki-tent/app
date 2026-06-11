@@ -22,7 +22,12 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef1f3;color:#1a2228;min-
 .hdr .today{font:700 15px/1 'Noto Sans JP';color:rgba(255,255,255,.85)}
 .hdr .refresh{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);color:#fff;font:700 14px/1 'Noto Sans JP';border-radius:8px;padding:9px 14px;cursor:pointer}
 
-.kiosk{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;max-width:1340px;margin:0 auto;padding:16px;align-items:start}
+.kiosk{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1320px;margin:0 auto;padding:16px;align-items:start}
+.dnav{display:flex;align-items:center;gap:6px}
+.dnav input[type=date]{flex:1}
+.dnav-btn{flex:0 0 auto;width:42px;height:46px;border:2px solid #e2e8ec;border-radius:10px;background:#fff;font-size:18px;color:#416079;cursor:pointer}
+.dnav-btn:active{transform:scale(.95)}
+.dnav-today{flex:0 0 auto;height:46px;padding:0 14px;border:2px solid #e2e8ec;border-radius:10px;background:#fff;font:600 13px/1 'Noto Sans JP',sans-serif;color:#416079;cursor:pointer}
 @media(max-width:860px),(orientation:portrait){.kiosk{grid-template-columns:1fr}}
 .pane{background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .pane h2{font-size:15px;font-weight:800;color:#2a3742;margin-bottom:13px;display:flex;align-items:center;gap:8px}
@@ -126,7 +131,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:#eef1f3;color:#1a2228;min-
   <!-- 右：当日状況 -->
   <div class="pane">
     <h2>📋 点検状況</h2>
-    <div class="dayhead"><div class="field" style="margin:0"><label>表示日</label><input type="date" id="f_date" onchange="loadDay($('f_date').value)"></div></div>
+    <div class="dayhead"><div class="field" style="margin:0"><label>表示日</label>
+      <div class="dnav">
+        <button type="button" class="dnav-btn" onclick="shiftDay(-1)">◀</button>
+        <input type="date" id="f_date" onchange="loadDay($('f_date').value)">
+        <button type="button" class="dnav-btn" onclick="shiftDay(1)">▶</button>
+        <button type="button" class="dnav-today" onclick="goToday()">今日</button>
+      </div>
+    </div></div>
     <div id="dayList"><div class="empty">読み込み中...</div></div>
     <div class="divider"></div>
     <h2>📤 月次CSV出力（保存用）</h2>
@@ -190,6 +202,8 @@ function toast(msg,ok=true){const t=$('toast');t.style.pointerEvents='none';t.te
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function pad(n){return n<10?'0'+n:''+n;}
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function shiftDay(n){const d=new Date(($('f_date').value||todayStr())+'T00:00');d.setDate(d.getDate()+n);const v=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());$('f_date').value=v;loadDay(v);}
+function goToday(){const v=todayStr();$('f_date').value=v;loadDay(v);}
 function monthStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1);}
 function nowHHMM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes());}
 
