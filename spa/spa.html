@@ -1565,6 +1565,7 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cf-typeseg{display:flex;gap:8px;margin-bottom:16px}
   #view-cases .cf-typeseg button{flex:1;padding:11px 0;border:1.5px solid var(--border);border-radius:9px;background:var(--surface2);font:700 14px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
   #view-cases .cf-typeseg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  #view-cases select.cf-delsel{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);max-width:300px;width:100%}
   </style>
   <div id="casesBody" style="padding:16px 14px 80px;max-width:1000px;margin:0 auto"></div>
 </section>
@@ -5830,7 +5831,7 @@ const Cases = (function(){
 
   function loadAll(){ render(); return Promise.resolve(); }
 
-  const JVH=['load_in','setup','event','teardown','deliv','pickup']; // 企画制作で使う車両フェーズ
+  const JVH=['load_in','setup','event','teardown','lend','back','deliv']; // 企画制作で使う車両フェーズ
   function dateBlock(id,label){
     return `<div class="date-phase-block"><label class="date-phase-label">${label}</label><div class="date-list" id="cf_d_${id}"></div><button type="button" class="date-add-btn" onclick="Cases.addDate('cf_d_${id}')">＋ 日付追加</button></div>`;
   }
@@ -5884,13 +5885,20 @@ const Cases = (function(){
           <div id="cf_jt_rental" class="cf-hide">
             <div class="phase-hd">レンタル期間</div>
             <div class="cf-grid2">${dateBlock('lend','貸出日')}${dateBlock('back','返却日')}</div>
+            <div class="phase-hd">配送方法</div>
+            <select id="cf_rdeliv" class="cf-delsel" onchange="Cases.setRdeliv()"><option>客が取りに来る</option><option>自社車両で届ける</option><option>運送便</option></select>
+            <div id="cf_rcarrier" class="cf-hide" style="margin-top:10px"><div class="mo-field"><label>運送業者</label><input id="cf_rcarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
+            <div id="cf_rveh" class="cf-hide" style="margin-top:10px"><div class="cf-grid2">${vhBlock('lend','貸出')}${vhBlock('back','返却')}</div></div>
           </div>
           <div id="cf_jt_nouhin" class="cf-hide">
-            <div class="phase-hd">日程</div>
-            <div class="cf-grid2">${dateBlock('deliv','納品日')}${dateBlock('pickup','引取日')}</div>
-            <div class="phase-hd">車両</div>
-            <div class="cf-grid2">${vhBlock('deliv','納品')}${vhBlock('pickup','引取')}</div>
+            <div class="phase-hd">納品日</div>
+            <div class="cf-grid2">${dateBlock('deliv','納品日')}</div>
+            <div class="phase-hd">配送方法</div>
+            <select id="cf_ndeliv" class="cf-delsel" onchange="Cases.setNdeliv()"><option>運送便</option><option>自社車両で届ける</option></select>
+            <div id="cf_ncarrier" style="margin-top:10px"><div class="mo-field"><label>運送業者</label><input id="cf_ncarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
+            <div id="cf_nveh" class="cf-hide" style="margin-top:10px"><div class="cf-grid2">${vhBlock('deliv','納品')}</div></div>
           </div>
+          <div id="cf_jt_material"><div class="phase-hd">材料・仕入</div><div class="mo-row full"><div class="mo-field"><label>材料・仕入メモ</label><textarea id="cf_material"></textarea></div></div></div>
           <div class="phase-hd">レンタル品</div>
           <div class="mo-row full"><div class="mo-field"><label>レンタル品</label><textarea id="cf_rentals"></textarea></div></div>
         </div>
@@ -5917,8 +5925,21 @@ const Cases = (function(){
     $('cf_jt_sekou').classList.toggle('cf-hide', t!=='施工');
     $('cf_jt_rental').classList.toggle('cf-hide', t!=='レンタル');
     $('cf_jt_nouhin').classList.toggle('cf-hide', t!=='納品');
+    $('cf_jt_material').classList.toggle('cf-hide', t==='レンタル'); // レンタルは材料なし
   }
   function jType(){ const b=[...$('cf_typeseg').children].find(x=>x.classList.contains('on')); return b?b.dataset.t:'施工'; }
+  // レンタルの配送方法：客取り＝何も出さない／自社車両＝車両／運送便＝業者
+  function setRdeliv(){
+    const v=$('cf_rdeliv').value;
+    $('cf_rcarrier').classList.toggle('cf-hide', v!=='運送便');
+    $('cf_rveh').classList.toggle('cf-hide', v!=='自社車両で届ける');
+  }
+  // 納品の配送方法：運送便＝業者／自社車両＝車両
+  function setNdeliv(){
+    const v=$('cf_ndeliv').value;
+    $('cf_ncarrier').classList.toggle('cf-hide', v!=='運送便');
+    $('cf_nveh').classList.toggle('cf-hide', v!=='自社車両で届ける');
+  }
 
   function addProd(prefill){
     const wrap=$('cf_prodRows');
@@ -5970,17 +5991,24 @@ const Cases = (function(){
     prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status,deadline:L.deadline,section:L.section,subcontractor:L.sub,start_date:L.start,notes}));
     if(useProj){
       const t=jType();
-      const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,rentals:$('cf_rentals').value.trim(),notes,
+      const material=(t==='レンタル')?'':$('cf_material').value.trim();
+      const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,rentals:$('cf_rentals').value.trim(),material,notes,
         venue:t==='レンタル'?'':$('cf_venue').value.trim(), address:t==='レンタル'?'':$('cf_address').value.trim()};
       if(t==='施工'){
-        Object.assign(p,{
+        Object.assign(p,{ delivery:'自社車両',
           date_load_in:getDates('cf_d_load_in'), date_setup:getDates('cf_d_setup'), date_event:getDates('cf_d_event'), date_teardown:getDates('cf_d_teardown'),
           people_load_in:$('cf_p_load_in').value, people_setup:$('cf_p_setup').value, people_event:$('cf_p_event').value, people_teardown:$('cf_p_teardown').value,
           vehicles_load_in:getVehicles('load_in'), vehicles_setup:getVehicles('setup'), vehicles_event:getVehicles('event'), vehicles_teardown:getVehicles('teardown') });
       }else if(t==='レンタル'){
-        Object.assign(p,{ date_rental_out:getDates('cf_d_lend'), date_rental_return:getDates('cf_d_back') });
+        const m=$('cf_rdeliv').value;
+        const delivery=m==='運送便'?('運送便（'+$('cf_rcarrier_in').value.trim()+'）'):(m==='自社車両で届ける'?'自社車両':'客取り');
+        Object.assign(p,{ delivery, date_rental_out:getDates('cf_d_lend'), date_rental_return:getDates('cf_d_back'),
+          vehicles_rental_out:m==='自社車両で届ける'?getVehicles('lend'):'', vehicles_rental_return:m==='自社車両で届ける'?getVehicles('back'):'' });
       }else if(t==='納品'){
-        Object.assign(p,{ date_rental_out:getDates('cf_d_deliv'), date_rental_return:getDates('cf_d_pickup'), vehicles_rental_out:getVehicles('deliv'), vehicles_rental_return:getVehicles('pickup') });
+        const m=$('cf_ndeliv').value;
+        const delivery=m==='運送便'?('運送便（'+$('cf_ncarrier_in').value.trim()+'）'):'自社車両';
+        Object.assign(p,{ delivery, date_rental_out:getDates('cf_d_deliv'),
+          vehicles_rental_out:m==='自社車両で届ける'?getVehicles('deliv'):'' });
       }
       posts.push(p);
     }
@@ -5991,7 +6019,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, toggle, setJType, addProd, delRow, addDate, save };
+  return { loadAll, render, init, toggle, setJType, setRdeliv, setNdeliv, addProd, delRow, addDate, save };
 })();
 
 const App = {
