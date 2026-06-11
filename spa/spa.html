@@ -5839,7 +5839,7 @@ const Cases = (function(){
       <div class="cases-head">案件登録</div>
       <div class="cases-card">
         <div class="mo-row full"><div class="mo-field"><label>案件名（物件名）*</label><input id="cf_project"></div></div>
-        <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="cf_our_person"></div></div>
+        <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="cf_our_person"></div><div class="mo-field f3"><label>ステータス</label><select id="cf_status"><option>見積中</option><option selected>受注</option><option>見送り</option></select></div></div>
         <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div></div>
         <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="cf_client"></div><div class="mo-field f3"><label>窓口</label><input id="cf_person"></div></div>
       </div>
@@ -5859,7 +5859,7 @@ const Cases = (function(){
         </div>
         <div id="cf_projWrap" class="cf-hide">
           <div class="type-toggle"><input type="checkbox" id="cf_is_rental" onclick="Cases.toggleRental()"><label>レンタル（貸出・返却のみ）</label><span class="hint">チェックで設営関連を無効化</span></div>
-          <div class="mo-row pair"><div class="mo-field f7"><label>会場名</label><input id="cf_venue"></div><div class="mo-field f3"><label>ステータス</label><select id="cf_jstatus"><option>受注</option><option>見積中</option><option>準備中</option><option>現場中</option><option>レンタル中</option><option>完了</option></select></div></div>
+          <div class="mo-row full"><div class="mo-field"><label>会場名</label><input id="cf_venue"></div></div>
           <div class="mo-row full"><div class="mo-field"><label>住所</label><input id="cf_address"></div></div>
           <div class="phase-hd">日程</div>
           <div class="cf-grid2">
@@ -5902,7 +5902,7 @@ const Cases = (function(){
     const div=document.createElement('div'); div.className='cf-prod-item';
     div.innerHTML=`<div class="cf-item-hd"><span>制作物</span><button class="cf-del" onclick="Cases.delRow(this)">×</button></div>
       <div class="mo-row full"><div class="mo-field"><label>制作物名（空なら案件名）</label><input class="cf-pname"></div></div>
-      <div class="mo-row pair"><div class="mo-field"><label>作業場所</label><select class="cf-psection">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="mo-field"><label>ステータス</label><select class="cf-pstatus">${PROD_ST.map(s=>`<option${s==='受注'?' selected':''}>${s}</option>`).join('')}</select></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>作業場所</label><select class="cf-psection">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div></div>
       <div class="mo-row full"><div class="mo-field"><label>外注先</label><input class="cf-psub"></div></div>
       <div class="mo-row pair"><div class="mo-field"><label>作業開始予定日</label><input type="date" class="cf-pstart"></div><div class="mo-field"><label>納期</label><input type="date" class="cf-pdeadline"></div></div>`;
     wrap.appendChild(div);
@@ -5930,26 +5930,26 @@ const Cases = (function(){
     if(!projectName){ toast('案件名を入れてください',true); return; }
     const useProd=$('cf_useProd').checked, useProj=$('cf_useProj').checked;
     if(!useProd && !useProj){ toast('生産か企画制作にチェックを入れてください',true); return; }
+    const status=$('cf_status').value;
     const prodLines=!useProd?[]:[...document.querySelectorAll('#cf_prodRows .cf-prod-item')].map(r=>({
       name:r.querySelector('.cf-pname').value.trim()||projectName,
       deadline:r.querySelector('.cf-pdeadline').value,
       section:r.querySelector('.cf-psection').value,
       sub:r.querySelector('.cf-psub').value.trim(),
-      start:r.querySelector('.cf-pstart').value,
-      status:r.querySelector('.cf-pstatus').value
+      start:r.querySelector('.cf-pstart').value
     })).filter(x=>x.name);
-    if(useProd && prodLines.length===0) prodLines.push({name:projectName,deadline:'',section:'未定',sub:'',start:'',status:'受注'});
+    if(useProd && prodLines.length===0) prodLines.push({name:projectName,deadline:'',section:'未定',sub:'',start:''});
     _busy=true; setTimeout(()=>_busy=false,1500);
 
     const case_id=newCaseId();
     const hdr={ order_no:$('cf_order_no').value.trim(), estimate_no:$('cf_estimate_no').value.trim(), client:$('cf_client').value.trim(), person:$('cf_person').value.trim(), our_person:$('cf_our_person').value.trim() };
     const notes='';
     const posts=[];
-    prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status:L.status||'受注',deadline:L.deadline,section:L.section,subcontractor:L.sub,start_date:L.start,notes}));
+    prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status,deadline:L.deadline,section:L.section,subcontractor:L.sub,start_date:L.start,notes}));
     if(useProj){
       posts.push({dept:'project',action:'save',case_id,...hdr,project:projectName,
         type:$('cf_is_rental').checked?'レンタル':'現場',
-        venue:$('cf_venue').value.trim(), address:$('cf_address').value.trim(), status:$('cf_jstatus').value,
+        venue:$('cf_venue').value.trim(), address:$('cf_address').value.trim(), status,
         date_load_in:getDates('cf_d_load_in'), date_setup:getDates('cf_d_setup'), date_event:getDates('cf_d_event'), date_teardown:getDates('cf_d_teardown'), date_rental_out:getDates('cf_d_rental_out'), date_rental_return:getDates('cf_d_rental_return'),
         people_load_in:$('cf_p_load_in').value, people_setup:$('cf_p_setup').value, people_event:$('cf_p_event').value, people_teardown:$('cf_p_teardown').value,
         vehicles_load_in:getVehicles('load_in'), vehicles_setup:getVehicles('setup'), vehicles_event:getVehicles('event'), vehicles_teardown:getVehicles('teardown'), vehicles_rental_out:getVehicles('rental_out'), vehicles_rental_return:getVehicles('rental_return'),
