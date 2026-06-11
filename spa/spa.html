@@ -1557,6 +1557,9 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cf-toggle input{width:18px;height:18px;cursor:pointer;accent-color:var(--accent)}
   #view-cases .cases-card.off{opacity:.6}
   #view-cases .cases-hint{font-size:12px;color:var(--text-dim);margin:-4px 2px 12px}
+  #view-cases #cf_projWrap.rental-on .cf-setup,#view-cases #cf_projWrap.rental-on .cf-setup-hd{display:none}
+  #view-cases .cf-grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+  #view-cases .cf-ddel{width:24px;height:24px;font-size:12px;line-height:1;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:6px;cursor:pointer}
   </style>
   <div id="casesBody" style="padding:16px 14px 80px;max-width:1000px;margin:0 auto"></div>
 </section>
@@ -5816,10 +5819,17 @@ const FInv = (function(){
 const Cases = (function(){
   let _busy=false;
   const SECTIONS=['未定','2F工場','1F工場','出力関係','外注','その他'];
-  const PTYPES=['施工','レンタル','納品'];
-  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
+  const VH=['load_in','setup','event','teardown','rental_out','rental_return'];
 
   function loadAll(){ render(); return Promise.resolve(); }
+
+  function dateBlock(id,label,setup){
+    return `<div class="date-phase-block${setup?' cf-setup':''}"><label class="date-phase-label">${label}</label><div class="date-list" id="cf_d_${id}"></div><button type="button" class="date-add-btn" onclick="Cases.addDate('cf_d_${id}')">＋ 日付追加</button></div>`;
+  }
+  function vhBlock(id,label,setup){
+    return `<div class="date-phase-block${setup?' cf-setup':''}"><label class="date-phase-label">${label}</label><div class="chk-list" id="cf_vh_${id}"></div></div>`;
+  }
 
   function render(){
     $('casesBody').innerHTML=`
@@ -5827,10 +5837,11 @@ const Cases = (function(){
       <div class="cases-card">
         <div class="mo-row pair"><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div></div>
         <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="cf_client" placeholder="例: ○○町内会"></div><div class="mo-field f3"><label>窓口</label><input id="cf_person"></div></div>
-        <div class="mo-row pair"><div class="mo-field f7"><label>案件名（物件名）</label><input id="cf_project" placeholder="例: アルコネクト 6K×10K 主幕・横幕"></div><div class="mo-field f3"><label>担当</label><input id="cf_our_person"></div></div>
+        <div class="mo-row pair"><div class="mo-field f7"><label>案件名（物件名）*</label><input id="cf_project" placeholder="例: アルコネクト 6K×10K 主幕・横幕"></div><div class="mo-field f3"><label>担当</label><input id="cf_our_person"></div></div>
         <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="cf_notes"></textarea></div></div>
       </div>
-      <div class="cases-hint">この案件がどこで動くかを選ぶ（両方でも可）。工場で製作→自社施工なら両方にチェック。</div>
+      <div class="cases-hint">この案件がどこで動くかを選ぶ（両方でも可）。工場で製作→自社施工なら両方にチェック。生産がベースの案件・企画制作がベースの案件、どちらもここから登録。</div>
+
       <div class="cases-card off" id="cf_prodCard">
         <div class="cases-sec-hd">
           <label class="cf-toggle"><input type="checkbox" id="cf_useProd" onchange="Cases.toggle('prod')"> 生産（工場で製作）</label>
@@ -5838,55 +5849,73 @@ const Cases = (function(){
         </div>
         <div id="cf_prodWrap" class="cf-hide"><div id="cf_prodRows"></div></div>
       </div>
+
       <div class="cases-card off" id="cf_projCard">
         <div class="cases-sec-hd">
           <label class="cf-toggle"><input type="checkbox" id="cf_useProj" onchange="Cases.toggle('proj')"> 企画制作（施工・レンタル・納品）</label>
-          <button class="cases-add cf-hide" id="cf_projAddBtn" onclick="Cases.addProj()">＋ 追加</button>
         </div>
-        <div id="cf_projWrap" class="cf-hide"><div id="cf_projRows"></div></div>
+        <div id="cf_projWrap" class="cf-hide">
+          <div class="type-toggle"><input type="checkbox" id="cf_is_rental" onclick="Cases.toggleRental()"><label>レンタル（貸出・返却のみ）</label><span class="hint">チェックで設営関連を無効化</span></div>
+          <div class="mo-row pair"><div class="mo-field f7"><label>会場名</label><input id="cf_venue"></div><div class="mo-field f3"><label>ステータス</label><select id="cf_jstatus"><option>受注</option><option>見積中</option><option>準備中</option><option>現場中</option><option>レンタル中</option><option>完了</option></select></div></div>
+          <div class="mo-row full"><div class="mo-field"><label>住所</label><input id="cf_address"></div></div>
+          <div class="phase-hd">日程</div>
+          <div class="cf-grid2">
+            ${dateBlock('load_in','搬入日',1)}${dateBlock('setup','設営日',1)}${dateBlock('event','本番',1)}${dateBlock('teardown','撤去日',1)}${dateBlock('rental_out','貸出日',0)}${dateBlock('rental_return','返却日',0)}
+          </div>
+          <div class="phase-hd cf-setup-hd">人数（予定）</div>
+          <div class="phase-grid cf-setup">
+            <div class="mo-field"><label>搬入</label><input type="number" id="cf_p_load_in" min="0" placeholder="0"></div>
+            <div class="mo-field"><label>設営</label><input type="number" id="cf_p_setup" min="0" placeholder="0"></div>
+            <div class="mo-field"><label>本番</label><input type="number" id="cf_p_event" min="0" placeholder="0"></div>
+            <div class="mo-field"><label>撤去</label><input type="number" id="cf_p_teardown" min="0" placeholder="0"></div>
+          </div>
+          <div class="phase-hd">車両</div>
+          <div class="cf-grid2">
+            ${vhBlock('load_in','搬入',1)}${vhBlock('setup','設営',1)}${vhBlock('event','本番',1)}${vhBlock('teardown','撤去',1)}${vhBlock('rental_out','貸出',0)}${vhBlock('rental_return','返却',0)}
+          </div>
+          <div class="phase-hd">レンタル品</div>
+          <div class="mo-row full"><div class="mo-field"><label>レンタル品</label><textarea id="cf_rentals" placeholder="例: テント3張、テーブル10台、椅子50脚"></textarea></div></div>
+        </div>
       </div>
+
       <div class="cases-foot"><button class="save" onclick="Cases.save()">案件を登録</button></div>`;
+    // 車両チェックを各フェーズに展開
+    VH.forEach(ph=>{ const el=$('cf_vh_'+ph); if(el) el.innerHTML=VEHICLES.map(v=>`<label><input type="checkbox" value="${v}">${v}</label>`).join(''); });
   }
 
-  // 生産/企画制作のON/OFF。ONにしたら既定で1行（案件名でプリフィル）出す。
   function toggle(which){
     const on=$(which==='prod'?'cf_useProd':'cf_useProj').checked;
     $(which==='prod'?'cf_prodWrap':'cf_projWrap').classList.toggle('cf-hide',!on);
-    $(which==='prod'?'cf_prodAddBtn':'cf_projAddBtn').classList.toggle('cf-hide',!on);
     $(which==='prod'?'cf_prodCard':'cf_projCard').classList.toggle('off',!on);
-    if(on){
-      const rows=$(which==='prod'?'cf_prodRows':'cf_projRows');
-      if(!rows.querySelector('.cf-row')){
-        which==='prod'?addProd():addProj();
-        const nm=$('cf_project').value.trim();
-        if(nm){ const inp=rows.querySelector(which==='prod'?'.cf-pname':'.cf-jname'); if(inp&&!inp.value) inp.value=nm; }
-      }
+    if(which==='prod'){
+      $('cf_prodAddBtn').classList.toggle('cf-hide',!on);
+      if(on && !$('cf_prodRows').querySelector('.cf-row')) addProd(true);
     }
   }
+  function toggleRental(){ $('cf_projWrap').classList.toggle('rental-on', $('cf_is_rental').checked); }
 
-  function addProd(){
+  function addProd(prefill){
     const wrap=$('cf_prodRows');
     const div=document.createElement('div'); div.className='cf-row';
     div.innerHTML=`<input class="cf-pname" placeholder="制作物名（空なら案件名）" style="flex:2">
-      <input type="date" class="cf-pdeadline" title="納期" style="flex:0 0 150px">
+      <input type="date" class="cf-pdeadline" title="納期" style="flex:0 0 145px">
       <select class="cf-psection" style="flex:1">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select>
       <input class="cf-psub" placeholder="外注先" style="flex:1">
+      <input type="date" class="cf-pstart" title="作業開始予定日" style="flex:0 0 145px">
       <button class="cf-del" onclick="Cases.delRow(this)">×</button>`;
     wrap.appendChild(div);
+    if(prefill){ const nm=$('cf_project').value.trim(); if(nm) div.querySelector('.cf-pname').value=nm; }
   }
-
-  function addProj(){
-    const wrap=$('cf_projRows');
-    const div=document.createElement('div'); div.className='cf-row';
-    div.innerHTML=`<select class="cf-jtype" style="flex:0 0 110px">${PTYPES.map(s=>`<option>${s}</option>`).join('')}</select>
-      <input class="cf-jname" placeholder="物件名（空なら案件名）" style="flex:2">
-      <input class="cf-jvenue" placeholder="会場" style="flex:1">
-      <input class="cf-jnote" placeholder="備考" style="flex:1">
-      <button class="cf-del" onclick="Cases.delRow(this)">×</button>`;
-    wrap.appendChild(div);
-  }
-
   function delRow(btn){ const r=btn.closest('.cf-row'); if(r) r.remove(); }
+
+  function addDate(containerId,val){
+    const wrap=$(containerId);
+    const d=document.createElement('div'); d.className='date-item';
+    d.innerHTML=`<input type="date" value="${val||''}"><button type="button" class="cf-ddel" onclick="this.closest('.date-item').remove()">×</button>`;
+    wrap.appendChild(d);
+  }
+  function getDates(containerId){ return [...$(containerId).querySelectorAll('input[type=date]')].map(i=>i.value).filter(Boolean).join(', '); }
+  function getVehicles(ph){ return [...$('cf_vh_'+ph).querySelectorAll('input:checked')].map(i=>i.value).join(', '); }
 
   function newCaseId(){
     const u=(self.crypto&&crypto.randomUUID)?crypto.randomUUID().replace(/-/g,''):(Date.now().toString(36)+Math.random().toString(36).slice(2));
@@ -5895,43 +5924,42 @@ const Cases = (function(){
 
   function save(){
     if(_busy)return;
-    const order_no=$('cf_order_no').value.trim();
     const projectName=$('cf_project').value.trim();
-    if(!order_no && !projectName){ toast('受注番号か案件名を入れてください',true); return; }
+    if(!projectName){ toast('案件名を入れてください',true); return; }
     const useProd=$('cf_useProd').checked, useProj=$('cf_useProj').checked;
     if(!useProd && !useProj){ toast('生産か企画制作にチェックを入れてください',true); return; }
-    // 名前が空なら案件名で補完（チェックされた側は最低1件作る）
     const prodLines=!useProd?[]:[...document.querySelectorAll('#cf_prodRows .cf-row')].map(r=>({
       name:r.querySelector('.cf-pname').value.trim()||projectName,
       deadline:r.querySelector('.cf-pdeadline').value,
       section:r.querySelector('.cf-psection').value,
-      sub:r.querySelector('.cf-psub').value.trim()
+      sub:r.querySelector('.cf-psub').value.trim(),
+      start:r.querySelector('.cf-pstart').value
     })).filter(x=>x.name);
-    const projLines=!useProj?[]:[...document.querySelectorAll('#cf_projRows .cf-row')].map(r=>({
-      type:r.querySelector('.cf-jtype').value,
-      name:r.querySelector('.cf-jname').value.trim()||projectName,
-      venue:r.querySelector('.cf-jvenue').value.trim(),
-      note:r.querySelector('.cf-jnote').value.trim()
-    })).filter(x=>x.name);
-    if(prodLines.length===0 && projLines.length===0){ toast('案件名を入れるか、明細を追加してください',true); return; }
+    if(useProd && prodLines.length===0) prodLines.push({name:projectName,deadline:'',section:'未定',sub:'',start:''});
     _busy=true; setTimeout(()=>_busy=false,1500);
 
     const case_id=newCaseId();
-    const hdr={ order_no, estimate_no:$('cf_estimate_no').value.trim(), client:$('cf_client').value.trim(), person:$('cf_person').value.trim(), our_person:$('cf_our_person').value.trim() };
+    const hdr={ order_no:$('cf_order_no').value.trim(), estimate_no:$('cf_estimate_no').value.trim(), client:$('cf_client').value.trim(), person:$('cf_person').value.trim(), our_person:$('cf_our_person').value.trim() };
     const notes=$('cf_notes').value.trim();
     const posts=[];
-    prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status:'受注',deadline:L.deadline,section:L.section,subcontractor:L.sub,notes}));
-    projLines.forEach(L=>posts.push({dept:'project',action:'save',case_id,...hdr,project:(L.name||projectName),type:L.type,venue:L.venue,status:'受注',notes:(L.note||notes)}));
-    // GASのappendRow同時実行の取りこぼし対策で300ms間隔で投げる
+    prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status:'受注',deadline:L.deadline,section:L.section,subcontractor:L.sub,start_date:L.start,notes}));
+    if(useProj){
+      posts.push({dept:'project',action:'save',case_id,...hdr,project:projectName,
+        type:$('cf_is_rental').checked?'レンタル':'現場',
+        venue:$('cf_venue').value.trim(), address:$('cf_address').value.trim(), status:$('cf_jstatus').value,
+        date_load_in:getDates('cf_d_load_in'), date_setup:getDates('cf_d_setup'), date_event:getDates('cf_d_event'), date_teardown:getDates('cf_d_teardown'), date_rental_out:getDates('cf_d_rental_out'), date_rental_return:getDates('cf_d_rental_return'),
+        people_load_in:$('cf_p_load_in').value, people_setup:$('cf_p_setup').value, people_event:$('cf_p_event').value, people_teardown:$('cf_p_teardown').value,
+        vehicles_load_in:getVehicles('load_in'), vehicles_setup:getVehicles('setup'), vehicles_event:getVehicles('event'), vehicles_teardown:getVehicles('teardown'), vehicles_rental_out:getVehicles('rental_out'), vehicles_rental_return:getVehicles('rental_return'),
+        rentals:$('cf_rentals').value.trim(), notes });
+    }
     posts.forEach((b,i)=>setTimeout(()=>fireAndForget(b), i*300));
-    toast(`案件を登録しました（${posts.length}明細／${case_id}）`);
-    // 生産/企画制作のキャッシュを無効化（次に開くと再取得して新案件が出る）
+    toast(`案件を登録しました（${posts.length}件／${case_id}）`);
     App._loaded['prod']=false; App._loaded['proj']=false;
     render();
   }
 
   function init(){}
-  return { loadAll, render, init, toggle, addProd, addProj, delRow, save };
+  return { loadAll, render, init, toggle, toggleRental, addProd, delRow, addDate, save };
 })();
 
 const App = {
