@@ -1562,6 +1562,9 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cf-ddel{width:24px;height:24px;font-size:12px;line-height:1;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:6px;cursor:pointer}
   #view-cases .cf-prod-item{border:1px solid var(--border);border-radius:10px;padding:14px 14px 2px;margin-bottom:10px;background:var(--surface2)}
   #view-cases .cf-item-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--text-dim)}
+  #view-cases .cf-typeseg{display:flex;gap:8px;margin-bottom:16px}
+  #view-cases .cf-typeseg button{flex:1;padding:11px 0;border:1.5px solid var(--border);border-radius:9px;background:var(--surface2);font:700 14px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+  #view-cases .cf-typeseg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
   </style>
   <div id="casesBody" style="padding:16px 14px 80px;max-width:1000px;margin:0 auto"></div>
 </section>
@@ -5827,11 +5830,12 @@ const Cases = (function(){
 
   function loadAll(){ render(); return Promise.resolve(); }
 
-  function dateBlock(id,label,setup){
-    return `<div class="date-phase-block${setup?' cf-setup':''}"><label class="date-phase-label">${label}</label><div class="date-list" id="cf_d_${id}"></div><button type="button" class="date-add-btn" onclick="Cases.addDate('cf_d_${id}')">＋ 日付追加</button></div>`;
+  const JVH=['load_in','setup','event','teardown','deliv','pickup']; // 企画制作で使う車両フェーズ
+  function dateBlock(id,label){
+    return `<div class="date-phase-block"><label class="date-phase-label">${label}</label><div class="date-list" id="cf_d_${id}"></div><button type="button" class="date-add-btn" onclick="Cases.addDate('cf_d_${id}')">＋ 日付追加</button></div>`;
   }
-  function vhBlock(id,label,setup){
-    return `<div class="date-phase-block${setup?' cf-setup':''}"><label class="date-phase-label">${label}</label><div class="chk-list" id="cf_vh_${id}"></div></div>`;
+  function vhBlock(id,label){
+    return `<div class="date-phase-block"><label class="date-phase-label">${label}</label><div class="chk-list" id="cf_vh_${id}"></div></div>`;
   }
 
   function render(){
@@ -5858,23 +5862,34 @@ const Cases = (function(){
           <label class="cf-toggle"><input type="checkbox" id="cf_useProj" onchange="Cases.toggle('proj')"> 企画制作（施工・レンタル・納品）</label>
         </div>
         <div id="cf_projWrap" class="cf-hide">
-          <div class="type-toggle"><input type="checkbox" id="cf_is_rental" onclick="Cases.toggleRental()"><label>レンタル（貸出・返却のみ）</label><span class="hint">チェックで設営関連を無効化</span></div>
-          <div class="mo-row full"><div class="mo-field"><label>会場名</label><input id="cf_venue"></div></div>
-          <div class="mo-row full"><div class="mo-field"><label>住所</label><input id="cf_address"></div></div>
-          <div class="phase-hd">日程</div>
-          <div class="cf-grid2">
-            ${dateBlock('load_in','搬入日',1)}${dateBlock('setup','設営日',1)}${dateBlock('event','本番',1)}${dateBlock('teardown','撤去日',1)}${dateBlock('rental_out','貸出日',0)}${dateBlock('rental_return','返却日',0)}
+          <div class="cf-typeseg" id="cf_typeseg">
+            <button type="button" data-t="施工" class="on" onclick="Cases.setJType('施工')">施工</button>
+            <button type="button" data-t="レンタル" onclick="Cases.setJType('レンタル')">レンタル</button>
+            <button type="button" data-t="納品" onclick="Cases.setJType('納品')">納品</button>
           </div>
-          <div class="phase-hd cf-setup-hd">人数（予定）</div>
-          <div class="phase-grid cf-setup">
-            <div class="mo-field"><label>搬入</label><input type="number" id="cf_p_load_in" min="0" placeholder="0"></div>
-            <div class="mo-field"><label>設営</label><input type="number" id="cf_p_setup" min="0" placeholder="0"></div>
-            <div class="mo-field"><label>本番</label><input type="number" id="cf_p_event" min="0" placeholder="0"></div>
-            <div class="mo-field"><label>撤去</label><input type="number" id="cf_p_teardown" min="0" placeholder="0"></div>
+          <div id="cf_jt_va"><div class="mo-row pair"><div class="mo-field f7"><label>会場名</label><input id="cf_venue"></div><div class="mo-field f3"><label>住所</label><input id="cf_address"></div></div></div>
+          <div id="cf_jt_sekou">
+            <div class="phase-hd">日程</div>
+            <div class="cf-grid2">${dateBlock('load_in','搬入日')}${dateBlock('setup','設営日')}${dateBlock('event','本番')}${dateBlock('teardown','撤去日')}</div>
+            <div class="phase-hd">人数（予定）</div>
+            <div class="phase-grid">
+              <div class="mo-field"><label>搬入</label><input type="number" id="cf_p_load_in" min="0" placeholder="0"></div>
+              <div class="mo-field"><label>設営</label><input type="number" id="cf_p_setup" min="0" placeholder="0"></div>
+              <div class="mo-field"><label>本番</label><input type="number" id="cf_p_event" min="0" placeholder="0"></div>
+              <div class="mo-field"><label>撤去</label><input type="number" id="cf_p_teardown" min="0" placeholder="0"></div>
+            </div>
+            <div class="phase-hd">車両</div>
+            <div class="cf-grid2">${vhBlock('load_in','搬入')}${vhBlock('setup','設営')}${vhBlock('event','本番')}${vhBlock('teardown','撤去')}</div>
           </div>
-          <div class="phase-hd">車両</div>
-          <div class="cf-grid2">
-            ${vhBlock('load_in','搬入',1)}${vhBlock('setup','設営',1)}${vhBlock('event','本番',1)}${vhBlock('teardown','撤去',1)}${vhBlock('rental_out','貸出',0)}${vhBlock('rental_return','返却',0)}
+          <div id="cf_jt_rental" class="cf-hide">
+            <div class="phase-hd">レンタル期間</div>
+            <div class="cf-grid2">${dateBlock('lend','貸出日')}${dateBlock('back','返却日')}</div>
+          </div>
+          <div id="cf_jt_nouhin" class="cf-hide">
+            <div class="phase-hd">日程</div>
+            <div class="cf-grid2">${dateBlock('deliv','納品日')}${dateBlock('pickup','引取日')}</div>
+            <div class="phase-hd">車両</div>
+            <div class="cf-grid2">${vhBlock('deliv','納品')}${vhBlock('pickup','引取')}</div>
           </div>
           <div class="phase-hd">レンタル品</div>
           <div class="mo-row full"><div class="mo-field"><label>レンタル品</label><textarea id="cf_rentals"></textarea></div></div>
@@ -5883,7 +5898,7 @@ const Cases = (function(){
 
       <div class="cases-foot"><button class="save" onclick="Cases.save()">案件を登録</button></div>`;
     // 車両チェックを各フェーズに展開
-    VH.forEach(ph=>{ const el=$('cf_vh_'+ph); if(el) el.innerHTML=VEHICLES.map(v=>`<label><input type="checkbox" value="${v}">${v}</label>`).join(''); });
+    JVH.forEach(ph=>{ const el=$('cf_vh_'+ph); if(el) el.innerHTML=VEHICLES.map(v=>`<label><input type="checkbox" value="${v}">${v}</label>`).join(''); });
   }
 
   function toggle(which){
@@ -5895,7 +5910,15 @@ const Cases = (function(){
       if(on && !$('cf_prodRows').querySelector('.cf-row')) addProd(true);
     }
   }
-  function toggleRental(){ $('cf_projWrap').classList.toggle('rental-on', $('cf_is_rental').checked); }
+  // 企画制作タイプ切替（施工/レンタル/納品）。性質ごとに項目を出し分け。
+  function setJType(t){
+    [...$('cf_typeseg').children].forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+    $('cf_jt_va').classList.toggle('cf-hide', t==='レンタル');   // 単純レンタルは会場/住所不要
+    $('cf_jt_sekou').classList.toggle('cf-hide', t!=='施工');
+    $('cf_jt_rental').classList.toggle('cf-hide', t!=='レンタル');
+    $('cf_jt_nouhin').classList.toggle('cf-hide', t!=='納品');
+  }
+  function jType(){ const b=[...$('cf_typeseg').children].find(x=>x.classList.contains('on')); return b?b.dataset.t:'施工'; }
 
   function addProd(prefill){
     const wrap=$('cf_prodRows');
@@ -5947,13 +5970,20 @@ const Cases = (function(){
     const posts=[];
     prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status,deadline:L.deadline,section:L.section,subcontractor:L.sub,start_date:L.start,notes}));
     if(useProj){
-      posts.push({dept:'project',action:'save',case_id,...hdr,project:projectName,
-        type:$('cf_is_rental').checked?'レンタル':'現場',
-        venue:$('cf_venue').value.trim(), address:$('cf_address').value.trim(), status,
-        date_load_in:getDates('cf_d_load_in'), date_setup:getDates('cf_d_setup'), date_event:getDates('cf_d_event'), date_teardown:getDates('cf_d_teardown'), date_rental_out:getDates('cf_d_rental_out'), date_rental_return:getDates('cf_d_rental_return'),
-        people_load_in:$('cf_p_load_in').value, people_setup:$('cf_p_setup').value, people_event:$('cf_p_event').value, people_teardown:$('cf_p_teardown').value,
-        vehicles_load_in:getVehicles('load_in'), vehicles_setup:getVehicles('setup'), vehicles_event:getVehicles('event'), vehicles_teardown:getVehicles('teardown'), vehicles_rental_out:getVehicles('rental_out'), vehicles_rental_return:getVehicles('rental_return'),
-        rentals:$('cf_rentals').value.trim(), notes });
+      const t=jType();
+      const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,rentals:$('cf_rentals').value.trim(),notes,
+        venue:t==='レンタル'?'':$('cf_venue').value.trim(), address:t==='レンタル'?'':$('cf_address').value.trim()};
+      if(t==='施工'){
+        Object.assign(p,{
+          date_load_in:getDates('cf_d_load_in'), date_setup:getDates('cf_d_setup'), date_event:getDates('cf_d_event'), date_teardown:getDates('cf_d_teardown'),
+          people_load_in:$('cf_p_load_in').value, people_setup:$('cf_p_setup').value, people_event:$('cf_p_event').value, people_teardown:$('cf_p_teardown').value,
+          vehicles_load_in:getVehicles('load_in'), vehicles_setup:getVehicles('setup'), vehicles_event:getVehicles('event'), vehicles_teardown:getVehicles('teardown') });
+      }else if(t==='レンタル'){
+        Object.assign(p,{ date_rental_out:getDates('cf_d_lend'), date_rental_return:getDates('cf_d_back') });
+      }else if(t==='納品'){
+        Object.assign(p,{ date_rental_out:getDates('cf_d_deliv'), date_rental_return:getDates('cf_d_pickup'), vehicles_rental_out:getVehicles('deliv'), vehicles_rental_return:getVehicles('pickup') });
+      }
+      posts.push(p);
     }
     posts.forEach((b,i)=>setTimeout(()=>fireAndForget(b), i*300));
     toast(`案件を登録しました（${posts.length}件／${case_id}）`);
@@ -5962,7 +5992,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, toggle, toggleRental, addProd, delRow, addDate, save };
+  return { loadAll, render, init, toggle, setJType, addProd, delRow, addDate, save };
 })();
 
 const App = {
