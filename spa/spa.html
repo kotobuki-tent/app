@@ -1524,6 +1524,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navOt" onclick="App.nav('ot')">時間外</button>
     <div class="nav-spacer"></div>
     <div class="nav-right">
+      <button class="nav-link" id="navCases" onclick="App.nav('cases')">案件</button>
       <button class="nav-link" id="navProd" onclick="App.nav('prod')">生産</button>
       <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
       <button class="nav-link" id="navSales" onclick="App.nav('sales')">販売</button>
@@ -1534,6 +1535,26 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
 </div>
+
+<!-- ===== 案件登録 section ===== -->
+<section id="view-cases" class="hidden">
+  <style>
+  #view-cases .cases-head{font-size:18px;font-weight:800;color:var(--text);margin:4px 2px 16px}
+  #view-cases .cases-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
+  #view-cases .cases-sec-hd{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
+  #view-cases .cases-add{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 13px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+  #view-cases .cases-add:active{transform:scale(.97)}
+  #view-cases .cf-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  #view-cases .cf-row input,#view-cases .cf-row select{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);min-width:0}
+  #view-cases .cf-row input:focus,#view-cases .cf-row select:focus{outline:none;border-color:var(--accent)}
+  #view-cases .cf-del{flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;line-height:1}
+  #view-cases .cf-empty{color:var(--text-dim);font-size:13px;padding:4px 2px}
+  #view-cases .cases-foot{display:flex;justify-content:flex-end;margin:6px 0 12px}
+  #view-cases .cases-foot .save{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px 30px;font:700 15px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+  #view-cases .cases-foot .save:active{transform:scale(.98)}
+  </style>
+  <div id="casesBody" style="padding:16px 14px 80px;max-width:1000px;margin:0 auto"></div>
+</section>
 
 <!-- ===== 生産 section（中身は移植フェーズで流し込む） ===== -->
 <section id="view-prod" class="hidden">
@@ -5784,10 +5805,116 @@ const FInv = (function(){
   return { loadAll, init, setView, search, openIn, closeIn, saveIn, openReceive, openOrder, closeOrder, saveOrder, openClaim, closeClaim, saveClaim, openRow, delRow };
 })();
 
+// ===== 案件登録（事務用・top-down 振り分け）=====
+// 案件を1回入力 → 製作行は orders、施工/レンタル/納品行は projects へ。
+// 全子行に同じ case_id ＋共通ヘッダを焼き付ける（A案・現場ページ無改修）。
+const Cases = (function(){
+  let _busy=false;
+  const SECTIONS=['未定','2F工場','1F工場','出力関係','外注','その他'];
+  const PTYPES=['施工','レンタル','納品'];
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  function loadAll(){ render(); return Promise.resolve(); }
+
+  function render(){
+    $('casesBody').innerHTML=`
+      <div class="cases-head">案件登録</div>
+      <div class="cases-card">
+        <div class="mo-row pair"><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div></div>
+        <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="cf_client" placeholder="例: ○○町内会"></div><div class="mo-field f3"><label>窓口</label><input id="cf_person"></div></div>
+        <div class="mo-row pair"><div class="mo-field f7"><label>案件名（物件名）</label><input id="cf_project" placeholder="例: ○○町内会 盆踊り大会"></div><div class="mo-field f3"><label>担当</label><input id="cf_our_person"></div></div>
+        <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="cf_notes"></textarea></div></div>
+      </div>
+      <div class="cases-card">
+        <div class="cases-sec-hd"><span>製作（→ 生産へ）</span><button class="cases-add" onclick="Cases.addProd()">＋ 制作物</button></div>
+        <div id="cf_prodRows"></div>
+      </div>
+      <div class="cases-card">
+        <div class="cases-sec-hd"><span>施工・レンタル・納品（→ 企画制作へ）</span><button class="cases-add" onclick="Cases.addProj()">＋ 追加</button></div>
+        <div id="cf_projRows"></div>
+      </div>
+      <div class="cases-foot"><button class="save" onclick="Cases.save()">案件を登録</button></div>`;
+    refreshEmpty();
+  }
+
+  function refreshEmpty(){
+    const p=$('cf_prodRows'), j=$('cf_projRows');
+    if(p && !p.querySelector('.cf-row')) p.innerHTML='<div class="cf-empty">製作物が無ければ空のままでOK（生産には作られません）</div>';
+    if(j && !j.querySelector('.cf-row')) j.innerHTML='<div class="cf-empty">施工/レンタル/納品が無ければ空のままでOK（企画制作には作られません）</div>';
+  }
+
+  function addProd(){
+    const wrap=$('cf_prodRows'); const e=wrap.querySelector('.cf-empty'); if(e)e.remove();
+    const div=document.createElement('div'); div.className='cf-row';
+    div.innerHTML=`<input class="cf-pname" placeholder="品名（例: ステージバック幕）" style="flex:2">
+      <input type="date" class="cf-pdeadline" title="納期" style="flex:0 0 150px">
+      <select class="cf-psection" style="flex:1">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select>
+      <input class="cf-psub" placeholder="外注先" style="flex:1">
+      <button class="cf-del" onclick="Cases.delRow(this)">×</button>`;
+    wrap.appendChild(div); div.querySelector('.cf-pname').focus();
+  }
+
+  function addProj(){
+    const wrap=$('cf_projRows'); const e=wrap.querySelector('.cf-empty'); if(e)e.remove();
+    const div=document.createElement('div'); div.className='cf-row';
+    div.innerHTML=`<select class="cf-jtype" style="flex:0 0 110px">${PTYPES.map(s=>`<option>${s}</option>`).join('')}</select>
+      <input class="cf-jname" placeholder="物件名（空なら案件名）" style="flex:2">
+      <input class="cf-jvenue" placeholder="会場" style="flex:1">
+      <input class="cf-jnote" placeholder="備考" style="flex:1">
+      <button class="cf-del" onclick="Cases.delRow(this)">×</button>`;
+    wrap.appendChild(div); div.querySelector('.cf-jname').focus();
+  }
+
+  function delRow(btn){ const r=btn.closest('.cf-row'); if(r){ r.remove(); refreshEmpty(); } }
+
+  function newCaseId(){
+    const u=(self.crypto&&crypto.randomUUID)?crypto.randomUUID().replace(/-/g,''):(Date.now().toString(36)+Math.random().toString(36).slice(2));
+    return 'C'+u.slice(0,8);
+  }
+
+  function save(){
+    if(_busy)return;
+    const order_no=$('cf_order_no').value.trim();
+    const projectName=$('cf_project').value.trim();
+    if(!order_no && !projectName){ toast('受注番号か案件名を入れてください',true); return; }
+    const prodLines=[...document.querySelectorAll('#cf_prodRows .cf-row')].map(r=>({
+      name:r.querySelector('.cf-pname').value.trim(),
+      deadline:r.querySelector('.cf-pdeadline').value,
+      section:r.querySelector('.cf-psection').value,
+      sub:r.querySelector('.cf-psub').value.trim()
+    })).filter(x=>x.name);
+    const projLines=[...document.querySelectorAll('#cf_projRows .cf-row')].map(r=>({
+      type:r.querySelector('.cf-jtype').value,
+      name:r.querySelector('.cf-jname').value.trim(),
+      venue:r.querySelector('.cf-jvenue').value.trim(),
+      note:r.querySelector('.cf-jnote').value.trim()
+    }));
+    if(prodLines.length===0 && projLines.length===0){ toast('製作 か 施工/レンタル/納品 を1行以上追加してください',true); return; }
+    _busy=true; setTimeout(()=>_busy=false,1500);
+
+    const case_id=newCaseId();
+    const hdr={ order_no, estimate_no:$('cf_estimate_no').value.trim(), client:$('cf_client').value.trim(), person:$('cf_person').value.trim(), our_person:$('cf_our_person').value.trim() };
+    const notes=$('cf_notes').value.trim();
+    const posts=[];
+    prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status:'受注',deadline:L.deadline,section:L.section,subcontractor:L.sub,notes}));
+    projLines.forEach(L=>posts.push({dept:'project',action:'save',case_id,...hdr,project:(L.name||projectName),type:L.type,venue:L.venue,status:'受注',notes:(L.note||notes)}));
+    // GASのappendRow同時実行の取りこぼし対策で300ms間隔で投げる
+    posts.forEach((b,i)=>setTimeout(()=>fireAndForget(b), i*300));
+    toast(`案件を登録しました（${posts.length}明細／${case_id}）`);
+    // 生産/企画制作のキャッシュを無効化（次に開くと再取得して新案件が出る）
+    App._loaded['prod']=false; App._loaded['proj']=false;
+    render();
+  }
+
+  function init(){}
+  return { loadAll, render, init, addProd, addProj, delRow, save };
+})();
+
 const App = {
   current:null,
   // アプリ登録：ここに {key, ns(IIFE), sectionId, navId} を足すだけで全機構が回る
   REG:[
+    {key:'cases',ns:()=>Cases,section:'view-cases',nav:'navCases'},
     {key:'prod', ns:()=>Prod, section:'view-prod', nav:'navProd'},
     {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj'},
     {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv'},
