@@ -5886,7 +5886,7 @@ const Cases = (function(){
             <div class="phase-hd">レンタル期間</div>
             <div class="cf-grid2">${dateBlock('lend','貸出日')}${dateBlock('back','返却日')}</div>
             <div class="phase-hd">配送方法</div>
-            <select id="cf_rdeliv" class="cf-delsel" onchange="Cases.setRdeliv()"><option>客が取りに来る</option><option>自社車両で届ける</option><option>運送便</option></select>
+            <select id="cf_rdeliv" class="cf-delsel" onchange="Cases.setRdeliv()"><option>引き取り</option><option>自社配送</option><option>運送便</option></select>
             <div id="cf_rcarrier" class="cf-hide" style="margin-top:10px"><div class="mo-field"><label>運送業者</label><input id="cf_rcarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
             <div id="cf_rveh" class="cf-hide" style="margin-top:10px"><div class="cf-grid2">${vhBlock('lend','貸出')}${vhBlock('back','返却')}</div></div>
           </div>
@@ -5894,7 +5894,7 @@ const Cases = (function(){
             <div class="phase-hd">納品日</div>
             <div class="cf-grid2">${dateBlock('deliv','納品日')}</div>
             <div class="phase-hd">配送方法</div>
-            <select id="cf_ndeliv" class="cf-delsel" onchange="Cases.setNdeliv()"><option>運送便</option><option>自社車両で届ける</option></select>
+            <select id="cf_ndeliv" class="cf-delsel" onchange="Cases.setNdeliv()"><option>運送便</option><option>自社配送</option><option>引き取り</option></select>
             <div id="cf_ncarrier" style="margin-top:10px"><div class="mo-field"><label>運送業者</label><input id="cf_ncarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
             <div id="cf_nveh" class="cf-hide" style="margin-top:10px"><div class="cf-grid2">${vhBlock('deliv','納品')}</div></div>
           </div>
@@ -5932,13 +5932,13 @@ const Cases = (function(){
   function setRdeliv(){
     const v=$('cf_rdeliv').value;
     $('cf_rcarrier').classList.toggle('cf-hide', v!=='運送便');
-    $('cf_rveh').classList.toggle('cf-hide', v!=='自社車両で届ける');
+    $('cf_rveh').classList.toggle('cf-hide', v!=='自社配送');
   }
-  // 納品の配送方法：運送便＝業者／自社車両＝車両
+  // 配送方法：運送便＝業者／自社配送＝車両／引き取り＝なし
   function setNdeliv(){
     const v=$('cf_ndeliv').value;
     $('cf_ncarrier').classList.toggle('cf-hide', v!=='運送便');
-    $('cf_nveh').classList.toggle('cf-hide', v!=='自社車両で届ける');
+    $('cf_nveh').classList.toggle('cf-hide', v!=='自社配送');
   }
 
   function addProd(prefill){
@@ -6001,14 +6001,14 @@ const Cases = (function(){
           vehicles_load_in:getVehicles('load_in'), vehicles_setup:getVehicles('setup'), vehicles_event:getVehicles('event'), vehicles_teardown:getVehicles('teardown') });
       }else if(t==='レンタル'){
         const m=$('cf_rdeliv').value;
-        const delivery=m==='運送便'?('運送便（'+$('cf_rcarrier_in').value.trim()+'）'):(m==='自社車両で届ける'?'自社車両':'客取り');
+        const delivery=m==='運送便'?('運送便（'+$('cf_rcarrier_in').value.trim()+'）'):m;
         Object.assign(p,{ delivery, date_rental_out:getDates('cf_d_lend'), date_rental_return:getDates('cf_d_back'),
-          vehicles_rental_out:m==='自社車両で届ける'?getVehicles('lend'):'', vehicles_rental_return:m==='自社車両で届ける'?getVehicles('back'):'' });
+          vehicles_rental_out:m==='自社配送'?getVehicles('lend'):'', vehicles_rental_return:m==='自社配送'?getVehicles('back'):'' });
       }else if(t==='納品'){
         const m=$('cf_ndeliv').value;
-        const delivery=m==='運送便'?('運送便（'+$('cf_ncarrier_in').value.trim()+'）'):'自社車両';
+        const delivery=m==='運送便'?('運送便（'+$('cf_ncarrier_in').value.trim()+'）'):m;
         Object.assign(p,{ delivery, date_rental_out:getDates('cf_d_deliv'),
-          vehicles_rental_out:m==='自社車両で届ける'?getVehicles('deliv'):'' });
+          vehicles_rental_out:m==='自社配送'?getVehicles('deliv'):'' });
       }
       posts.push(p);
     }
