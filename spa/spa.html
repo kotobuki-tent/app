@@ -5852,7 +5852,7 @@ const Cases = (function(){
       <div class="cases-card off" id="cf_prodCard">
         <div class="cases-sec-hd">
           <label class="cf-toggle"><input type="checkbox" id="cf_useProd" onchange="Cases.toggle('prod')"> 生産（工場で製作）</label>
-          <button class="cases-add cf-hide" id="cf_prodAddBtn" onclick="Cases.addProd()">＋ 制作物</button>
+          <button class="cases-add cf-hide" id="cf_prodAddBtn" onclick="Cases.addProd()">＋ 製作物</button>
         </div>
         <div id="cf_prodWrap" class="cf-hide"><div id="cf_prodRows"></div></div>
       </div>
@@ -5923,10 +5923,9 @@ const Cases = (function(){
   function addProd(prefill){
     const wrap=$('cf_prodRows');
     const div=document.createElement('div'); div.className='cf-prod-item';
-    div.innerHTML=`<div class="cf-item-hd"><span>制作物</span><button class="cf-del" onclick="Cases.delRow(this)">×</button></div>
-      <div class="mo-row full"><div class="mo-field"><label>制作物名（空なら案件名）</label><input class="cf-pname"></div></div>
-      <div class="mo-row full"><div class="mo-field"><label>作業場所</label><select class="cf-psection">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div></div>
-      <div class="mo-row full"><div class="mo-field"><label>外注先</label><input class="cf-psub"></div></div>
+    div.innerHTML=`<div class="cf-item-hd"><span>製作物</span><button class="cf-del" onclick="Cases.delRow(this)">×</button></div>
+      <div class="mo-row full"><div class="mo-field"><label>製作物</label><input class="cf-pname"></div></div>
+      <div class="mo-row pair"><div class="mo-field"><label>作業場所</label><select class="cf-psection">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="mo-field"><label>外注先</label><input class="cf-psub"></div></div>
       <div class="mo-row pair"><div class="mo-field"><label>作業開始予定日</label><input type="date" class="cf-pstart"></div><div class="mo-field"><label>納期</label><input type="date" class="cf-pdeadline"></div></div>`;
     wrap.appendChild(div);
     if(prefill){ const nm=$('cf_project').value.trim(); if(nm) div.querySelector('.cf-pname').value=nm; }
