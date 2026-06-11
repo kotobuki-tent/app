@@ -5838,10 +5838,10 @@ const Cases = (function(){
     $('casesBody').innerHTML=`
       <div class="cases-head">案件登録</div>
       <div class="cases-card">
-        <div class="mo-row pair"><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div></div>
-        <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="cf_client" placeholder="例: ○○町内会"></div><div class="mo-field f3"><label>窓口</label><input id="cf_person"></div></div>
-        <div class="mo-row pair"><div class="mo-field f7"><label>案件名（物件名）*</label><input id="cf_project" placeholder="例: アルコネクト 6K×10K 主幕・横幕"></div><div class="mo-field f3"><label>担当</label><input id="cf_our_person"></div></div>
-        <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="cf_notes"></textarea></div></div>
+        <div class="mo-row full"><div class="mo-field"><label>案件名（物件名）*</label><input id="cf_project"></div></div>
+        <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="cf_our_person"></div></div>
+        <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div></div>
+        <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="cf_client"></div><div class="mo-field f3"><label>窓口</label><input id="cf_person"></div></div>
       </div>
       <div class="cases-hint">この案件がどこで動くかを選ぶ（両方でも可）。工場で製作→自社施工なら両方にチェック。生産がベースの案件・企画制作がベースの案件、どちらもここから登録。</div>
 
@@ -5877,7 +5877,7 @@ const Cases = (function(){
             ${vhBlock('load_in','搬入',1)}${vhBlock('setup','設営',1)}${vhBlock('event','本番',1)}${vhBlock('teardown','撤去',1)}${vhBlock('rental_out','貸出',0)}${vhBlock('rental_return','返却',0)}
           </div>
           <div class="phase-hd">レンタル品</div>
-          <div class="mo-row full"><div class="mo-field"><label>レンタル品</label><textarea id="cf_rentals" placeholder="例: テント3張、テーブル10台、椅子50脚"></textarea></div></div>
+          <div class="mo-row full"><div class="mo-field"><label>レンタル品</label><textarea id="cf_rentals"></textarea></div></div>
         </div>
       </div>
 
@@ -5903,7 +5903,7 @@ const Cases = (function(){
     div.innerHTML=`<div class="cf-item-hd"><span>制作物</span><button class="cf-del" onclick="Cases.delRow(this)">×</button></div>
       <div class="mo-row full"><div class="mo-field"><label>制作物名（空なら案件名）</label><input class="cf-pname"></div></div>
       <div class="mo-row pair"><div class="mo-field"><label>作業場所</label><select class="cf-psection">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="mo-field"><label>ステータス</label><select class="cf-pstatus">${PROD_ST.map(s=>`<option${s==='受注'?' selected':''}>${s}</option>`).join('')}</select></div></div>
-      <div class="mo-row full"><div class="mo-field"><label>外注先</label><input class="cf-psub" placeholder="例: 丸正帆布工業"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>外注先</label><input class="cf-psub"></div></div>
       <div class="mo-row pair"><div class="mo-field"><label>作業開始予定日</label><input type="date" class="cf-pstart"></div><div class="mo-field"><label>納期</label><input type="date" class="cf-pdeadline"></div></div>`;
     wrap.appendChild(div);
     if(prefill){ const nm=$('cf_project').value.trim(); if(nm) div.querySelector('.cf-pname').value=nm; }
@@ -5943,7 +5943,7 @@ const Cases = (function(){
 
     const case_id=newCaseId();
     const hdr={ order_no:$('cf_order_no').value.trim(), estimate_no:$('cf_estimate_no').value.trim(), client:$('cf_client').value.trim(), person:$('cf_person').value.trim(), our_person:$('cf_our_person').value.trim() };
-    const notes=$('cf_notes').value.trim();
+    const notes='';
     const posts=[];
     prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status:L.status||'受注',deadline:L.deadline,section:L.section,subcontractor:L.sub,start_date:L.start,notes}));
     if(useProj){
