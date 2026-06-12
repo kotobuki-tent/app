@@ -1625,7 +1625,6 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="prodPcDate"></span>
     <button class="sub-tab on" data-view="factory">工場ボード</button>
     <button class="sub-tab" data-view="labor">工数</button>
-    <button class="sub-tab" data-view="archive">出荷済</button>
     <button class="staff-btn" id="prodStaffBtn" onclick="Prod.openStaff()">STAFF <span class="count">-</span></button>
     <button class="slog-btn" id="prodSlogBtn" onclick="Prod.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="prodPcSearch" placeholder="検索...">
@@ -1706,7 +1705,6 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="sub-tabs" id="projTabs">
     <span class="subtab-date" id="projPcDate"></span>
     <button class="sub-tab on" data-view="gantt">スケジュール</button>
-    <button class="sub-tab" data-view="projDone">完了</button>
     <button class="slog-btn" id="projSlogBtn" onclick="Proj.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="projPcSearch" placeholder="検索...">
   </div>
@@ -2026,7 +2024,6 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="sub-tabs" id="salesTabs">
     <span class="subtab-date" id="salesPcDate"></span>
     <button class="sub-tab on" data-view="board">一覧</button>
-    <button class="sub-tab" data-view="archive">納品済</button>
     <button class="slog-btn" id="salesSlogBtn" onclick="Sales.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="salesPcSearch" placeholder="検索..." oninput="Sales.unifiedSearch(this.value)">
   </div>
