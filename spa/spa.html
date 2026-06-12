@@ -1580,38 +1580,13 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .ctab.new{margin-left:auto;background:transparent;border-style:dashed;color:var(--accent)}
   #view-cases .ctab.new.on{background:var(--accent);border-style:solid;color:#fff}
   #view-cases .cases-empty,#view-cases .cases-loading{color:var(--text-dim);font-size:14px;text-align:center;padding:40px 0}
-  #view-cases .case-cards{display:flex;flex-direction:column;gap:10px}
-  #view-cases .case-card{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-  #view-cases .case-card .cc-main{flex:1;min-width:0}
-  #view-cases .cc-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;word-break:break-word}
-  #view-cases .cc-meta{font-size:12.5px;color:var(--text-dim);line-height:1.5;word-break:break-word}
-  #view-cases .cc-sub{font-size:11px;opacity:.7;margin-top:2px}
-  #view-cases .cc-side{flex:0 0 auto;display:flex;flex-direction:column;gap:7px;align-items:stretch;min-width:124px}
-  #view-cases .cc-st{padding:7px 9px;border:1px solid var(--border);border-radius:8px;font:600 12.5px/1 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
-  #view-cases .cc-inv{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--text);cursor:pointer;justify-content:center;border:1px solid var(--border);border-radius:8px;padding:6px}
-  #view-cases .cc-inv input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
-  #view-cases .cc-arch{padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text-dim);font:600 12px/1 'Noto Sans JP',sans-serif;cursor:pointer}
-  #view-cases .cc-arch:active{transform:scale(.97)}
-  #view-cases .case-mtx{width:100%;border-collapse:collapse;font-size:13px}
-  #view-cases .case-mtx th{text-align:left;color:var(--text-dim);font-weight:700;font-size:11.5px;padding:6px 8px;border-bottom:1px solid var(--border)}
-  #view-cases .case-mtx td{padding:7px 8px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
-  #view-cases .case-mtx tr.arch{opacity:.5}
-  #view-cases .case-mtx .cc-st{width:100%}
-  #view-cases .case-ops{display:flex;gap:6px;white-space:nowrap}
-  #view-cases .case-ops button{padding:5px 9px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--text-dim);font:600 11.5px/1 'Noto Sans JP',sans-serif;cursor:pointer}
-  #view-cases .case-ops button.del{color:#c0392b;border-color:rgba(192,57,43,.4)}
-  @media(max-width:480px),(orientation:portrait){
-    #view-cases .case-card{flex-direction:column;gap:10px}
-    #view-cases .cc-side{flex-direction:row;min-width:0;flex-wrap:wrap}
-    #view-cases .cc-side>*{flex:1}
-    #view-cases .case-mtx thead{display:none}
-    #view-cases .case-mtx,#view-cases .case-mtx tbody,#view-cases .case-mtx tr,#view-cases .case-mtx td{display:block;width:auto}
-    #view-cases .case-mtx tr{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;padding:6px 4px}
-    #view-cases .case-mtx td{border:none;padding:5px 10px}
-    #view-cases .case-mtx td::before{content:attr(data-l);color:var(--text-dim);font-size:11px;font-weight:700;display:block;margin-bottom:2px}
-  }
+  #view-cases .case-st-sel{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);cursor:pointer}
+  #view-cases tr.arch td{opacity:.55}
+  #view-cases #casesPane table th{cursor:default}
+  #view-cases #casesPane table th:hover{color:var(--text-dim)}
+  #view-cases .cases-card,#view-cases .cases-hint,#view-cases .cases-foot{max-width:760px}
   </style>
-  <div id="casesBody" style="padding:16px 14px 80px;max-width:1000px;margin:0 auto"></div>
+  <div id="casesBody" style="padding:16px 14px 80px"></div>
 </section>
 
 <!-- ===== 生産 section（中身は移植フェーズで流し込む） ===== -->
@@ -5923,19 +5898,23 @@ const Cases = (function(){
 
   function caseTable(rows, t){
     const manage=t==='manage';
-    return `<table class="case-mtx"><thead><tr><th>案件名</th><th>得意先</th><th>受注/見積</th><th>担当</th><th>状態</th><th>伝票</th><th>登録</th><th></th></tr></thead><tbody>${rows.map(c=>{
+    let h='<div class="tbl-wrap"><table><thead><tr><th>案件名</th><th>得意先</th><th>受注番号</th><th>見積番号</th><th>担当</th><th>状態</th><th>伝票</th><th>登録</th><th>操作</th></tr></thead><tbody>';
+    rows.forEach(c=>{
       const id=esc(c.id), archd=_arch(c.archived);
-      return `<tr${archd?' class="arch"':''}>
-        <td data-l="案件名">${esc(c.name||'')}</td>
-        <td data-l="得意先">${esc(c.client||'')}</td>
-        <td data-l="受注/見積">${esc([c.order_no,c.estimate_no].filter(Boolean).join(' / '))}</td>
-        <td data-l="担当">${esc(c.our_person||'')}</td>
-        <td data-l="状態"><select class="cc-st" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select></td>
-        <td data-l="伝票" style="text-align:center"><input type="checkbox" ${_inv(c.invoiced)?'checked':''} onchange="Cases.toggleInv('${id}')"></td>
-        <td data-l="登録">${fmtD(c.created_at)}</td>
-        <td data-l="操作" class="case-ops">${archd?`<button onclick="Cases.unarchive('${id}')">復活</button>`:`<button onclick="Cases.archive('${id}')">退避</button>`}${manage?`<button class="del" onclick="Cases.del('${id}')">削除</button>`:''}</td>
-      </tr>`;
-    }).join('')}</tbody></table>`;
+      h+=`<tr${archd?' class="arch"':''}>`
+        +`<td>${esc(c.name||'')}</td>`
+        +`<td>${esc(c.client||'')}</td>`
+        +`<td>${esc(c.order_no||'')}</td>`
+        +`<td>${esc(c.estimate_no||'')}</td>`
+        +`<td>${esc(c.our_person||'')}</td>`
+        +`<td><select class="case-st-sel" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select></td>`
+        +`<td style="text-align:center"><input type="checkbox" ${_inv(c.invoiced)?'checked':''} onchange="Cases.toggleInv('${id}')" style="width:18px;height:18px;cursor:pointer"></td>`
+        +`<td>${fmtD(c.created_at)}</td>`
+        +`<td style="white-space:nowrap">${archd?`<button class="act-btn" onclick="Cases.unarchive('${id}')">復活</button>`:`<button class="act-btn" onclick="Cases.archive('${id}')">退避</button>`}${manage?` <button class="act-btn" style="color:#c0392b" onclick="Cases.del('${id}')">削除</button>`:''}</td>`
+        +`</tr>`;
+    });
+    h+='</tbody></table></div>';
+    return h;
   }
 
   function setStatus(id,st){ const c=_find(id); if(c)c.status=st; fireAndForget({dept:'cases',action:'status',id,status:st}); toast('ステータスを'+st+'に変更'); render(); }
