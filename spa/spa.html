@@ -2385,7 +2385,7 @@ function _getCache(key){
 function _setCache(key,data){
   try{sessionStorage.setItem('seq_'+key,JSON.stringify(data));}catch(e){}
 }
-function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
 
 // 楽観的更新の保護：ローカルのtmp_*レコードのうち、サーバに反映済みのものは除外し、
 // 未反映のもの（まだサーバから返ってこない）はサーバデータと統合して保持する。
@@ -3533,7 +3533,7 @@ const Inv = (function(){
       const r=await fetch(url);return r.json();
     }catch(e){console.error('apiGet失敗(inventory):',e);return null;}
   }
-  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})})}
+  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})})}
 
   // ===== ステータスログ =====
   function detectInvChanges(){
@@ -4013,7 +4013,7 @@ const Veh = (function(){
   function fmtKm(v){if(v==null||v==='')return'';return Number(v).toLocaleString()+' km'}
   function fireAndForget(body){
     body.dept='vehicle';
-    fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)});
+    fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)});
   }
   function _vesc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 
@@ -4533,7 +4533,7 @@ const Sales = (function(){
 
   // ===== 販売方言ユーティリティ =====
   async function apiGet(params){try{const u=API+'?dept='+DEPT+'&'+new URLSearchParams(params);const r=await fetch(u);return r.json()}catch(e){console.error('apiGet失敗(sales):',e);return null}}
-  function apiPost(body){body.dept=DEPT;fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+  function apiPost(body){body.dept=DEPT;fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
   function fmtDate(d){if(!d)return'';const dt=(d instanceof Date)?d:new Date(d);if(isNaN(dt))return String(d).slice(0,10);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')}
   function fmtDateJP(s){if(!s)return'';const dt=new Date(s);if(isNaN(dt))return String(s);return(dt.getMonth()+1)+'/'+dt.getDate()+'（'+dow[dt.getDay()]+'）'}
   function fmtAmount(v){if(v===''||v==null||isNaN(Number(v)))return'';return'¥'+Number(v).toLocaleString()}
@@ -5132,7 +5132,7 @@ const Labor = (function(){
     $('detailModal').classList.add('show');
   }
   function closeDetail(){$('detailModal').classList.remove('show')}
-  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
   function setArchive(id,on){
     if(_arcBusy)return;_arcBusy=true;setTimeout(()=>_arcBusy=false,1500);
     const job=allJobs.find(x=>String(x.id)===String(id));if(!job){_arcBusy=false;return}
@@ -5180,7 +5180,7 @@ const Daily = (function(){
   let editingId=null;
 
   function isOffDay(d){const dw=d.getDay();return dw===0||dw===6||HOLIDAYS.hasOwnProperty(dateStr(d))}
-  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
 
   // ===== データ取得 =====
   async function loadStaff(){try{const r=await fetch(API+'?dept=daily&action=staff_for_daily');const j=await r.json();if(j.success)staffList=j.staff||[]}catch(e){}}
@@ -5518,7 +5518,7 @@ const Ot = (function(){
   function todayStr(){return fmtDate(new Date())}
   function oesc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
   async function apiGet(params){try{const qs=new URLSearchParams({dept:DEPT,...params}).toString();const r=await fetch(API+'?'+qs);return r.json()}catch(e){console.error('apiGet失敗(daily):',e);return null}}
-  function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',body:JSON.stringify({dept:DEPT,...body})});return{success:true}}
+  function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,body:JSON.stringify({dept:DEPT,...body})});return{success:true}}
 
   function scheduleSyncFromServer(){
     if(syncTimer)clearTimeout(syncTimer);
@@ -5704,7 +5704,7 @@ const FInv = (function(){
   let _busy=false;
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   async function apiGet(params){try{const u=API+'?dept=factory&'+new URLSearchParams(params);const r=await fetch(u);return r.json()}catch(e){console.error('apiGet失敗(factory):',e);return null}}
-  function apiPost(body){body.dept='factory';fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+  function apiPost(body){body.dept='factory';fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
 
   async function loadAll(){
     try{const j=await apiGet({action:'read'});if(j&&j.success)items=mergeWithTmp(j.data||[],items,r=>String(r.item||'')+'|'+String(r.created_at||''))}catch(e){console.warn('finv load',e)}
