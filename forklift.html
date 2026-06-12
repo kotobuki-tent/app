@@ -208,7 +208,7 @@ function monthStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth
 function nowHHMM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes());}
 
 async function apiGet(params){const url=API+'?dept=forklift&'+new URLSearchParams(params);const r=await fetch(url);return r.json();}
-function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'forklift',...body})});}
+function apiPost(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'forklift',...body})}).catch(function(){});}catch(e){}}
 
 async function boot(){
   $('f_date').value=todayStr();$('f_month').value=monthStr();

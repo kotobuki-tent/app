@@ -321,7 +321,7 @@ function nowHHMM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinu
 function fmtTime(t){if(!t)return'';t=String(t);if(/^\d{1,2}:\d{2}/.test(t))return t.slice(0,5);const d=new Date(t);if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return t;}
 
 async function apiGet(params){const url=API+'?dept=alcohol&'+new URLSearchParams(params);const r=await fetch(url);return r.json();}
-function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'alcohol',...body})});}
+function apiPost(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'alcohol',...body})}).catch(function(){});}catch(e){}}
 
 function segPick(segId,btn){[...$(segId).children].forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
 function segVal(segId){const on=$(segId).querySelector('.on');return on?on.dataset.v:'';}
