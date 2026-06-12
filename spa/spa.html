@@ -1625,14 +1625,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="prodPcDate"></span>
     <button class="sub-tab on" data-view="factory">工場ボード</button>
     <button class="sub-tab" data-view="labor">工数</button>
-    <div class="subtab-more">
-      <button type="button" class="sub-tab" id="prodMoreBtn" onclick="toggleSubMore('prodMoreBtn','prodMoreMenu',event)">その他 ▾</button>
-      <div class="nav-dd-menu hidden subtab-more-menu" id="prodMoreMenu">
-        <button class="sub-tab nav-dd-item" data-view="archive">出荷済</button>
-        <button class="sub-tab nav-dd-item" data-view="archived">アーカイブ</button>
-        <button class="sub-tab nav-dd-item" data-view="admin">管理</button>
-      </div>
-    </div>
+    <button class="sub-tab" data-view="archive">出荷済</button>
     <button class="staff-btn" id="prodStaffBtn" onclick="Prod.openStaff()">STAFF <span class="count">-</span></button>
     <button class="slog-btn" id="prodSlogBtn" onclick="Prod.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="prodPcSearch" placeholder="検索...">
@@ -1713,14 +1706,7 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="sub-tabs" id="projTabs">
     <span class="subtab-date" id="projPcDate"></span>
     <button class="sub-tab on" data-view="gantt">スケジュール</button>
-    <div class="subtab-more">
-      <button type="button" class="sub-tab" id="projMoreBtn" onclick="toggleSubMore('projMoreBtn','projMoreMenu',event)">その他 ▾</button>
-      <div class="nav-dd-menu hidden subtab-more-menu" id="projMoreMenu">
-        <button class="sub-tab nav-dd-item" data-view="projDone">完了</button>
-        <button class="sub-tab nav-dd-item" data-view="projArchived">アーカイブ</button>
-        <button class="sub-tab nav-dd-item" data-view="admin">管理</button>
-      </div>
-    </div>
+    <button class="sub-tab" data-view="projDone">完了</button>
     <button class="slog-btn" id="projSlogBtn" onclick="Proj.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="projPcSearch" placeholder="検索...">
   </div>
@@ -2041,8 +2027,6 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="salesPcDate"></span>
     <button class="sub-tab on" data-view="board">一覧</button>
     <button class="sub-tab" data-view="archive">納品済</button>
-    <button class="sub-tab" data-view="archived">アーカイブ</button>
-    <button class="sub-tab" data-view="admin">管理</button>
     <button class="slog-btn" id="salesSlogBtn" onclick="Sales.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="salesPcSearch" placeholder="検索..." oninput="Sales.unifiedSearch(this.value)">
   </div>
@@ -2994,7 +2978,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
 
   // ===== サブタブ切替イベント（init時に1回配線） =====
   function init(){
-    $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('prodTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProdView=t.dataset.view;const mb=$('prodMoreBtn');if(mb)mb.classList.toggle('on',!!t.closest('#prodMoreMenu'));$('prodMoreMenu').classList.add('hidden');render()});
+    $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('prodTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProdView=t.dataset.view;const pm=$('prodMoreMenu');if(pm)pm.classList.add('hidden');render()});
     const pc=$('prodPcDate');if(pc)pc.textContent=dateJP(today);
     $('prodPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
   }
@@ -3514,7 +3498,7 @@ const Proj = (function(){
 
   // ===== init（サブタブ切替イベント・車両チェックボックス生成・日付セット） =====
   function init(){
-    $('projTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('projTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProjView=t.dataset.view;const mb=$('projMoreBtn');if(mb)mb.classList.toggle('on',!!t.closest('#projMoreMenu'));$('projMoreMenu').classList.add('hidden');render()});
+    $('projTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('projTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProjView=t.dataset.view;const pm=$('projMoreMenu');if(pm)pm.classList.add('hidden');render()});
     initVehicleChecks();   // モーダル内の車両チェックボックス生成（元コードはトップレベル即時実行→initへ）
     const pc=$('projPcDate');if(pc)pc.textContent=dateJP(today);
     $('projPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
