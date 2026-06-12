@@ -5918,29 +5918,11 @@ const Cases = (function(){
     else if(t==='arch') rows=rows.filter(c=>_arch(c.archived));
     rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
     if(!rows.length){ pane.innerHTML='<div class="cases-empty">該当する案件はありません</div>'; return; }
-    if(t==='manage'){ pane.innerHTML=manageTable(rows); return; }
-    pane.innerHTML=`<div class="case-cards">${rows.map(c=>caseCard(c)).join('')}</div>`;
+    pane.innerHTML=caseTable(rows, t);
   }
 
-  function caseCard(c){
-    const id=esc(c.id), archd=_arch(c.archived);
-    const sub=[c.order_no?('受'+c.order_no):'', c.estimate_no?('見'+c.estimate_no):''].filter(Boolean).join(' / ');
-    const meta=[c.client,c.contact].filter(Boolean).map(esc).join(' ／ ');
-    return `<div class="case-card">
-      <div class="cc-main">
-        <div class="cc-name">${esc(c.name||'(無題)')}</div>
-        <div class="cc-meta">${meta}${sub?(' ・ '+esc(sub)):''}${c.our_person?(' ・ 担当'+esc(c.our_person)):''}</div>
-        <div class="cc-meta cc-sub">${id}　${fmtD(c.created_at)}</div>
-      </div>
-      <div class="cc-side">
-        <select class="cc-st" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select>
-        <label class="cc-inv"><input type="checkbox" ${_inv(c.invoiced)?'checked':''} onchange="Cases.toggleInv('${id}')">伝票</label>
-        ${archd?`<button class="cc-arch" onclick="Cases.unarchive('${id}')">元に戻す</button>`:`<button class="cc-arch" onclick="Cases.archive('${id}')">アーカイブ</button>`}
-      </div>
-    </div>`;
-  }
-
-  function manageTable(rows){
+  function caseTable(rows, t){
+    const manage=t==='manage';
     return `<table class="case-mtx"><thead><tr><th>案件名</th><th>得意先</th><th>受注/見積</th><th>担当</th><th>状態</th><th>伝票</th><th>登録</th><th></th></tr></thead><tbody>${rows.map(c=>{
       const id=esc(c.id), archd=_arch(c.archived);
       return `<tr${archd?' class="arch"':''}>
@@ -5951,7 +5933,7 @@ const Cases = (function(){
         <td data-l="状態"><select class="cc-st" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select></td>
         <td data-l="伝票" style="text-align:center"><input type="checkbox" ${_inv(c.invoiced)?'checked':''} onchange="Cases.toggleInv('${id}')"></td>
         <td data-l="登録">${fmtD(c.created_at)}</td>
-        <td data-l="操作" class="case-ops">${archd?`<button onclick="Cases.unarchive('${id}')">復活</button>`:`<button onclick="Cases.archive('${id}')">退避</button>`}<button class="del" onclick="Cases.del('${id}')">削除</button></td>
+        <td data-l="操作" class="case-ops">${archd?`<button onclick="Cases.unarchive('${id}')">復活</button>`:`<button onclick="Cases.archive('${id}')">退避</button>`}${manage?`<button class="del" onclick="Cases.del('${id}')">削除</button>`:''}</td>
       </tr>`;
     }).join('')}</tbody></table>`;
   }
