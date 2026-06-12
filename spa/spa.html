@@ -5960,9 +5960,12 @@ const Cases = (function(){
       <div class="cases-card off" id="cf_prodCard">
         <div class="cases-sec-hd">
           <label class="cf-toggle"><input type="checkbox" id="cf_useProd" onchange="Cases.toggle('prod')"> 生産（工場で製作）</label>
-          <button class="cases-add cf-hide" id="cf_prodAddBtn" onclick="Cases.addProd()">＋ 製作物</button>
         </div>
-        <div id="cf_prodWrap" class="cf-hide"><div id="cf_prodRows"></div></div>
+        <div id="cf_prodWrap" class="cf-hide">
+          <div class="mo-row pair"><div class="mo-field"><label>作業場所</label><select id="cf_psection">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="mo-field"><label>外注先</label><input id="cf_psub"></div></div>
+          <div class="mo-row pair"><div class="mo-field"><label>作業開始予定日</label><input type="date" id="cf_pstart"></div><div class="mo-field"><label>納期</label><input type="date" id="cf_pdeadline"></div></div>
+          <div class="mo-row full"><div class="mo-field"><label>製作物・備考</label><textarea id="cf_pnotes" placeholder="例: ・遮音カーテン膜 1464×2755 3枚 ・納入運賃 1式"></textarea></div></div>
+        </div>
       </div>
 
       <div class="cases-card off" id="cf_projCard">
@@ -6032,10 +6035,6 @@ const Cases = (function(){
     const m=map[which]; const on=$(m[0]).checked;
     $(m[1]).classList.toggle('cf-hide',!on);
     $(m[2]).classList.toggle('off',!on);
-    if(which==='prod'){
-      $('cf_prodAddBtn').classList.toggle('cf-hide',!on);
-      if(on && !$('cf_prodRows').querySelector('.cf-prod-item')) addProd(true);
-    }
   }
   // 企画制作タイプ切替（施工/レンタル/納品）。性質ごとに項目を出し分け。
   function setJType(t){
@@ -6063,18 +6062,6 @@ const Cases = (function(){
     const h=$('cf_nhint'); if(h) h.classList.toggle('cf-hide', v==='自社配送');
   }
 
-  function addProd(prefill){
-    const wrap=$('cf_prodRows');
-    const div=document.createElement('div'); div.className='cf-prod-item';
-    div.innerHTML=`<div class="cf-item-hd"><span>製作物</span><button class="cf-del" onclick="Cases.delRow(this)">×</button></div>
-      <div class="mo-row full"><div class="mo-field"><label>製作物</label><input class="cf-pname"></div></div>
-      <div class="mo-row pair"><div class="mo-field"><label>作業場所</label><select class="cf-psection">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="mo-field"><label>外注先</label><input class="cf-psub"></div></div>
-      <div class="mo-row pair"><div class="mo-field"><label>作業開始予定日</label><input type="date" class="cf-pstart"></div><div class="mo-field"><label>納期</label><input type="date" class="cf-pdeadline"></div></div>`;
-    wrap.appendChild(div);
-    if(prefill){ const nm=$('cf_project').value.trim(); if(nm) div.querySelector('.cf-pname').value=nm; }
-  }
-  function delRow(btn){ const r=btn.closest('.cf-prod-item')||btn.closest('.cf-row'); if(r) r.remove(); }
-
   function addDate(containerId,val){
     const wrap=$(containerId);
     const d=document.createElement('div'); d.className='date-item';
@@ -6096,16 +6083,8 @@ const Cases = (function(){
     const useProd=$('cf_useProd').checked, useProj=$('cf_useProj').checked, useSales=$('cf_useSales').checked;
     if(!useProd && !useProj && !useSales){ toast('生産・企画制作・販売のどれかにチェックを入れてください',true); return; }
     const status=$('cf_status').value;
-    const prodLines=!useProd?[]:[...document.querySelectorAll('#cf_prodRows .cf-prod-item')].map(r=>({
-      name:r.querySelector('.cf-pname').value.trim()||projectName,
-      deadline:r.querySelector('.cf-pdeadline').value,
-      section:r.querySelector('.cf-psection').value,
-      sub:r.querySelector('.cf-psub').value.trim(),
-      start:r.querySelector('.cf-pstart').value
-    })).filter(x=>x.name);
-    if(useProd && prodLines.length===0) prodLines.push({name:projectName,deadline:'',section:'未定',sub:'',start:''});
 
-    // 納品×運送便/引き取りは「生産案件」扱い：企画制作行は作らず、配送方法・材料を製作物(生産)へ焼く
+    // 納品×運送便/引き取りは「生産案件」扱い：企画制作行は作らず、配送方法・材料を生産へ焼く
     let nouhinToProd=false, shipDelivery='', shipMaterial='', shipNotes='';
     if(useProj && jType()==='納品' && $('cf_ndeliv').value!=='自社配送'){
       nouhinToProd=true;
@@ -6113,7 +6092,7 @@ const Cases = (function(){
       shipDelivery=m==='運送便'?('運送便（'+$('cf_ncarrier_in').value.trim()+'）'):m;
       shipMaterial=$('cf_material').value.trim();
       const nd=getDates('cf_d_deliv'); shipNotes=nd?('納品日 '+nd.replace(/-/g,'/')):'';
-      if(!useProd || prodLines.length===0){ toast('運送便/引き取りの納品は生産（製作物）が必要です。製作物を追加するか自社配送を選んでください',true); return; }
+      if(!useProd){ toast('運送便/引き取りの納品は生産にチェックが必要です（自社配送なら企画制作で登録）',true); return; }
     }
 
     _busy=true; setTimeout(()=>_busy=false,1500);
@@ -6121,8 +6100,13 @@ const Cases = (function(){
     const hdr={ order_no:$('cf_order_no').value.trim(), estimate_no:$('cf_estimate_no').value.trim(), client:$('cf_client').value.trim(), person:$('cf_person').value.trim(), our_person:$('cf_our_person').value.trim() };
     const notes='';
     const posts=[];
-    prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status,deadline:L.deadline,section:L.section,subcontractor:L.sub,start_date:L.start,
-      delivery:nouhinToProd?shipDelivery:'', material:nouhinToProd?shipMaterial:'', notes:nouhinToProd?shipNotes:notes}));
+    if(useProd){
+      const pnotes=$('cf_pnotes').value.trim();
+      posts.push({dept:'production',action:'save',case_id,...hdr,project:projectName,status,
+        section:$('cf_psection').value, subcontractor:$('cf_psub').value.trim(), start_date:$('cf_pstart').value, deadline:$('cf_pdeadline').value,
+        delivery:nouhinToProd?shipDelivery:'', material:nouhinToProd?shipMaterial:'',
+        notes:nouhinToProd?[pnotes,shipNotes].filter(Boolean).join(' / '):pnotes});
+    }
     if(useProj && !nouhinToProd){
       const t=jType();
       const material=(t==='レンタル')?'':$('cf_material').value.trim();
@@ -6160,7 +6144,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addProd, delRow, addDate, save, setStatus, toggleInv, archive, unarchive, del };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del };
 })();
 
 const App = {
