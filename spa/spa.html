@@ -123,6 +123,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .nav-dd-item{background:transparent;border:none;text-align:left;padding:10px 14px;border-radius:6px;font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text,#1a1d27);cursor:pointer;white-space:nowrap}
 .nav-dd-item:hover{background:var(--surface2,rgba(0,0,0,.06))}
 .nav-dd-item.on{color:var(--accent,#416079);background:var(--surface2,rgba(65,96,121,.08))}
+.subtab-more{display:inline-flex}
+.subtab-more-menu .sub-tab{display:block;width:100%;text-align:left;border-radius:6px;margin:0}
+.subtab-more-menu .sub-tab.on{color:var(--accent,#416079);background:var(--surface2,rgba(65,96,121,.1))}
 .home-link{font-weight:700;display:inline-flex;align-items:center}
 .hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(74,14,31,.9);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
 .hdr-btn:hover{color:#4a0e1f;border-color:rgba(255,255,255,.5)}
@@ -1529,15 +1532,10 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navOt" onclick="App.nav('ot')">時間外</button>
     <div class="nav-spacer"></div>
     <div class="nav-right">
-      <div class="nav-dd">
-        <button class="nav-link" id="navJimu" onclick="App.toggleJimu(event)">事務 ▾</button>
-        <div class="nav-dd-menu hidden" id="navJimuMenu">
-          <button class="nav-dd-item" id="navCases" onclick="App.nav('cases');App.closeJimu()">案件</button>
-          <button class="nav-dd-item" id="navSales" onclick="App.nav('sales');App.closeJimu()">販売</button>
-        </div>
-      </div>
+      <button class="nav-link" id="navCases" onclick="App.nav('cases')">案件</button>
       <button class="nav-link" id="navProd" onclick="App.nav('prod')">生産</button>
       <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
+      <button class="nav-link" id="navSales" onclick="App.nav('sales')">販売</button>
       <button class="nav-link" id="navLabor" onclick="App.nav('labor')">工数</button>
       <button class="nav-link" id="navInv" onclick="App.nav('inv')">在庫</button>
       <button class="nav-link" id="navVeh" onclick="App.nav('veh')">車両</button>
@@ -1622,9 +1620,14 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="sub-tabs" id="prodTabs">
     <span class="subtab-date" id="prodPcDate"></span>
     <button class="sub-tab on" data-view="factory">工場ボード</button>
-    <button class="sub-tab" data-view="archive">出荷済</button>
-    <button class="sub-tab" data-view="archived">アーカイブ</button>
-    <button class="sub-tab" data-view="admin">管理</button>
+    <div class="subtab-more">
+      <button type="button" class="sub-tab" id="prodMoreBtn" onclick="toggleSubMore('prodMoreBtn','prodMoreMenu',event)">その他 ▾</button>
+      <div class="nav-dd-menu hidden subtab-more-menu" id="prodMoreMenu">
+        <button class="sub-tab nav-dd-item" data-view="archive">出荷済</button>
+        <button class="sub-tab nav-dd-item" data-view="archived">アーカイブ</button>
+        <button class="sub-tab nav-dd-item" data-view="admin">管理</button>
+      </div>
+    </div>
     <button class="staff-btn" id="prodStaffBtn" onclick="Prod.openStaff()">STAFF <span class="count">-</span></button>
     <button class="slog-btn" id="prodSlogBtn" onclick="Prod.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="prodPcSearch" placeholder="検索...">
@@ -1704,9 +1707,14 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="sub-tabs" id="projTabs">
     <span class="subtab-date" id="projPcDate"></span>
     <button class="sub-tab on" data-view="gantt">スケジュール</button>
-    <button class="sub-tab" data-view="projDone">完了</button>
-    <button class="sub-tab" data-view="projArchived">アーカイブ</button>
-    <button class="sub-tab" data-view="admin">管理</button>
+    <div class="subtab-more">
+      <button type="button" class="sub-tab" id="projMoreBtn" onclick="toggleSubMore('projMoreBtn','projMoreMenu',event)">その他 ▾</button>
+      <div class="nav-dd-menu hidden subtab-more-menu" id="projMoreMenu">
+        <button class="sub-tab nav-dd-item" data-view="projDone">完了</button>
+        <button class="sub-tab nav-dd-item" data-view="projArchived">アーカイブ</button>
+        <button class="sub-tab nav-dd-item" data-view="admin">管理</button>
+      </div>
+    </div>
     <button class="slog-btn" id="projSlogBtn" onclick="Proj.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="projPcSearch" placeholder="検索...">
   </div>
@@ -2976,7 +2984,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
 
   // ===== サブタブ切替イベント（init時に1回配線） =====
   function init(){
-    $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t)return;$('prodTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProdView=t.dataset.view;render()});
+    $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('prodTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProdView=t.dataset.view;const mb=$('prodMoreBtn');if(mb)mb.classList.toggle('on',!!t.closest('#prodMoreMenu'));$('prodMoreMenu').classList.add('hidden');render()});
     const pc=$('prodPcDate');if(pc)pc.textContent=dateJP(today);
     $('prodPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
   }
@@ -3496,7 +3504,7 @@ const Proj = (function(){
 
   // ===== init（サブタブ切替イベント・車両チェックボックス生成・日付セット） =====
   function init(){
-    $('projTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t)return;$('projTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProjView=t.dataset.view;render()});
+    $('projTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('projTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProjView=t.dataset.view;const mb=$('projMoreBtn');if(mb)mb.classList.toggle('on',!!t.closest('#projMoreMenu'));$('projMoreMenu').classList.add('hidden');render()});
     initVehicleChecks();   // モーダル内の車両チェックボックス生成（元コードはトップレベル即時実行→initへ）
     const pc=$('projPcDate');if(pc)pc.textContent=dateJP(today);
     $('projPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
@@ -6183,7 +6191,6 @@ const App = {
       $(r.section).classList.toggle('hidden', r.key!==name);
       const nv=$(r.nav); if(nv) nv.classList.toggle('on', r.key===name);
     });
-    const jimu=$('navJimu'); if(jimu) jimu.classList.toggle('on', name==='cases'||name==='sales');
     this.current=name;
     centerActiveNav();
 
@@ -6206,8 +6213,6 @@ const App = {
       }
     }
   },
-  toggleJimu(e){ if(e)e.stopPropagation(); const m=$('navJimuMenu'); const willOpen=m.classList.contains('hidden'); m.classList.toggle('hidden'); if(willOpen){ const b=$('navJimu').getBoundingClientRect(); m.style.left=b.left+'px'; m.style.top=(b.bottom+2)+'px'; } },
-  closeJimu(){ const m=$('navJimuMenu'); if(m) m.classList.add('hidden'); },
   // 更新：今表示中のアプリだけ再取得（裏アプリのGASは叩かない＝SEQ-011全停止対策）
   async refreshCurrent(){
     const name=this.current;
@@ -6222,8 +6227,15 @@ const App = {
 $('refreshBtn').addEventListener('click', function(){
   safeRefresh(this, ()=>App.refreshCurrent());
 });
-// 事務ドロップダウン：外側クリックで閉じる
-document.addEventListener('click', e=>{ if(!e.target.closest('.nav-dd')) App.closeJimu(); });
+// サブタブ「その他」ドロップダウン（生産/企画の出荷済・アーカイブ・管理を畳む）
+function toggleSubMore(btnId, menuId, e){
+  if(e)e.stopPropagation();
+  const m=document.getElementById(menuId); if(!m)return;
+  const open=m.classList.contains('hidden');
+  document.querySelectorAll('.subtab-more-menu').forEach(x=>x.classList.add('hidden'));
+  if(open){ const b=document.getElementById(btnId).getBoundingClientRect(); m.style.left=b.left+'px'; m.style.top=(b.bottom+2)+'px'; m.classList.remove('hidden'); }
+}
+document.addEventListener('click', e=>{ if(!e.target.closest('.subtab-more')) document.querySelectorAll('.subtab-more-menu').forEach(x=>x.classList.add('hidden')); });
 
 let _bgBusy=false;
 setInterval(()=>{
