@@ -1585,8 +1585,26 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases #casesPane table th{cursor:default}
   #view-cases #casesPane table th:hover{color:var(--text-dim)}
   #view-cases .cases-card,#view-cases .cases-hint,#view-cases .cases-foot{max-width:760px}
+  #view-cases .cases-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  #view-cases .cases-search{flex:0 0 auto;width:300px;max-width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
+  #view-cases .cases-search:focus{outline:none;border-color:var(--accent)}
+  #view-cases .cases-chips{display:flex;gap:6px;flex-wrap:wrap}
+  #view-cases .cf-chip{padding:6px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface2);font:600 12px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+  #view-cases .cf-chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  #view-cases .cf-chip b{font-weight:800;margin-right:2px}
   </style>
   <div id="casesBody" style="padding:16px 14px 80px"></div>
+  <div class="mo-bg" id="caseEditBg">
+    <div class="mo" style="max-width:560px">
+      <h2>案件を編集</h2>
+      <div class="mo-row full"><div class="mo-field"><label>案件名（物件名）</label><input id="ce_name"></div></div>
+      <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="ce_our_person"></div><div class="mo-field f3"><label>状態</label><select id="ce_status"><option>見積中</option><option>受注</option><option>完了</option><option>見送り</option></select></div></div>
+      <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="ce_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="ce_order_no"></div></div>
+      <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="ce_client"></div><div class="mo-field f3"><label>窓口</label><input id="ce_contact"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
+      <div class="mo-foot"><button class="cancel" onclick="Cases.closeEdit()">閉じる</button><button class="save" onclick="Cases.saveEdit()">保存</button></div>
+    </div>
+  </div>
 </section>
 
 <!-- ===== 生産 section（中身は移植フェーズで流し込む） ===== -->
@@ -5864,7 +5882,7 @@ const Cases = (function(){
   const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
   const VH=['load_in','setup','event','teardown','rental_out','rental_return'];
   const CASE_ST=['見積中','受注','完了','見送り'];
-  let _cases=[], _tab='list';
+  let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='';
 
   async function loadAll(){
     if(_tab!=='form') $('casesBody').innerHTML='<div class="cases-loading">読み込み中...</div>';
@@ -5891,26 +5909,44 @@ const Cases = (function(){
     if(t==='list') rows=rows.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
     else if(t==='done') rows=rows.filter(c=>!_arch(c.archived)&&(c.status==='完了'||c.status==='見送り'));
     else if(t==='arch') rows=rows.filter(c=>_arch(c.archived));
-    rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
-    if(!rows.length){ pane.innerHTML='<div class="cases-empty">該当する案件はありません</div>'; return; }
-    pane.innerHTML=caseTable(rows, t);
+    if(t==='manage' && _stf) rows=rows.filter(c=> _stf==='__arch'?_arch(c.archived):c.status===_stf);
+    const q=_q.trim().toLowerCase();
+    if(q) rows=rows.filter(c=>['name','client','contact','our_person','order_no','estimate_no'].some(k=>String(c[k]||'').toLowerCase().includes(q)));
+    if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
+    else rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+    const chips = t==='manage' ? statusChips() : '';
+    const tools=`<div class="cases-toolbar"><input class="cases-search" id="casesSearch" placeholder="検索（案件名・得意先・受注番号…）" value="${esc(_q)}" oninput="Cases.search(this.value)">${chips}</div>`;
+    pane.innerHTML=tools + (rows.length?caseTable(rows,t):'<div class="cases-empty">該当する案件はありません</div>');
+    const si=$('casesSearch'); if(si && _q){ si.focus(); si.setSelectionRange(si.value.length,si.value.length); }
+  }
+  function statusChips(){
+    const all=_cases.length;
+    const cnt=s=>_cases.filter(c=>c.status===s).length;
+    const archN=_cases.filter(c=>_arch(c.archived)).length;
+    const chip=(label,val,n)=>`<button class="cf-chip${_stf===val?' on':''}" onclick="Cases.setStf('${val}')"><b>${n}</b> ${label}</button>`;
+    return `<div class="cases-chips">${chip('すべて','',all)}${CASE_ST.map(s=>chip(s,s,cnt(s))).join('')}${chip('アーカイブ','__arch',archN)}</div>`;
   }
 
   function caseTable(rows, t){
     const manage=t==='manage';
-    let h='<div class="tbl-wrap"><table><thead><tr><th>案件名</th><th>得意先</th><th>受注番号</th><th>見積番号</th><th>担当</th><th>状態</th><th>伝票</th><th>登録</th><th>操作</th></tr></thead><tbody>';
+    const arr=c=>_sort.col===c?(_sort.asc?'▲':'▼'):'';
+    const th=(label,col)=>`<th onclick="Cases.sortBy('${col}')" style="cursor:pointer">${label}<span class="arrow">${arr(col)}</span></th>`;
+    let h='<div class="tbl-wrap"><table><thead><tr>'
+      +th('案件名','name')+th('得意先','client')+th('受注番号','order_no')+th('見積番号','estimate_no')+th('担当','our_person')+th('状態','status')
+      +'<th>伝票</th>'+th('登録','created_at')+'<th>操作</th></tr></thead><tbody>';
     rows.forEach(c=>{
       const id=esc(c.id), archd=_arch(c.archived);
-      h+=`<tr${archd?' class="arch"':''}>`
+      const stop=' onclick="event.stopPropagation()"';
+      h+=`<tr${archd?' class="arch"':''} onclick="Cases.openEdit('${id}')" style="cursor:pointer">`
         +`<td>${esc(c.name||'')}</td>`
         +`<td>${esc(c.client||'')}</td>`
         +`<td>${esc(c.order_no||'')}</td>`
         +`<td>${esc(c.estimate_no||'')}</td>`
         +`<td>${esc(c.our_person||'')}</td>`
-        +`<td><select class="case-st-sel" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select></td>`
-        +`<td style="text-align:center"><input type="checkbox" ${_inv(c.invoiced)?'checked':''} onchange="Cases.toggleInv('${id}')" style="width:18px;height:18px;cursor:pointer"></td>`
+        +`<td${stop}><select class="case-st-sel" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select></td>`
+        +`<td style="text-align:center"${stop}><input type="checkbox" ${_inv(c.invoiced)?'checked':''} onchange="Cases.toggleInv('${id}')" style="width:18px;height:18px;cursor:pointer"></td>`
         +`<td>${fmtD(c.created_at)}</td>`
-        +`<td style="white-space:nowrap">${archd?`<button class="act-btn" onclick="Cases.unarchive('${id}')">復活</button>`:`<button class="act-btn" onclick="Cases.archive('${id}')">退避</button>`}${manage?` <button class="act-btn" style="color:#c0392b" onclick="Cases.del('${id}')">削除</button>`:''}</td>`
+        +`<td style="white-space:nowrap"${stop}>${archd?`<button class="act-btn" onclick="Cases.unarchive('${id}')">復活</button>`:`<button class="act-btn" onclick="Cases.archive('${id}')">退避</button>`}${manage?` <button class="act-btn" style="color:#c0392b" onclick="Cases.del('${id}')">削除</button>`:''}</td>`
         +`</tr>`;
     });
     h+='</tbody></table></div>';
@@ -5922,6 +5958,17 @@ const Cases = (function(){
   function archive(id){ const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); }
   function unarchive(id){ const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); }
   function del(id){ if(!confirm('この案件を削除しますか？（生産/企画制作の明細は残ります）'))return; _cases=_cases.filter(c=>String(c.id)!==String(id)); fireAndForget({dept:'cases',action:'delete',id}); toast('削除しました'); render(); }
+  function search(v){ _q=v; const qq=v.trim().toLowerCase(); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||tr.textContent.toLowerCase().includes(qq))?'':'none'; }); }
+  function sortBy(col){ if(_sort.col===col)_sort.asc=!_sort.asc; else {_sort.col=col;_sort.asc=true;} render(); }
+  function setStf(v){ _stf=(_stf===v?'':v); render(); }
+  function openEdit(id){ const c=_find(id); if(!c)return; _editId=id;
+    $('ce_name').value=c.name||''; $('ce_client').value=c.client||''; $('ce_contact').value=c.contact||''; $('ce_our_person').value=c.our_person||'';
+    $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; $('ce_status').value=CASE_ST.indexOf(c.status)>=0?c.status:'受注'; $('ce_note').value=c.note||'';
+    $('caseEditBg').classList.add('show'); }
+  function closeEdit(){ $('caseEditBg').classList.remove('show'); _editId=''; }
+  function saveEdit(){ if(!_editId)return; const c=_find(_editId); if(!c){closeEdit();return;}
+    const upd={name:$('ce_name').value.trim(),client:$('ce_client').value.trim(),contact:$('ce_contact').value.trim(),our_person:$('ce_our_person').value.trim(),estimate_no:$('ce_estimate_no').value.trim(),order_no:$('ce_order_no').value.trim(),status:$('ce_status').value,note:$('ce_note').value.trim()};
+    Object.assign(c,upd); fireAndForget({dept:'cases',action:'save',id:_editId,...upd}); toast('案件を更新しました'); closeEdit(); render(); }
 
   const JVH=['load_in','setup','event','teardown','lend','back','deliv']; // 企画制作で使う車両フェーズ
   function dateBlock(id,label){
@@ -6128,7 +6175,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit };
 })();
 
 const App = {
