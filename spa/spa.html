@@ -1592,6 +1592,11 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cf-chip{padding:6px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface2);font:600 12px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
   #view-cases .cf-chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
   #view-cases .cf-chip b{font-weight:800;margin-right:2px}
+  #view-cases .cases-slogbtn{margin-left:auto;flex:0 0 auto;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;font:600 12px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+  #view-cases .slog-row{display:flex;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--surface3);font-size:13px}
+  #view-cases .slog-nm{flex:1;min-width:0;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #view-cases .slog-ch{flex:0 0 auto;color:var(--accent);font-weight:700}
+  #view-cases .slog-ts{flex:0 0 auto;color:var(--text-faint);font-size:11px}
   </style>
   <div id="casesBody" style="padding:16px 14px 80px"></div>
   <div class="mo-bg" id="caseEditBg">
@@ -1603,6 +1608,13 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="ce_client"></div><div class="mo-field f3"><label>窓口</label><input id="ce_contact"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
       <div class="mo-foot"><button class="cancel" onclick="Cases.closeEdit()">閉じる</button><button class="save" onclick="Cases.saveEdit()">保存</button></div>
+    </div>
+  </div>
+  <div class="mo-bg" id="caseSlogBg">
+    <div class="mo" style="max-width:480px">
+      <h2>ステータスログ</h2>
+      <div id="caseSlogList" style="max-height:60vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"></div>
+      <div class="mo-foot"><button class="cancel" onclick="Cases.closeSlog()">閉じる</button></div>
     </div>
   </div>
 </section>
@@ -5915,7 +5927,7 @@ const Cases = (function(){
     if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
     else rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
     const chips = t==='manage' ? statusChips() : '';
-    const tools=`<div class="cases-toolbar"><input class="cases-search" id="casesSearch" placeholder="検索（案件名・得意先・受注番号…）" value="${esc(_q)}" oninput="Cases.search(this.value)">${chips}</div>`;
+    const tools=`<div class="cases-toolbar"><input class="cases-search" id="casesSearch" placeholder="検索（案件名・得意先・受注番号…）" value="${esc(_q)}" oninput="Cases.search(this.value)">${chips}<button class="cases-slogbtn" onclick="Cases.openSlog()">ステータスログ</button></div>`;
     pane.innerHTML=tools + (rows.length?caseTable(rows,t):'<div class="cases-empty">該当する案件はありません</div>');
     const si=$('casesSearch'); if(si && _q){ si.focus(); si.setSelectionRange(si.value.length,si.value.length); }
   }
@@ -5953,7 +5965,13 @@ const Cases = (function(){
     return h;
   }
 
-  function setStatus(id,st){ const c=_find(id); if(c)c.status=st; fireAndForget({dept:'cases',action:'status',id,status:st}); toast('ステータスを'+st+'に変更'); render(); }
+  function setStatus(id,st){ const c=_find(id); if(c){ logStatus(c,c.status,st); c.status=st; } fireAndForget({dept:'cases',action:'status',id,status:st}); toast('ステータスを'+st+'に変更'); render(); }
+  function logStatus(c,from,to){ if(from===to)return; try{ const k='cases_slog'; const a=JSON.parse(localStorage.getItem(k)||'[]'); a.unshift({name:c.name||c.id,from:from||'',to:to,ts:Date.now()}); localStorage.setItem(k,JSON.stringify(a.slice(0,100))); }catch(e){} }
+  function fmtTs(ts){ try{ const d=new Date(ts); return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }catch(e){return ''} }
+  function openSlog(){ let a=[]; try{a=JSON.parse(localStorage.getItem('cases_slog')||'[]')}catch(e){}
+    $('caseSlogList').innerHTML=a.length?a.map(x=>`<div class="slog-row"><span class="slog-nm">${esc(x.name)}</span><span class="slog-ch">${esc(x.from||'—')} → ${esc(x.to)}</span><span class="slog-ts">${fmtTs(x.ts)}</span></div>`).join(''):'<div class="cases-empty">履歴はありません</div>';
+    $('caseSlogBg').classList.add('show'); }
+  function closeSlog(){ $('caseSlogBg').classList.remove('show'); }
   function toggleInv(id){ const c=_find(id); if(!c)return; const nv=!_inv(c.invoiced); c.invoiced=nv; fireAndForget({dept:'cases',action:'invoiced',id,invoiced:nv}); }
   function archive(id){ const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); }
   function unarchive(id){ const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); }
@@ -5968,7 +5986,7 @@ const Cases = (function(){
   function closeEdit(){ $('caseEditBg').classList.remove('show'); _editId=''; }
   function saveEdit(){ if(!_editId)return; const c=_find(_editId); if(!c){closeEdit();return;}
     const upd={name:$('ce_name').value.trim(),client:$('ce_client').value.trim(),contact:$('ce_contact').value.trim(),our_person:$('ce_our_person').value.trim(),estimate_no:$('ce_estimate_no').value.trim(),order_no:$('ce_order_no').value.trim(),status:$('ce_status').value,note:$('ce_note').value.trim()};
-    Object.assign(c,upd); fireAndForget({dept:'cases',action:'save',id:_editId,...upd}); toast('案件を更新しました'); closeEdit(); render(); }
+    logStatus(c,c.status,upd.status); Object.assign(c,upd); fireAndForget({dept:'cases',action:'save',id:_editId,...upd}); toast('案件を更新しました'); closeEdit(); render(); }
 
   const JVH=['load_in','setup','event','teardown','lend','back','deliv']; // 企画制作で使う車両フェーズ
   function dateBlock(id,label){
@@ -6175,7 +6193,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog };
 })();
 
 const App = {
