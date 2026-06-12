@@ -6002,6 +6002,7 @@ const Cases = (function(){
             <div class="cf-grid2">${dateBlock('deliv','納品日')}</div>
             <div class="phase-hd">配送方法</div>
             <select id="cf_ndeliv" class="cf-delsel" onchange="Cases.setNdeliv()"><option>運送便</option><option>自社配送</option><option>引き取り</option></select>
+            <div id="cf_nhint" class="cases-hint" style="margin:8px 0 0">運送便／引き取りの納品は「生産案件」として登録（配送方法・材料は製作物に記録）。生産にチェックし製作物を追加してください。</div>
             <div id="cf_ncarrier" style="margin-top:10px"><div class="mo-field"><label>運送業者</label><input id="cf_ncarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
             <div id="cf_nveh" class="cf-hide" style="margin-top:10px"><div class="cf-grid2">${vhBlock('deliv','納品')}</div></div>
           </div>
@@ -6033,6 +6034,8 @@ const Cases = (function(){
     $('cf_jt_rental').classList.toggle('cf-hide', t!=='レンタル');
     $('cf_jt_nouhin').classList.toggle('cf-hide', t!=='納品');
     $('cf_jt_material').classList.toggle('cf-hide', t==='レンタル'); // レンタルは材料なし
+    if(t==='納品') setNdeliv();
+    if(t==='レンタル') setRdeliv();
   }
   function jType(){ const b=[...$('cf_typeseg').children].find(x=>x.classList.contains('on')); return b?b.dataset.t:'施工'; }
   // レンタルの配送方法：客取り＝何も出さない／自社車両＝車両／運送便＝業者
@@ -6046,6 +6049,7 @@ const Cases = (function(){
     const v=$('cf_ndeliv').value;
     $('cf_ncarrier').classList.toggle('cf-hide', v!=='運送便');
     $('cf_nveh').classList.toggle('cf-hide', v!=='自社配送');
+    const h=$('cf_nhint'); if(h) h.classList.toggle('cf-hide', v==='自社配送');
   }
 
   function addProd(prefill){
@@ -6089,14 +6093,26 @@ const Cases = (function(){
       start:r.querySelector('.cf-pstart').value
     })).filter(x=>x.name);
     if(useProd && prodLines.length===0) prodLines.push({name:projectName,deadline:'',section:'未定',sub:'',start:''});
-    _busy=true; setTimeout(()=>_busy=false,1500);
 
+    // 納品×運送便/引き取りは「生産案件」扱い：企画制作行は作らず、配送方法・材料を製作物(生産)へ焼く
+    let nouhinToProd=false, shipDelivery='', shipMaterial='', shipNotes='';
+    if(useProj && jType()==='納品' && $('cf_ndeliv').value!=='自社配送'){
+      nouhinToProd=true;
+      const m=$('cf_ndeliv').value;
+      shipDelivery=m==='運送便'?('運送便（'+$('cf_ncarrier_in').value.trim()+'）'):m;
+      shipMaterial=$('cf_material').value.trim();
+      const nd=getDates('cf_d_deliv'); shipNotes=nd?('納品日 '+nd.replace(/-/g,'/')):'';
+      if(!useProd || prodLines.length===0){ toast('運送便/引き取りの納品は生産（製作物）が必要です。製作物を追加するか自社配送を選んでください',true); return; }
+    }
+
+    _busy=true; setTimeout(()=>_busy=false,1500);
     const case_id=newCaseId();
     const hdr={ order_no:$('cf_order_no').value.trim(), estimate_no:$('cf_estimate_no').value.trim(), client:$('cf_client').value.trim(), person:$('cf_person').value.trim(), our_person:$('cf_our_person').value.trim() };
     const notes='';
     const posts=[];
-    prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status,deadline:L.deadline,section:L.section,subcontractor:L.sub,start_date:L.start,notes}));
-    if(useProj){
+    prodLines.forEach(L=>posts.push({dept:'production',action:'save',case_id,...hdr,project:L.name,status,deadline:L.deadline,section:L.section,subcontractor:L.sub,start_date:L.start,
+      delivery:nouhinToProd?shipDelivery:'', material:nouhinToProd?shipMaterial:'', notes:nouhinToProd?shipNotes:notes}));
+    if(useProj && !nouhinToProd){
       const t=jType();
       const material=(t==='レンタル')?'':$('cf_material').value.trim();
       const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,rentals:$('cf_rentals').value.trim(),material,notes,
@@ -6111,11 +6127,8 @@ const Cases = (function(){
         const delivery=m==='運送便'?('運送便（'+$('cf_rcarrier_in').value.trim()+'）'):m;
         Object.assign(p,{ delivery, date_rental_out:getDates('cf_d_lend'), date_rental_return:getDates('cf_d_back'),
           vehicles_rental_out:m==='自社配送'?getVehicles('lend'):'', vehicles_rental_return:m==='自社配送'?getVehicles('back'):'' });
-      }else if(t==='納品'){
-        const m=$('cf_ndeliv').value;
-        const delivery=m==='運送便'?('運送便（'+$('cf_ncarrier_in').value.trim()+'）'):m;
-        Object.assign(p,{ delivery, date_rental_out:getDates('cf_d_deliv'),
-          vehicles_rental_out:m==='自社配送'?getVehicles('deliv'):'' });
+      }else if(t==='納品'){ // 自社配送のみ（運送便/引き取りは上で生産へ振り分け済み）
+        Object.assign(p,{ delivery:'自社配送', date_rental_out:getDates('cf_d_deliv'), vehicles_rental_out:getVehicles('deliv') });
       }
       posts.push(p);
     }
