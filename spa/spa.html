@@ -4718,7 +4718,7 @@ const Sales = (function(){
     const ftBtn=(label,val)=>{const on=adminStatusFilter===val?' on':'';const cnt=val?stCnt[val]||0:allEntries.filter(e=>!ARCHIVE_ST.includes(e.status)).length;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`};
     let h=`<div class="fv-sum">${ftBtn('すべて',null)}`;
     ACTIVE_ST.forEach(s=>{h+=ftBtn(s,s)});
-    h+='<button class="av-add" style="margin-left:auto" onclick="Sales.openMo()">+ 新規登録</button></div>';
+    h+='<button class="av-add" style="margin-left:auto" onclick="App.nav(\'cases\');Cases.tab(\'form\')">＋ 案件から登録</button></div>';
     h+='<div class="tbl-wrap"><table class="tbl"><thead><tr>';
     cols.forEach(c=>{const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
     h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
@@ -6012,18 +6012,29 @@ const Cases = (function(){
         </div>
       </div>
 
+      <div class="cases-card off" id="cf_salesCard">
+        <div class="cases-sec-hd">
+          <label class="cf-toggle"><input type="checkbox" id="cf_useSales" onchange="Cases.toggle('sales')"> 販売（仕入れて売る）</label>
+        </div>
+        <div id="cf_salesWrap" class="cf-hide">
+          <div class="mo-row pair"><div class="mo-field f7"><label>仕入先</label><input id="cf_supplier"></div><div class="mo-field f3"><label>金額（円）</label><input type="number" id="cf_amount" min="0" step="1"></div></div>
+          <div class="mo-row full"><div class="mo-field"><label>納期</label><input type="date" id="cf_sdeadline"></div></div>
+        </div>
+      </div>
+
       <div class="cases-foot"><button class="save" onclick="Cases.save()">案件を登録</button></div>`;
     // 車両チェックを各フェーズに展開
     JVH.forEach(ph=>{ const el=$('cf_vh_'+ph); if(el) el.innerHTML=VEHICLES.map(v=>`<label><input type="checkbox" value="${v}">${v}</label>`).join(''); });
   }
 
   function toggle(which){
-    const on=$(which==='prod'?'cf_useProd':'cf_useProj').checked;
-    $(which==='prod'?'cf_prodWrap':'cf_projWrap').classList.toggle('cf-hide',!on);
-    $(which==='prod'?'cf_prodCard':'cf_projCard').classList.toggle('off',!on);
+    const map={prod:['cf_useProd','cf_prodWrap','cf_prodCard'],proj:['cf_useProj','cf_projWrap','cf_projCard'],sales:['cf_useSales','cf_salesWrap','cf_salesCard']};
+    const m=map[which]; const on=$(m[0]).checked;
+    $(m[1]).classList.toggle('cf-hide',!on);
+    $(m[2]).classList.toggle('off',!on);
     if(which==='prod'){
       $('cf_prodAddBtn').classList.toggle('cf-hide',!on);
-      if(on && !$('cf_prodRows').querySelector('.cf-row')) addProd(true);
+      if(on && !$('cf_prodRows').querySelector('.cf-prod-item')) addProd(true);
     }
   }
   // 企画制作タイプ切替（施工/レンタル/納品）。性質ごとに項目を出し分け。
@@ -6082,8 +6093,8 @@ const Cases = (function(){
     if(_busy)return;
     const projectName=$('cf_project').value.trim();
     if(!projectName){ toast('案件名を入れてください',true); return; }
-    const useProd=$('cf_useProd').checked, useProj=$('cf_useProj').checked;
-    if(!useProd && !useProj){ toast('生産か企画制作にチェックを入れてください',true); return; }
+    const useProd=$('cf_useProd').checked, useProj=$('cf_useProj').checked, useSales=$('cf_useSales').checked;
+    if(!useProd && !useProj && !useSales){ toast('生産・企画制作・販売のどれかにチェックを入れてください',true); return; }
     const status=$('cf_status').value;
     const prodLines=!useProd?[]:[...document.querySelectorAll('#cf_prodRows .cf-prod-item')].map(r=>({
       name:r.querySelector('.cf-pname').value.trim()||projectName,
@@ -6132,12 +6143,18 @@ const Cases = (function(){
       }
       posts.push(p);
     }
+    if(useSales){
+      const salesStatus=['見積中','受注','見送り'].includes(status)?status:'受注';
+      posts.push({dept:'sales',action:'save',case_id,...hdr,project:projectName,
+        supplier:$('cf_supplier').value.trim(), amount:$('cf_amount').value, deadline:$('cf_sdeadline').value,
+        status:salesStatus, created_at:new Date().toISOString().slice(0,10), notes});
+    }
     const parent={id:case_id,name:projectName,client:hdr.client,contact:hdr.person,our_person:hdr.our_person,estimate_no:hdr.estimate_no,order_no:hdr.order_no,status,invoiced:false,note:'',archived:false,created_at:new Date().toISOString()};
     fireAndForget({dept:'cases',action:'save',...parent});
     posts.forEach((b,i)=>setTimeout(()=>fireAndForget(b), i*300));
     _cases.unshift(parent);
     toast(`案件を登録しました（${posts.length}件／${case_id}）`);
-    App._loaded['prod']=false; App._loaded['proj']=false;
+    App._loaded['prod']=false; App._loaded['proj']=false; App._loaded['sales']=false;
     _tab='list'; render();
     setTimeout(loadAll,3000);
   }
