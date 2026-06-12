@@ -5902,7 +5902,10 @@ const Cases = (function(){
     if(t==='list') rows=rows.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
     else if(t==='done') rows=rows.filter(c=>!_arch(c.archived)&&(c.status==='完了'||c.status==='見送り'));
     else if(t==='arch') rows=rows.filter(c=>_arch(c.archived));
-    if(t==='manage' && _stf) rows=rows.filter(c=> _stf==='__arch'?_arch(c.archived):c.status===_stf);
+    if(t==='manage'){
+      if(_stf==='__arch') rows=rows.filter(c=>_arch(c.archived));
+      else { rows=rows.filter(c=>!_arch(c.archived)); if(_stf) rows=rows.filter(c=>c.status===_stf); }
+    }
     const q=_q.trim().toLowerCase();
     if(q) rows=rows.filter(c=>['name','client','contact','our_person','order_no','estimate_no'].some(k=>String(c[k]||'').toLowerCase().includes(q)));
     if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
@@ -5913,8 +5916,9 @@ const Cases = (function(){
     const si=$('casesSearch'); if(si && _q){ si.focus(); si.setSelectionRange(si.value.length,si.value.length); }
   }
   function statusChips(){
-    const all=_cases.length;
-    const cnt=s=>_cases.filter(c=>c.status===s).length;
+    const nonArch=_cases.filter(c=>!_arch(c.archived));
+    const all=nonArch.length;
+    const cnt=s=>nonArch.filter(c=>c.status===s).length;
     const archN=_cases.filter(c=>_arch(c.archived)).length;
     const chip=(label,val,n)=>`<button class="cf-chip${_stf===val?' on':''}" onclick="Cases.setStf('${val}')"><b>${n}</b> ${label}</button>`;
     return `<div class="cases-chips">${chip('すべて','',all)}${CASE_ST.map(s=>chip(s,s,cnt(s))).join('')}${chip('アーカイブ','__arch',archN)}</div>`;
