@@ -1529,14 +1529,14 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navDaily" data-zone="field" onclick="App.nav('daily')">日報</button>
     <button class="nav-link" id="navOt" data-zone="field" onclick="App.nav('ot')">時間外</button>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navAlcohol" data-zone="field" onclick="App.nav('alcohol')">アルコール</button>
-    <button class="nav-link" id="navForklift" data-zone="field" onclick="App.nav('forklift')">リフト</button>
+    <button class="nav-link" id="navAlcohol" data-zone="office" onclick="App.nav('alcohol')">アルコール</button>
+    <button class="nav-link" id="navForklift" data-zone="office" onclick="App.nav('forklift')">リフト</button>
     <button class="nav-link" id="navVeh" data-zone="office" onclick="App.nav('veh')">車両</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navProd" data-zone="field" onclick="App.nav('prod')">生産</button>
     <button class="nav-link" id="navProj" data-zone="field" onclick="App.nav('proj')">企画制作</button>
     <button class="nav-link" id="navSales" data-zone="office" onclick="App.nav('sales')">販売</button>
-    <button class="nav-link" id="navInv" data-zone="shared" onclick="App.nav('inv')">在庫</button>
+    <button class="nav-link" id="navInv" data-zone="office" onclick="App.nav('inv')">在庫</button>
     <button class="nav-link" id="navLabor" data-zone="office" onclick="App.nav('labor')">工数</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navCases" data-zone="office" onclick="App.nav('cases')">案件</button>
@@ -2370,11 +2370,11 @@ table.jobs tr:last-child td{border-bottom:none}
         <div class="portal-card-icon" style="background:#a3e635;color:#365314">企</div>
         <div class="portal-card-body"><div class="portal-card-title">企画制作部</div><div class="portal-card-desc">ガントチャート・車両バッティング・現場管理</div></div>
       </a>
-      <a class="portal-card" data-zone="field" onclick="App.nav('alcohol')">
+      <a class="portal-card" data-zone="office" onclick="App.nav('alcohol')">
         <div class="portal-card-icon" style="background:#5eead4;color:#042f2c">酒</div>
         <div class="portal-card-body"><div class="portal-card-title">アルコールチェック</div><div class="portal-card-desc">運転前後の酒気帯び確認・記録</div></div>
       </a>
-      <a class="portal-card" data-zone="field" onclick="App.nav('forklift')">
+      <a class="portal-card" data-zone="office" onclick="App.nav('forklift')">
         <div class="portal-card-icon" style="background:#fcd34d;color:#713f12">リ</div>
         <div class="portal-card-body"><div class="portal-card-title">フォークリフト点検</div><div class="portal-card-desc">始業前点検・否の記録</div></div>
       </a>
@@ -2386,7 +2386,7 @@ table.jobs tr:last-child td{border-bottom:none}
         <div class="portal-card-icon" style="background:#34d399;color:#064e3b">工</div>
         <div class="portal-card-body"><div class="portal-card-title">工数管理</div><div class="portal-card-desc">案件ごとの延べ作業時間・人別内訳</div></div>
       </a>
-      <a class="portal-card" data-zone="shared" onclick="App.nav('inv')">
+      <a class="portal-card" data-zone="office" onclick="App.nav('inv')">
         <div class="portal-card-icon" style="background:#22d3ee;color:#155e75">庫</div>
         <div class="portal-card-body"><div class="portal-card-title">在庫管理</div><div class="portal-card-desc">商品台帳・貸出/予約・メンテ・在庫確認</div></div>
       </a>
@@ -7089,15 +7089,15 @@ const App = {
     {key:'cases',ns:()=>Cases,section:'view-cases',nav:'navCases',zone:'office'},
     {key:'prod', ns:()=>Prod, section:'view-prod', nav:'navProd',zone:'field'},
     {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj',zone:'field'},
-    {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv',zone:'shared'},
+    {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv',zone:'office'},
     {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh',zone:'office'},
     {key:'finv', ns:()=>FInv, section:'view-finv', nav:'navFinv',zone:'field'},
     {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales',zone:'office'},
     {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor',zone:'office'},
     {key:'daily',ns:()=>Daily,section:'view-daily',nav:'navDaily',zone:'field'},
     {key:'ot',   ns:()=>Ot,   section:'view-ot',   nav:'navOt',zone:'field'},
-    {key:'alcohol',ns:()=>Alc,section:'view-alcohol',nav:'navAlcohol',zone:'field'},
-    {key:'forklift',ns:()=>Fork,section:'view-forklift',nav:'navForklift',zone:'field'},
+    {key:'alcohol',ns:()=>Alc,section:'view-alcohol',nav:'navAlcohol',zone:'office'},
+    {key:'forklift',ns:()=>Fork,section:'view-forklift',nav:'navForklift',zone:'office'},
     {key:'portal',ns:()=>Portal,section:'view-portal',nav:'navHome'},
   ],
   mode:(function(){ try{var m=new URLSearchParams(location.search).get('mode'); if(m==='floor'||m==='full'){localStorage.setItem('spa_mode',m); history.replaceState({},'',location.pathname);} }catch(e){} try{return localStorage.getItem('spa_mode')||'full';}catch(e){return 'full';} })(),
