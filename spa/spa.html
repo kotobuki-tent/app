@@ -6381,14 +6381,15 @@ const Cases = (function(){
     return h;
   }
 
-  function setStatus(id,st){ const c=_find(id); if(c){ logStatus(c,c.status,st); c.status=st; } fireAndForget({dept:'cases',action:'status',id,status:st}); toast('ステータスを'+st+'に変更'); render(); }
+  function _invalidateDepts(){ App._loaded.prod=false; App._loaded.proj=false; App._loaded.sales=false; }
+  function setStatus(id,st){ const c=_find(id); if(c){ logStatus(c,c.status,st); c.status=st; } fireAndForget({dept:'cases',action:'status',id,status:st}); _invalidateDepts(); toast('ステータスを'+st+'に変更'); render(); }
   function logStatus(c,from,to){ if(from===to)return; try{ const k='cases_slog'; const a=JSON.parse(localStorage.getItem(k)||'[]'); a.unshift({name:c.name||c.id,from:from||'',to:to,ts:Date.now()}); localStorage.setItem(k,JSON.stringify(a.slice(0,100))); }catch(e){} }
   function fmtTs(ts){ try{ const d=new Date(ts); return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }catch(e){return ''} }
   function openSlog(){ let a=[]; try{a=JSON.parse(localStorage.getItem('cases_slog')||'[]')}catch(e){}
     $('caseSlogList').innerHTML=a.length?a.map(x=>`<div class="slog-row"><span class="slog-nm">${esc(x.name)}</span><span class="slog-ch">${esc(x.from||'—')} → ${esc(x.to)}</span><span class="slog-ts">${fmtTs(x.ts)}</span></div>`).join(''):'<div class="cases-empty">履歴はありません</div>';
     $('caseSlogBg').classList.add('show'); }
   function closeSlog(){ $('caseSlogBg').classList.remove('show'); }
-  function toggleInv(id){ const c=_find(id); if(!c)return; const nv=!_inv(c.invoiced); c.invoiced=nv; fireAndForget({dept:'cases',action:'invoiced',id,invoiced:nv}); }
+  function toggleInv(id){ const c=_find(id); if(!c)return; const nv=!_inv(c.invoiced); c.invoiced=nv; fireAndForget({dept:'cases',action:'invoiced',id,invoiced:nv}); _invalidateDepts(); }
   function archive(id){ const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); }
   function unarchive(id){ const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); }
   function del(id){ if(!confirm('この案件を削除しますか？（生産/企画制作の明細は残ります）'))return; _cases=_cases.filter(c=>String(c.id)!==String(id)); fireAndForget({dept:'cases',action:'delete',id}); toast('削除しました'); render(); }
