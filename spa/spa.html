@@ -1596,6 +1596,17 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .slog-nm{flex:1;min-width:0;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #view-cases .slog-ch{flex:0 0 auto;color:var(--accent);font-weight:700}
   #view-cases .slog-ts{flex:0 0 auto;color:var(--text-faint);font-size:11px}
+  #view-cases .ce-children{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+  #view-cases .ce-child{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);cursor:pointer;font:inherit}
+  #view-cases .ce-child:hover{border-color:var(--accent)}
+  #view-cases .ce-cdept{flex:0 0 auto;font-size:11px;font-weight:700;color:#fff;background:var(--text-dim);border-radius:5px;padding:3px 8px}
+  #view-cases .ce-cdept.ce-production{background:#d99a00}
+  #view-cases .ce-cdept.ce-project{background:#5a9e3a}
+  #view-cases .ce-cdept.ce-sales{background:#c763b0}
+  #view-cases .ce-cname{flex:1;min-width:0;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #view-cases .ce-cst{flex:0 0 auto;font-size:12px;color:var(--text-dim)}
+  #view-cases .ce-cgo{flex:0 0 auto;font-size:11px;color:var(--accent);font-weight:700}
+  #view-cases .ce-nochild{color:var(--text-dim);font-size:13px;padding:6px 2px}
   </style>
   <div id="casesBody" style="padding:16px 14px 80px"></div>
   <div class="mo-bg" id="caseEditBg">
@@ -1606,6 +1617,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="ce_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="ce_order_no"></div></div>
       <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="ce_client"></div><div class="mo-field f3"><label>窓口</label><input id="ce_contact"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
+      <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div></div>
       <div class="mo-foot"><button class="cancel" onclick="Cases.closeEdit()">閉じる</button><button class="save" onclick="Cases.saveEdit()">保存</button></div>
     </div>
   </div>
@@ -5874,11 +5886,18 @@ const Cases = (function(){
   const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
   const VH=['load_in','setup','event','teardown','rental_out','rental_return'];
   const CASE_ST=['見積中','受注','完了','見送り'];
-  let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='';
+  let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='', _children={};
 
   async function loadAll(){
     if(_tab!=='form') $('casesBody').innerHTML='<div class="cases-loading">読み込み中...</div>';
-    try{ const r=await fetch(API+'?dept=cases&action=read'); const j=await r.json(); _cases=(j&&j.data)||[]; }catch(e){}
+    try{
+      const grab=d=>fetch(API+'?dept='+d+'&action=read').then(r=>r.json()).catch(()=>({}));
+      const [cs,od,pj,sl]=await Promise.all([grab('cases'),grab('production'),grab('project'),grab('sales')]);
+      _cases=(cs&&cs.data)||[];
+      _children={};
+      const add=(dept,rows)=>{(rows||[]).forEach(r=>{const cid=String(r.case_id||'').trim(); if(!cid)return; (_children[cid]=_children[cid]||[]).push({dept,id:r.id,project:r.project,status:r.status,invoiced:r.invoiced});});};
+      add('production',(od&&od.data)); add('project',(pj&&pj.data)); add('sales',(sl&&sl.data));
+    }catch(e){}
     if(_tab!=='form') render();
   }
   const _arch=v=>v===true||v==='true'||v==='TRUE';
@@ -5966,8 +5985,15 @@ const Cases = (function(){
   function openEdit(id){ const c=_find(id); if(!c)return; _editId=id;
     $('ce_name').value=c.name||''; $('ce_client').value=c.client||''; $('ce_contact').value=c.contact||''; $('ce_our_person').value=c.our_person||'';
     $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; $('ce_status').value=CASE_ST.indexOf(c.status)>=0?c.status:'受注'; $('ce_note').value=c.note||'';
+    const kids=_children[String(id)]||[];
+    const lbl={production:'生産',project:'企画',sales:'販売'};
+    $('ce_children').innerHTML = kids.length
+      ? kids.map(k=>`<button type="button" class="ce-child" onclick="Cases.jumpChild('${k.dept}','${esc(String(k.id))}')"><span class="ce-cdept ce-${k.dept}">${lbl[k.dept]||k.dept}</span><span class="ce-cname">${esc(k.project||'(無題)')}</span><span class="ce-cst">${esc(k.status||'')}</span><span class="ce-cgo">開く →</span></button>`).join('')
+      : '<div class="ce-nochild">紐付く明細はありません</div>';
     $('caseEditBg').classList.add('show'); }
   function closeEdit(){ $('caseEditBg').classList.remove('show'); _editId=''; }
+  async function jumpChild(dept,id){ closeEdit(); const key={production:'prod',project:'proj',sales:'sales'}[dept]; if(!key)return; try{ await App.nav(key); }catch(e){}
+    try{ if(dept==='production')Prod.editProd(id); else if(dept==='project')Proj.editProj(id); else if(dept==='sales')Sales.openMo(id); }catch(e){} }
   function saveEdit(){ if(!_editId)return; const c=_find(_editId); if(!c){closeEdit();return;}
     const upd={name:$('ce_name').value.trim(),client:$('ce_client').value.trim(),contact:$('ce_contact').value.trim(),our_person:$('ce_our_person').value.trim(),estimate_no:$('ce_estimate_no').value.trim(),order_no:$('ce_order_no').value.trim(),status:$('ce_status').value,note:$('ce_note').value.trim()};
     logStatus(c,c.status,upd.status); Object.assign(c,upd); fireAndForget({dept:'cases',action:'save',id:_editId,...upd}); toast('案件を更新しました'); closeEdit(); render(); }
@@ -6177,7 +6203,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild };
 })();
 
 const App = {
