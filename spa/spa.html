@@ -118,14 +118,6 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .nav-link:hover{color:#4a0e1f;background:rgba(255,255,255,.1)}
 .nav-link.on{background:var(--bg,#f5f6fa);color:#1a1d27;font-weight:700}
 .nav-link.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--bg,#f5f6fa)}
-.nav-dd{position:relative;display:inline-flex}
-.nav-dd-menu{position:fixed;background:var(--surface,#fff);border:1px solid var(--border,#e2e8ec);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);padding:4px;z-index:200;min-width:128px;display:flex;flex-direction:column;gap:2px}
-.nav-dd-item{background:transparent;border:none;text-align:left;padding:10px 14px;border-radius:6px;font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text,#1a1d27);cursor:pointer;white-space:nowrap}
-.nav-dd-item:hover{background:var(--surface2,rgba(0,0,0,.06))}
-.nav-dd-item.on{color:var(--accent,#416079);background:var(--surface2,rgba(65,96,121,.08))}
-.subtab-more{display:inline-flex}
-.subtab-more-menu .sub-tab{display:block;width:100%;text-align:left;border-radius:6px;margin:0}
-.subtab-more-menu .sub-tab.on{color:var(--accent,#416079);background:var(--surface2,rgba(65,96,121,.1))}
 .home-link{font-weight:700;display:inline-flex;align-items:center}
 .hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(74,14,31,.9);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
 .hdr-btn:hover{color:#4a0e1f;border-color:rgba(255,255,255,.5)}
@@ -2991,7 +2983,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
 
   // ===== サブタブ切替イベント（init時に1回配線） =====
   function init(){
-    $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('prodTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProdView=t.dataset.view;const pm=$('prodMoreMenu');if(pm)pm.classList.add('hidden');render()});
+    $('prodTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('prodTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProdView=t.dataset.view;render()});
     const pc=$('prodPcDate');if(pc)pc.textContent=dateJP(today);
     $('prodPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
   }
@@ -3511,7 +3503,7 @@ const Proj = (function(){
 
   // ===== init（サブタブ切替イベント・車両チェックボックス生成・日付セット） =====
   function init(){
-    $('projTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('projTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProjView=t.dataset.view;const pm=$('projMoreMenu');if(pm)pm.classList.add('hidden');render()});
+    $('projTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('projTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curProjView=t.dataset.view;render()});
     initVehicleChecks();   // モーダル内の車両チェックボックス生成（元コードはトップレベル即時実行→initへ）
     const pc=$('projPcDate');if(pc)pc.textContent=dateJP(today);
     $('projPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
@@ -6288,16 +6280,6 @@ const App = {
 $('refreshBtn').addEventListener('click', function(){
   safeRefresh(this, ()=>App.refreshCurrent());
 });
-// サブタブ「その他」ドロップダウン（生産/企画の出荷済・アーカイブ・管理を畳む）
-function toggleSubMore(btnId, menuId, e){
-  if(e)e.stopPropagation();
-  const m=document.getElementById(menuId); if(!m)return;
-  const open=m.classList.contains('hidden');
-  document.querySelectorAll('.subtab-more-menu').forEach(x=>x.classList.add('hidden'));
-  if(open){ const b=document.getElementById(btnId).getBoundingClientRect(); m.style.left=b.left+'px'; m.style.top=(b.bottom+2)+'px'; m.classList.remove('hidden'); }
-}
-document.addEventListener('click', e=>{ if(!e.target.closest('.subtab-more')) document.querySelectorAll('.subtab-more-menu').forEach(x=>x.classList.add('hidden')); });
-
 let _bgBusy=false;
 setInterval(()=>{
   if(document.visibilityState!=='visible')return;
