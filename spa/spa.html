@@ -5894,6 +5894,7 @@ const Cases = (function(){
   const CASE_ST=['見積中','受注','完了','見送り'];
   let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='', _children={}, _deptf='';
   function caseDepts(id){ const s={}; (_children[String(id)]||[]).forEach(k=>s[k.dept]=1); return s; }
+  function caseDeptKey(id){ const d=caseDepts(id); return ((d.production?'1':'')+(d.project?'2':'')+(d.sales?'3':''))||'9'; }
 
   async function loadAll(){
     if(_tab!=='form') $('casesBody').innerHTML='<div class="cases-loading">読み込み中...</div>';
@@ -5934,7 +5935,8 @@ const Cases = (function(){
     if(_deptf) rows=rows.filter(c=>caseDepts(c.id)[_deptf]);
     const q=_q.trim().toLowerCase();
     if(q) rows=rows.filter(c=>['name','client','contact','our_person','order_no','estimate_no'].some(k=>String(c[k]||'').toLowerCase().includes(q)));
-    if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
+    if(_sort.col==='__dept') rows.sort((a,b)=>(_sort.asc?1:-1)*caseDeptKey(a.id).localeCompare(caseDeptKey(b.id)));
+    else if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
     else rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
     const chips = t==='manage' ? statusChips() : '';
     const tools=`<div class="cases-toolbar"><input class="cases-search" id="casesSearch" placeholder="検索（案件名・得意先・受注番号…）" value="${esc(_q)}" oninput="Cases.search(this.value)">${deptChips()}${chips}<button class="cases-slogbtn" onclick="Cases.openSlog()">ステータスログ</button></div>`;
@@ -5961,7 +5963,7 @@ const Cases = (function(){
     const arr=c=>_sort.col===c?(_sort.asc?'▲':'▼'):'';
     const th=(label,col)=>`<th onclick="Cases.sortBy('${col}')" style="cursor:pointer">${label}<span class="arrow">${arr(col)}</span></th>`;
     let h='<div class="tbl-wrap"><table><thead><tr>'
-      +th('案件名','name')+'<th>部門</th>'+th('得意先','client')+th('受注番号','order_no')+th('見積番号','estimate_no')+th('担当','our_person')+th('状態','status')
+      +th('案件名','name')+th('部門','__dept')+th('得意先','client')+th('受注番号','order_no')+th('見積番号','estimate_no')+th('担当','our_person')+th('状態','status')
       +'<th>伝票</th>'+th('登録','created_at')+'<th>操作</th></tr></thead><tbody>';
     const dlbl=[['production','生',' 生産'],['project','企',' 企画'],['sales','販',' 販売']];
     rows.forEach(c=>{
