@@ -1615,11 +1615,12 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cf-chip.dept.on{background:var(--text);border-color:var(--text)}
   </style>
   <div id="casesBody" style="padding:16px 14px 80px"></div>
+  <datalist id="caseStaffList"></datalist>
   <div class="mo-bg" id="caseEditBg">
     <div class="mo" style="max-width:560px">
       <h2>案件を編集</h2>
       <div class="mo-row full"><div class="mo-field"><label>案件名（物件名）</label><input id="ce_name"></div></div>
-      <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="ce_our_person"></div><div class="mo-field f3"><label>状態</label><select id="ce_status"><option>見積中</option><option>受注</option><option>完了</option><option>見送り</option></select></div></div>
+      <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="ce_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>状態</label><select id="ce_status"><option>見積中</option><option>受注</option><option>完了</option><option>見送り</option></select></div></div>
       <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="ce_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="ce_order_no"></div></div>
       <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="ce_client"></div><div class="mo-field f3"><label>窓口</label><input id="ce_contact"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
@@ -5892,7 +5893,7 @@ const Cases = (function(){
   const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
   const VH=['load_in','setup','event','teardown','rental_out','rental_return'];
   const CASE_ST=['見積中','受注','完了','見送り'];
-  let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='', _children={}, _deptf='';
+  let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='', _children={}, _deptf='', _staff=[];
   function caseDepts(id){ const s={}; (_children[String(id)]||[]).forEach(k=>s[k.dept]=1); return s; }
   function caseDeptKey(id){ const d=caseDepts(id); return ((d.production?'1':'')+(d.project?'2':'')+(d.sales?'3':''))||'9'; }
 
@@ -5900,8 +5901,10 @@ const Cases = (function(){
     if(_tab!=='form') $('casesBody').innerHTML='<div class="cases-loading">読み込み中...</div>';
     try{
       const grab=d=>fetch(API+'?dept='+d+'&action=read').then(r=>r.json()).catch(()=>({}));
-      const [cs,od,pj,sl]=await Promise.all([grab('cases'),grab('production'),grab('project'),grab('sales')]);
+      const [cs,od,pj,sl,st]=await Promise.all([grab('cases'),grab('production'),grab('project'),grab('sales'),fetch(API+'?dept=cases&action=staff').then(r=>r.json()).catch(()=>({}))]);
       _cases=(cs&&cs.data)||[];
+      _staff=(st&&st.data)||[];
+      const dl=$('caseStaffList'); if(dl) dl.innerHTML=_staff.map(s=>`<option value="${esc(s.name)}">`).join('');
       _children={};
       const add=(dept,rows)=>{(rows||[]).forEach(r=>{const cid=String(r.case_id||'').trim(); if(!cid)return; (_children[cid]=_children[cid]||[]).push({dept,id:r.id,project:r.project,status:r.status,invoiced:r.invoiced});});};
       add('production',(od&&od.data)); add('project',(pj&&pj.data)); add('sales',(sl&&sl.data));
@@ -6030,7 +6033,7 @@ const Cases = (function(){
     $('casesPane').innerHTML=`
       <div class="cases-card">
         <div class="mo-row full"><div class="mo-field"><label>案件名（物件名）*</label><input id="cf_project"></div></div>
-        <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="cf_our_person"></div><div class="mo-field f3"><label>ステータス</label><select id="cf_status"><option>見積中</option><option selected>受注</option><option>見送り</option></select></div></div>
+        <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="cf_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>ステータス</label><select id="cf_status"><option>見積中</option><option selected>受注</option><option>見送り</option></select></div></div>
         <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div></div>
         <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="cf_client"></div><div class="mo-field f3"><label>窓口</label><input id="cf_person"></div></div>
       </div>
