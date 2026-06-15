@@ -20,6 +20,7 @@
   --border:#d8dbe3;--border-light:#ecedf0;
   --text:#1a1d27;--text-dim:#5a6270;--text-faint:#8a92a0;
   --accent:#3b82f6;--accent-dim:rgba(59,111,216,.1);
+  --hdr:#ffffff;
   --red:#dc2626;--red-dim:rgba(220,38,38,.1);
   --orange:#f59e0b;--orange-dim:rgba(245,158,11,.1);
   --green:#2a9d5a;--green-dim:rgba(42,157,90,.1);
@@ -112,15 +113,16 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .toast.err{background:#dc2626}
 
 /* ===== ヘッダー（アプリ間ナビ・共通） ===== */
-.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:#fb7185;display:flex;align-items:stretch;height:48px;padding:0;gap:0}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--hdr);border-bottom:1px solid var(--border-light);display:flex;align-items:stretch;height:48px;padding:0;gap:0}
 .hdr-inner{display:flex;align-items:stretch;width:100%;padding:6px 8px 0 8px;gap:2px}
-.nav-link{background:rgba(255,255,255,.04);border:none;color:rgba(74,14,31,.85);font:500 13px/1 'Noto Sans JP',sans-serif;padding:0 14px;border-radius:8px 8px 0 0;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;margin-bottom:0;position:relative;white-space:nowrap}
-.nav-link:hover{color:#4a0e1f;background:rgba(255,255,255,.1)}
-.nav-link.on{background:var(--bg,#f5f6fa);color:#1a1d27;font-weight:700}
-.nav-link.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--bg,#f5f6fa)}
+.nav-link{background:transparent;border:none;color:var(--text-dim);font:500 13px/1 'Noto Sans JP',sans-serif;padding:0 13px;border-radius:8px 8px 0 0;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;margin-bottom:0;position:relative;white-space:nowrap}
+.nav-link:hover{color:var(--text);background:var(--surface3)}
+.nav-link.on{background:transparent;color:var(--text);font-weight:700}
+.nav-link.on::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2.5px;border-radius:2px;background:var(--accent)}
 .home-link{font-weight:700;display:inline-flex;align-items:center}
-.nav-div{flex:0 0 auto;align-self:center;width:1px;height:18px;background:rgba(255,255,255,.3);margin:0 6px}
-.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(74,14,31,.9);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
+.nav-div{flex:0 0 auto;align-self:center;width:1px;height:18px;background:var(--border);margin:0 6px}
+.hdr-btn{background:var(--surface2);border:1px solid var(--border-light);color:var(--text-dim);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
+.hdr-btn:hover{color:var(--text);border-color:var(--border)}
 .hdr-btn:hover{color:#4a0e1f;border-color:rgba(255,255,255,.5)}
 .nav-spacer{flex:1}
 .nav-right{display:contents}
