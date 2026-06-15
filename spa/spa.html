@@ -119,6 +119,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .nav-link.on{background:var(--bg,#f5f6fa);color:#1a1d27;font-weight:700}
 .nav-link.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--bg,#f5f6fa)}
 .home-link{font-weight:700;display:inline-flex;align-items:center}
+.nav-div{flex:0 0 auto;align-self:center;width:1px;height:18px;background:rgba(255,255,255,.3);margin:0 6px}
 .hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(74,14,31,.9);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
 .hdr-btn:hover{color:#4a0e1f;border-color:rgba(255,255,255,.5)}
 .nav-spacer{flex:1}
@@ -1391,6 +1392,9 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-card-body{flex:1}
 .portal-card-title{font-size:15px;font-weight:700;margin-bottom:4px}
 .portal-card-desc{font-size:12px;color:var(--text-dim);line-height:1.5}
+.portal-modeswitch{display:flex;align-items:center;gap:8px;justify-content:center;font-size:12px;color:var(--text-dim);margin:0 0 20px}
+.pm-btn{padding:6px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font:600 12px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+.pm-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
 @media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:1fr}}
 
@@ -1520,17 +1524,18 @@ table.jobs tr:last-child td{border-bottom:none}
 <div class="hdr">
   <div class="hdr-inner">
     <button class="nav-link home-link on" id="navHome" onclick="App.nav('portal')"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</button>
-    <button class="nav-link" id="navDaily" onclick="App.nav('daily')">日報</button>
-    <button class="nav-link" id="navOt" onclick="App.nav('ot')">時間外</button>
+    <button class="nav-link" id="navDaily" data-zone="field" onclick="App.nav('daily')">日報</button>
+    <button class="nav-link" id="navOt" data-zone="field" onclick="App.nav('ot')">時間外</button>
+    <button class="nav-link" id="navProd" data-zone="field" onclick="App.nav('prod')">生産</button>
+    <button class="nav-link" id="navProj" data-zone="field" onclick="App.nav('proj')">企画制作</button>
+    <span class="nav-div"></span>
+    <button class="nav-link" id="navInv" data-zone="shared" onclick="App.nav('inv')">在庫</button>
     <div class="nav-spacer"></div>
     <div class="nav-right">
-      <button class="nav-link" id="navCases" onclick="App.nav('cases')">案件</button>
-      <button class="nav-link" id="navProd" onclick="App.nav('prod')">生産</button>
-      <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
-      <button class="nav-link" id="navSales" onclick="App.nav('sales')">販売</button>
-      <button class="nav-link" id="navLabor" onclick="App.nav('labor')">工数</button>
-      <button class="nav-link" id="navInv" onclick="App.nav('inv')">在庫</button>
-      <button class="nav-link" id="navVeh" onclick="App.nav('veh')">車両</button>
+      <button class="nav-link" id="navCases" data-zone="office" onclick="App.nav('cases')">案件</button>
+      <button class="nav-link" id="navSales" data-zone="office" onclick="App.nav('sales')">販売</button>
+      <button class="nav-link" id="navLabor" data-zone="office" onclick="App.nav('labor')">工数</button>
+      <button class="nav-link" id="navVeh" data-zone="office" onclick="App.nav('veh')">車両</button>
     </div>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
@@ -2340,36 +2345,40 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="portal-wrap">
     <div class="portal-logo">寿テント</div>
     <div class="portal-sub">業務管理システム</div>
+    <div class="portal-modeswitch">表示モード
+      <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
+      <button class="pm-btn" data-m="floor" onclick="App.setMode('floor')">現場</button>
+    </div>
     <div class="portal-grid">
-      <a class="portal-card" onclick="App.nav('daily')">
+      <a class="portal-card" data-zone="field" onclick="App.nav('daily')">
         <div class="portal-card-icon" style="background:#fb7185;color:#881337">日</div>
         <div class="portal-card-body"><div class="portal-card-title">日報</div><div class="portal-card-desc">作業時間の記録・みんなの日報閲覧</div></div>
       </a>
-      <a class="portal-card" onclick="App.nav('ot')">
+      <a class="portal-card" data-zone="field" onclick="App.nav('ot')">
         <div class="portal-card-icon" style="background:#fb923c;color:#7c2d12">時</div>
         <div class="portal-card-body"><div class="portal-card-title">時間外ボード</div><div class="portal-card-desc">残業・休日出勤の申告と管理</div></div>
       </a>
-      <a class="portal-card" onclick="App.nav('prod')">
+      <a class="portal-card" data-zone="field" onclick="App.nav('prod')">
         <div class="portal-card-icon" style="background:#fbbf24;color:#713f12">製</div>
         <div class="portal-card-body"><div class="portal-card-title">生産部</div><div class="portal-card-desc">工場ボード・案件管理・出荷済</div></div>
       </a>
-      <a class="portal-card" onclick="App.nav('proj')">
+      <a class="portal-card" data-zone="field" onclick="App.nav('proj')">
         <div class="portal-card-icon" style="background:#a3e635;color:#365314">企</div>
         <div class="portal-card-body"><div class="portal-card-title">企画制作部</div><div class="portal-card-desc">ガントチャート・車両バッティング・現場管理</div></div>
       </a>
-      <a class="portal-card" onclick="App.nav('sales')">
+      <a class="portal-card" data-zone="office" onclick="App.nav('sales')">
         <div class="portal-card-icon" style="background:#f9a8d4;color:#831843">販</div>
         <div class="portal-card-body"><div class="portal-card-title">販売管理</div><div class="portal-card-desc">仕入れて売る案件の状態・備忘録</div></div>
       </a>
-      <a class="portal-card" onclick="App.nav('labor')">
+      <a class="portal-card" data-zone="office" onclick="App.nav('labor')">
         <div class="portal-card-icon" style="background:#34d399;color:#064e3b">工</div>
         <div class="portal-card-body"><div class="portal-card-title">工数管理</div><div class="portal-card-desc">案件ごとの延べ作業時間・人別内訳</div></div>
       </a>
-      <a class="portal-card" onclick="App.nav('inv')">
+      <a class="portal-card" data-zone="shared" onclick="App.nav('inv')">
         <div class="portal-card-icon" style="background:#22d3ee;color:#155e75">庫</div>
         <div class="portal-card-body"><div class="portal-card-title">在庫管理</div><div class="portal-card-desc">商品台帳・貸出/予約・メンテ・在庫確認</div></div>
       </a>
-      <a class="portal-card" onclick="App.nav('veh')">
+      <a class="portal-card" data-zone="office" onclick="App.nav('veh')">
         <div class="portal-card-icon" style="background:#60a5fa;color:#1e3a8a">車</div>
         <div class="portal-card-body"><div class="portal-card-title">車両管理</div><div class="portal-card-desc">車検・保険期限アラート・メンテ履歴</div></div>
       </a>
@@ -6222,22 +6231,27 @@ const App = {
   current:null,
   // アプリ登録：ここに {key, ns(IIFE), sectionId, navId} を足すだけで全機構が回る
   REG:[
-    {key:'cases',ns:()=>Cases,section:'view-cases',nav:'navCases'},
-    {key:'prod', ns:()=>Prod, section:'view-prod', nav:'navProd'},
-    {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj'},
-    {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv'},
-    {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh'},
-    {key:'finv', ns:()=>FInv, section:'view-finv', nav:'navFinv'},
-    {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales'},
-    {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor'},
-    {key:'daily',ns:()=>Daily,section:'view-daily',nav:'navDaily'},
-    {key:'ot',   ns:()=>Ot,   section:'view-ot',   nav:'navOt'},
+    {key:'cases',ns:()=>Cases,section:'view-cases',nav:'navCases',zone:'office'},
+    {key:'prod', ns:()=>Prod, section:'view-prod', nav:'navProd',zone:'field'},
+    {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj',zone:'field'},
+    {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv',zone:'shared'},
+    {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh',zone:'office'},
+    {key:'finv', ns:()=>FInv, section:'view-finv', nav:'navFinv',zone:'field'},
+    {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales',zone:'office'},
+    {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor',zone:'office'},
+    {key:'daily',ns:()=>Daily,section:'view-daily',nav:'navDaily',zone:'field'},
+    {key:'ot',   ns:()=>Ot,   section:'view-ot',   nav:'navOt',zone:'field'},
     {key:'portal',ns:()=>Portal,section:'view-portal',nav:'navHome'},
   ],
+  mode:(function(){ try{var m=new URLSearchParams(location.search).get('mode'); if(m==='floor'||m==='full'){localStorage.setItem('spa_mode',m); history.replaceState({},'',location.pathname);} }catch(e){} try{return localStorage.getItem('spa_mode')||'full';}catch(e){return 'full';} })(),
+  allowedZones(){ return this.mode==='floor' ? ['field','shared'] : ['field','shared','office']; },
+  setMode(m){ this.mode=m; try{localStorage.setItem('spa_mode',m);}catch(e){} this.applyMode(); const c=this.current; if(c&&c!=='portal'){const r=this.reg(c); if(r&&r.zone&&this.allowedZones().indexOf(r.zone)<0) this.nav('portal');} if(typeof Portal!=='undefined'&&Portal.render)Portal.render(); },
+  applyMode(){ const allow=this.allowedZones(); document.querySelectorAll('[data-zone]').forEach(b=>b.classList.toggle('hidden',allow.indexOf(b.getAttribute('data-zone'))<0)); document.querySelectorAll('.pm-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-m')===this.mode)); },
   _loaded:{},
   _loading:{},
   reg(name){ return this.REG.find(r=>r.key===name); },
   async nav(name){
+    const _r=this.reg(name); if(_r&&_r.zone&&this.allowedZones().indexOf(_r.zone)<0) name='portal';
     if(this.current===name) return;
     // 全sectionのdisplay切替＋ナビ.on切替（登録ぶん全部回す＝0秒）
     this.REG.forEach(r=>{
@@ -6294,6 +6308,7 @@ setInterval(()=>{
 window.addEventListener('load', ()=>{
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   initMobileFilters();
+  App.applyMode();
   App.current=null;
   App.nav('portal');
 });
