@@ -1532,7 +1532,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navAlcohol" data-zone="office" onclick="App.nav('alcohol')">点呼</button>
     <button class="nav-link" id="navForklift" data-zone="office" onclick="App.nav('forklift')">リフト</button>
     <button class="nav-link" id="navVeh" data-zone="office" onclick="App.nav('veh')">車両</button>
-    <span class="nav-div"></span>
+    <div class="nav-spacer"></div>
     <button class="nav-link" id="navProd" data-zone="field" onclick="App.nav('prod')">生産</button>
     <button class="nav-link" id="navProj" data-zone="field" onclick="App.nav('proj')">企画制作</button>
     <button class="nav-link" id="navSales" data-zone="office" onclick="App.nav('sales')">販売</button>
@@ -1540,7 +1540,6 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navLabor" data-zone="office" onclick="App.nav('labor')">工数</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navCases" data-zone="office" onclick="App.nav('cases')">案件</button>
-    <div class="nav-spacer"></div>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
 </div>
@@ -1576,6 +1575,9 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cf-typeseg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
   #view-cases select.cf-delsel{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);max-width:300px;width:100%}
   /* 案件タブ・一覧・管理 */
+  #view-cases #casesPane{padding:16px 14px}
+  #view-cases .sub-tab.cases-new{background:var(--accent);color:#fff;font-weight:700}
+  #view-cases .sub-tab.cases-new.on{background:var(--accent);color:#fff}
   #view-cases .cases-tabs{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap}
   #view-cases .ctab{padding:9px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface2);font:700 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
   #view-cases .ctab.on{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -1616,7 +1618,7 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cdept-none{color:var(--text-faint)}
   #view-cases .cf-chip.dept.on{background:var(--text);border-color:var(--text)}
   </style>
-  <div id="casesBody" style="padding:16px 14px 80px"></div>
+  <div id="casesBody" style="padding:0 0 80px"></div>
   <datalist id="caseStaffList"></datalist>
   <div class="mo-bg" id="caseEditBg">
     <div class="mo" style="max-width:560px">
@@ -6310,8 +6312,15 @@ const Cases = (function(){
 
   // ===== 案件タブ：登録 / 一覧 / 完了 / アーカイブ / 管理 =====
   function render(){
-    const tabs=[['list','一覧'],['done','完了'],['arch','アーカイブ'],['manage','管理'],['form','＋新規登録']];
-    $('casesBody').innerHTML=`<div class="cases-tabs">${tabs.map(([k,l])=>`<button class="ctab${k==='form'?' new':''}${_tab===k?' on':''}" onclick="Cases.tab('${k}')">${l}</button>`).join('')}</div><div id="casesPane"></div>`;
+    const tabs=[['list','一覧'],['done','完了'],['arch','アーカイブ'],['manage','管理']];
+    const bar=`<div class="sub-tabs">`
+      +`<span class="subtab-date">${dateJP(today)}</span>`
+      +tabs.map(([k,l])=>`<button class="sub-tab${_tab===k?' on':''}" onclick="Cases.tab('${k}')">${l}</button>`).join('')
+      +`<button class="sub-tab cases-new${_tab==='form'?' on':''}" onclick="Cases.tab('form')">＋ 新規登録</button>`
+      +`<button class="slog-btn" onclick="Cases.openSlog()">ステータスログ</button>`
+      +`<input class="subtab-search" id="casesSearch" placeholder="検索..." value="${esc(_q)}" oninput="Cases.search(this.value)">`
+      +`</div>`;
+    $('casesBody').innerHTML=bar+`<div id="casesPane"></div>`;
     if(_tab==='form') renderForm();
     else renderCaseList(_tab);
   }
@@ -6334,9 +6343,8 @@ const Cases = (function(){
     else if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
     else rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
     const chips = t==='manage' ? statusChips() : '';
-    const tools=`<div class="cases-toolbar"><input class="cases-search" id="casesSearch" placeholder="検索（案件名・得意先・受注番号…）" value="${esc(_q)}" oninput="Cases.search(this.value)">${deptChips()}${chips}<button class="cases-slogbtn" onclick="Cases.openSlog()">ステータスログ</button></div>`;
+    const tools=`<div class="cases-toolbar">${deptChips()}${chips}</div>`;
     pane.innerHTML=tools + (rows.length?caseTable(rows,t):'<div class="cases-empty">該当する案件はありません</div>');
-    const si=$('casesSearch'); if(si && _q){ si.focus(); si.setSelectionRange(si.value.length,si.value.length); }
   }
   function deptChips(){
     const count=d=>_cases.filter(c=>caseDepts(c.id)[d]).length;
@@ -7082,6 +7090,8 @@ function reloadAll(){boot();toast('更新しました');}
   function init(){}
   return { loadAll, init, setMemo, selectMachine, selectInspector, toggleExtraIns, setItem, record, shiftDay, loadDay, goToday, exportCsv, delById, reloadAll };
 })();
+// キオスク用ディープリンク：?go=画面 を mode-strip 前に捕捉（事務所前=alcohol/倉庫=forklift のアイコン用）
+const _deepGo=(function(){try{return new URLSearchParams(location.search).get('go')}catch(e){return null}})();
 const App = {
   current:null,
   // アプリ登録：ここに {key, ns(IIFE), sectionId, navId} を足すだけで全機構が回る
@@ -7168,7 +7178,7 @@ window.addEventListener('load', ()=>{
   initMobileFilters();
   App.applyMode();
   App.current=null;
-  App.nav('portal');
+  App.nav((_deepGo && App.reg(_deepGo)) ? _deepGo : 'portal');
 });
 </script>
 </body>
