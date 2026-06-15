@@ -252,6 +252,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
 
 /* STAFFボタンと出勤モーダル */
+.labor-view-lbl{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim)}
+.labor-view-lbl select{padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:500 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
 .staff-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
 .staff-btn+.slog-btn{margin-left:8px}
 .slog-btn+.subtab-search{margin-left:8px}
@@ -2125,9 +2127,13 @@ table.jobs tr:last-child td{border-bottom:none}
 <section id="view-labor" class="hidden">
   <div class="sub-tabs" id="laborTabs">
     <span class="subtab-date" id="laborPcDate"></span>
-    <button class="sub-tab on" data-view="active">工場ボード</button>
-    <button class="sub-tab" data-view="archive">出荷済</button>
-    <button class="sub-tab" data-view="archived">アーカイブ</button>
+    <label class="labor-view-lbl">表示
+      <select id="laborViewSel" onchange="Labor.setView(this.value)">
+        <option value="active">稼働中</option>
+        <option value="archive">出荷済</option>
+        <option value="archived">アーカイブ</option>
+      </select>
+    </label>
     <button class="slog-btn" id="laborSlogBtn" onclick="Labor.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="laborPcSearch" placeholder="検索...">
   </div>
@@ -5030,7 +5036,7 @@ const Labor = (function(){
 
   function setView(v){
     currentView=v;
-    $('laborTabs').querySelectorAll('.sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+    const sel=$('laborViewSel'); if(sel)sel.value=v;
     if(v==='archive'||v==='archived')stFilter='';
     renderTable();
   }
