@@ -1528,19 +1528,19 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link home-link on" id="navHome" onclick="App.nav('portal')"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</button>
     <button class="nav-link" id="navDaily" data-zone="field" onclick="App.nav('daily')">日報</button>
     <button class="nav-link" id="navOt" data-zone="field" onclick="App.nav('ot')">時間外</button>
-    <button class="nav-link" id="navProd" data-zone="field" onclick="App.nav('prod')">生産</button>
-    <button class="nav-link" id="navProj" data-zone="field" onclick="App.nav('proj')">企画制作</button>
+    <span class="nav-div"></span>
     <button class="nav-link" id="navAlcohol" data-zone="field" onclick="App.nav('alcohol')">アルコール</button>
     <button class="nav-link" id="navForklift" data-zone="field" onclick="App.nav('forklift')">リフト</button>
+    <button class="nav-link" id="navVeh" data-zone="office" onclick="App.nav('veh')">車両</button>
     <span class="nav-div"></span>
+    <button class="nav-link" id="navProd" data-zone="field" onclick="App.nav('prod')">生産</button>
+    <button class="nav-link" id="navProj" data-zone="field" onclick="App.nav('proj')">企画制作</button>
+    <button class="nav-link" id="navSales" data-zone="office" onclick="App.nav('sales')">販売</button>
     <button class="nav-link" id="navInv" data-zone="shared" onclick="App.nav('inv')">在庫</button>
+    <button class="nav-link" id="navLabor" data-zone="office" onclick="App.nav('labor')">工数</button>
+    <span class="nav-div"></span>
+    <button class="nav-link" id="navCases" data-zone="office" onclick="App.nav('cases')">案件</button>
     <div class="nav-spacer"></div>
-    <div class="nav-right">
-      <button class="nav-link" id="navCases" data-zone="office" onclick="App.nav('cases')">案件</button>
-      <button class="nav-link" id="navSales" data-zone="office" onclick="App.nav('sales')">販売</button>
-      <button class="nav-link" id="navLabor" data-zone="office" onclick="App.nav('labor')">工数</button>
-      <button class="nav-link" id="navVeh" data-zone="office" onclick="App.nav('veh')">車両</button>
-    </div>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
 </div>
@@ -7103,7 +7103,8 @@ const App = {
   mode:(function(){ try{var m=new URLSearchParams(location.search).get('mode'); if(m==='floor'||m==='full'){localStorage.setItem('spa_mode',m); history.replaceState({},'',location.pathname);} }catch(e){} try{return localStorage.getItem('spa_mode')||'full';}catch(e){return 'full';} })(),
   allowedZones(){ return this.mode==='floor' ? ['field','shared'] : ['field','shared','office']; },
   setMode(m){ this.mode=m; try{localStorage.setItem('spa_mode',m);}catch(e){} this.applyMode(); const c=this.current; if(c&&c!=='portal'){const r=this.reg(c); if(r&&r.zone&&this.allowedZones().indexOf(r.zone)<0) this.nav('portal');} if(typeof Portal!=='undefined'&&Portal.render)Portal.render(); },
-  applyMode(){ const allow=this.allowedZones(); document.querySelectorAll('[data-zone]').forEach(b=>b.classList.toggle('hidden',allow.indexOf(b.getAttribute('data-zone'))<0)); document.querySelectorAll('.pm-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-m')===this.mode)); },
+  applyMode(){ const allow=this.allowedZones(); document.querySelectorAll('[data-zone]').forEach(b=>b.classList.toggle('hidden',allow.indexOf(b.getAttribute('data-zone'))<0)); document.querySelectorAll('.pm-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-m')===this.mode));
+    const inner=document.querySelector('.hdr-inner'); if(inner){ const kids=[...inner.children]; kids.forEach((el,i)=>{ if(!el.classList.contains('nav-div'))return; let has=false; for(let j=i+1;j<kids.length;j++){ const k=kids[j]; if(k.classList.contains('nav-div')||k.classList.contains('nav-spacer')||k.id==='refreshBtn')break; if(k.classList.contains('nav-link')&&!k.classList.contains('hidden')){has=true;break;} } el.classList.toggle('hidden',!has); }); } },
   _loaded:{},
   _loading:{},
   reg(name){ return this.REG.find(r=>r.key===name); },
