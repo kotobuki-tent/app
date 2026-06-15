@@ -1607,6 +1607,12 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .ce-cst{flex:0 0 auto;font-size:12px;color:var(--text-dim)}
   #view-cases .ce-cgo{flex:0 0 auto;font-size:11px;color:var(--accent);font-weight:700}
   #view-cases .ce-nochild{color:var(--text-dim);font-size:13px;padding:6px 2px}
+  #view-cases .cdept{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:5px;font-size:11px;font-weight:700;color:#fff;margin-right:3px}
+  #view-cases .cdept-production{background:#d99a00}
+  #view-cases .cdept-project{background:#5a9e3a}
+  #view-cases .cdept-sales{background:#c763b0}
+  #view-cases .cdept-none{color:var(--text-faint)}
+  #view-cases .cf-chip.dept.on{background:var(--text);border-color:var(--text)}
   </style>
   <div id="casesBody" style="padding:16px 14px 80px"></div>
   <div class="mo-bg" id="caseEditBg">
@@ -5886,7 +5892,8 @@ const Cases = (function(){
   const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
   const VH=['load_in','setup','event','teardown','rental_out','rental_return'];
   const CASE_ST=['見積中','受注','完了','見送り'];
-  let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='', _children={};
+  let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='', _children={}, _deptf='';
+  function caseDepts(id){ const s={}; (_children[String(id)]||[]).forEach(k=>s[k.dept]=1); return s; }
 
   async function loadAll(){
     if(_tab!=='form') $('casesBody').innerHTML='<div class="cases-loading">読み込み中...</div>';
@@ -5924,15 +5931,22 @@ const Cases = (function(){
       if(_stf==='__arch') rows=rows.filter(c=>_arch(c.archived));
       else { rows=rows.filter(c=>!_arch(c.archived)); if(_stf) rows=rows.filter(c=>c.status===_stf); }
     }
+    if(_deptf) rows=rows.filter(c=>caseDepts(c.id)[_deptf]);
     const q=_q.trim().toLowerCase();
     if(q) rows=rows.filter(c=>['name','client','contact','our_person','order_no','estimate_no'].some(k=>String(c[k]||'').toLowerCase().includes(q)));
     if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
     else rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
     const chips = t==='manage' ? statusChips() : '';
-    const tools=`<div class="cases-toolbar"><input class="cases-search" id="casesSearch" placeholder="検索（案件名・得意先・受注番号…）" value="${esc(_q)}" oninput="Cases.search(this.value)">${chips}<button class="cases-slogbtn" onclick="Cases.openSlog()">ステータスログ</button></div>`;
+    const tools=`<div class="cases-toolbar"><input class="cases-search" id="casesSearch" placeholder="検索（案件名・得意先・受注番号…）" value="${esc(_q)}" oninput="Cases.search(this.value)">${deptChips()}${chips}<button class="cases-slogbtn" onclick="Cases.openSlog()">ステータスログ</button></div>`;
     pane.innerHTML=tools + (rows.length?caseTable(rows,t):'<div class="cases-empty">該当する案件はありません</div>');
     const si=$('casesSearch'); if(si && _q){ si.focus(); si.setSelectionRange(si.value.length,si.value.length); }
   }
+  function deptChips(){
+    const count=d=>_cases.filter(c=>caseDepts(c.id)[d]).length;
+    const chip=(label,val)=>`<button class="cf-chip dept${_deptf===val?' on':''}" onclick="Cases.setDeptf('${val}')">${val?('<b>'+count(val)+'</b> '):''}${label}</button>`;
+    return `<div class="cases-chips">${chip('全部門','')}${chip('生産','production')}${chip('企画','project')}${chip('販売','sales')}</div>`;
+  }
+  function setDeptf(v){ _deptf=(_deptf===v?'':v); render(); }
   function statusChips(){
     const nonArch=_cases.filter(c=>!_arch(c.archived));
     const all=nonArch.length;
@@ -5947,13 +5961,17 @@ const Cases = (function(){
     const arr=c=>_sort.col===c?(_sort.asc?'▲':'▼'):'';
     const th=(label,col)=>`<th onclick="Cases.sortBy('${col}')" style="cursor:pointer">${label}<span class="arrow">${arr(col)}</span></th>`;
     let h='<div class="tbl-wrap"><table><thead><tr>'
-      +th('案件名','name')+th('得意先','client')+th('受注番号','order_no')+th('見積番号','estimate_no')+th('担当','our_person')+th('状態','status')
+      +th('案件名','name')+'<th>部門</th>'+th('得意先','client')+th('受注番号','order_no')+th('見積番号','estimate_no')+th('担当','our_person')+th('状態','status')
       +'<th>伝票</th>'+th('登録','created_at')+'<th>操作</th></tr></thead><tbody>';
+    const dlbl=[['production','生',' 生産'],['project','企',' 企画'],['sales','販',' 販売']];
     rows.forEach(c=>{
       const id=esc(c.id), archd=_arch(c.archived);
       const stop=' onclick="event.stopPropagation()"';
+      const dps=caseDepts(c.id);
+      const badges=dlbl.filter(d=>dps[d[0]]).map(d=>`<span class="cdept cdept-${d[0]}" title="${d[2].trim()}">${d[1]}</span>`).join('')||'<span class="cdept-none">—</span>';
       h+=`<tr${archd?' class="arch"':''} onclick="Cases.openEdit('${id}')" style="cursor:pointer">`
         +`<td>${esc(c.name||'')}</td>`
+        +`<td style="white-space:nowrap">${badges}</td>`
         +`<td>${esc(c.client||'')}</td>`
         +`<td>${esc(c.order_no||'')}</td>`
         +`<td>${esc(c.estimate_no||'')}</td>`
@@ -6203,7 +6221,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf };
 })();
 
 const App = {
