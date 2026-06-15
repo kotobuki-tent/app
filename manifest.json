@@ -2,7 +2,7 @@
   "name": "業務管理",
   "short_name": "業務管理",
   "description": "寿テント 業務管理アプリ（SEQUENCE LAB）",
-  "start_url": "./portal.html",
+  "start_url": "./spa/spa.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

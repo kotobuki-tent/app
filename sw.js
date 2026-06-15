@@ -5,19 +5,11 @@
 // HTML/CSS/JS を変更したら必ずこの数字をインクリメントすること。
 // 例: "v1" → "v2" → "v3" ...
 // ============================================================
-const CACHE_VERSION = 'v154';
+const CACHE_VERSION = 'v155';
 const CACHE_NAME = `sequence-lab-${CACHE_VERSION}`;
 
 // プリキャッシュ対象（アプリシェル）
 const PRECACHE_URLS = [
-  './portal.html',
-  './daily.html',
-  './overtime.html',
-  './index.html',
-  './project.html',
-  './labor.html',
-  './inventory.html',
-  './vehicle.html',
   './register.html',
   './manifest.json',
   './icons/icon-192.png',
