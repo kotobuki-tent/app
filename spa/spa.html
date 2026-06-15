@@ -280,8 +280,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
   .fv-si .l{font-size:12px;font-weight:600;line-height:1;margin:0;color:inherit;order:1}
   .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
 
-  /* 工場カード：1列＆内部調整 */
-  .fv-cards{grid-template-columns:1fr;gap:10px}
+  /* 工場カード：幅に応じて自動で列数（狭い端末＝1列、幅広縦タブレット＝複数列） */
+  .fv-cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
   .fv-card{padding:14px 13px}
   .fv-card .pname{font-size:15px;line-height:1.35}
   .fv-card .top{gap:8px}
@@ -963,7 +963,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 
 @media(max-width:480px),(orientation:portrait){
   .factory-view,.admin-view{padding:0 0 12px}
-  .fv-cards{grid-template-columns:1fr;gap:10px}
+  .fv-cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
   .fv-card{padding:14px 13px}
   .fv-card .pname{font-size:15px;line-height:1.35}
   .fv-card .top{gap:8px}
