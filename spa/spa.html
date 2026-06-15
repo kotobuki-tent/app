@@ -4701,7 +4701,6 @@ const Sales = (function(){
     if(d.deadline){if(dlLine)dlLine+='　/　';dlLine+=`納期: ${fmtDateJP(d.deadline)}`}
     if(dlLine)h+=`<div class="dl">${dlLine}</div>`;
     if(d.amount!==''&&d.amount!=null&&!isNaN(Number(d.amount))&&Number(d.amount)>0)h+=`<div class="sub-info">${fmtAmount(d.amount)}</div>`;
-    if(d.notes){const nt=String(d.notes);h+=`<div class="note">${esc(nt.length>60?nt.slice(0,60)+'…':nt)}</div>`}
     h+='</div>';
     return h;
   }
