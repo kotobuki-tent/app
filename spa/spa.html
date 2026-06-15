@@ -6410,7 +6410,13 @@ const Cases = (function(){
     try{ if(dept==='production')Prod.editProd(id); else if(dept==='project')Proj.editProj(id); else if(dept==='sales')Sales.openMo(id); }catch(e){} }
   function saveEdit(){ if(!_editId)return; const c=_find(_editId); if(!c){closeEdit();return;}
     const upd={name:$('ce_name').value.trim(),client:$('ce_client').value.trim(),contact:$('ce_contact').value.trim(),our_person:$('ce_our_person').value.trim(),estimate_no:$('ce_estimate_no').value.trim(),order_no:$('ce_order_no').value.trim(),status:$('ce_status').value,note:$('ce_note').value.trim()};
-    logStatus(c,c.status,upd.status); Object.assign(c,upd); fireAndForget({dept:'cases',action:'save',id:_editId,...upd}); toast('案件を更新しました'); closeEdit(); render(); }
+    logStatus(c,c.status,upd.status); Object.assign(c,upd); fireAndForget({dept:'cases',action:'save',id:_editId,...upd});
+    // ヘッダ（受注/見積番号・得意先・窓口・担当）を子（生産/企画/販売）にも反映
+    const kids=_children[String(_editId)]||[];
+    const chdr={order_no:upd.order_no, estimate_no:upd.estimate_no, client:upd.client, person:upd.contact, our_person:upd.our_person};
+    kids.forEach((k,i)=>setTimeout(()=>fireAndForget({dept:k.dept,action:'save',id:k.id,...chdr}), i*250));
+    _invalidateDepts();
+    toast('案件を更新しました'); closeEdit(); render(); }
 
   const JVH=['load_in','setup','event','teardown','lend','back','deliv']; // 企画制作で使う車両フェーズ
   function dateBlock(id,label){
