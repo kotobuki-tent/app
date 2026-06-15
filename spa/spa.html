@@ -233,7 +233,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
    各slogボタンを margin-left:auto で起点にし、slog＋検索バーを右端に寄せる */
 /* STAFFボタンを持つのは生産だけ。それ以外（企画/在庫/車両/今後追加分）はslogボタンを右寄せ起点に。
    ★アプリ追加時はここに #〇〇SlogBtn を必ず足すこと（横展開漏れ防止） */
-#projSlogBtn, #invSlogBtn, #vSlogBtn, #salesSlogBtn, #laborSlogBtn{margin-left:auto}
+#projSlogBtn, #invSlogBtn, #vSlogBtn, #salesSlogBtn, #laborSlogBtn, #casesSlogBtn{margin-left:auto}
 .slog-btn:hover{border-color:var(--accent);color:var(--accent)}
 .slog-btn .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
 .slog-btn.has-new .dot{display:block}
@@ -6320,7 +6320,7 @@ const Cases = (function(){
       +`<span class="subtab-date">${dateJP(today)}</span>`
       +tabs.map(([k,l])=>`<button class="sub-tab${_tab===k?' on':''}" onclick="Cases.tab('${k}')">${l}</button>`).join('')
       +`<button class="sub-tab cases-new${_tab==='form'?' on':''}" onclick="Cases.tab('form')">＋ 新規登録</button>`
-      +`<button class="slog-btn" onclick="Cases.openSlog()">ステータスログ</button>`
+      +`<button class="slog-btn" id="casesSlogBtn" onclick="Cases.openSlog()">ステータスログ</button>`
       +`<input class="subtab-search" id="casesSearch" placeholder="検索..." value="${esc(_q)}" oninput="Cases.search(this.value)">`
       +`</div>`;
     $('casesBody').innerHTML=bar+`<div id="casesPane"></div>`;
