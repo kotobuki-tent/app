@@ -252,8 +252,6 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
 
 /* STAFFボタンと出勤モーダル */
-.labor-view-lbl{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim)}
-.labor-view-lbl select{padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:500 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
 .staff-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
 .staff-btn+.slog-btn{margin-left:8px}
 .slog-btn+.subtab-search{margin-left:8px}
@@ -1538,6 +1536,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <button class="nav-link" id="navProd" onclick="App.nav('prod')">生産</button>
       <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
       <button class="nav-link" id="navSales" onclick="App.nav('sales')">販売</button>
+      <button class="nav-link" id="navLabor" onclick="App.nav('labor')">工数</button>
       <button class="nav-link" id="navInv" onclick="App.nav('inv')">在庫</button>
       <button class="nav-link" id="navVeh" onclick="App.nav('veh')">車両</button>
     </div>
@@ -1644,7 +1643,6 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="sub-tabs" id="prodTabs">
     <span class="subtab-date" id="prodPcDate"></span>
     <button class="sub-tab on" data-view="factory">工場ボード</button>
-    <button class="sub-tab" data-view="labor">工数</button>
     <button class="staff-btn" id="prodStaffBtn" onclick="Prod.openStaff()">STAFF <span class="count">-</span></button>
     <button class="slog-btn" id="prodSlogBtn" onclick="Prod.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="prodPcSearch" placeholder="検索...">
@@ -1655,7 +1653,6 @@ table.jobs tr:last-child td{border-bottom:none}
     <div id="prodArchive" class="admin-view hidden"></div>
     <div id="prodArchived" class="admin-view hidden"></div>
   </div>
-  <div id="prodLabor" class="hidden"></div>
 
   <!-- 案件登録/編集モーダル -->
   <div class="mo-bg" id="prodMoBg">
@@ -2127,13 +2124,9 @@ table.jobs tr:last-child td{border-bottom:none}
 <section id="view-labor" class="hidden">
   <div class="sub-tabs" id="laborTabs">
     <span class="subtab-date" id="laborPcDate"></span>
-    <label class="labor-view-lbl">表示
-      <select id="laborViewSel" onchange="Labor.setView(this.value)">
-        <option value="active">稼働中</option>
-        <option value="archive">出荷済</option>
-        <option value="archived">アーカイブ</option>
-      </select>
-    </label>
+    <button class="sub-tab on" data-view="active">工場ボード</button>
+    <button class="sub-tab" data-view="archive">出荷済</button>
+    <button class="sub-tab" data-view="archived">アーカイブ</button>
     <button class="slog-btn" id="laborSlogBtn" onclick="Labor.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="laborPcSearch" placeholder="検索...">
   </div>
@@ -2515,7 +2508,6 @@ const Prod = (function(){
   // ===== 生産の状態（旧グローバル変数→IIFE内ローカルに隔離） =====
   let prodData=[];
   let curProdView='factory';
-  let _laborLoaded=false;
   let prodSort={col:null,asc:true};
   let prodFilter=null;
   let adminStatusFilter=null;
@@ -2704,9 +2696,6 @@ const Prod = (function(){
 
   // ===== 描画 =====
   function render(){
-    const _lab=curProdView==='labor';
-    const pl=$('prodLabor'); if(pl) pl.classList.toggle('hidden',!_lab);
-    if(_lab){ ['prodFactory','prodAdmin','prodArchive','prodArchived'].forEach(id=>$(id).classList.add('hidden')); if(!_laborLoaded && typeof Labor!=='undefined'){_laborLoaded=true; Labor.loadAll();} updateSlogBtn();updateStaffBtnCount(); return; }
     if(curProdView==='factory'){$('prodFactory').classList.remove('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.add('hidden');$('prodArchived').classList.add('hidden');renderFactory()}
     else if(curProdView==='admin'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.remove('hidden');$('prodArchive').classList.add('hidden');$('prodArchived').classList.add('hidden');renderProdAdmin()}
     else if(curProdView==='archive'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.remove('hidden');$('prodArchived').classList.add('hidden');renderArchive()}
@@ -5036,7 +5025,7 @@ const Labor = (function(){
 
   function setView(v){
     currentView=v;
-    const sel=$('laborViewSel'); if(sel)sel.value=v;
+    $('laborTabs').querySelectorAll('.sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
     if(v==='archive'||v==='archived')stFilter='';
     renderTable();
   }
@@ -6246,6 +6235,7 @@ const App = {
     {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh'},
     {key:'finv', ns:()=>FInv, section:'view-finv', nav:'navFinv'},
     {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales'},
+    {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor'},
     {key:'daily',ns:()=>Daily,section:'view-daily',nav:'navDaily'},
     {key:'ot',   ns:()=>Ot,   section:'view-ot',   nav:'navOt'},
     {key:'portal',ns:()=>Portal,section:'view-portal',nav:'navHome'},
@@ -6305,12 +6295,6 @@ function toggleSubMore(btnId, menuId, e){
   if(open){ const b=document.getElementById(btnId).getBoundingClientRect(); m.style.left=b.left+'px'; m.style.top=(b.bottom+2)+'px'; m.classList.remove('hidden'); }
 }
 document.addEventListener('click', e=>{ if(!e.target.closest('.subtab-more')) document.querySelectorAll('.subtab-more-menu').forEach(x=>x.classList.add('hidden')); });
-// 工数を生産のサブタブに内包：view-labor を prodLabor へ移設し Labor.init を直接呼ぶ（REGから外したため）
-(function(){
-  const lab=document.getElementById('view-labor'), host=document.getElementById('prodLabor');
-  if(lab&&host){ lab.classList.remove('hidden'); host.appendChild(lab); }
-  if(typeof Labor!=='undefined' && Labor.init) try{ Labor.init(); }catch(e){}
-})();
 
 let _bgBusy=false;
 setInterval(()=>{
