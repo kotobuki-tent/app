@@ -862,7 +862,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .v-card .v-status.稼働中{color:var(--green);background:var(--green-dim)}
 .v-card .v-status.整備中{color:var(--orange);background:var(--orange-dim)}
 .v-card .v-status.休車{color:var(--red);background:var(--red-dim)}
-.v-card .v-plate{font-size:13px;color:var(--text-dim);margin-bottom:4px}
+.v-card .v-plate{display:inline-flex;flex-direction:column;align-items:center;margin-bottom:8px;padding:4px 12px;border:1.5px solid var(--border);border-radius:7px;line-height:1.15}
+.v-card .v-plate .vp-a{font-size:11px;font-weight:600;color:var(--text-dim)}
+.v-card .v-plate .vp-b{font-size:19px;font-weight:800;letter-spacing:.06em;color:var(--text)}
 .v-card .v-type{font-size:12px;color:var(--text-faint);margin-bottom:8px}
 .v-card .v-dates{display:flex;flex-wrap:wrap;gap:6px}
 .v-card .v-date{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:500}
@@ -875,6 +877,12 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .v-card .vs-lab{font-size:10px;font-weight:600;color:var(--text-dim)}
 .v-card .vs-num{font-size:19px;font-weight:800;line-height:1;color:var(--text)}
 .v-card .vs-unit{margin-left:auto;align-self:flex-end;font-size:11px;font-weight:600;color:var(--text-dim)}
+.mo-field .plate-row{display:flex;gap:6px}
+.mo-field .plate-row input{width:auto;min-width:0;flex:1;text-align:center;padding:10px 6px}
+.mo-field .plate-row .pl-region{flex:1.6}
+.mo-field .plate-row .pl-class{flex:1}
+.mo-field .plate-row .pl-kana{flex:.8}
+.mo-field .plate-row .pl-seq{flex:1.6}
 .maint-section{margin-top:20px;border-top:2px solid var(--surface3);padding-top:16px}
 .maint-section h3{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .maint-section h3 button{font-size:12px;background:var(--accent);color:#fff;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-weight:600}
@@ -1971,10 +1979,17 @@ table.jobs tr:last-child td{border-bottom:none}
     <input type="hidden" id="vf_id">
     <div class="mo-row">
       <div class="mo-field"><label>車両名称 *</label><input id="vf_name"></div>
-    </div>
-    <div class="mo-row">
       <div class="mo-field"><label>車種</label><input id="vf_type"></div>
-      <div class="mo-field"><label>ナンバー</label><input id="vf_plate"></div>
+    </div>
+    <div class="mo-row full">
+      <div class="mo-field"><label>ナンバー</label>
+        <div class="plate-row">
+          <input id="vf_plate_region" class="pl-region">
+          <input id="vf_plate_class" class="pl-class" inputmode="numeric">
+          <input id="vf_plate_kana" class="pl-kana">
+          <input id="vf_plate_seq" class="pl-seq" inputmode="numeric">
+        </div>
+      </div>
     </div>
     <div class="mo-row">
       <div class="mo-field"><label>全長 (mm)</label><input id="vf_length" type="number" inputmode="numeric"></div>
@@ -4561,6 +4576,19 @@ const Veh = (function(){
     return alerts;
   }
 
+  // ナンバープレートを 地名/分類番号/かな/一連番号 に分解（スペース区切り・連結どちらも対応）
+  function parsePlate(s){
+    s=String(s||'').trim();
+    if(!s)return {region:'',cls:'',kana:'',seq:''};
+    const m=s.match(/^(.+?)\s*(\d{1,3})\s*([^\d\s]{1,2})\s*([\d\s\-・]+)$/);
+    if(m)return {region:m[1].trim(),cls:m[2],kana:m[3].trim(),seq:m[4].trim()};
+    return {region:s,cls:'',kana:'',seq:''};
+  }
+  // 1行表示（詳細・テーブル・タイトル用）
+  function plateLine(s){const p=parsePlate(s);const a=[p.region,p.cls,p.kana,p.seq].filter(Boolean);return a.length?a.join(' '):String(s||'');}
+  // 2行表示（一覧カード用）：上=地名+分類、下=かな+一連番号
+  function plate2HTML(s){const p=parsePlate(s);if(!p.cls&&!p.kana&&!p.seq)return esc(String(s||''));return `<span class="vp-a">${esc(p.region)} ${esc(p.cls)}</span><span class="vp-b">${esc(p.kana)} ${esc(p.seq)}</span>`;}
+
   // 車両サイズ表示（一覧カード・詳細用）
   function vSizeHTML(v){
     const L=v.length,W=v.width,H=v.height;
@@ -4618,7 +4646,7 @@ const Veh = (function(){
         const hokenDiff=diffDays(v.hoken_date);
         h+=`<div class="v-card" data-id="${v.id}">
           <div class="v-top"><span class="v-name">${esc(v.name)}</span></div>
-          <div class="v-plate">${esc(v.plate||'')}</div>
+          <div class="v-plate">${plate2HTML(v.plate)}</div>
           <div class="v-type">${esc(v.type||'')}</div>
           ${vSizeHTML(v)}
           <div class="v-dates">`;
@@ -4637,7 +4665,7 @@ const Veh = (function(){
   function alertCardHTML(a){
     return`<div class="alert-card ${a.level}" data-id="${a.vehicle.id}">
       <div class="a-top">
-        <div><span class="a-name">${esc(a.vehicle.name)}</span> <span class="a-plate">${esc(a.vehicle.plate||'')}</span></div>
+        <div><span class="a-name">${esc(a.vehicle.name)}</span> <span class="a-plate">${esc(plateLine(a.vehicle.plate))}</span></div>
         <span class="a-badge ${a.level}">${esc(a.type)}</span>
       </div>
       <div class="a-detail">${esc(a.msg)}</div>
@@ -4659,7 +4687,7 @@ const Veh = (function(){
       cols.forEach(c=>{
         let v=d[c.key]||'';
         if(c.key.endsWith('_date')&&v)v=dateJP(v);
-        if(c.key==='current_km'&&v)v=fmtKm(v);
+        if(c.key==='plate'&&v)v=plateLine(v);
         h+=`<td>${esc(v)}</td>`;
       });
       h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Veh.editVehicle('${d.id}')">編集</button></td></tr>`;
@@ -4681,11 +4709,11 @@ const Veh = (function(){
     const v=vehicleData.find(x=>String(x.id)===String(id));if(!v)return;
     currentViewId=id;
     const th=getThresholds();
-    $('vViewTitle').textContent=v.name+(v.plate?' — '+v.plate:'');
+    $('vViewTitle').textContent=v.name+(v.plate?' — '+plateLine(v.plate):'');
     const vr=(l,val)=>`<div class="view-row"><div class="vr-label">${l}</div><div class="vr-value">${val||'—'}</div></div>`;
     let h='';
     h+=vr('車両名称',esc(v.name));
-    h+=vr('ナンバー',esc(v.plate));
+    h+=vr('ナンバー',esc(plateLine(v.plate)));
     h+=vr('車種',esc(v.type));
     h+=vr('全長',v.length?esc(String(v.length))+' mm':'');
     h+=vr('全幅',v.width?esc(String(v.width))+' mm':'');
@@ -4769,7 +4797,11 @@ const Veh = (function(){
     $('vfDel').classList.toggle('hidden',!d);
     $('vf_id').value=d?d.id:'';
     $('vf_name').value=d?d.name:'';
-    $('vf_plate').value=d?d.plate||'':'';
+    const pp=parsePlate(d?d.plate||'':'');
+    $('vf_plate_region').value=pp.region;
+    $('vf_plate_class').value=pp.cls;
+    $('vf_plate_kana').value=pp.kana;
+    $('vf_plate_seq').value=pp.seq;
     $('vf_type').value=d?d.type||'':'';
     $('vf_length').value=d?d.length||'':'';
     $('vf_width').value=d?d.width||'':'';
@@ -4792,9 +4824,10 @@ const Veh = (function(){
     const name=$('vf_name').value.trim();
     if(!name){toast('車両名称を入力してください',true);return}
     const editId=$('vf_id').value;
+    const plate=[$('vf_plate_region').value,$('vf_plate_class').value,$('vf_plate_kana').value,$('vf_plate_seq').value].map(x=>x.trim()).filter(Boolean).join(' ');
     const body={
       action:'save',id:editId||undefined,
-      name,plate:$('vf_plate').value.trim(),type:$('vf_type').value.trim(),
+      name,plate,type:$('vf_type').value.trim(),
       length:$('vf_length').value,width:$('vf_width').value,height:$('vf_height').value,
       shaken_date:$('vf_shaken').value,jibaiseki_date:$('vf_jibaiseki').value,
       hoken_date:$('vf_hoken').value,
