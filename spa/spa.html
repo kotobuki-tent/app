@@ -862,9 +862,11 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .v-card .v-status.稼働中{color:var(--green);background:var(--green-dim)}
 .v-card .v-status.整備中{color:var(--orange);background:var(--orange-dim)}
 .v-card .v-status.休車{color:var(--red);background:var(--red-dim)}
-.v-card .v-plate{display:inline-flex;flex-direction:column;align-items:center;margin-bottom:8px;padding:4px 12px;border:1.5px solid var(--border);border-radius:7px;line-height:1.15}
-.v-card .v-plate .vp-a{font-size:11px;font-weight:600;color:var(--text-dim)}
-.v-card .v-plate .vp-b{font-size:19px;font-weight:800;letter-spacing:.06em;color:var(--text)}
+.v-card .v-plate{display:inline-flex;flex-direction:column;align-items:center;margin-bottom:8px;padding:4px 14px;border:1.5px solid var(--border);border-radius:7px;line-height:1.2}
+.v-card .v-plate .vp-a{font-size:14px;font-weight:700;color:var(--text-dim)}
+.v-card .v-plate .vp-b{font-size:21px;font-weight:800;letter-spacing:.06em;color:var(--text)}
+.v-card .v-plate .vp-kana{font-size:14px;font-weight:700;margin-right:4px}
+.v-card .v-model{font-size:13px;font-weight:600;color:var(--text-dim);margin-left:5px}
 .v-card .v-type{font-size:12px;color:var(--text-faint);margin-bottom:8px}
 .v-card .v-dates{display:flex;flex-wrap:wrap;gap:6px}
 .v-card .v-date{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:500}
@@ -931,7 +933,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
   #adminView td:nth-of-type(1)::before{display:none}
   /* 列ラベル（車両：車両名称/ナンバー/車種/全長/全幅/全高/車検満了/自賠責満了/任意保険満了/操作） */
   #adminView td:nth-of-type(2)::before{content:'ナンバー'}
-  #adminView td:nth-of-type(3)::before{content:'車種'}
+  #adminView td:nth-of-type(3)::before{content:'名称'}
   #adminView td:nth-of-type(4)::before{content:'全長(mm)'}
   #adminView td:nth-of-type(5)::before{content:'全幅(mm)'}
   #adminView td:nth-of-type(6)::before{content:'全高(mm)'}
@@ -1978,8 +1980,8 @@ table.jobs tr:last-child td{border-bottom:none}
     <h2 id="vMoTitle"><span id="vMoTitleText">車両登録</span><button class="del-link hidden" id="vfDel" onclick="Veh.delVehicle($('vf_id').value)">削除</button></h2>
     <input type="hidden" id="vf_id">
     <div class="mo-row">
-      <div class="mo-field"><label>車両名称 *</label><input id="vf_name"></div>
-      <div class="mo-field"><label>車種</label><input id="vf_type"></div>
+      <div class="mo-field"><label>車種 *</label><input id="vf_name"></div>
+      <div class="mo-field"><label>名称</label><input id="vf_type"></div>
     </div>
     <div class="mo-row full">
       <div class="mo-field"><label>ナンバー</label>
@@ -4587,7 +4589,7 @@ const Veh = (function(){
   // 1行表示（詳細・テーブル・タイトル用）
   function plateLine(s){const p=parsePlate(s);const a=[p.region,p.cls,p.kana,p.seq].filter(Boolean);return a.length?a.join(' '):String(s||'');}
   // 2行表示（一覧カード用）：上=地名+分類、下=かな+一連番号
-  function plate2HTML(s){const p=parsePlate(s);if(!p.cls&&!p.kana&&!p.seq)return esc(String(s||''));return `<span class="vp-a">${esc(p.region)} ${esc(p.cls)}</span><span class="vp-b">${esc(p.kana)} ${esc(p.seq)}</span>`;}
+  function plate2HTML(s){const p=parsePlate(s);if(!p.cls&&!p.kana&&!p.seq)return esc(String(s||''));return `<span class="vp-a">${esc(p.region)} ${esc(p.cls)}</span><span class="vp-b"><span class="vp-kana">${esc(p.kana)}</span>${esc(p.seq)}</span>`;}
 
   // 車両サイズ表示（一覧カード・詳細用）
   function vSizeHTML(v){
@@ -4645,9 +4647,8 @@ const Veh = (function(){
         const jiDiff=diffDays(v.jibaiseki_date);
         const hokenDiff=diffDays(v.hoken_date);
         h+=`<div class="v-card" data-id="${v.id}">
-          <div class="v-top"><span class="v-name">${esc(v.name)}</span></div>
+          <div class="v-top"><span class="v-name">${esc(v.name)}${v.type&&v.type!==v.name?' <span class="v-model">'+esc(v.type)+'</span>':''}</span></div>
           <div class="v-plate">${plate2HTML(v.plate)}</div>
-          <div class="v-type">${esc(v.type||'')}</div>
           ${vSizeHTML(v)}
           <div class="v-dates">`;
         if(v.shaken_date){const l=dateLevel(shakenDiff,th.shaken);h+=`<span class="v-date ${l}">車検 ${dateJP(v.shaken_date)}${shakenDiff!==null?' ('+shakenDiff+'日)':''}</span>`}
@@ -4677,7 +4678,7 @@ const Veh = (function(){
     const el=$('adminView');
     let items=[...vehicleData];
     if(adminSort.col)items.sort((a,b)=>{let va=String(a[adminSort.col]||'').toLowerCase(),vb=String(b[adminSort.col]||'').toLowerCase();return va<vb?(adminSort.asc?-1:1):va>vb?(adminSort.asc?1:-1):0});
-    const cols=[{key:'name',label:'車両名称'},{key:'plate',label:'ナンバー'},{key:'type',label:'車種'},{key:'length',label:'全長'},{key:'width',label:'全幅'},{key:'height',label:'全高'},{key:'shaken_date',label:'車検満了'},{key:'jibaiseki_date',label:'自賠責満了'},{key:'hoken_date',label:'任意保険満了'}];
+    const cols=[{key:'name',label:'車種'},{key:'plate',label:'ナンバー'},{key:'type',label:'名称'},{key:'length',label:'全長'},{key:'width',label:'全幅'},{key:'height',label:'全高'},{key:'shaken_date',label:'車検満了'},{key:'jibaiseki_date',label:'自賠責満了'},{key:'hoken_date',label:'任意保険満了'}];
     let h=`<div class="fv-sum"><div class="fv-si on"><div class="n">${vehicleData.length}</div><div class="l">全車両</div></div><button class="av-add" style="margin-left:auto" onclick="Veh.openVMo()">+ 車両登録</button></div>`;
     h+='<div class="tbl-wrap"><table><thead><tr>';
     cols.forEach(c=>{const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
@@ -4712,9 +4713,9 @@ const Veh = (function(){
     $('vViewTitle').textContent=v.name+(v.plate?' — '+plateLine(v.plate):'');
     const vr=(l,val)=>`<div class="view-row"><div class="vr-label">${l}</div><div class="vr-value">${val||'—'}</div></div>`;
     let h='';
-    h+=vr('車両名称',esc(v.name));
+    h+=vr('車種',esc(v.name));
     h+=vr('ナンバー',esc(plateLine(v.plate)));
-    h+=vr('車種',esc(v.type));
+    h+=vr('名称',esc(v.type));
     h+=vr('全長',v.length?esc(String(v.length))+' mm':'');
     h+=vr('全幅',v.width?esc(String(v.width))+' mm':'');
     h+=vr('全高',v.height?esc(String(v.height))+' mm':'');
@@ -4822,7 +4823,7 @@ const Veh = (function(){
   function saveVehicle(){
     if(_savingVehicle) return;
     const name=$('vf_name').value.trim();
-    if(!name){toast('車両名称を入力してください',true);return}
+    if(!name){toast('車種を入力してください',true);return}
     const editId=$('vf_id').value;
     const plate=[$('vf_plate_region').value,$('vf_plate_class').value,$('vf_plate_kana').value,$('vf_plate_seq').value].map(x=>x.trim()).filter(Boolean).join(' ');
     const body={
