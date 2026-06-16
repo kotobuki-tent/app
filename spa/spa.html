@@ -6345,13 +6345,13 @@ const Cases = (function(){
     if(_sort.col==='__dept') rows.sort((a,b)=>(_sort.asc?1:-1)*caseDeptKey(a.id).localeCompare(caseDeptKey(b.id)));
     else if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
     else rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
-    const chips = t==='manage' ? statusChips() : '';
-    pane.innerHTML=deptChips() + chips + (rows.length?caseTable(rows,t):'<div class="cases-empty">該当する案件はありません</div>');
+    const inner = deptChips() + (t==='manage' ? statusChips() : '');
+    pane.innerHTML=`<div class="fv-sum">${inner}</div>` + (rows.length?caseTable(rows,t):'<div class="cases-empty">該当する案件はありません</div>');
   }
   function deptChips(){
     const count=d=>_cases.filter(c=>caseDepts(c.id)[d]).length;
-    const si=(label,val,n)=>`<div class="fv-si${_deptf===val?' on':''}" data-f="${val}" onclick="Cases.setDeptf('${val}')"><div class="n">${n}</div><div class="l">${label}</div></div>`;
-    return `<div class="fv-sum">${si('全部門','',_cases.length)}${si('生産','production',count('production'))}${si('企画','project',count('project'))}${si('販売','sales',count('sales'))}</div>`;
+    const si=(label,val,n)=>`<div class="fv-si${_deptf===val?' on':''}" data-f="dept:${val}" onclick="Cases.setDeptf('${val}')"><div class="n">${n}</div><div class="l">${label}</div></div>`;
+    return `${si('全部門','',_cases.length)}${si('生産','production',count('production'))}${si('企画','project',count('project'))}${si('販売','sales',count('sales'))}`;
   }
   function setDeptf(v){ _deptf=(_deptf===v?'':v); render(); }
   function statusChips(){
@@ -6359,8 +6359,8 @@ const Cases = (function(){
     const all=nonArch.length;
     const cnt=s=>nonArch.filter(c=>c.status===s).length;
     const archN=_cases.filter(c=>_arch(c.archived)).length;
-    const si=(label,val,n)=>`<div class="fv-si${_stf===val?' on':''}" data-f="${val}" onclick="Cases.setStf('${val}')"><div class="n">${n}</div><div class="l">${label}</div></div>`;
-    return `<div class="fv-sum">${si('すべて','',all)}${CASE_ST.map(s=>si(s,s,cnt(s))).join('')}${si('アーカイブ','__arch',archN)}</div>`;
+    const si=(label,val,n)=>`<div class="fv-si${_stf===val?' on':''}" data-f="st:${val}" onclick="Cases.setStf('${val}')"><div class="n">${n}</div><div class="l">${label}</div></div>`;
+    return `${si('すべて','',all)}${CASE_ST.map(s=>si(s,s,cnt(s))).join('')}${si('アーカイブ','__arch',archN)}`;
   }
 
   function caseTable(rows, t){
