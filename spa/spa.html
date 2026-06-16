@@ -1417,8 +1417,9 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
 @media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:1fr}}
 
-/* 売掛カード持ち出しパネル（HOME） */
-.card-panel{width:100%;max-width:600px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin:0 0 20px;text-align:left}
+/* いないカード持ち出し（専用タブ view-card） */
+.card-wrap{max-width:640px;margin:0 auto;padding:24px 16px 60px}
+.card-panel{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);text-align:left}
 .card-panel:empty{display:none}
 .card-panel .cp-title{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px}
 .card-panel .cp-state{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -1581,6 +1582,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navInv" data-zone="office" onclick="App.nav('inv')">在庫</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navVeh" data-zone="office" onclick="App.nav('veh')">車両</button>
+    <button class="nav-link" id="navCard" data-zone="shared" onclick="App.nav('card')">カード</button>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
 </div>
@@ -2393,7 +2395,6 @@ table.jobs tr:last-child td{border-bottom:none}
       <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
       <button class="pm-btn" data-m="floor" onclick="App.setMode('floor')">現場</button>
     </div>
-    <div id="cardPanel" class="card-panel"></div>
     <div class="portal-grid">
       <a class="portal-card" data-zone="field" onclick="App.nav('daily')">
         <div class="portal-card-icon" style="background:#fb7185;color:#881337">日</div>
@@ -2438,6 +2439,10 @@ table.jobs tr:last-child td{border-bottom:none}
     </div>
     <div class="portal-footer">Built by iller with Claude — 2026</div>
   </div>
+</section>
+
+<section id="view-card" class="hidden">
+  <div class="card-wrap"><div id="cardBody" class="card-panel"></div></div>
 </section>
 
 <section id="view-alcohol" class="hidden">
@@ -6132,14 +6137,14 @@ const Card = (function(){
   function openLoan(){ return loans.find(l=>!l.return_at); }
   async function loadAll(){ const d=await apiGet(); if(d){ loans=d.loans||[]; staff=d.staff||[]; } render(); }
   function render(){
-    const el=document.getElementById('cardPanel'); if(!el)return;
+    const el=document.getElementById('cardBody'); if(!el)return;
     const open=openLoan();
-    let h='<div class="cp-title">🛒 売掛カード</div>';
+    let h='<div class="cp-title">🛒 いないカード</div>';
     if(open){
       h+=`<div class="cp-state"><span class="cp-badge out">持ち出し中</span><span class="cp-holder">${esc(open.name||'(不明)')}</span><span class="cp-time">${fmt(open.out_at)}〜</span><button class="cp-btn ret" onclick="Card.ret()">返却</button></div>`;
     }else{
-      const opts=staff.map(n=>`<option value="${esc(n)}"></option>`).join('');
-      h+=`<div class="cp-state"><span class="cp-badge in">事務所にあり</span><input class="cp-name" id="cardName" list="cardStaff" placeholder="持ち出す人" autocomplete="off"><datalist id="cardStaff">${opts}</datalist><button class="cp-btn take" onclick="Card.out()">持ち出す</button></div>`;
+      const opts='<option value="">氏名を選択</option>'+staff.map(n=>`<option>${esc(n)}</option>`).join('');
+      h+=`<div class="cp-state"><span class="cp-badge in">定位置にあり</span><select class="cp-name" id="cardName">${opts}</select><button class="cp-btn take" onclick="Card.out()">持ち出す</button></div>`;
     }
     const done=loans.filter(l=>l.return_at).slice(0,5);
     if(done.length){
@@ -6166,8 +6171,8 @@ const Card = (function(){
 })();
 
 const Portal = (function(){
-  // リンク集＋売掛カードパネル。
-  async function loadAll(){ await Card.loadAll(); }
+  // リンク集のみ。データ取得なし。
+  async function loadAll(){}
   function init(){}
   return { loadAll, init };
 })();
@@ -7171,6 +7176,7 @@ const App = {
     {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj',zone:'field'},
     {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv',zone:'office'},
     {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh',zone:'office'},
+    {key:'card', ns:()=>Card, section:'view-card', nav:'navCard',zone:'shared'},
     {key:'finv', ns:()=>FInv, section:'view-finv', nav:'navFinv',zone:'field'},
     {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales',zone:'office'},
     {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor',zone:'office'},
