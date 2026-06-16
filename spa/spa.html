@@ -862,7 +862,8 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .v-card .v-status.稼働中{color:var(--green);background:var(--green-dim)}
 .v-card .v-status.整備中{color:var(--orange);background:var(--orange-dim)}
 .v-card .v-status.休車{color:var(--red);background:var(--red-dim)}
-.v-card .v-plate{display:inline-flex;flex-direction:column;align-items:center;margin-bottom:8px;padding:4px 14px;border:1.5px solid var(--border);border-radius:7px;line-height:1.2}
+.v-card .v-mid{display:flex;align-items:center;gap:16px;margin-bottom:9px}
+.v-card .v-plate{display:inline-flex;flex:0 0 auto;flex-direction:column;align-items:center;padding:4px 14px;border:1.5px solid var(--border);border-radius:7px;line-height:1.2}
 .v-card .v-plate .vp-a{font-size:14px;font-weight:700;color:var(--text-dim)}
 .v-card .v-plate .vp-b{font-size:21px;font-weight:800;letter-spacing:.06em;color:var(--text)}
 .v-card .v-plate .vp-kana{font-size:14px;font-weight:700;margin-right:4px}
@@ -873,12 +874,12 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .v-card .v-date.ok{color:var(--green);background:var(--green-dim)}
 .v-card .v-date.warn{color:var(--orange);background:var(--orange-dim)}
 .v-card .v-date.danger{color:var(--red);background:var(--red-dim)}
-.v-card .v-size{display:flex;align-items:baseline;gap:11px;margin:7px 0 9px;padding:6px 10px;background:var(--surface3);border-radius:6px}
-.v-card .v-size.none{color:var(--text-faint);font-size:12px;padding:6px 10px}
-.v-card .vs-cell{display:flex;flex-direction:column;gap:1px}
-.v-card .vs-lab{font-size:10px;font-weight:600;color:var(--text-faint)}
-.v-card .vs-num{font-size:14px;font-weight:700;line-height:1;color:var(--text-dim)}
-.v-card .vs-unit{margin-left:auto;align-self:flex-end;font-size:10px;font-weight:500;color:var(--text-faint)}
+.v-card .v-size{display:flex;flex-direction:column;gap:3px}
+.v-card .v-size.none{color:var(--text-faint);font-size:12px}
+.v-card .vs-row{display:flex;align-items:baseline;gap:8px}
+.v-card .vs-lab{font-size:10px;font-weight:600;color:var(--text-faint);width:26px;flex:0 0 auto}
+.v-card .vs-num{font-size:14px;font-weight:700;line-height:1.1;color:var(--text-dim);font-variant-numeric:tabular-nums}
+.v-card .vs-unit{font-size:10px;font-weight:500;color:var(--text-faint);margin-left:2px}
 .mo-field .plate-row{display:flex;gap:6px}
 .mo-field .plate-row input{width:auto;min-width:0;flex:1;text-align:center;padding:10px 6px}
 .mo-field .plate-row .pl-region{flex:1.6}
@@ -4596,8 +4597,8 @@ const Veh = (function(){
   function vSizeHTML(v){
     const L=v.length,W=v.width,H=v.height;
     if(!L&&!W&&!H)return '<div class="v-size none">サイズ未登録</div>';
-    const cell=(lab,val)=>`<span class="vs-cell"><span class="vs-lab">${lab}</span><span class="vs-num">${val?esc(String(val)):'—'}</span></span>`;
-    return `<div class="v-size">${cell('全長',L)}${cell('全幅',W)}${cell('全高',H)}<span class="vs-unit">mm</span></div>`;
+    const row=(lab,val,unit)=>`<div class="vs-row"><span class="vs-lab">${lab}</span><span class="vs-num">${val?esc(String(val)):'—'}</span>${unit?'<span class="vs-unit">mm</span>':''}</div>`;
+    return `<div class="v-size">${row('全長',L,false)}${row('全幅',W,false)}${row('全高',H,true)}</div>`;
   }
 
   // ===== ダッシュボード =====
@@ -4649,8 +4650,7 @@ const Veh = (function(){
         const hokenDiff=diffDays(v.hoken_date);
         h+=`<div class="v-card" data-id="${v.id}">
           <div class="v-top"><span class="v-name">${esc(v.name)}${v.type&&v.type!==v.name?' <span class="v-model">'+esc(v.type)+'</span>':''}</span></div>
-          <div class="v-plate">${plate2HTML(v.plate)}</div>
-          ${vSizeHTML(v)}
+          <div class="v-mid"><div class="v-plate">${plate2HTML(v.plate)}</div>${vSizeHTML(v)}</div>
           <div class="v-dates">`;
         if(v.shaken_date){const l=dateLevel(shakenDiff,th.shaken);h+=`<span class="v-date ${l}">車検 ${dateJP(v.shaken_date)}${shakenDiff!==null?' ('+shakenDiff+'日)':''}</span>`}
         if(v.jibaiseki_date){const l=dateLevel(jiDiff,th.jibaiseki);h+=`<span class="v-date ${l}">自賠責 ${dateJP(v.jibaiseki_date)}</span>`}
