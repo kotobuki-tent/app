@@ -1434,9 +1434,11 @@ table.jobs tr:last-child td{border-bottom:none}
 .cp-day{margin-bottom:12px}
 .cp-day:last-child{margin-bottom:0}
 .cp-day-hd{font-size:12px;font-weight:700;color:var(--text-dim);padding:0 0 5px;border-bottom:1px solid var(--surface3);margin-bottom:3px}
-.cp-log-row{display:flex;align-items:baseline;gap:14px;padding:7px 2px;font-size:14px}
-.cp-log-time{color:var(--text-dim);min-width:3.6em;flex:0 0 auto;font-variant-numeric:tabular-nums}
+.cp-log-row{display:flex;align-items:center;gap:14px;padding:7px 2px;font-size:14px}
+.cp-log-time{color:var(--text-dim);min-width:7.5em;flex:0 0 auto;font-variant-numeric:tabular-nums}
 .cp-log-nm{font-weight:700;color:var(--text)}
+.cp-ret{margin-left:auto;flex:0 0 auto;border:1px solid var(--border);background:var(--surface);color:var(--accent);font:600 12px/1 'Noto Sans JP',sans-serif;border-radius:6px;padding:6px 12px;cursor:pointer}
+.cp-ret:active{transform:scale(.96)}
 .cp-empty{color:var(--text-faint);font-size:13px;padding:6px 2px}
 @media(max-width:480px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
 
@@ -6152,7 +6154,7 @@ const Card = (function(){
     // その週の記録を日付ごとにまとめる（日付：新しい順、日内：新しい順）
     const inWk=loans.filter(l=>{ const p=parseTs(l.out_at); return p && p.date>=s && p.date<=e; });
     const byDay={};
-    inWk.forEach(l=>{ const p=parseTs(l.out_at); (byDay[p.date]=byDay[p.date]||[]).push({hm:p.hm,name:l.name,ts:l.out_at}); });
+    inWk.forEach(l=>{ const p=parseTs(l.out_at); (byDay[p.date]=byDay[p.date]||[]).push(l); });
     const days=Object.keys(byDay).sort().reverse();
     const opts='<option value="">氏名を選択</option>'+staff.map(n=>`<option>${esc(n)}</option>`).join('');
     let h='';
@@ -6164,8 +6166,12 @@ const Card = (function(){
       days.forEach(dy=>{
         const dd=new Date(dy+'T00:00:00');
         h+=`<div class="cp-day"><div class="cp-day-hd">${lbl(dd)}</div>`;
-        byDay[dy].sort((a,b)=>String(b.ts).localeCompare(String(a.ts)));
-        byDay[dy].forEach(r=>{ h+=`<div class="cp-log-row"><span class="cp-log-time">${esc(r.hm)}</span><span class="cp-log-nm">${esc(r.name||'')}</span></div>`; });
+        byDay[dy].sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at)));
+        byDay[dy].forEach(l=>{
+          const op=parseTs(l.out_at), rp=l.return_at?parseTs(l.return_at):null;
+          const range=op.hm+(rp?(' 〜 '+rp.hm):' 〜');
+          h+=`<div class="cp-log-row"><span class="cp-log-time">${esc(range)}</span><span class="cp-log-nm">${esc(l.name||'')}</span>${l.return_at?'':`<button class="cp-ret" onclick="Card.ret('${esc(String(l.id))}')">返却</button>`}</div>`;
+        });
         h+='</div>';
       });
     }else{
@@ -6183,7 +6189,14 @@ const Card = (function(){
     _wk=monday(new Date()); // 記録後は今週を表示
     render(); setTimeout(loadAll,3000);
   }
-  return { loadAll, render, out, prevWeek, nextWeek, thisWeek };
+  function ret(id){
+    if(guard())return;
+    const l=loans.find(x=>String(x.id)===String(id));
+    fire({action:'return',id:String(id).indexOf('tmp_')===0?undefined:id});
+    if(l) l.return_at=nowStr();
+    render(); setTimeout(loadAll,3000);
+  }
+  return { loadAll, render, out, ret, prevWeek, nextWeek, thisWeek };
 })();
 
 const Portal = (function(){
