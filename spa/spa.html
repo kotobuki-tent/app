@@ -1434,9 +1434,12 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-panel .cp-btn.take{background:var(--accent);color:#fff}
 .card-panel .cp-btn.ret{background:var(--surface3);color:var(--text);border:1px solid var(--border)}
 .card-panel .cp-btn:active{transform:scale(.97)}
-.card-panel .cp-hist{margin-top:12px;border-top:1px solid var(--surface3);padding-top:9px;display:flex;flex-direction:column;gap:3px}
-.card-panel .cp-hist-row{display:flex;gap:10px;font-size:12px;color:var(--text-dim)}
-.card-panel .cp-hist-nm{font-weight:600;color:var(--text);min-width:5em;flex:0 0 auto}
+.card-panel .cp-log{margin-top:14px;border-top:1px solid var(--surface3);padding-top:6px;display:flex;flex-direction:column}
+.card-panel .cp-log-row{display:flex;align-items:baseline;gap:14px;padding:8px 2px;border-bottom:1px solid var(--surface3);font-size:14px}
+.card-panel .cp-log-row:last-child{border-bottom:none}
+.card-panel .cp-log-dt{color:var(--text-dim);font-size:13px;min-width:6.5em;flex:0 0 auto;font-variant-numeric:tabular-nums}
+.card-panel .cp-log-nm{font-weight:700;color:var(--text)}
+.card-panel .cp-empty{margin-top:14px;color:var(--text-faint);font-size:13px}
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
 
@@ -6134,40 +6137,28 @@ const Card = (function(){
   function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'card',...body})}); }catch(e){} }
   function nowStr(){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
   function fmt(s){ const m=String(s||'').match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/); return m?`${+m[2]}/${+m[3]} ${+m[4]}:${m[5]}`:''; }
-  function openLoan(){ return loans.find(l=>!l.return_at); }
   async function loadAll(){ const d=await apiGet(); if(d){ loans=d.loans||[]; staff=d.staff||[]; } render(); }
   function render(){
     const el=document.getElementById('cardBody'); if(!el)return;
-    const open=openLoan();
+    const opts='<option value="">氏名を選択</option>'+staff.map(n=>`<option>${esc(n)}</option>`).join('');
     let h='<div class="cp-title">🛒 いないカード</div>';
-    if(open){
-      h+=`<div class="cp-state"><span class="cp-badge out">持ち出し中</span><span class="cp-holder">${esc(open.name||'(不明)')}</span><span class="cp-time">${fmt(open.out_at)}〜</span><button class="cp-btn ret" onclick="Card.ret()">返却</button></div>`;
+    h+=`<div class="cp-state"><select class="cp-name" id="cardName">${opts}</select><button class="cp-btn take" onclick="Card.out()">持ち出し</button></div>`;
+    if(loans.length){
+      h+='<div class="cp-log">'+loans.slice(0,30).map(l=>`<div class="cp-log-row"><span class="cp-log-dt">${fmt(l.out_at)}</span><span class="cp-log-nm">${esc(l.name||'')}</span></div>`).join('')+'</div>';
     }else{
-      const opts='<option value="">氏名を選択</option>'+staff.map(n=>`<option>${esc(n)}</option>`).join('');
-      h+=`<div class="cp-state"><span class="cp-badge in">定位置にあり</span><select class="cp-name" id="cardName">${opts}</select><button class="cp-btn take" onclick="Card.out()">持ち出す</button></div>`;
-    }
-    const done=loans.filter(l=>l.return_at).slice(0,5);
-    if(done.length){
-      h+='<div class="cp-hist">'+done.map(l=>`<div class="cp-hist-row"><span class="cp-hist-nm">${esc(l.name||'')}</span><span>${fmt(l.out_at)} 〜 ${fmt(l.return_at)}</span></div>`).join('')+'</div>';
+      h+='<div class="cp-empty">まだ記録がありません</div>';
     }
     el.innerHTML=h;
   }
   function out(){
-    const inp=document.getElementById('cardName'); const name=inp?inp.value.trim():'';
-    if(!name){ if(inp)inp.focus(); return; }
+    const sel=document.getElementById('cardName'); const name=sel?sel.value.trim():'';
+    if(!name){ if(sel)sel.focus(); return; }
     if(guard())return;
     fire({action:'out',name});
     loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:''});
     render(); setTimeout(loadAll,3000);
   }
-  function ret(){
-    const open=openLoan(); if(!open)return;
-    if(guard())return;
-    fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id});
-    open.return_at=nowStr();
-    render(); setTimeout(loadAll,3000);
-  }
-  return { loadAll, render, out, ret };
+  return { loadAll, render, out };
 })();
 
 const Portal = (function(){
