@@ -1417,29 +1417,28 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
 @media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:1fr}}
 
-/* いないカード持ち出し（専用タブ view-card） */
-.card-wrap{max-width:640px;margin:0 auto;padding:24px 16px 60px}
-.card-panel{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);text-align:left}
-.card-panel:empty{display:none}
-.card-panel .cp-title{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px}
-.card-panel .cp-state{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.card-panel .cp-badge{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;white-space:nowrap;flex:0 0 auto}
-.card-panel .cp-badge.out{background:var(--red-dim);color:var(--red)}
-.card-panel .cp-badge.in{background:var(--green-dim);color:var(--green)}
-.card-panel .cp-holder{font-size:16px;font-weight:800;color:var(--text)}
-.card-panel .cp-time{font-size:12px;color:var(--text-dim)}
-.card-panel .cp-name{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.2 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
-.card-panel .cp-name:focus{outline:none;border-color:var(--accent)}
-.card-panel .cp-btn{flex:0 0 auto;margin-left:auto;border:none;border-radius:8px;padding:9px 18px;font:700 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
-.card-panel .cp-btn.take{background:var(--accent);color:#fff}
-.card-panel .cp-btn.ret{background:var(--surface3);color:var(--text);border:1px solid var(--border)}
-.card-panel .cp-btn:active{transform:scale(.97)}
-.card-panel .cp-log{margin-top:14px;border-top:1px solid var(--surface3);padding-top:6px;display:flex;flex-direction:column}
-.card-panel .cp-log-row{display:flex;align-items:baseline;gap:14px;padding:8px 2px;border-bottom:1px solid var(--surface3);font-size:14px}
-.card-panel .cp-log-row:last-child{border-bottom:none}
-.card-panel .cp-log-dt{color:var(--text-dim);font-size:13px;min-width:6.5em;flex:0 0 auto;font-variant-numeric:tabular-nums}
-.card-panel .cp-log-nm{font-weight:700;color:var(--text)}
-.card-panel .cp-empty{margin-top:14px;color:var(--text-faint);font-size:13px}
+/* いないカード持ち出し（専用タブ view-card・左右ペイン＋週ナビ） */
+.card-wrap{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
+.cardwk-nav{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.cardwk-nav .wk-btn{width:38px;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:17px;color:var(--text-dim);cursor:pointer}
+.cardwk-nav .wk-btn:active{transform:scale(.95)}
+.cardwk-nav .wk-label{font-size:15px;font-weight:700;color:var(--text);min-width:13em;text-align:center}
+.cardwk-nav .wk-today{margin-left:2px;padding:9px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+.card-panes{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
+.card-pane{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-pane .cp-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.card-pane .cp-name{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:8px;font:400 15px/1.2 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
+.card-pane .cp-name:focus{outline:none;border-color:var(--accent)}
+.card-pane .cp-btn{width:100%;margin-top:10px;border:none;border-radius:8px;padding:12px;font:700 14px/1 'Noto Sans JP',sans-serif;background:var(--accent);color:#fff;cursor:pointer}
+.card-pane .cp-btn:active{transform:scale(.98)}
+.cp-day{margin-bottom:12px}
+.cp-day:last-child{margin-bottom:0}
+.cp-day-hd{font-size:12px;font-weight:700;color:var(--text-dim);padding:0 0 5px;border-bottom:1px solid var(--surface3);margin-bottom:3px}
+.cp-log-row{display:flex;align-items:baseline;gap:14px;padding:7px 2px;font-size:14px}
+.cp-log-time{color:var(--text-dim);min-width:3.6em;flex:0 0 auto;font-variant-numeric:tabular-nums}
+.cp-log-nm{font-weight:700;color:var(--text)}
+.cp-empty{color:var(--text-faint);font-size:13px;padding:6px 2px}
+@media(max-width:480px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
 
@@ -2445,7 +2444,7 @@ table.jobs tr:last-child td{border-bottom:none}
 </section>
 
 <section id="view-card" class="hidden">
-  <div class="card-wrap"><div id="cardBody" class="card-panel"></div></div>
+  <div class="card-wrap"><div id="cardBody"></div></div>
 </section>
 
 <section id="view-alcohol" class="hidden">
@@ -6127,27 +6126,52 @@ requestAnimationFrame(()=>{$('reqModalBg').scrollTop=0;const _mo=$('reqModalBg')
   };
 })();
 
-// 売掛カード持ち出し（HOMEパネル）— 1枚のカードの保持者をワンタップ管理
+// いないカード持ち出し（専用タブ）— 左ペイン=記録、右ペイン=その週の時系列
 const Card = (function(){
   const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  let loans=[], staff=[], _busy=false;
+  const DOW=['日','月','火','水','木','金','土'];
+  let loans=[], staff=[], _busy=false, _wk=monday(new Date());
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function ymd(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+  function monday(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }
+  function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function nowStr(){ const d=new Date(); return `${ymd(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; }
+  function parseTs(s){ const m=String(s||'').match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/); return m?{date:`${m[1]}-${m[2]}-${m[3]}`,hm:`${+m[4]}:${m[5]}`}:null; }
+  function lbl(d){ return `${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}）`; }
   async function apiGet(){ try{ const r=await fetch(API+'?dept=card&action=read'); return await r.json(); }catch(e){ return null; } }
   function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'card',...body})}); }catch(e){} }
-  function nowStr(){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
-  function fmt(s){ const m=String(s||'').match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/); return m?`${+m[2]}/${+m[3]} ${+m[4]}:${m[5]}`:''; }
   async function loadAll(){ const d=await apiGet(); if(d){ loans=d.loans||[]; staff=d.staff||[]; } render(); }
+  function prevWeek(){ _wk=addDays(_wk,-7); render(); }
+  function nextWeek(){ _wk=addDays(_wk,7); render(); }
+  function thisWeek(){ _wk=monday(new Date()); render(); }
   function render(){
     const el=document.getElementById('cardBody'); if(!el)return;
+    const wkEnd=addDays(_wk,6), s=ymd(_wk), e=ymd(wkEnd);
+    // その週の記録を日付ごとにまとめる（日付：新しい順、日内：新しい順）
+    const inWk=loans.filter(l=>{ const p=parseTs(l.out_at); return p && p.date>=s && p.date<=e; });
+    const byDay={};
+    inWk.forEach(l=>{ const p=parseTs(l.out_at); (byDay[p.date]=byDay[p.date]||[]).push({hm:p.hm,name:l.name,ts:l.out_at}); });
+    const days=Object.keys(byDay).sort().reverse();
     const opts='<option value="">氏名を選択</option>'+staff.map(n=>`<option>${esc(n)}</option>`).join('');
-    let h='<div class="cp-title">🛒 いないカード</div>';
-    h+=`<div class="cp-state"><select class="cp-name" id="cardName">${opts}</select><button class="cp-btn take" onclick="Card.out()">持ち出し</button></div>`;
-    if(loans.length){
-      h+='<div class="cp-log">'+loans.slice(0,30).map(l=>`<div class="cp-log-row"><span class="cp-log-dt">${fmt(l.out_at)}</span><span class="cp-log-nm">${esc(l.name||'')}</span></div>`).join('')+'</div>';
+    let h='';
+    h+=`<div class="cardwk-nav"><button class="wk-btn" onclick="Card.prevWeek()">‹</button><span class="wk-label">${lbl(_wk)} 〜 ${lbl(wkEnd)}</span><button class="wk-btn" onclick="Card.nextWeek()">›</button><button class="wk-today" onclick="Card.thisWeek()">今週</button></div>`;
+    h+='<div class="card-panes">';
+    h+=`<div class="card-pane"><div class="cp-title">🛒 持ち出しを記録</div><select class="cp-name" id="cardName">${opts}</select><button class="cp-btn" onclick="Card.out()">持ち出し</button></div>`;
+    h+='<div class="card-pane"><div class="cp-title">持ち出し記録</div>';
+    if(days.length){
+      days.forEach(dy=>{
+        const dd=new Date(dy+'T00:00:00');
+        h+=`<div class="cp-day"><div class="cp-day-hd">${lbl(dd)}</div>`;
+        byDay[dy].sort((a,b)=>String(b.ts).localeCompare(String(a.ts)));
+        byDay[dy].forEach(r=>{ h+=`<div class="cp-log-row"><span class="cp-log-time">${esc(r.hm)}</span><span class="cp-log-nm">${esc(r.name||'')}</span></div>`; });
+        h+='</div>';
+      });
     }else{
-      h+='<div class="cp-empty">まだ記録がありません</div>';
+      h+='<div class="cp-empty">この週の記録はありません</div>';
     }
+    h+='</div></div>';
     el.innerHTML=h;
   }
   function out(){
@@ -6156,9 +6180,10 @@ const Card = (function(){
     if(guard())return;
     fire({action:'out',name});
     loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:''});
+    _wk=monday(new Date()); // 記録後は今週を表示
     render(); setTimeout(loadAll,3000);
   }
-  return { loadAll, render, out };
+  return { loadAll, render, out, prevWeek, nextWeek, thisWeek };
 })();
 
 const Portal = (function(){
