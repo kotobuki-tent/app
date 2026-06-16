@@ -1431,12 +1431,15 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane .cp-name:focus{outline:none;border-color:var(--accent)}
 .card-pane .cp-btn{width:100%;margin-top:10px;border:none;border-radius:8px;padding:12px;font:700 14px/1 'Noto Sans JP',sans-serif;background:var(--accent);color:#fff;cursor:pointer}
 .card-pane .cp-btn:active{transform:scale(.98)}
-.cp-day{margin-bottom:12px}
-.cp-day:last-child{margin-bottom:0}
-.cp-day-hd{font-size:12px;font-weight:700;color:var(--text-dim);padding:0 0 5px;border-bottom:1px solid var(--surface3);margin-bottom:3px}
-.cp-log-row{display:flex;align-items:center;gap:14px;padding:7px 2px;font-size:14px}
-.cp-log-time{color:var(--text-dim);min-width:7.5em;flex:0 0 auto;font-variant-numeric:tabular-nums}
-.cp-log-nm{font-weight:700;color:var(--text)}
+.cp-tbl{width:100%;border-collapse:collapse;font-size:14px}
+.cp-tbl th{background:var(--surface2);color:var(--text-dim);font-size:12px;font-weight:700;padding:9px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.cp-tbl td{padding:11px 10px;border-bottom:1px solid var(--surface3);text-align:left;white-space:nowrap}
+.cp-tbl tr:last-child td{border-bottom:none}
+.cp-tbl .t-day{color:var(--text-dim);font-size:13px}
+.cp-tbl .t-nm{font-weight:700;color:var(--text)}
+.cp-tbl .t-out{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.cp-tbl .t-ret{font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
+.cp-tbl .t-now{font-size:12px;font-weight:700;color:var(--orange);background:var(--orange-dim);padding:3px 9px;border-radius:999px}
 .card-pane .cp-out{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .card-pane .cp-out-badge{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:var(--orange-dim);color:var(--orange);flex:0 0 auto}
 .card-pane .cp-out-who{font-size:17px;font-weight:800;color:var(--text)}
@@ -6154,10 +6157,8 @@ const Card = (function(){
     const el=document.getElementById('cardBody'); if(!el)return;
     const wkEnd=addDays(_wk,6), s=ymd(_wk), e=ymd(wkEnd);
     // その週の記録を日付ごとにまとめる（日付：新しい順、日内：新しい順）
-    const inWk=loans.filter(l=>{ const p=parseTs(l.out_at); return p && p.date>=s && p.date<=e; });
-    const byDay={};
-    inWk.forEach(l=>{ const p=parseTs(l.out_at); (byDay[p.date]=byDay[p.date]||[]).push(l); });
-    const days=Object.keys(byDay).sort().reverse();
+    const inWk=loans.filter(l=>{ const p=parseTs(l.out_at); return p && p.date>=s && p.date<=e; })
+      .sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at)));
     const opts='<option value="">氏名を選択</option>'+staff.map(n=>`<option>${esc(n)}</option>`).join('');
     let h='';
     h+=`<div class="cardwk-nav"><button class="wk-btn" onclick="Card.prevWeek()">‹</button><span class="wk-label">${lbl(_wk)} 〜 ${lbl(wkEnd)}</span><button class="wk-btn" onclick="Card.nextWeek()">›</button><button class="wk-today" onclick="Card.thisWeek()">今週</button></div>`;
@@ -6173,18 +6174,15 @@ const Card = (function(){
     }
     h+='</div>';
     h+='<div class="card-pane"><div class="cp-title">持ち出し記録</div>';
-    if(days.length){
-      days.forEach(dy=>{
-        const dd=new Date(dy+'T00:00:00');
-        h+=`<div class="cp-day"><div class="cp-day-hd">${lbl(dd)}</div>`;
-        byDay[dy].sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at)));
-        byDay[dy].forEach(l=>{
-          const op=parseTs(l.out_at), rp=l.return_at?parseTs(l.return_at):null;
-          const range=op.hm+(rp?(' 〜 '+rp.hm):' 〜（持ち出し中）');
-          h+=`<div class="cp-log-row"><span class="cp-log-time">${esc(range)}</span><span class="cp-log-nm">${esc(l.name||'')}</span></div>`;
-        });
-        h+='</div>';
+    if(inWk.length){
+      h+='<table class="cp-tbl"><thead><tr><th>日付</th><th>氏名</th><th>持ち出し</th><th>返却</th></tr></thead><tbody>';
+      inWk.forEach(l=>{
+        const op=parseTs(l.out_at), rp=l.return_at?parseTs(l.return_at):null;
+        const dd=new Date(op.date+'T00:00:00');
+        const ret=rp?`<span class="t-ret">${rp.hm}</span>`:'<span class="t-now">持ち出し中</span>';
+        h+=`<tr><td class="t-day">${lbl(dd)}</td><td class="t-nm">${esc(l.name||'')}</td><td class="t-out">${op?op.hm:''}</td><td>${ret}</td></tr>`;
       });
+      h+='</tbody></table>';
     }else{
       h+='<div class="cp-empty">この週の記録はありません</div>';
     }
