@@ -1437,8 +1437,11 @@ table.jobs tr:last-child td{border-bottom:none}
 .cp-log-row{display:flex;align-items:center;gap:14px;padding:7px 2px;font-size:14px}
 .cp-log-time{color:var(--text-dim);min-width:7.5em;flex:0 0 auto;font-variant-numeric:tabular-nums}
 .cp-log-nm{font-weight:700;color:var(--text)}
-.cp-ret{margin-left:auto;flex:0 0 auto;border:1px solid var(--border);background:var(--surface);color:var(--accent);font:600 12px/1 'Noto Sans JP',sans-serif;border-radius:6px;padding:6px 12px;cursor:pointer}
-.cp-ret:active{transform:scale(.96)}
+.card-pane .cp-out{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.card-pane .cp-out-badge{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:var(--orange-dim);color:var(--orange);flex:0 0 auto}
+.card-pane .cp-out-who{font-size:17px;font-weight:800;color:var(--text)}
+.card-pane .cp-out-since{font-size:13px;color:var(--text-dim)}
+.card-pane .cp-btn.ret{background:var(--green)}
 .cp-empty{color:var(--text-faint);font-size:13px;padding:6px 2px}
 @media(max-width:480px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
 
@@ -6145,6 +6148,7 @@ const Card = (function(){
   async function apiGet(){ try{ const r=await fetch(API+'?dept=card&action=read'); return await r.json(); }catch(e){ return null; } }
   function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'card',...body})}); }catch(e){} }
   async function loadAll(){ const d=await apiGet(); if(d){ loans=d.loans||[]; staff=d.staff||[]; } render(); }
+  function openLoan(){ return loans.find(l=>!l.return_at); } // loansはout_at降順＝先頭の未返却が最新
   function prevWeek(){ _wk=addDays(_wk,-7); render(); }
   function nextWeek(){ _wk=addDays(_wk,7); render(); }
   function thisWeek(){ _wk=monday(new Date()); render(); }
@@ -6160,7 +6164,16 @@ const Card = (function(){
     let h='';
     h+=`<div class="cardwk-nav"><button class="wk-btn" onclick="Card.prevWeek()">‹</button><span class="wk-label">${lbl(_wk)} 〜 ${lbl(wkEnd)}</span><button class="wk-btn" onclick="Card.nextWeek()">›</button><button class="wk-today" onclick="Card.thisWeek()">今週</button></div>`;
     h+='<div class="card-panes">';
-    h+=`<div class="card-pane"><div class="cp-title">🛒 持ち出しを記録</div><select class="cp-name" id="cardName">${opts}</select><button class="cp-btn" onclick="Card.out()">持ち出し</button></div>`;
+    const open=openLoan();
+    h+='<div class="card-pane"><div class="cp-title">🛒 カードの持ち出し</div>';
+    if(open){
+      const op=parseTs(open.out_at);
+      h+=`<div class="cp-out"><span class="cp-out-badge">持ち出し中</span><span class="cp-out-who">${esc(open.name||'')}</span><span class="cp-out-since">${op?op.hm:''}〜</span></div>`;
+      h+=`<button class="cp-btn ret" onclick="Card.ret()">返却</button>`;
+    }else{
+      h+=`<select class="cp-name" id="cardName">${opts}</select><button class="cp-btn" onclick="Card.out()">持ち出し</button>`;
+    }
+    h+='</div>';
     h+='<div class="card-pane"><div class="cp-title">持ち出し記録</div>';
     if(days.length){
       days.forEach(dy=>{
@@ -6169,8 +6182,8 @@ const Card = (function(){
         byDay[dy].sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at)));
         byDay[dy].forEach(l=>{
           const op=parseTs(l.out_at), rp=l.return_at?parseTs(l.return_at):null;
-          const range=op.hm+(rp?(' 〜 '+rp.hm):' 〜');
-          h+=`<div class="cp-log-row"><span class="cp-log-time">${esc(range)}</span><span class="cp-log-nm">${esc(l.name||'')}</span>${l.return_at?'':`<button class="cp-ret" onclick="Card.ret('${esc(String(l.id))}')">返却</button>`}</div>`;
+          const range=op.hm+(rp?(' 〜 '+rp.hm):' 〜（持ち出し中）');
+          h+=`<div class="cp-log-row"><span class="cp-log-time">${esc(range)}</span><span class="cp-log-nm">${esc(l.name||'')}</span></div>`;
         });
         h+='</div>';
       });
@@ -6189,11 +6202,11 @@ const Card = (function(){
     _wk=monday(new Date()); // 記録後は今週を表示
     render(); setTimeout(loadAll,3000);
   }
-  function ret(id){
+  function ret(){
+    const open=openLoan(); if(!open)return;
     if(guard())return;
-    const l=loans.find(x=>String(x.id)===String(id));
-    fire({action:'return',id:String(id).indexOf('tmp_')===0?undefined:id});
-    if(l) l.return_at=nowStr();
+    fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id});
+    open.return_at=nowStr();
     render(); setTimeout(loadAll,3000);
   }
   return { loadAll, render, out, ret, prevWeek, nextWeek, thisWeek };
