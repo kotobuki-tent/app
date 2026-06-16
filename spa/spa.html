@@ -1417,6 +1417,26 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
 @media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:1fr}}
 
+/* 売掛カード持ち出しパネル（HOME） */
+.card-panel{width:100%;max-width:600px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin:0 0 20px;text-align:left}
+.card-panel:empty{display:none}
+.card-panel .cp-title{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px}
+.card-panel .cp-state{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card-panel .cp-badge{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;white-space:nowrap;flex:0 0 auto}
+.card-panel .cp-badge.out{background:var(--red-dim);color:var(--red)}
+.card-panel .cp-badge.in{background:var(--green-dim);color:var(--green)}
+.card-panel .cp-holder{font-size:16px;font-weight:800;color:var(--text)}
+.card-panel .cp-time{font-size:12px;color:var(--text-dim)}
+.card-panel .cp-name{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.2 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
+.card-panel .cp-name:focus{outline:none;border-color:var(--accent)}
+.card-panel .cp-btn{flex:0 0 auto;margin-left:auto;border:none;border-radius:8px;padding:9px 18px;font:700 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+.card-panel .cp-btn.take{background:var(--accent);color:#fff}
+.card-panel .cp-btn.ret{background:var(--surface3);color:var(--text);border:1px solid var(--border)}
+.card-panel .cp-btn:active{transform:scale(.97)}
+.card-panel .cp-hist{margin-top:12px;border-top:1px solid var(--surface3);padding-top:9px;display:flex;flex-direction:column;gap:3px}
+.card-panel .cp-hist-row{display:flex;gap:10px;font-size:12px;color:var(--text-dim)}
+.card-panel .cp-hist-nm{font-weight:600;color:var(--text);min-width:5em;flex:0 0 auto}
+
 /* ===== モバイル(@media 480px)共通微調整 ===== */
 
 /* ===== モバイル時：admin/archive/archived テーブルをカード化 工場ボード風コンパクト =====
@@ -2373,6 +2393,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
       <button class="pm-btn" data-m="floor" onclick="App.setMode('floor')">現場</button>
     </div>
+    <div id="cardPanel" class="card-panel"></div>
     <div class="portal-grid">
       <a class="portal-card" data-zone="field" onclick="App.nav('daily')">
         <div class="portal-card-icon" style="background:#fb7185;color:#881337">日</div>
@@ -6098,9 +6119,55 @@ requestAnimationFrame(()=>{$('reqModalBg').scrollTop=0;const _mo=$('reqModalBg')
   };
 })();
 
+// 売掛カード持ち出し（HOMEパネル）— 1枚のカードの保持者をワンタップ管理
+const Card = (function(){
+  const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  let loans=[], staff=[], _busy=false;
+  function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
+  async function apiGet(){ try{ const r=await fetch(API+'?dept=card&action=read'); return await r.json(); }catch(e){ return null; } }
+  function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'card',...body})}); }catch(e){} }
+  function nowStr(){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
+  function fmt(s){ const m=String(s||'').match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/); return m?`${+m[2]}/${+m[3]} ${+m[4]}:${m[5]}`:''; }
+  function openLoan(){ return loans.find(l=>!l.return_at); }
+  async function loadAll(){ const d=await apiGet(); if(d){ loans=d.loans||[]; staff=d.staff||[]; } render(); }
+  function render(){
+    const el=document.getElementById('cardPanel'); if(!el)return;
+    const open=openLoan();
+    let h='<div class="cp-title">🛒 売掛カード</div>';
+    if(open){
+      h+=`<div class="cp-state"><span class="cp-badge out">持ち出し中</span><span class="cp-holder">${esc(open.name||'(不明)')}</span><span class="cp-time">${fmt(open.out_at)}〜</span><button class="cp-btn ret" onclick="Card.ret()">返却</button></div>`;
+    }else{
+      const opts=staff.map(n=>`<option value="${esc(n)}"></option>`).join('');
+      h+=`<div class="cp-state"><span class="cp-badge in">事務所にあり</span><input class="cp-name" id="cardName" list="cardStaff" placeholder="持ち出す人" autocomplete="off"><datalist id="cardStaff">${opts}</datalist><button class="cp-btn take" onclick="Card.out()">持ち出す</button></div>`;
+    }
+    const done=loans.filter(l=>l.return_at).slice(0,5);
+    if(done.length){
+      h+='<div class="cp-hist">'+done.map(l=>`<div class="cp-hist-row"><span class="cp-hist-nm">${esc(l.name||'')}</span><span>${fmt(l.out_at)} 〜 ${fmt(l.return_at)}</span></div>`).join('')+'</div>';
+    }
+    el.innerHTML=h;
+  }
+  function out(){
+    const inp=document.getElementById('cardName'); const name=inp?inp.value.trim():'';
+    if(!name){ if(inp)inp.focus(); return; }
+    if(guard())return;
+    fire({action:'out',name});
+    loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:''});
+    render(); setTimeout(loadAll,3000);
+  }
+  function ret(){
+    const open=openLoan(); if(!open)return;
+    if(guard())return;
+    fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id});
+    open.return_at=nowStr();
+    render(); setTimeout(loadAll,3000);
+  }
+  return { loadAll, render, out, ret };
+})();
+
 const Portal = (function(){
-  // リンク集のみ。データ取得なし。
-  async function loadAll(){}
+  // リンク集＋売掛カードパネル。
+  async function loadAll(){ await Card.loadAll(); }
   function init(){}
   return { loadAll, init };
 })();
