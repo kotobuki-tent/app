@@ -1466,7 +1466,7 @@ table.jobs tr:last-child td{border-bottom:none}
 /* キオスク（27インチ横・広幅）：左右ペインを画面いっぱいの等高にし、各ペイン内部スクロール
    → 右ペインが記録で伸びない／左右の高さが揃う。リフトは記録ボタンを上部に移したので埋もれない。
    縦・狭幅は従来フロー（ページスクロール） */
-@media (min-width:1100px) and (orientation:landscape){
+@media (min-width:1000px) and (orientation:landscape){
   html #view-alcohol, html #view-forklift{min-height:0}
   #view-alcohol .kiosk, #view-forklift .kiosk{height:calc(100dvh - 48px);grid-template-rows:minmax(0,1fr);align-items:stretch}
   #view-alcohol .pane, #view-forklift .pane{height:100%;min-height:0;overflow-y:auto}
