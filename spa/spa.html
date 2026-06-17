@@ -1404,18 +1404,18 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;min-height:calc(100vh - 120px)}
 .portal-logo{font-family:'Kosugi Maru',sans-serif;font-size:32px;font-weight:400;letter-spacing:.1em;margin-bottom:6px;color:var(--text)}
 .portal-sub{font-size:14px;color:var(--text-dim);margin-bottom:40px}
-.portal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;width:100%;max-width:600px}
-.portal-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;text-decoration:none;color:var(--text);transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;align-items:center;gap:16px;cursor:pointer}
-.portal-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.1);border-color:#aab;transform:translateY(-2px)}
-.portal-card-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;flex-shrink:0;font-family:serif}
-.portal-card-body{flex:1}
-.portal-card-title{font-size:15px;font-weight:700;margin-bottom:4px}
-.portal-card-desc{font-size:12px;color:var(--text-dim);line-height:1.5}
+.portal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px 18px;width:100%;max-width:560px}
+.portal-card{background:transparent;border:none;box-shadow:none;padding:0;text-decoration:none;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:9px;transition:transform .12s}
+.portal-card:hover{transform:translateY(-3px)}
+.portal-card:active{transform:scale(.94)}
+.portal-card-icon{width:84px;height:84px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:40px;font-family:'Noto Sans JP',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.10)}
+.portal-card-body{text-align:center}
+.portal-card-title{font-size:13px;font-weight:600;color:var(--text)}
 .portal-modeswitch{display:flex;align-items:center;gap:8px;justify-content:center;font-size:12px;color:var(--text-dim);margin:0 0 20px}
 .pm-btn{padding:6px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font:600 12px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
 .pm-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
-@media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:1fr}}
+@media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:repeat(3,1fr);gap:18px 12px}}
 
 /* いないカード持ち出し（点呼・リフトと同じキオスク型） */
 .card-wrap{max-width:1760px;margin:0 auto;padding:18px}
