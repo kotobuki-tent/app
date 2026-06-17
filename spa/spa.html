@@ -1446,7 +1446,23 @@ table.jobs tr:last-child td{border-bottom:none}
 .cp-tbl .t-ret{font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
 .cp-tbl .t-now{font-size:13px;font-weight:700;color:var(--orange);background:var(--orange-dim);padding:4px 10px;border-radius:999px}
 .cp-empty{color:var(--text-faint);font-size:14px;padding:24px 2px;text-align:center}
+.card-pane .cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:9px;margin-bottom:12px}
+.card-pane .cp-nbtn{padding:16px 8px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);font:600 16px/1.2 'Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;text-align:center}
+.card-pane .cp-nbtn:hover{border-color:var(--accent);background:var(--accent-dim)}
+.card-pane .cp-nbtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
+.card-pane .cp-nbtn:active{transform:scale(.96)}
 @media(max-width:840px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
+
+/* キオスク（27インチ横・広幅）：左右ペインを画面いっぱいの等高にし、各ペイン内部スクロール
+   → 右ペインが記録で伸びない／左右の高さが揃う／下半分の余白が消える。縦・狭幅は従来フロー */
+@media (min-width:1100px) and (orientation:landscape){
+  html #view-alcohol, html #view-forklift{min-height:0}
+  #view-alcohol .kiosk, #view-forklift .kiosk{height:calc(100dvh - 48px);grid-template-rows:minmax(0,1fr);align-items:stretch}
+  #view-alcohol .pane, #view-forklift .pane{height:100%;min-height:0;overflow-y:auto}
+  #view-card .card-wrap{box-sizing:border-box}
+  #view-card .card-panes{height:calc(100dvh - 48px - 36px);grid-template-rows:minmax(0,1fr);align-items:stretch}
+  #view-card .card-pane{min-height:0;overflow-y:auto}
+}
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
 
@@ -6138,7 +6154,7 @@ const Card = (function(){
   const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const DOW=['日','月','火','水','木','金','土'];
-  let loans=[], staff=[], _busy=false, _wk=monday(new Date());
+  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel='';
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   function pad(n){ return String(n).padStart(2,'0'); }
   function ymd(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
@@ -6160,7 +6176,6 @@ const Card = (function(){
     // その週の記録を日付ごとにまとめる（日付：新しい順、日内：新しい順）
     const inWk=loans.filter(l=>{ const p=parseTs(l.out_at); return p && p.date>=s && p.date<=e; })
       .sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at)));
-    const opts='<option value="">氏名を選択</option>'+staff.map(n=>`<option>${esc(n)}</option>`).join('');
     let h='';
     h+='<div class="card-panes">';
     const open=openLoan();
@@ -6170,7 +6185,8 @@ const Card = (function(){
       h+=`<div class="cp-out"><span class="cp-out-badge">持ち出し中</span><span class="cp-out-who">${esc(open.name||'')}</span><span class="cp-out-since">${op?op.hm:''}〜</span></div>`;
       h+=`<button class="cp-btn ret" onclick="Card.ret()">返却</button>`;
     }else{
-      h+=`<select class="cp-name" id="cardName">${opts}</select><button class="cp-btn" onclick="Card.out()">持ち出し</button>`;
+      h+=`<div class="cp-grid">${staff.map(n=>`<button type="button" class="cp-nbtn${_sel===n?' sel':''}" onclick="Card.sel('${esc(n)}')">${esc(n)}</button>`).join('')}</div>`;
+      h+=`<button class="cp-btn" onclick="Card.out()">${_sel?esc(_sel)+' を持ち出し':'持ち出し'}</button>`;
     }
     h+='</div>';
     h+='<div class="card-pane"><div class="cp-title">📋 持ち出し記録</div>';
@@ -6190,13 +6206,14 @@ const Card = (function(){
     h+='</div></div>';
     el.innerHTML=h;
   }
+  function sel(n){ _sel=(_sel===n?'':n); render(); }
   function out(){
-    const sel=document.getElementById('cardName'); const name=sel?sel.value.trim():'';
-    if(!name){ if(sel)sel.focus(); return; }
+    const name=_sel;
+    if(!name)return;
     if(guard())return;
     fire({action:'out',name});
     loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:''});
-    _wk=monday(new Date()); // 記録後は今週を表示
+    _sel=''; _wk=monday(new Date()); // 記録後は選択解除＋今週を表示
     render(); setTimeout(loadAll,3000);
   }
   function ret(){
@@ -6206,7 +6223,7 @@ const Card = (function(){
     open.return_at=nowStr();
     render(); setTimeout(loadAll,3000);
   }
-  return { loadAll, render, out, ret, prevWeek, nextWeek, thisWeek };
+  return { loadAll, render, out, ret, sel, prevWeek, nextWeek, thisWeek };
 })();
 
 const Portal = (function(){
