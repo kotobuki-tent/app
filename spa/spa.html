@@ -1408,7 +1408,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-card{background:transparent;border:none;box-shadow:none;padding:0;text-decoration:none;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:9px;transition:transform .12s}
 .portal-card:hover{transform:translateY(-3px)}
 .portal-card:active{transform:scale(.94)}
-.portal-card-icon{width:84px;height:84px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:40px;font-family:'Noto Sans JP',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.10)}
+.portal-card-icon{width:84px;height:84px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:40px;font-family:'Noto Sans JP',sans-serif;background:#eef1f6;color:#3f4757;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .portal-card-body{text-align:center}
 .portal-card-title{font-size:13px;font-weight:600;color:var(--text)}
 .portal-modeswitch{display:flex;align-items:center;gap:8px;justify-content:center;font-size:12px;color:var(--text-dim);margin:0 0 20px}
@@ -2436,48 +2436,48 @@ table.jobs tr:last-child td{border-bottom:none}
     </div>
     <div class="portal-grid">
       <a class="portal-card" data-zone="field" data-kiosk onclick="App.nav('daily')">
-        <div class="portal-card-icon" style="background:#fb7185;color:#881337">日</div>
+        <div class="portal-card-icon">日</div>
         <div class="portal-card-body"><div class="portal-card-title">日報</div></div>
       </a>
       <a class="portal-card" data-zone="field" onclick="App.nav('ot')">
-        <div class="portal-card-icon" style="background:#fb923c;color:#7c2d12">時</div>
+        <div class="portal-card-icon">時</div>
         <div class="portal-card-body"><div class="portal-card-title">時間外ボード</div></div>
       </a>
-      <a class="portal-card" data-zone="office" data-kiosk onclick="App.nav('alcohol')">
-        <div class="portal-card-icon" style="background:#5eead4;color:#042f2c">点</div>
-        <div class="portal-card-body"><div class="portal-card-title">アルコールチェック</div></div>
-      </a>
-      <a class="portal-card" data-zone="office" data-kiosk onclick="App.nav('forklift')">
-        <div class="portal-card-icon" style="background:#fcd34d;color:#713f12">検</div>
-        <div class="portal-card-body"><div class="portal-card-title">フォークリフト点検</div></div>
-      </a>
-      <a class="portal-card" data-zone="office" data-kiosk onclick="App.nav('card')">
-        <div class="portal-card-icon" style="background:#c4b5fd;color:#4c1d95">カ</div>
-        <div class="portal-card-body"><div class="portal-card-title">いないカード</div></div>
-      </a>
       <a class="portal-card" data-zone="field" onclick="App.nav('prod')">
-        <div class="portal-card-icon" style="background:#fbbf24;color:#713f12">製</div>
+        <div class="portal-card-icon">製</div>
         <div class="portal-card-body"><div class="portal-card-title">生産部</div></div>
       </a>
       <a class="portal-card" data-zone="field" onclick="App.nav('proj')">
-        <div class="portal-card-icon" style="background:#a3e635;color:#365314">企</div>
+        <div class="portal-card-icon">企</div>
         <div class="portal-card-body"><div class="portal-card-title">企画制作部</div></div>
       </a>
       <a class="portal-card" data-zone="office" onclick="App.nav('sales')">
-        <div class="portal-card-icon" style="background:#f9a8d4;color:#831843">販</div>
+        <div class="portal-card-icon">販</div>
         <div class="portal-card-body"><div class="portal-card-title">販売管理</div></div>
       </a>
       <a class="portal-card" data-zone="office" onclick="App.nav('labor')">
-        <div class="portal-card-icon" style="background:#34d399;color:#064e3b">工</div>
+        <div class="portal-card-icon">工</div>
         <div class="portal-card-body"><div class="portal-card-title">工数管理</div></div>
       </a>
       <a class="portal-card" data-zone="office" onclick="App.nav('inv')">
-        <div class="portal-card-icon" style="background:#22d3ee;color:#155e75">庫</div>
+        <div class="portal-card-icon">庫</div>
         <div class="portal-card-body"><div class="portal-card-title">在庫管理</div></div>
       </a>
       <a class="portal-card" data-zone="office" onclick="App.nav('veh')">
-        <div class="portal-card-icon" style="background:#60a5fa;color:#1e3a8a">車</div>
+        <div class="portal-card-icon">車</div>
         <div class="portal-card-body"><div class="portal-card-title">車両管理</div></div>
+      </a>
+      <a class="portal-card" data-zone="office" data-kiosk onclick="App.nav('alcohol')">
+        <div class="portal-card-icon">点</div>
+        <div class="portal-card-body"><div class="portal-card-title">アルコールチェック</div></div>
+      </a>
+      <a class="portal-card" data-zone="office" data-kiosk onclick="App.nav('forklift')">
+        <div class="portal-card-icon">検</div>
+        <div class="portal-card-body"><div class="portal-card-title">フォークリフト点検</div></div>
+      </a>
+      <a class="portal-card" data-zone="office" data-kiosk onclick="App.nav('card')">
+        <div class="portal-card-icon">カ</div>
+        <div class="portal-card-body"><div class="portal-card-title">いないカード</div></div>
       </a>
     </div>
     <div class="portal-footer">Built by iller with Claude — 2026</div>
