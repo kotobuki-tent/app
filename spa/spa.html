@@ -1417,36 +1417,36 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
 @media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:1fr}}
 
-/* いないカード持ち出し（専用タブ view-card・左右ペイン＋週ナビ） */
-.card-wrap{max-width:1000px;margin:0 auto;padding:20px 16px 60px}
-.cardwk-nav{display:flex;align-items:center;gap:8px;margin-bottom:16px}
-.cardwk-nav .wk-btn{width:38px;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:17px;color:var(--text-dim);cursor:pointer}
-.cardwk-nav .wk-btn:active{transform:scale(.95)}
-.cardwk-nav .wk-label{font-size:15px;font-weight:700;color:var(--text);min-width:13em;text-align:center}
-.cardwk-nav .wk-today{margin-left:2px;padding:9px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
-.card-panes{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
-.card-pane{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.card-pane .cp-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:7px}
-.card-pane .cp-name{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:8px;font:400 15px/1.2 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
+/* いないカード持ち出し（点呼・リフトと同じキオスク型） */
+.card-wrap{max-width:1760px;margin:0 auto;padding:18px}
+.card-panes{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.card-pane{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-pane .cp-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-pane .cp-name{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:10px;font:400 16px/1.4 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);-webkit-appearance:none;appearance:none}
 .card-pane .cp-name:focus{outline:none;border-color:var(--accent)}
-.card-pane .cp-btn{width:100%;margin-top:10px;border:none;border-radius:8px;padding:12px;font:700 14px/1 'Noto Sans JP',sans-serif;background:var(--accent);color:#fff;cursor:pointer}
+.card-pane .cp-btn{width:100%;margin-top:12px;border:none;border-radius:12px;padding:18px;font:700 18px/1 'Noto Sans JP',sans-serif;background:var(--accent);color:#fff;cursor:pointer}
 .card-pane .cp-btn:active{transform:scale(.98)}
-.cp-tbl{width:100%;border-collapse:collapse;font-size:14px}
-.cp-tbl th{background:var(--surface2);color:var(--text-dim);font-size:12px;font-weight:700;padding:9px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
-.cp-tbl td{padding:11px 10px;border-bottom:1px solid var(--surface3);text-align:left;white-space:nowrap}
+.card-pane .cp-btn.ret{background:var(--green)}
+.card-pane .cp-out{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.card-pane .cp-out-badge{font-size:13px;font-weight:700;padding:6px 13px;border-radius:999px;background:var(--orange-dim);color:var(--orange);flex:0 0 auto}
+.card-pane .cp-out-who{font-size:21px;font-weight:800;color:var(--text)}
+.card-pane .cp-out-since{font-size:14px;color:var(--text-dim)}
+.card-pane .wknav{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+.card-pane .wknav .wk-btn{width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
+.card-pane .wknav .wk-btn:active{transform:scale(.95)}
+.card-pane .wknav .wk-label{flex:1;text-align:center;font-size:15px;font-weight:700;color:var(--text)}
+.card-pane .wknav .wk-today{height:46px;padding:0 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font:600 14px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+.cp-tbl{width:100%;border-collapse:collapse;font-size:15px}
+.cp-tbl th{background:var(--surface2);color:var(--text-dim);font-size:13px;font-weight:700;padding:11px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.cp-tbl td{padding:13px 12px;border-bottom:1px solid var(--surface3);text-align:left;white-space:nowrap}
 .cp-tbl tr:last-child td{border-bottom:none}
-.cp-tbl .t-day{color:var(--text-dim);font-size:13px}
+.cp-tbl .t-day{color:var(--text-dim);font-size:14px}
 .cp-tbl .t-nm{font-weight:700;color:var(--text)}
 .cp-tbl .t-out{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
 .cp-tbl .t-ret{font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
-.cp-tbl .t-now{font-size:12px;font-weight:700;color:var(--orange);background:var(--orange-dim);padding:3px 9px;border-radius:999px}
-.card-pane .cp-out{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.card-pane .cp-out-badge{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:var(--orange-dim);color:var(--orange);flex:0 0 auto}
-.card-pane .cp-out-who{font-size:17px;font-weight:800;color:var(--text)}
-.card-pane .cp-out-since{font-size:13px;color:var(--text-dim)}
-.card-pane .cp-btn.ret{background:var(--green)}
-.cp-empty{color:var(--text-faint);font-size:13px;padding:6px 2px}
-@media(max-width:480px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
+.cp-tbl .t-now{font-size:13px;font-weight:700;color:var(--orange);background:var(--orange-dim);padding:4px 10px;border-radius:999px}
+.cp-empty{color:var(--text-faint);font-size:14px;padding:24px 2px;text-align:center}
+@media(max-width:840px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
 
@@ -2467,7 +2467,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol .hdr .today{font:700 15px/1 'Noto Sans JP';color:var(--text-dim)}
 #view-alcohol .hdr .refresh{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font:700 14px/1 'Noto Sans JP';border-radius:8px;padding:9px 14px;cursor:pointer}
 #view-alcohol .hdr .refresh:active{transform:scale(.96)}
-#view-alcohol .kiosk{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1320px;margin:0 auto;padding:16px;align-items:start}
+#view-alcohol .kiosk{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1760px;margin:0 auto;padding:18px;align-items:start}
 #view-alcohol .dnav{display:flex;align-items:center;gap:6px}
 #view-alcohol .dnav input[type=date]{flex:1}
 #view-alcohol .dnav-btn{flex:0 0 auto;width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
@@ -2728,7 +2728,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift .hdr .right{display:flex;align-items:center;gap:14px}
 #view-forklift .hdr .today{font:700 15px/1 'Noto Sans JP';color:var(--text-dim)}
 #view-forklift .hdr .refresh{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font:700 14px/1 'Noto Sans JP';border-radius:8px;padding:9px 14px;cursor:pointer}
-#view-forklift .kiosk{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1320px;margin:0 auto;padding:16px;align-items:start}
+#view-forklift .kiosk{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1760px;margin:0 auto;padding:18px;align-items:start}
 #view-forklift .dnav{display:flex;align-items:center;gap:6px}
 #view-forklift .dnav input[type=date]{flex:1}
 #view-forklift .dnav-btn{flex:0 0 auto;width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
@@ -6162,7 +6162,6 @@ const Card = (function(){
       .sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at)));
     const opts='<option value="">氏名を選択</option>'+staff.map(n=>`<option>${esc(n)}</option>`).join('');
     let h='';
-    h+=`<div class="cardwk-nav"><button class="wk-btn" onclick="Card.prevWeek()">‹</button><span class="wk-label">${lbl(_wk)} 〜 ${lbl(wkEnd)}</span><button class="wk-btn" onclick="Card.nextWeek()">›</button><button class="wk-today" onclick="Card.thisWeek()">今週</button></div>`;
     h+='<div class="card-panes">';
     const open=openLoan();
     h+='<div class="card-pane"><div class="cp-title">🛒 カードの持ち出し</div>';
@@ -6174,7 +6173,8 @@ const Card = (function(){
       h+=`<select class="cp-name" id="cardName">${opts}</select><button class="cp-btn" onclick="Card.out()">持ち出し</button>`;
     }
     h+='</div>';
-    h+='<div class="card-pane"><div class="cp-title">持ち出し記録</div>';
+    h+='<div class="card-pane"><div class="cp-title">📋 持ち出し記録</div>';
+    h+=`<div class="wknav"><button class="wk-btn" onclick="Card.prevWeek()">◀</button><span class="wk-label">${lbl(_wk)} 〜 ${lbl(wkEnd)}</span><button class="wk-btn" onclick="Card.nextWeek()">▶</button><button class="wk-today" onclick="Card.thisWeek()">今週</button></div>`;
     if(inWk.length){
       h+='<table class="cp-tbl"><thead><tr><th>日付</th><th>氏名</th><th>持ち出し</th><th>返却</th></tr></thead><tbody>';
       inWk.forEach(l=>{
