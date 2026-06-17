@@ -1455,16 +1455,6 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane .cp-more:hover{text-decoration:underline}
 @media(max-width:840px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
 
-/* キオスク（27インチ横・広幅）：左右ペインを画面いっぱいの等高にし、各ペイン内部スクロール
-   → 右ペインが記録で伸びない／左右の高さが揃う／下半分の余白が消える。縦・狭幅は従来フロー */
-@media (min-width:1100px) and (orientation:landscape){
-  html #view-alcohol, html #view-forklift{min-height:0}
-  #view-alcohol .kiosk, #view-forklift .kiosk{height:calc(100dvh - 48px);grid-template-rows:minmax(0,1fr);align-items:stretch}
-  #view-alcohol .pane, #view-forklift .pane{height:100%;min-height:0;overflow-y:auto}
-  #view-card .card-wrap{box-sizing:border-box}
-  #view-card .card-panes{height:calc(100dvh - 48px - 36px);grid-template-rows:minmax(0,1fr);align-items:stretch}
-  #view-card .card-pane{min-height:0;overflow-y:auto}
-}
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
 
