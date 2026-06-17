@@ -1425,6 +1425,8 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane .cp-name{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:10px;font:400 16px/1.4 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);-webkit-appearance:none;appearance:none}
 .card-pane .cp-name:focus{outline:none;border-color:var(--accent)}
 .card-pane .cp-btn{width:100%;margin-top:12px;border:none;border-radius:12px;padding:18px;font:700 18px/1 'Noto Sans JP',sans-serif;background:var(--accent);color:#fff;cursor:pointer}
+.card-pane .cp-acts{display:flex;gap:12px;margin-top:12px}
+.card-pane .cp-acts .cp-btn{flex:1;width:auto;margin-top:0}
 .card-pane .cp-btn:active{transform:scale(.98)}
 .card-pane .cp-btn.ret{background:var(--green)}
 .card-pane .cp-out{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
@@ -6194,23 +6196,16 @@ const Card = (function(){
       .sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at)));
     let h='';
     h+='<div class="card-panes">';
-    const open=openLoan();
     h+='<div class="card-pane"><div class="cp-title">🛒 カードの持ち出し</div>';
-    if(open){
-      const op=parseTs(open.out_at);
-      h+=`<div class="cp-out"><span class="cp-out-badge">持ち出し中</span><span class="cp-out-who">${esc(open.name||'')}</span><span class="cp-out-since">${op?op.hm:''}〜</span></div>`;
-      h+=`<button class="cp-btn ret" onclick="Card.ret()">返却</button>`;
-    }else{
-      h+=`<div class="cp-selbar${_sel?'':' none'}"><span class="cp-sel-lab">持ち出す人</span><span class="cp-sel-who">${_sel?esc(_sel):'下から名前を選んでください'}</span>${_sel?'<span class="cp-sel-clr" onclick="Card.clearSel()">変更</span>':''}</div>`;
-      const nbtn=s=>`<button type="button" class="cp-nbtn${_sel===s.name?' sel':''}" onclick="Card.sel('${esc(s.name)}')">${esc(s.name)}</button>`;
-      const reg=staff.filter(s=>s.reg!==false), extra=staff.filter(s=>s.reg===false);
-      if(reg.length) h+=`<div class="cp-grid">${reg.map(nbtn).join('')}</div>`;
-      if(extra.length){
-        h+=`<div><span class="cp-more" onclick="Card.toggleExtra()">${_showExtra?'− 控えを隠す':'＋ その他の人'}</span></div>`;
-        if(_showExtra) h+=`<div class="cp-grid">${extra.map(nbtn).join('')}</div>`;
-      }
-      h+=`<button class="cp-btn" onclick="Card.out()">持ち出し</button>`;
+    h+=`<div class="cp-selbar${_sel?'':' none'}"><span class="cp-sel-lab">持ち出す人</span><span class="cp-sel-who">${_sel?esc(_sel):'下から名前を選んでください'}</span></div>`;
+    const nbtn=s=>`<button type="button" class="cp-nbtn${_sel===s.name?' sel':''}" onclick="Card.sel('${esc(s.name)}')">${esc(s.name)}</button>`;
+    const reg=staff.filter(s=>s.reg!==false), extra=staff.filter(s=>s.reg===false);
+    if(reg.length) h+=`<div class="cp-grid">${reg.map(nbtn).join('')}</div>`;
+    if(extra.length){
+      h+=`<div><span class="cp-more" onclick="Card.toggleExtra()">${_showExtra?'− 控えを隠す':'＋ その他の人'}</span></div>`;
+      if(_showExtra) h+=`<div class="cp-grid">${extra.map(nbtn).join('')}</div>`;
     }
+    h+=`<div class="cp-acts"><button class="cp-btn take" onclick="Card.out()">持ち出し</button><button class="cp-btn ret" onclick="Card.ret()">返却</button></div>`;
     h+='</div>';
     h+='<div class="card-pane"><div class="cp-title">📋 持ち出し記録</div>';
     h+=`<div class="wknav"><button class="wk-btn" onclick="Card.prevWeek()">◀</button><span class="wk-label">${lbl(_wk)} 〜 ${lbl(wkEnd)}</span><button class="wk-btn" onclick="Card.nextWeek()">▶</button><button class="wk-today" onclick="Card.thisWeek()">今週</button></div>`;
@@ -6234,7 +6229,8 @@ const Card = (function(){
   function toggleExtra(){ _showExtra=!_showExtra; render(); }
   function out(){
     const name=_sel;
-    if(!name)return;
+    if(!name){toast('持ち出す人を選んでください');return;}
+    if(openLoan()){toast('まだ返却されていません',false);return;}
     if(guard())return;
     fire({action:'out',name});
     loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:''});
@@ -6242,7 +6238,7 @@ const Card = (function(){
     render(); setTimeout(loadAll,3000);
   }
   function ret(){
-    const open=openLoan(); if(!open)return;
+    const open=openLoan(); if(!open){toast('持ち出し中の記録がありません',false);return;}
     if(guard())return;
     fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id});
     open.return_at=nowStr();
