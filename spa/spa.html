@@ -1451,6 +1451,8 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane .cp-nbtn:hover{border-color:var(--accent);background:var(--accent-dim)}
 .card-pane .cp-nbtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
 .card-pane .cp-nbtn:active{transform:scale(.96)}
+.card-pane .cp-more{display:inline-block;margin:10px 2px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer}
+.card-pane .cp-more:hover{text-decoration:underline}
 @media(max-width:840px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
 
 /* キオスク（27インチ横・広幅）：左右ペインを画面いっぱいの等高にし、各ペイン内部スクロール
@@ -6154,7 +6156,7 @@ const Card = (function(){
   const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const DOW=['日','月','火','水','木','金','土'];
-  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel='';
+  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel='', _showExtra=false;
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   function pad(n){ return String(n).padStart(2,'0'); }
   function ymd(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
@@ -6165,7 +6167,7 @@ const Card = (function(){
   function lbl(d){ return `${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}）`; }
   async function apiGet(){ try{ const r=await fetch(API+'?dept=card&action=read'); return await r.json(); }catch(e){ return null; } }
   function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'card',...body})}); }catch(e){} }
-  async function loadAll(){ const d=await apiGet(); if(d){ loans=d.loans||[]; staff=d.staff||[]; } render(); }
+  async function loadAll(){ const d=await apiGet(); if(d){ loans=d.loans||[]; staff=(d.staff||[]).map(s=>typeof s==='string'?{name:s,reg:true}:s); } render(); }
   function openLoan(){ return loans.find(l=>!l.return_at); } // loansはout_at降順＝先頭の未返却が最新
   function prevWeek(){ _wk=addDays(_wk,-7); render(); }
   function nextWeek(){ _wk=addDays(_wk,7); render(); }
@@ -6185,7 +6187,13 @@ const Card = (function(){
       h+=`<div class="cp-out"><span class="cp-out-badge">持ち出し中</span><span class="cp-out-who">${esc(open.name||'')}</span><span class="cp-out-since">${op?op.hm:''}〜</span></div>`;
       h+=`<button class="cp-btn ret" onclick="Card.ret()">返却</button>`;
     }else{
-      h+=`<div class="cp-grid">${staff.map(n=>`<button type="button" class="cp-nbtn${_sel===n?' sel':''}" onclick="Card.sel('${esc(n)}')">${esc(n)}</button>`).join('')}</div>`;
+      const nbtn=s=>`<button type="button" class="cp-nbtn${_sel===s.name?' sel':''}" onclick="Card.sel('${esc(s.name)}')">${esc(s.name)}</button>`;
+      const reg=staff.filter(s=>s.reg!==false), extra=staff.filter(s=>s.reg===false);
+      if(reg.length) h+=`<div class="cp-grid">${reg.map(nbtn).join('')}</div>`;
+      if(extra.length){
+        h+=`<div><span class="cp-more" onclick="Card.toggleExtra()">${_showExtra?'− 控えを隠す':'＋ その他の人'}</span></div>`;
+        if(_showExtra) h+=`<div class="cp-grid">${extra.map(nbtn).join('')}</div>`;
+      }
       h+=`<button class="cp-btn" onclick="Card.out()">${_sel?esc(_sel)+' を持ち出し':'持ち出し'}</button>`;
     }
     h+='</div>';
@@ -6207,6 +6215,7 @@ const Card = (function(){
     el.innerHTML=h;
   }
   function sel(n){ _sel=(_sel===n?'':n); render(); }
+  function toggleExtra(){ _showExtra=!_showExtra; render(); }
   function out(){
     const name=_sel;
     if(!name)return;
@@ -6223,7 +6232,7 @@ const Card = (function(){
     open.return_at=nowStr();
     render(); setTimeout(loadAll,3000);
   }
-  return { loadAll, render, out, ret, sel, prevWeek, nextWeek, thisWeek };
+  return { loadAll, render, out, ret, sel, toggleExtra, prevWeek, nextWeek, thisWeek };
 })();
 
 const Portal = (function(){
