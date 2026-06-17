@@ -1453,6 +1453,12 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane .cp-nbtn:active{transform:scale(.96)}
 .card-pane .cp-more{display:inline-block;margin:10px 2px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer}
 .card-pane .cp-more:hover{text-decoration:underline}
+.card-pane .cp-selbar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--accent-dim);border:1px solid var(--accent);margin-bottom:14px;min-height:60px}
+.card-pane .cp-selbar.none{background:var(--surface2);border-color:var(--border);border-style:dashed}
+.card-pane .cp-sel-lab{font-size:13px;font-weight:600;color:var(--text-dim)}
+.card-pane .cp-sel-who{font-size:24px;font-weight:900;color:var(--accent);flex:1}
+.card-pane .cp-selbar.none .cp-sel-who{font-size:16px;font-weight:600;color:var(--text-faint)}
+.card-pane .cp-sel-clr{font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
 @media(max-width:840px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
 
 /* キオスク（27インチ横・広幅）：左右ペインを画面いっぱいの等高にし、各ペイン内部スクロール
@@ -6195,6 +6201,7 @@ const Card = (function(){
       h+=`<div class="cp-out"><span class="cp-out-badge">持ち出し中</span><span class="cp-out-who">${esc(open.name||'')}</span><span class="cp-out-since">${op?op.hm:''}〜</span></div>`;
       h+=`<button class="cp-btn ret" onclick="Card.ret()">返却</button>`;
     }else{
+      h+=`<div class="cp-selbar${_sel?'':' none'}"><span class="cp-sel-lab">持ち出す人</span><span class="cp-sel-who">${_sel?esc(_sel):'下から名前を選んでください'}</span>${_sel?'<span class="cp-sel-clr" onclick="Card.clearSel()">変更</span>':''}</div>`;
       const nbtn=s=>`<button type="button" class="cp-nbtn${_sel===s.name?' sel':''}" onclick="Card.sel('${esc(s.name)}')">${esc(s.name)}</button>`;
       const reg=staff.filter(s=>s.reg!==false), extra=staff.filter(s=>s.reg===false);
       if(reg.length) h+=`<div class="cp-grid">${reg.map(nbtn).join('')}</div>`;
@@ -6202,7 +6209,7 @@ const Card = (function(){
         h+=`<div><span class="cp-more" onclick="Card.toggleExtra()">${_showExtra?'− 控えを隠す':'＋ その他の人'}</span></div>`;
         if(_showExtra) h+=`<div class="cp-grid">${extra.map(nbtn).join('')}</div>`;
       }
-      h+=`<button class="cp-btn" onclick="Card.out()">${_sel?esc(_sel)+' を持ち出し':'持ち出し'}</button>`;
+      h+=`<button class="cp-btn" onclick="Card.out()">持ち出し</button>`;
     }
     h+='</div>';
     h+='<div class="card-pane"><div class="cp-title">📋 持ち出し記録</div>';
@@ -6223,6 +6230,7 @@ const Card = (function(){
     el.innerHTML=h;
   }
   function sel(n){ _sel=(_sel===n?'':n); render(); }
+  function clearSel(){ _sel=''; render(); }
   function toggleExtra(){ _showExtra=!_showExtra; render(); }
   function out(){
     const name=_sel;
@@ -6240,7 +6248,7 @@ const Card = (function(){
     open.return_at=nowStr();
     render(); setTimeout(loadAll,3000);
   }
-  return { loadAll, render, out, ret, sel, toggleExtra, prevWeek, nextWeek, thisWeek };
+  return { loadAll, render, out, ret, sel, clearSel, toggleExtra, prevWeek, nextWeek, thisWeek };
 })();
 
 const Portal = (function(){
