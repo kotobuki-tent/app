@@ -1455,6 +1455,17 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane .cp-more:hover{text-decoration:underline}
 @media(max-width:840px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
 
+/* キオスク（27インチ横・広幅）：左右ペインを画面いっぱいの等高にし、各ペイン内部スクロール
+   → 右ペインが記録で伸びない／左右の高さが揃う。リフトは記録ボタンを上部に移したので埋もれない。
+   縦・狭幅は従来フロー（ページスクロール） */
+@media (min-width:1100px) and (orientation:landscape){
+  html #view-alcohol, html #view-forklift{min-height:0}
+  #view-alcohol .kiosk, #view-forklift .kiosk{height:calc(100dvh - 48px);grid-template-rows:minmax(0,1fr);align-items:stretch}
+  #view-alcohol .pane, #view-forklift .pane{height:100%;min-height:0;overflow-y:auto}
+  #view-card .card-wrap{box-sizing:border-box}
+  #view-card .card-panes{height:calc(100dvh - 48px - 36px);grid-template-rows:minmax(0,1fr);align-items:stretch}
+  #view-card .card-pane{min-height:0;overflow-y:auto}
+}
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
 
@@ -1582,7 +1593,7 @@ table.jobs tr:last-child td{border-bottom:none}
 <div class="hdr">
   <div class="hdr-inner">
     <button class="nav-link home-link on" id="navHome" onclick="App.nav('portal')"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</button>
-    <button class="nav-link" id="navDaily" data-zone="field" onclick="App.nav('daily')">日報</button>
+    <button class="nav-link" id="navDaily" data-zone="field" data-kiosk onclick="App.nav('daily')">日報</button>
     <button class="nav-link" id="navOt" data-zone="field" onclick="App.nav('ot')">時間外</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navAlcohol" data-zone="office" data-kiosk onclick="App.nav('alcohol')">点呼</button>
@@ -2416,7 +2427,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <button class="pm-btn" data-m="kiosk" onclick="App.setMode('kiosk')">点検</button>
     </div>
     <div class="portal-grid">
-      <a class="portal-card" data-zone="field" onclick="App.nav('daily')">
+      <a class="portal-card" data-zone="field" data-kiosk onclick="App.nav('daily')">
         <div class="portal-card-icon" style="background:#fb7185;color:#881337">日</div>
         <div class="portal-card-body"><div class="portal-card-title">日報</div></div>
       </a>
@@ -7250,7 +7261,7 @@ const App = {
   ],
   mode:(function(){ try{var m=new URLSearchParams(location.search).get('mode'); if(m==='floor'||m==='full'||m==='kiosk'){localStorage.setItem('spa_mode',m); history.replaceState({},'',location.pathname);} }catch(e){} try{return localStorage.getItem('spa_mode')||'full';}catch(e){return 'full';} })(),
   allowedZones(){ return this.mode==='floor' ? ['field','shared'] : ['field','shared','office']; },
-  KIOSK_KEYS:['alcohol','forklift','card'],
+  KIOSK_KEYS:['daily','alcohol','forklift','card'],
   _allowed(key){ if(key==='portal')return true; if(this.mode==='kiosk') return this.KIOSK_KEYS.indexOf(key)>=0; const r=this.reg(key); return !r||!r.zone||this.allowedZones().indexOf(r.zone)>=0; },
   setMode(m){ this.mode=m; try{localStorage.setItem('spa_mode',m);}catch(e){} this.applyMode(); const c=this.current; if(c&&!this._allowed(c)) this.nav('portal'); if(typeof Portal!=='undefined'&&Portal.render)Portal.render(); },
   applyMode(){ const kiosk=this.mode==='kiosk', allow=this.allowedZones(); document.querySelectorAll('[data-zone]').forEach(b=>{ const show=kiosk?b.hasAttribute('data-kiosk'):allow.indexOf(b.getAttribute('data-zone'))>=0; b.classList.toggle('hidden',!show); }); document.querySelectorAll('.pm-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-m')===this.mode));
