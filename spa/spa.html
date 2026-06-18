@@ -2493,38 +2493,34 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol *{margin:0;padding:0;box-sizing:border-box}
 #view-alcohol{font-size:16px;scrollbar-gutter:stable}
 #view-alcohol{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
-#view-alcohol .hdr{background:var(--surface);border-bottom:1px solid var(--border-light);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
-#view-alcohol .hdr h1{font-size:19px;font-weight:900;color:var(--text);letter-spacing:.04em}
-#view-alcohol .hdr .right{display:flex;align-items:center;gap:14px}
-#view-alcohol .hdr .today{font:700 15px/1 'Noto Sans JP';color:var(--text-dim)}
-#view-alcohol .hdr .refresh{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font:700 14px/1 'Noto Sans JP';border-radius:8px;padding:9px 14px;cursor:pointer}
-#view-alcohol .hdr .refresh:active{transform:scale(.96)}
-#view-alcohol .kiosk{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1760px;margin:0 auto;padding:18px;align-items:start}
+#view-alcohol .kiosk{display:grid;grid-template-columns:1.12fr 1fr;gap:20px;max-width:1820px;margin:0 auto;padding:20px;align-items:start}
 #view-alcohol .dnav{display:flex;align-items:center;gap:6px}
 #view-alcohol .dnav input[type=date]{flex:1}
 #view-alcohol .dnav-btn{flex:0 0 auto;width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
 #view-alcohol .dnav-btn:active{transform:scale(.95)}
 #view-alcohol .dnav-today{flex:0 0 auto;height:46px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
-#view-alcohol .pane{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-#view-alcohol .pane h2{font-size:15px;font-weight:800;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-#view-alcohol .selbar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--accent-dim);border:1px solid var(--accent);margin-bottom:14px;min-height:60px}
+#view-alcohol .pane{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:0 22px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+#view-alcohol .pane h2{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;padding:18px 0 14px;margin-bottom:18px;border-bottom:1px solid var(--border-light);position:sticky;top:0;background:var(--surface);z-index:5}
+#view-alcohol .selbar{position:relative;display:flex;align-items:center;justify-content:center;padding:18px 20px;border-radius:14px;background:var(--accent-dim);border:1.5px solid var(--accent);margin-bottom:18px;min-height:66px}
 #view-alcohol .selbar.none{background:var(--surface2);border-color:var(--border);border-style:dashed}
-#view-alcohol .selbar .lab{font-size:13px;font-weight:600;color:var(--text-dim)}
-#view-alcohol .selbar .who{font-size:24px;font-weight:900;color:var(--accent);flex:1}
-#view-alcohol .selbar.none .who{font-size:16px;font-weight:600;color:var(--text-faint)}
-#view-alcohol .selbar .clr{font:600 13px/1 'Noto Sans JP';color:var(--text-dim);cursor:pointer;padding:6px 10px;border:1px solid var(--border);border-radius:7px;background:var(--surface)}
+#view-alcohol .selbar .lab{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.08em}
+#view-alcohol .selbar.none .lab{color:var(--text-faint)}
+#view-alcohol .selbar .who{font-size:32px;font-weight:900;color:var(--accent);letter-spacing:.04em}
+#view-alcohol .selbar.none .who{font-size:17px;font-weight:600;color:var(--text-faint)}
+#view-alcohol .selbar .clr{display:none}
 #view-alcohol .moretoggle{font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;display:inline-block;margin:14px 2px 6px}
 #view-alcohol .moretoggle:hover{text-decoration:underline}
-#view-alcohol .ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:9px}
-#view-alcohol .namebtn{padding:16px 8px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);font:600 16px/1.2 'Noto Sans JP';color:var(--text);cursor:pointer;transition:.12s;text-align:center;position:relative}
+#view-alcohol .secl{font-size:12px;font-weight:800;color:var(--text-faint);letter-spacing:.08em;margin:4px 2px 11px}
+#view-alcohol .ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px}
+#view-alcohol .namebtn{padding:18px 8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 19px/1.2 'Noto Sans JP';color:var(--text);cursor:pointer;transition:.12s;text-align:center;position:relative}
 #view-alcohol .namebtn:hover{border-color:var(--accent);background:var(--accent-dim)}
-#view-alcohol .namebtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700;box-shadow:0 3px 10px rgba(59,130,246,.28)}
+#view-alcohol .namebtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(59,130,246,.3)}
 #view-alcohol .namebtn:active{transform:scale(.96)}
-#view-alcohol .namebtn .st{position:absolute;top:4px;right:6px;font-size:11px;font-weight:700}
-#view-alcohol .namebtn .st.full{color:var(--green)}
-#view-alcohol .namebtn.sel .st.full{color:#bbf7d0}
-#view-alcohol .namebtn .st.half{color:var(--orange)}
-#view-alcohol .namebtn.sel .st.half{color:#fde68a}
+#view-alcohol .namebtn .st{position:absolute;top:9px;right:10px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900;color:#fff}
+#view-alcohol .namebtn .st.full{background:var(--green)}
+#view-alcohol .namebtn.sel .st.full{background:#fff;color:var(--green)}
+#view-alcohol .namebtn .st.half{background:var(--orange)}
+#view-alcohol .namebtn.sel .st.half{background:#fff;color:var(--orange)}
 #view-alcohol .field{margin-bottom:14px}
 #view-alcohol .field label{display:block;font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:6px}
 #view-alcohol .field input,#view-alcohol .field select{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:10px;font:400 16px/1.4 'Noto Sans JP';color:var(--text);background:var(--surface2);-webkit-appearance:none;appearance:none}
@@ -2539,10 +2535,12 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol .seg.alc button[data-v="無"].on{background:var(--green);color:#fff}
 #view-alcohol .seg.alc button[data-v="有"].on{background:var(--red);color:#fff}
 #view-alcohol .seg.big button{padding:18px 0;font-size:20px}
-#view-alcohol .alc2{display:flex;gap:12px}
-#view-alcohol .alc2 button{flex:1;padding:18px 0;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);font:700 20px/1 'Noto Sans JP';color:var(--text-dim);cursor:pointer;transition:.12s}
-#view-alcohol .alc2 button[data-v="無"].on{background:var(--green);border-color:var(--green);color:#fff}
-#view-alcohol .alc2 button[data-v="有"].on{background:var(--red);border-color:var(--red);color:#fff}
+#view-alcohol .fldrow{display:flex;align-items:center;gap:24px;margin:18px 0 16px}
+#view-alcohol .fldrow>label{margin:0;font-size:14px;font-weight:800;color:var(--text-dim)}
+#view-alcohol .alc2{display:inline-flex;background:var(--surface3);border-radius:12px;padding:4px;gap:4px}
+#view-alcohol .alc2 button{border:0;background:transparent;font:800 17px/1 'Noto Sans JP';color:var(--text-dim);padding:13px 30px;border-radius:9px;cursor:pointer;transition:.12s}
+#view-alcohol .alc2 button[data-v="無"].on{background:var(--green);color:#fff}
+#view-alcohol .alc2 button[data-v="有"].on{background:var(--red);color:#fff}
 #view-alcohol .alc2 button:active{transform:scale(.97)}
 #view-alcohol .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px}
 #view-alcohol .chips button{padding:9px 13px;border:1px solid var(--border);border-radius:18px;background:var(--surface);font:600 13px/1 'Noto Sans JP';color:var(--text-dim);cursor:pointer;transition:.1s}
@@ -2554,29 +2552,31 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol #detailBox{display:none}
 #view-alcohol #detailBox.open{display:block}
 #view-alcohol .hide{display:none!important}
-#view-alcohol .commit{display:flex;gap:12px;margin-top:8px}
-#view-alcohol .commit button{flex:1;padding:24px 0;border:none;border-radius:14px;font:700 22px/1 'Noto Sans JP';cursor:pointer;letter-spacing:.06em;transition:.12s;color:#fff}
+#view-alcohol .commit{display:flex;gap:16px;margin-top:14px}
+#view-alcohol .commit button{flex:1;height:172px;border:none;border-radius:18px;font:800 46px/1.2 'Noto Sans JP';cursor:pointer;letter-spacing:.04em;transition:.12s;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+#view-alcohol .commit button small{font-size:15px;font-weight:700;opacity:.8;letter-spacing:.1em}
 #view-alcohol .commit .pre{background:var(--accent)}
-#view-alcohol .commit .post{background:var(--orange)}
+#view-alcohol .commit .post{background:var(--text)}
 #view-alcohol .commit button:active{transform:scale(.97)}
 #view-alcohol .commit button:disabled{background:var(--surface3);color:var(--text-faint);cursor:not-allowed}
 #view-alcohol .dayhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 #view-alcohol .dayhead .field{margin:0;flex:1}
-#view-alcohol .mtx{width:100%;border-collapse:collapse;font-size:15px}
-#view-alcohol .mtx th,#view-alcohol .mtx td{border:1px solid var(--border-light);padding:11px 8px;text-align:center}
-#view-alcohol .mtx th{background:var(--surface2);color:var(--text-dim);font-weight:700;font-size:13px}
-#view-alcohol .mtx td.nm{text-align:left;font-weight:700;color:var(--text);white-space:nowrap}
-#view-alcohol .mtx .cell-done{padding:8px 6px}
-#view-alcohol .mtx .cell-done.ng{background:var(--red-dim)}
-#view-alcohol .mtx .ct{cursor:pointer;display:block}
-#view-alcohol .mtx .al-tm{display:block;font-size:11px;font-weight:500;color:var(--text-faint);margin-bottom:3px}
-#view-alcohol .mtx .al-st{display:block;font-weight:800;font-size:15px}
-#view-alcohol .mtx .cell-done.ok .al-st{color:var(--green)}
-#view-alcohol .mtx .cell-done.ng .al-st{color:var(--red)}
-#view-alcohol .mtx .celldel{margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--text-dim);font:600 11px/1 'Noto Sans JP';padding:6px 11px;border-radius:7px;cursor:pointer}
+#view-alcohol .mtx{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:15px}
+#view-alcohol .mtx th{color:var(--text-faint);font-weight:800;font-size:12px;text-align:center;padding:0 8px 4px;letter-spacing:.05em}
+#view-alcohol .mtx th:first-child{text-align:left;padding-left:16px}
+#view-alcohol .mtx td{background:var(--surface2);padding:12px 8px;text-align:center;border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light)}
+#view-alcohol .mtx td.nm{text-align:left;font-weight:800;font-size:17px;color:var(--text);white-space:nowrap;border-left:1px solid var(--border-light);border-radius:12px 0 0 12px;padding-left:16px}
+#view-alcohol .mtx tr td:last-child{border-right:1px solid var(--border-light);border-radius:0 12px 12px 0;font-size:14px;color:var(--text-dim);font-weight:600}
+#view-alcohol .mtx .ct{cursor:pointer;display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;border-radius:10px;min-width:88px;background:var(--green-dim,#e6f6ee)}
+#view-alcohol .mtx .cell-done.ng .ct{background:var(--red-dim)}
+#view-alcohol .mtx .al-tm{display:block;font-size:17px;font-weight:800}
+#view-alcohol .mtx .cell-done.ok .al-tm{color:var(--green)}
+#view-alcohol .mtx .cell-done.ng .al-tm{color:var(--red)}
+#view-alcohol .mtx .al-st{display:block;font-size:11px;font-weight:700;color:var(--text-dim)}
+#view-alcohol .mtx .celldel{display:block;margin:6px auto 0;background:transparent;border:1px solid var(--border);color:var(--text-dim);font:600 11px/1 'Noto Sans JP';padding:5px 10px;border-radius:7px;cursor:pointer}
 #view-alcohol .mtx .celldel:hover{border-color:var(--red);color:var(--red)}
 #view-alcohol .mtx .celldel:active{transform:scale(.95)}
-#view-alcohol .mtx .cell-none{color:var(--text-faint)}
+#view-alcohol .mtx .cell-none{color:var(--text-faint);font-size:20px}
 #view-alcohol .empty{text-align:center;padding:26px;color:var(--text-faint);font-size:14px}
 #view-alcohol .divider{height:1px;background:var(--border-light);margin:18px 0}
 #view-alcohol .csvbar{display:flex;gap:10px;align-items:flex-end}
@@ -2602,7 +2602,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
   <!-- ===== 左：記録 ===== -->
   <div class="pane">
-    <h2>🍶 チェックを記録</h2>
+    <h2>点呼を記録</h2>
 
     <div class="selbar none" id="selbar">
       <span class="lab">運転者</span>
@@ -2610,9 +2610,10 @@ table.jobs tr:last-child td{border-bottom:none}
       <span class="clr hide" id="selClr" onclick="Alc.clearSel()">変更</span>
     </div>
 
+    <div class="secl">運転する人</div>
     <div id="driverGrid"><div class="empty">読み込み中...</div></div>
 
-    <div class="field" style="margin-top:16px">
+    <div class="fldrow">
       <label>酒気帯び</label>
       <div class="alc2" id="segAlcohol">
         <button type="button" class="on" data-v="無" onclick="Alc.segPick('segAlcohol',this);Alc.onAlcoholChange()">無</button>
@@ -2660,14 +2661,14 @@ table.jobs tr:last-child td{border-bottom:none}
     </div>
 
     <div class="commit">
-      <button class="pre" id="btnPre" onclick="Alc.record('運転前')">運転前</button>
-      <button class="post" id="btnPost" onclick="Alc.record('運転後')">運転後</button>
+      <button class="pre" id="btnPre" onclick="Alc.record('運転前')"><small>BEFORE</small>運転前を記録</button>
+      <button class="post" id="btnPost" onclick="Alc.record('運転後')"><small>AFTER</small>運転後を記録</button>
     </div>
   </div>
 
   <!-- ===== 右：本日の状況 ===== -->
   <div class="pane">
-    <h2>📋 実施状況</h2>
+    <h2>本日の点呼状況</h2>
     <div class="dayhead">
       <div class="field" style="margin:0;flex:1"><label>表示日</label>
         <div class="dnav">
@@ -2755,64 +2756,61 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift *{margin:0;padding:0;box-sizing:border-box}
 #view-forklift{font-size:16px;scrollbar-gutter:stable}
 #view-forklift{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-#view-forklift .hdr{background:var(--surface);border-bottom:1px solid var(--border-light);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
-#view-forklift .hdr h1{font-size:18px;font-weight:900;color:var(--text);letter-spacing:.03em}
-#view-forklift .hdr .right{display:flex;align-items:center;gap:14px}
-#view-forklift .hdr .today{font:700 15px/1 'Noto Sans JP';color:var(--text-dim)}
-#view-forklift .hdr .refresh{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font:700 14px/1 'Noto Sans JP';border-radius:8px;padding:9px 14px;cursor:pointer}
-#view-forklift .kiosk{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1760px;margin:0 auto;padding:18px;align-items:start}
+#view-forklift .kiosk{display:grid;grid-template-columns:1.12fr 1fr;gap:20px;max-width:1820px;margin:0 auto;padding:20px;align-items:start}
 #view-forklift .dnav{display:flex;align-items:center;gap:6px}
 #view-forklift .dnav input[type=date]{flex:1}
 #view-forklift .dnav-btn{flex:0 0 auto;width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
 #view-forklift .dnav-btn:active{transform:scale(.95)}
 #view-forklift .dnav-today{flex:0 0 auto;height:46px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
-#view-forklift .pane{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-#view-forklift .pane h2{font-size:15px;font-weight:800;color:var(--text);margin-bottom:13px;display:flex;align-items:center;gap:8px}
-#view-forklift .gl{font-size:12px;font-weight:700;color:var(--text-dim);margin:14px 2px 7px}
-#view-forklift .ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
-#view-forklift .namebtn{padding:15px 8px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);font:600 16px/1.2 'Noto Sans JP';color:var(--text);cursor:pointer;transition:.12s;text-align:center}
+#view-forklift .pane{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:0 22px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+#view-forklift .pane h2{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;padding:18px 0 14px;margin-bottom:16px;border-bottom:1px solid var(--border-light);position:sticky;top:0;background:var(--surface);z-index:5}
+#view-forklift .gl{font-size:12px;font-weight:800;color:var(--text-faint);letter-spacing:.08em;margin:14px 2px 11px}
+#view-forklift .ngrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+#view-forklift .namebtn{padding:16px 8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 18px/1.2 'Noto Sans JP';color:var(--text);cursor:pointer;transition:.12s;text-align:center}
 #view-forklift .namebtn:hover{border-color:var(--accent);background:var(--accent-dim)}
-#view-forklift .namebtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700;box-shadow:0 3px 10px rgba(59,130,246,.28)}
-#view-forklift .namebtn .sub{display:block;font-size:11px;font-weight:600;opacity:.7;margin-top:3px}
-#view-forklift .inspgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
-#view-forklift .inspgrid .namebtn{font-size:15px;padding:13px 6px}
+#view-forklift .namebtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(59,130,246,.3)}
+#view-forklift .namebtn .sub{display:block;font-size:12px;font-weight:600;color:var(--text-faint);margin-top:4px}
+#view-forklift .namebtn.sel .sub{color:#cfe0fb}
+#view-forklift .inspgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+#view-forklift .inspgrid .namebtn{font-size:16px;padding:14px 6px}
 #view-forklift .moretoggle{font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;display:inline-block;margin:6px 2px}
 #view-forklift .moretoggle:hover{text-decoration:underline}
 #view-forklift .field{margin-bottom:12px}
 #view-forklift .field label{display:block;font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:6px}
 #view-forklift .field input{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:10px;font:400 16px/1.4 'Noto Sans JP';color:var(--text);background:var(--surface2)}
 #view-forklift .field input:focus{outline:none;border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 4px var(--accent-dim)}
-#view-forklift .ckwrap{margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:0 20px;align-items:start}
-#view-forklift .ckwrap .gl-span{grid-column:1/-1;margin:12px 2px 2px}
+#view-forklift .ckwrap{margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;align-items:start}
+#view-forklift .ckwrap .gl-span{grid-column:1/-1;font-size:13px;font-weight:800;color:var(--text);background:var(--surface3);border-radius:8px;padding:8px 12px;margin:6px 0 2px}
 #view-forklift .ck-cell{min-width:0}
-#view-forklift .ck-item{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid var(--surface3)}
-#view-forklift .ck-label{flex:1;font-size:13.5px;font-weight:600;color:var(--text);line-height:1.3;min-width:0}
-#view-forklift .ck-seg{display:flex;gap:6px;flex-shrink:0}
-#view-forklift .ck-seg button{width:50px;padding:8px 0;border:1.5px solid var(--border);border-radius:9px;background:var(--surface);font:700 14px/1 'Noto Sans JP';color:var(--text-dim);cursor:pointer;transition:.1s}
-#view-forklift .ck-seg .ck-ok.on{background:var(--green);border-color:var(--green);color:#fff}
-#view-forklift .ck-seg .ck-ng.on{background:var(--red);border-color:var(--red);color:#fff}
+#view-forklift .ck-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--border-light);border-radius:10px}
+#view-forklift .ck-label{flex:1;font-size:14px;font-weight:600;color:var(--text);line-height:1.35;min-width:0}
+#view-forklift .ck-seg{display:inline-flex;background:var(--surface3);border-radius:9px;padding:3px;gap:3px;flex-shrink:0}
+#view-forklift .ck-seg button{width:48px;padding:9px 0;border:0;border-radius:7px;background:transparent;font:800 15px/1 'Noto Sans JP';color:var(--text-dim);cursor:pointer;transition:.1s}
+#view-forklift .ck-seg .ck-ok.on{background:var(--green);color:#fff}
+#view-forklift .ck-seg .ck-ng.on{background:var(--red);color:#fff}
 #view-forklift .ck-seg button:active{transform:scale(.95)}
-#view-forklift .ck-memo{width:100%;margin:0 0 6px;padding:11px 13px;border:1px solid var(--red);border-radius:9px;font:400 15px/1.4 'Noto Sans JP';background:var(--red-dim)}
+#view-forklift .ck-memo{width:100%;margin:8px 0 4px;padding:11px 13px;border:1px solid var(--red);border-radius:9px;font:400 15px/1.4 'Noto Sans JP';background:var(--red-dim)}
 #view-forklift .ck-memo:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 4px rgba(220,38,38,.08)}
 #view-forklift .ck-hint{padding:24px;text-align:center;color:var(--text-faint);font-size:14px}
-#view-forklift .summary{display:flex;align-items:center;gap:12px;margin-top:14px;padding:13px 15px;border-radius:12px;background:var(--green-dim);border:1px solid var(--green)}
+#view-forklift .summary{display:flex;align-items:center;gap:12px;margin-top:14px;padding:14px 16px;border-radius:12px;background:var(--green-dim,#e6f6ee);border:1px solid var(--green)}
 #view-forklift .summary.ng{background:var(--red-dim);border-color:var(--red)}
-#view-forklift .summary .s-txt{flex:1;font-size:14px;font-weight:700;color:var(--green)}
+#view-forklift .summary .s-txt{flex:1;font-size:15px;font-weight:800;color:var(--green)}
 #view-forklift .summary.ng .s-txt{color:var(--red)}
-#view-forklift .btn-rec{width:100%;margin-top:14px;padding:20px 0;border:none;border-radius:14px;font:700 20px/1 'Noto Sans JP';color:#fff;background:var(--accent);cursor:pointer;letter-spacing:.04em}
+#view-forklift .btn-rec{width:100%;margin-top:14px;height:84px;border:none;border-radius:16px;font:800 26px/1 'Noto Sans JP';color:#fff;background:var(--accent);cursor:pointer;letter-spacing:.04em}
+#view-forklift .btn-rec.ng{background:var(--red)}
 #view-forklift .btn-rec:active{transform:scale(.98)}
 #view-forklift .btn-rec:disabled{background:var(--surface3);color:var(--text-faint);cursor:not-allowed}
 #view-forklift .dayhead{margin-bottom:12px}
-#view-forklift .rec{display:flex;align-items:center;gap:10px;padding:12px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:11px;margin-bottom:9px}
+#view-forklift .rec{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface2);border:1px solid var(--border-light);border-radius:12px;margin-bottom:10px}
 #view-forklift .rec.optimistic{opacity:.65;border-style:dashed}
-#view-forklift .rec .mc{font-size:15px;font-weight:700;color:var(--text);flex:1}
-#view-forklift .rec .jd{font:800 14px/1 'Noto Sans JP';padding:7px 13px;border-radius:8px;white-space:nowrap;color:#fff}
-#view-forklift .rec .jd.ok{background:var(--green)}
-#view-forklift .rec .jd.ng{background:var(--red)}
-#view-forklift .rec .ins{font-size:12px;color:var(--text-dim);white-space:nowrap}
+#view-forklift .rec .mc{font-size:18px;font-weight:800;color:var(--text);flex:0 0 auto}
+#view-forklift .rec .jd{font:800 13px/1 'Noto Sans JP';padding:6px 13px;border-radius:20px;white-space:nowrap}
+#view-forklift .rec .jd.ok{background:var(--green-dim,#e6f6ee);color:#0d7a42}
+#view-forklift .rec .jd.ng{background:var(--red-dim);color:#b81f1f}
+#view-forklift .rec .ins{margin-left:auto;font-size:14px;color:var(--text-dim);font-weight:600;white-space:nowrap}
 #view-forklift .rec .rdel{background:transparent;border:1px solid var(--border);color:var(--text-dim);font:600 12px/1 'Noto Sans JP';padding:7px 10px;border-radius:8px;cursor:pointer}
 #view-forklift .rec .rdel:hover{border-color:var(--red);color:var(--red)}
-#view-forklift .rec-ng{font-size:12px;color:var(--red);margin:-4px 2px 10px;line-height:1.5}
+#view-forklift .rec-ng{font-size:13px;color:var(--red);font-weight:600;margin:-4px 2px 12px;line-height:1.5;padding-left:4px}
 #view-forklift .divider{height:1px;background:var(--border-light);margin:18px 0}
 #view-forklift .csvbar{display:flex;gap:10px;align-items:flex-end}
 #view-forklift .csvbar .field{flex:1;margin:0}
@@ -2829,7 +2827,7 @@ table.jobs tr:last-child td{border-bottom:none}
 <div class="kiosk">
   <!-- 左：点検 -->
   <div class="pane">
-    <h2>🚜 点検する</h2>
+    <h2>点検を記録</h2>
     <div class="gl">機体</div>
     <div class="ngrid" id="fk_machineGrid"></div>
 
@@ -2847,7 +2845,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
   <!-- 右：当日状況 -->
   <div class="pane">
-    <h2>📋 点検状況</h2>
+    <h2>本日の点検</h2>
     <div class="dayhead"><div class="field" style="margin:0"><label>表示日</label>
       <div class="dnav">
         <button type="button" class="dnav-btn" onclick="Fork.shiftDay(-1)">◀</button>
@@ -7162,6 +7160,7 @@ function updateSummary(){
   if(ng.length){s.classList.add('ng');$('fk_sumTxt').textContent='否 '+ng.length+'件 ／ 不具合は使用中止してサービス窓口へ';}
   else{s.classList.remove('ng');$('fk_sumTxt').textContent='すべて良';}
   $('fk_btnRec').textContent=ng.length?('否ありで記録（'+ng.length+'件）'):'点検を記録';
+  $('fk_btnRec').classList.toggle('ng',ng.length>0);
 }
 
 function record(){
