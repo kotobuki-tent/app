@@ -1468,6 +1468,43 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-card .card-panes{height:calc(100dvh - 48px - 40px);grid-template-rows:minmax(0,1fr);align-items:stretch}
   #view-card .card-pane{min-height:0;overflow-y:auto}
 }
+/* 縦画面キオスク（事務所前タブレット 1080×1920）：入力ボタンは控えめに揃え、本日の記録を大きく一目瞭然に */
+@media (orientation:portrait) and (min-width:900px){
+  html #view-alcohol .kiosk, html #view-forklift .kiosk{gap:20px;padding:22px}
+  html .card-wrap{padding:22px}
+  html .card-panes{gap:20px}
+  html #view-alcohol .pane h2, html #view-forklift .pane h2, html .card-pane .cp-title{font-size:19px}
+  /* 選択バナー・氏名ボタン：ほどほどに */
+  html #view-alcohol .selbar, html .card-pane .cp-selbar{min-height:72px}
+  html #view-alcohol .selbar .who, html .card-pane .cp-sel-who{font-size:34px}
+  html #view-alcohol .namebtn, html #view-forklift .namebtn, html .card-pane .cp-nbtn{font-size:18px;padding:20px 8px}
+  html #view-forklift .inspgrid .namebtn{padding:20px 8px}
+  html #view-alcohol .ngrid, html #view-forklift .ngrid, html #view-forklift .inspgrid, html .card-pane .cp-grid{gap:12px}
+  html #view-alcohol .alc2 button{font-size:18px;padding:14px 30px}
+  /* 記録ボタンは氏名ボタンとの差を詰める（でかすぎ解消） */
+  html #view-alcohol .commit{gap:14px;margin-top:14px}
+  html #view-alcohol .commit button{height:118px;font-size:32px;border-radius:16px}
+  html #view-alcohol .commit button small{font-size:13px}
+  html #view-forklift .btn-rec{height:96px;font-size:30px}
+  html .card-pane .cp-btn{height:118px;font-size:32px;border-radius:16px}
+  /* 本日の記録を一目瞭然に：大きく見せる */
+  html #view-alcohol .mtx td{padding:16px 8px}
+  html #view-alcohol .mtx td.nm{font-size:22px}
+  html #view-alcohol .mtx .ct{min-width:108px;padding:11px 0}
+  html #view-alcohol .mtx .al-tm{font-size:22px}
+  html #view-alcohol .mtx .al-st{font-size:12px}
+  html #view-alcohol .mtx th, html .cp-tbl th{font-size:13px}
+  html #view-alcohol .mtx tr td:last-child{font-size:16px}
+  html .cp-tbl td{padding:18px 14px}
+  html .cp-tbl .t-day{font-size:16px}
+  html .cp-tbl .t-nm{font-size:21px}
+  html .cp-tbl .t-out, html .cp-tbl .t-ret{font-size:20px}
+  html .cp-tbl .t-now{font-size:15px}
+  html #view-forklift .rec{padding:18px 16px}
+  html #view-forklift .rec .mc{font-size:22px}
+  html #view-forklift .rec .jd{font-size:15px}
+  html #view-forklift .rec .ins{font-size:16px}
+}
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
 
