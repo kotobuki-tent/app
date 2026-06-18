@@ -2759,13 +2759,13 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift .pane h2{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;padding:18px 0 14px;margin-bottom:16px;border-bottom:1px solid var(--border-light);position:sticky;top:0;background:var(--surface);z-index:5}
 #view-forklift .gl{font-size:12px;font-weight:800;color:var(--text-faint);letter-spacing:.08em;margin:14px 2px 11px}
 #view-forklift .ngrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
-#view-forklift .namebtn{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 18px/1.2 'Noto Sans JP';color:var(--text);cursor:pointer;transition:.12s;text-align:center}
+#view-forklift .namebtn{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 19px/1.2 'Noto Sans JP';color:var(--text);cursor:pointer;transition:.12s;text-align:center}
 #view-forklift .namebtn:hover{border-color:var(--accent);background:var(--accent-dim)}
 #view-forklift .namebtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(59,130,246,.3)}
 #view-forklift .namebtn .sub{display:block;font-size:12px;font-weight:600;color:var(--text-faint);margin-top:4px}
 #view-forklift .namebtn.sel .sub{color:#cfe0fb}
 #view-forklift .inspgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-#view-forklift .inspgrid .namebtn{font-size:16px;padding:14px 6px}
+#view-forklift .inspgrid .namebtn{padding:8px}
 #view-forklift .moretoggle{font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;display:inline-block;margin:6px 2px}
 #view-forklift .moretoggle:hover{text-decoration:underline}
 #view-forklift .field{margin-bottom:12px}
@@ -6233,6 +6233,7 @@ const Card = (function(){
     if(guard())return;
     fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id});
     open.return_at=nowStr();
+    _sel='';                 // 返却後は持ち出す人の選択を解除
     render(); setTimeout(loadAll,3000);
   }
   return { loadAll, render, out, ret, sel, clearSel, toggleExtra, prevWeek, nextWeek, thisWeek };
