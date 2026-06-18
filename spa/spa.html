@@ -6728,6 +6728,13 @@ const Cases = (function(){
       if(!useProd){ toast('運送便/引き取りの納品は生産にチェックが必要です（自社配送なら企画制作で登録）',true); return; }
     }
 
+    // 登録先の確認（チェックの付け間違いで生産と企画制作の両方に入るのを防ぐ）
+    const _dests=[];
+    if(useProd)_dests.push('生産');
+    if(useProj && !nouhinToProd)_dests.push('企画制作');
+    if(useSales)_dests.push('販売');
+    if(!confirm(`「${projectName}」を登録します。\n\n登録先：${_dests.join(' ＋ ')}\n\nこの内容でよろしいですか？`))return;
+
     _busy=true; setTimeout(()=>_busy=false,1500);
     const case_id=newCaseId();
     const hdr={ order_no:$('cf_order_no').value.trim(), estimate_no:$('cf_estimate_no').value.trim(), client:$('cf_client').value.trim(), person:$('cf_person').value.trim(), our_person:$('cf_our_person').value.trim() };
