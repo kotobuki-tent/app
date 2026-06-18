@@ -1419,7 +1419,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
 /* いないカード持ち出し（点呼・リフトと同じキオスク型） */
 .card-wrap{max-width:1820px;margin:0 auto;padding:20px}
-.card-panes{display:grid;grid-template-columns:1.12fr 1fr;gap:20px;align-items:start}
+.card-panes{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;align-items:start}
 .card-pane{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:0 22px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .card-pane .cp-title{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;padding:18px 0 14px;margin-bottom:18px;border-bottom:1px solid var(--border-light);position:sticky;top:0;background:var(--surface);z-index:5}
 .card-pane .cp-acts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
@@ -1442,7 +1442,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .cp-tbl .t-ret{font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
 .cp-tbl .t-now{font-size:13px;font-weight:800;color:var(--orange);background:var(--orange-dim);padding:5px 12px;border-radius:999px}
 .cp-empty{color:var(--text-faint);font-size:14px;padding:24px 2px;text-align:center}
-.card-pane .cp-grid{display:grid;grid-template-columns:repeat(4,150px);gap:11px;margin-bottom:12px;justify-content:start}
+.card-pane .cp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:12px}
 .card-pane .cp-nbtn{aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 19px/1.2 'Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;text-align:center}
 .card-pane .cp-nbtn:hover{border-color:var(--accent);background:var(--accent-dim)}
 .card-pane .cp-nbtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(59,130,246,.3)}
@@ -2487,7 +2487,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol *{margin:0;padding:0;box-sizing:border-box}
 #view-alcohol{font-size:16px;scrollbar-gutter:stable}
 #view-alcohol{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
-#view-alcohol .kiosk{display:grid;grid-template-columns:1.12fr 1fr;gap:20px;max-width:1820px;margin:0 auto;padding:20px;align-items:start}
+#view-alcohol .kiosk{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;max-width:1820px;margin:0 auto;padding:20px;align-items:start}
 #view-alcohol .dnav{display:flex;align-items:center;gap:6px}
 #view-alcohol .dnav input[type=date]{flex:1}
 #view-alcohol .dnav-btn{flex:0 0 auto;width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
@@ -2505,7 +2505,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol .moretoggle{font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;display:inline-block;margin:14px 2px 6px}
 #view-alcohol .moretoggle:hover{text-decoration:underline}
 #view-alcohol .secl{font-size:12px;font-weight:800;color:var(--text-faint);letter-spacing:.08em;margin:4px 2px 11px}
-#view-alcohol .ngrid{display:grid;grid-template-columns:repeat(4,150px);gap:11px;justify-content:start}
+#view-alcohol .ngrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
 #view-alcohol .namebtn{aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 19px/1.2 'Noto Sans JP';color:var(--text);cursor:pointer;transition:.12s;text-align:center;position:relative}
 #view-alcohol .namebtn:hover{border-color:var(--accent);background:var(--accent-dim)}
 #view-alcohol .namebtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(59,130,246,.3)}
@@ -2749,7 +2749,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift *{margin:0;padding:0;box-sizing:border-box}
 #view-forklift{font-size:16px;scrollbar-gutter:stable}
 #view-forklift{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-#view-forklift .kiosk{display:grid;grid-template-columns:1.12fr 1fr;gap:20px;max-width:1820px;margin:0 auto;padding:20px;align-items:start}
+#view-forklift .kiosk{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;max-width:1820px;margin:0 auto;padding:20px;align-items:start}
 #view-forklift .dnav{display:flex;align-items:center;gap:6px}
 #view-forklift .dnav input[type=date]{flex:1}
 #view-forklift .dnav-btn{flex:0 0 auto;width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
@@ -2758,13 +2758,13 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift .pane{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:0 22px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 #view-forklift .pane h2{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;padding:18px 0 14px;margin-bottom:16px;border-bottom:1px solid var(--border-light);position:sticky;top:0;background:var(--surface);z-index:5}
 #view-forklift .gl{font-size:12px;font-weight:800;color:var(--text-faint);letter-spacing:.08em;margin:14px 2px 11px}
-#view-forklift .ngrid{display:grid;grid-template-columns:repeat(4,150px);gap:11px;justify-content:start}
+#view-forklift .ngrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
 #view-forklift .namebtn{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 18px/1.2 'Noto Sans JP';color:var(--text);cursor:pointer;transition:.12s;text-align:center}
 #view-forklift .namebtn:hover{border-color:var(--accent);background:var(--accent-dim)}
 #view-forklift .namebtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(59,130,246,.3)}
 #view-forklift .namebtn .sub{display:block;font-size:12px;font-weight:600;color:var(--text-faint);margin-top:4px}
 #view-forklift .namebtn.sel .sub{color:#cfe0fb}
-#view-forklift .inspgrid{display:grid;grid-template-columns:repeat(4,150px);gap:9px;justify-content:start}
+#view-forklift .inspgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
 #view-forklift .inspgrid .namebtn{font-size:16px;padding:14px 6px}
 #view-forklift .moretoggle{font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;display:inline-block;margin:6px 2px}
 #view-forklift .moretoggle:hover{text-decoration:underline}
