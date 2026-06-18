@@ -1418,49 +1418,43 @@ table.jobs tr:last-child td{border-bottom:none}
 @media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:repeat(4,1fr);gap:18px 8px}}
 
 /* いないカード持ち出し（点呼・リフトと同じキオスク型） */
-.card-wrap{max-width:1760px;margin:0 auto;padding:18px}
-.card-panes{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-.card-pane{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.card-pane .cp-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.card-pane .cp-name{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:10px;font:400 16px/1.4 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);-webkit-appearance:none;appearance:none}
-.card-pane .cp-name:focus{outline:none;border-color:var(--accent)}
-.card-pane .cp-btn{width:100%;margin-top:12px;border:none;border-radius:12px;padding:18px;font:700 18px/1 'Noto Sans JP',sans-serif;background:var(--accent);color:#fff;cursor:pointer}
-.card-pane .cp-acts{display:flex;gap:12px;margin-top:12px}
-.card-pane .cp-acts .cp-btn{flex:1;width:auto;margin-top:0}
+.card-wrap{max-width:1820px;margin:0 auto;padding:20px}
+.card-panes{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.card-pane{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:0 22px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-pane .cp-title{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;padding:18px 0 14px;margin-bottom:18px;border-bottom:1px solid var(--border-light);position:sticky;top:0;background:var(--surface);z-index:5}
+.card-pane .cp-acts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.card-pane .cp-btn{height:130px;border:none;border-radius:18px;font:800 30px/1 'Noto Sans JP',sans-serif;background:var(--accent);color:#fff;cursor:pointer;letter-spacing:.04em}
 .card-pane .cp-btn:active{transform:scale(.98)}
 .card-pane .cp-btn.ret{background:var(--green)}
-.card-pane .cp-out{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.card-pane .cp-out-badge{font-size:13px;font-weight:700;padding:6px 13px;border-radius:999px;background:var(--orange-dim);color:var(--orange);flex:0 0 auto}
-.card-pane .cp-out-who{font-size:21px;font-weight:800;color:var(--text)}
-.card-pane .cp-out-since{font-size:14px;color:var(--text-dim)}
 .card-pane .wknav{display:flex;align-items:center;gap:6px;margin-bottom:14px}
 .card-pane .wknav .wk-btn{width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
 .card-pane .wknav .wk-btn:active{transform:scale(.95)}
 .card-pane .wknav .wk-label{flex:1;text-align:center;font-size:15px;font-weight:700;color:var(--text)}
 .card-pane .wknav .wk-today{height:46px;padding:0 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font:600 14px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
-.cp-tbl{width:100%;border-collapse:collapse;font-size:15px}
-.cp-tbl th{background:var(--surface2);color:var(--text-dim);font-size:13px;font-weight:700;padding:11px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
-.cp-tbl td{padding:13px 12px;border-bottom:1px solid var(--surface3);text-align:left;white-space:nowrap}
-.cp-tbl tr:last-child td{border-bottom:none}
-.cp-tbl .t-day{color:var(--text-dim);font-size:14px}
-.cp-tbl .t-nm{font-weight:700;color:var(--text)}
-.cp-tbl .t-out{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
-.cp-tbl .t-ret{font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
-.cp-tbl .t-now{font-size:13px;font-weight:700;color:var(--orange);background:var(--orange-dim);padding:4px 10px;border-radius:999px}
+.cp-tbl{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:15px}
+.cp-tbl th{color:var(--text-faint);font-size:12px;font-weight:800;letter-spacing:.05em;padding:0 14px 4px;text-align:left;white-space:nowrap}
+.cp-tbl td{padding:14px;background:var(--surface2);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light);text-align:left;white-space:nowrap}
+.cp-tbl tr td:first-child{border-left:1px solid var(--border-light);border-radius:12px 0 0 12px}
+.cp-tbl tr td:last-child{border-right:1px solid var(--border-light);border-radius:0 12px 12px 0}
+.cp-tbl .t-day{color:var(--text-dim);font-size:14px;font-weight:600}
+.cp-tbl .t-nm{font-weight:800;font-size:17px;color:var(--text)}
+.cp-tbl .t-out{font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.cp-tbl .t-ret{font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
+.cp-tbl .t-now{font-size:13px;font-weight:800;color:var(--orange);background:var(--orange-dim);padding:5px 12px;border-radius:999px}
 .cp-empty{color:var(--text-faint);font-size:14px;padding:24px 2px;text-align:center}
-.card-pane .cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:9px;margin-bottom:12px}
-.card-pane .cp-nbtn{padding:16px 8px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);font:600 16px/1.2 'Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;text-align:center}
+.card-pane .cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px;margin-bottom:12px}
+.card-pane .cp-nbtn{padding:18px 8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 19px/1.2 'Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;text-align:center}
 .card-pane .cp-nbtn:hover{border-color:var(--accent);background:var(--accent-dim)}
-.card-pane .cp-nbtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
+.card-pane .cp-nbtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(59,130,246,.3)}
 .card-pane .cp-nbtn:active{transform:scale(.96)}
 .card-pane .cp-more{display:inline-block;margin:10px 2px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer}
 .card-pane .cp-more:hover{text-decoration:underline}
-.card-pane .cp-selbar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--accent-dim);border:1px solid var(--accent);margin-bottom:14px;min-height:60px}
+.card-pane .cp-selbar{position:relative;display:flex;align-items:center;justify-content:center;padding:18px 20px;border-radius:14px;background:var(--accent-dim);border:1.5px solid var(--accent);margin-bottom:18px;min-height:66px}
 .card-pane .cp-selbar.none{background:var(--surface2);border-color:var(--border);border-style:dashed}
-.card-pane .cp-sel-lab{font-size:13px;font-weight:600;color:var(--text-dim)}
-.card-pane .cp-sel-who{font-size:24px;font-weight:900;color:var(--accent);flex:1}
-.card-pane .cp-selbar.none .cp-sel-who{font-size:16px;font-weight:600;color:var(--text-faint)}
-.card-pane .cp-sel-clr{font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+.card-pane .cp-sel-lab{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.08em}
+.card-pane .cp-selbar.none .cp-sel-lab{color:var(--text-faint)}
+.card-pane .cp-sel-who{font-size:32px;font-weight:900;color:var(--accent);letter-spacing:.04em}
+.card-pane .cp-selbar.none .cp-sel-who{font-size:17px;font-weight:600;color:var(--text-faint)}
 @media(max-width:840px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
 
 /* キオスク（27インチ横・広幅）：左右ペインを画面いっぱいの等高にし、各ペイン内部スクロール
@@ -6193,7 +6187,7 @@ const Card = (function(){
       .sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at)));
     let h='';
     h+='<div class="card-panes">';
-    h+='<div class="card-pane"><div class="cp-title">🛒 カードの持ち出し</div>';
+    h+='<div class="card-pane"><div class="cp-title">カードの持ち出し</div>';
     h+=`<div class="cp-selbar${_sel?'':' none'}"><span class="cp-sel-lab">持ち出す人</span><span class="cp-sel-who">${_sel?esc(_sel):'下から名前を選んでください'}</span></div>`;
     const nbtn=s=>`<button type="button" class="cp-nbtn${_sel===s.name?' sel':''}" onclick="Card.sel('${esc(s.name)}')">${esc(s.name)}</button>`;
     const reg=staff.filter(s=>s.reg!==false), extra=staff.filter(s=>s.reg===false);
@@ -6204,7 +6198,7 @@ const Card = (function(){
     }
     h+=`<div class="cp-acts"><button class="cp-btn take" onclick="Card.out()">持ち出し</button><button class="cp-btn ret" onclick="Card.ret()">返却</button></div>`;
     h+='</div>';
-    h+='<div class="card-pane"><div class="cp-title">📋 持ち出し記録</div>';
+    h+='<div class="card-pane"><div class="cp-title">持ち出し記録</div>';
     h+=`<div class="wknav"><button class="wk-btn" onclick="Card.prevWeek()">◀</button><span class="wk-label">${lbl(_wk)} 〜 ${lbl(wkEnd)}</span><button class="wk-btn" onclick="Card.nextWeek()">▶</button><button class="wk-today" onclick="Card.thisWeek()">今週</button></div>`;
     if(inWk.length){
       h+='<table class="cp-tbl"><thead><tr><th>日付</th><th>氏名</th><th>持ち出し</th><th>返却</th></tr></thead><tbody>';
