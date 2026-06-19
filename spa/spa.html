@@ -6941,8 +6941,9 @@ function renderToday(){
   if(!records.length){el.innerHTML='<div class="empty">この日の記録はまだありません</div>';return;}
   const byD={};
   records.forEach(r=>{(byD[r.driver]=byD[r.driver]||{})[r.phase]=r;});
-  const order=drivers.map(d=>d.name);
-  const names=Object.keys(byD).sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?999:ia)-(ib<0?999:ib);});
+  // 新しい順：各運転者の最新記録時刻（運転前/後のうち遅いほう）で降順
+  const latestOf=n=>{const d=byD[n];let t='';['運転前','運転後'].forEach(ph=>{const r=d[ph];if(r){const tt=fmtTime(r.time)||'';if(tt>t)t=tt;}});return t;};
+  const names=Object.keys(byD).sort((a,b)=>latestOf(b).localeCompare(latestOf(a)));
   const cell=r=>{
     if(!r)return '<td class="cell-none">—</td>';
     const ng=r.alcohol==='有';
