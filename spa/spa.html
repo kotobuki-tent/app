@@ -111,6 +111,11 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}
 .toast.err{background:#dc2626}
+/* 中央トースト（キオスクの日報用・気づきやすく画面中央に） */
+.center-toast{position:fixed;top:50%;left:50%;bottom:auto;right:auto;width:auto;transform:translate(-50%,-50%) scale(.92);padding:26px 42px;border-radius:16px;font:800 25px/1.45 'Noto Sans JP',sans-serif;color:#fff;background:#1a1d27;box-shadow:0 16px 48px rgba(0,0,0,.3);z-index:9999;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;text-align:center;max-width:84vw}
+.center-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.center-toast.ok{background:var(--green)}
+.center-toast.err{background:var(--red)}
 
 /* ===== ヘッダー（アプリ間ナビ・共通） ===== */
 .hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--hdr);border-bottom:1px solid var(--border-light);display:flex;align-items:stretch;height:48px;padding:0;gap:0}
@@ -2629,8 +2634,8 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol .modal .sub{font-size:13px;color:var(--text-faint);margin-bottom:16px}
 #view-alcohol .modal .acts{display:flex;gap:10px;margin-top:18px}
 #view-alcohol .modal .acts .btn{flex:1;text-align:center}
-#view-alcohol .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:15px 30px;border-radius:12px;font:700 16px/1 'Noto Sans JP';z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.18)}
-#view-alcohol .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#view-alcohol .toast{position:fixed;top:50%;left:50%;bottom:auto;right:auto;width:auto;transform:translate(-50%,-50%) scale(.92);padding:26px 42px;border-radius:16px;font:800 25px/1.45 'Noto Sans JP';z-index:9999;opacity:0;transition:.18s;pointer-events:none;box-shadow:0 16px 48px rgba(0,0,0,.3);text-align:center;max-width:84vw}
+#view-alcohol .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 #view-alcohol .toast.ok{background:var(--accent);color:#fff}
 #view-alcohol .toast.err{background:var(--red);color:#fff}
 @media(max-width:840px),(orientation:portrait){#view-alcohol .kiosk{grid-template-columns:1fr}}
@@ -2854,8 +2859,8 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift .note{font-size:12px;color:var(--text-faint);margin-top:10px;line-height:1.6}
 #view-forklift .empty{text-align:center;padding:24px;color:var(--text-faint);font-size:14px}
 #view-forklift .hide{display:none!important}
-#view-forklift .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:15px 30px;border-radius:12px;font:700 16px/1 'Noto Sans JP';z-index:999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.18)}
-#view-forklift .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#view-forklift .toast{position:fixed;top:50%;left:50%;bottom:auto;right:auto;width:auto;transform:translate(-50%,-50%) scale(.92);padding:26px 42px;border-radius:16px;font:800 25px/1.45 'Noto Sans JP';z-index:9999;opacity:0;transition:.18s;pointer-events:none;box-shadow:0 16px 48px rgba(0,0,0,.3);text-align:center;max-width:84vw}
+#view-forklift .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 #view-forklift .toast.ok{background:var(--accent);color:#fff}
 #view-forklift .toast.err{background:var(--red);color:#fff}
 @media(max-width:860px),(orientation:portrait){#view-forklift .kiosk{grid-template-columns:1fr}#view-forklift .ckwrap{grid-template-columns:1fr}}
@@ -2906,6 +2911,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
 <div class="loading-overlay hidden" id="loader"><div class="spin"></div><br>読み込み中...</div>
 <div class="toast" id="toast"></div>
+<div id="ctoastEl" class="center-toast"></div>
 
 <script>
 /* ========================================================================
@@ -3020,6 +3026,8 @@ function _playSeq(notes){
 function sndOK(){ _playSeq([{t:0,f:988},{t:0.13,f:1319}]); }                                                           // 成功：上昇2音ピロン
 function sndAlert(){ _playSeq([{t:0,f:1047,type:'square',dur:0.12,vol:0.2},{t:0.17,f:1047,type:'square',dur:0.12,vol:0.2},{t:0.34,f:1047,type:'square',dur:0.18,vol:0.2}]); } // 重大：ピッピッピー
 function sndError(){ _playSeq([{t:0,f:330,type:'square',dur:0.11,vol:0.18},{t:0.1,f:196,type:'square',dur:0.2,vol:0.18}]); }  // エラー：下降ブッ
+// 中央トースト表示（視覚のみ・音は呼び出し側で）。kind: 'ok' | 'err'
+function showCenter(msg,kind,ms){const t=document.getElementById('ctoastEl');if(!t)return;t.innerHTML=msg;t.className='center-toast show '+(kind||'ok');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},ms||(kind==='err'?2600:1700));}
 async function safeRefresh(btn, fn){
   if(!btn || btn.disabled) return;
   const orig = btn.innerHTML;
@@ -5732,7 +5740,7 @@ const Daily = (function(){
   function isOffDay(d){const dw=d.getDay();return dw===0||dw===6||HOLIDAYS.hasOwnProperty(dateStr(d))}
   function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
   // 日報のトーストに効果音を付ける（err=成功失敗の判定がそのまま音に対応）。グローバルtoastをこのIIFE内で包む
-  function toast(msg,err){ if(window.toast)window.toast(msg,err); if(err){sndError();}else{sndOK();} }
+  function toast(msg,err){ showCenter(msg, err?'err':'ok'); if(err){sndError();}else{sndOK();} }
 
   // ===== データ取得 =====
   async function loadStaff(){try{const r=await fetch(API+'?dept=daily&action=staff_for_daily');const j=await r.json();if(j.success)staffList=j.staff||[]}catch(e){}}
