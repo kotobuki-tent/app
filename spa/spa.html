@@ -1442,6 +1442,9 @@ table.jobs tr:last-child td{border-bottom:none}
 .cp-tbl .t-ret{font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
 .cp-tbl .t-now{font-size:13px;font-weight:800;color:var(--orange);background:var(--orange-dim);padding:5px 12px;border-radius:999px}
 .cp-empty{color:var(--text-faint);font-size:14px;padding:24px 2px;text-align:center}
+.card-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);padding:30px 48px;border-radius:18px;font:800 30px/1.4 'Noto Sans JP',sans-serif;color:#fff;background:var(--red);box-shadow:0 16px 48px rgba(0,0,0,.32);z-index:9999;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;text-align:center;max-width:84vw}
+.card-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.card-toast.ok{background:var(--accent)}
 .card-pane .cp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:12px}
 .card-pane .cp-nbtn{display:flex;align-items:center;justify-content:center;padding:20px 8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 16px/1.25 'Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;text-align:center}
 .card-pane .cp-nbtn:hover{border-color:var(--accent);background:var(--accent-dim)}
@@ -2517,6 +2520,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
 <section id="view-card" class="hidden">
   <div class="card-wrap"><div id="cardBody"></div></div>
+  <div id="cardToast" class="card-toast"></div>
 </section>
 
 <section id="view-alcohol" class="hidden">
@@ -6255,10 +6259,12 @@ const Card = (function(){
   function sel(n){ _sel=(_sel===n?'':n); render(); }
   function clearSel(){ _sel=''; render(); }
   function toggleExtra(){ _showExtra=!_showExtra; render(); }
+  // 画面ど真ん中に出す警告（最下部だと気づきにくいため）
+  function ctoast(msg,ok){const t=document.getElementById('cardToast');if(!t)return;t.textContent=msg;t.className='card-toast show'+(ok?' ok':'');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2200);}
   function out(){
     const name=_sel;
-    if(!name){toast('持ち出す人を選んでください');return;}
-    if(openLoan()){toast('まだ返却されていません',false);return;}
+    if(!name){ctoast('持ち出す人を選んでください');return;}
+    if(openLoan()){ctoast('まだ返却されていません');return;}
     if(guard())return;
     fire({action:'out',name});
     loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:''});
@@ -6266,7 +6272,7 @@ const Card = (function(){
     render(); setTimeout(loadAll,3000);
   }
   function ret(){
-    const open=openLoan(); if(!open){toast('持ち出し中の記録がありません',false);return;}
+    const open=openLoan(); if(!open){ctoast('持ち出し中の記録がありません');return;}
     if(guard())return;
     fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id});
     open.return_at=nowStr();
@@ -7141,6 +7147,7 @@ function renderMachines(){
   ).join('');
 }
 function selectMachine(id){
+  if(machine===id){ machine=null;machineType=null;itemState={};$('fk_afterMachine').classList.add('hide');renderMachines();return; }  // 同じ機体を再タップで選択解除
   const m=MACHINES.find(x=>x.id===id);if(!m)return;
   machine=m.id;machineType=m.type;
   itemState={};
