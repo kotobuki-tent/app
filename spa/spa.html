@@ -6206,7 +6206,24 @@ const Card = (function(){
   const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const DOW=['日','月','火','水','木','金','土'];
-  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel='', _showExtra=false;
+  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel='', _showExtra=false, _actx=null;
+  // 返却時のチャイム（Web Audio・音源ファイル不要。返却ボタンのタップが起点なのでiOSの音声制約もクリア）
+  function chime(){
+    try{
+      _actx=_actx||new (window.AudioContext||window.webkitAudioContext)();
+      const ctx=_actx; if(ctx.state==='suspended')ctx.resume();
+      const now=ctx.currentTime;
+      [[0,988],[0.13,1319]].forEach(function(p){
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.type='sine'; o.frequency.value=p[1]; o.connect(g); g.connect(ctx.destination);
+        const s=now+p[0];
+        g.gain.setValueAtTime(0.0001,s);
+        g.gain.exponentialRampToValueAtTime(0.22,s+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001,s+0.35);
+        o.start(s); o.stop(s+0.37);
+      });
+    }catch(e){}
+  }
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   function pad(n){ return String(n).padStart(2,'0'); }
   function ymd(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
@@ -6279,6 +6296,7 @@ const Card = (function(){
     fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id});
     open.return_at=nowStr();
     _sel='';                 // 返却後は持ち出す人の選択を解除
+    chime();
     ctoast('<span class="ct-h">返却しました</span><br>伝票に氏名・用途を明記の上、経理まで速やかに提出してください',true,5000,true);
     render(); setTimeout(loadAll,3000);
   }
