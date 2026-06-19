@@ -6921,6 +6921,7 @@ function renderDrivers(){
 function toggleExtra(){showExtra=!showExtra;renderDrivers();}
 
 function selectDriver(name){
+  if(selDriver===name){ clearSel(); return; }  // 同じ氏名を再タップで選択解除
   selDriver=name;
   $('selbar').classList.remove('none');
   $('selWho').textContent=name;
@@ -7161,7 +7162,7 @@ function renderInspectors(){
   $('fk_inspGrid').innerHTML=html;
 }
 function toggleExtraIns(){showExtraIns=!showExtraIns;renderInspectors();}
-function selectInspector(n){inspector=n;renderInspectors();}
+function selectInspector(n){inspector=(inspector===n?null:n);renderInspectors();}
 
 function renderChecklist(){
   const items=ITEMS.filter(it=>it.t==='all'||it.t===machineType);
