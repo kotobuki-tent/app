@@ -5731,6 +5731,8 @@ const Daily = (function(){
 
   function isOffDay(d){const dw=d.getDay();return dw===0||dw===6||HOLIDAYS.hasOwnProperty(dateStr(d))}
   function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+  // 日報のトーストに効果音を付ける（err=成功失敗の判定がそのまま音に対応）。グローバルtoastをこのIIFE内で包む
+  function toast(msg,err){ if(window.toast)window.toast(msg,err); if(err){sndError();}else{sndOK();} }
 
   // ===== データ取得 =====
   async function loadStaff(){try{const r=await fetch(API+'?dept=daily&action=staff_for_daily');const j=await r.json();if(j.success)staffList=j.staff||[]}catch(e){}}
