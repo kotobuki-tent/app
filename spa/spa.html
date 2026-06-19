@@ -1445,6 +1445,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);padding:30px 48px;border-radius:18px;font:800 30px/1.4 'Noto Sans JP',sans-serif;color:#fff;background:var(--red);box-shadow:0 16px 48px rgba(0,0,0,.32);z-index:9999;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;text-align:center;max-width:84vw}
 .card-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .card-toast.ok{background:var(--accent)}
+.card-toast.wide{width:600px;font-size:26px;line-height:1.55}
 .card-pane .cp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:12px}
 .card-pane .cp-nbtn{display:flex;align-items:center;justify-content:center;padding:20px 8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 16px/1.25 'Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;text-align:center}
 .card-pane .cp-nbtn:hover{border-color:var(--accent);background:var(--accent-dim)}
@@ -6260,7 +6261,7 @@ const Card = (function(){
   function clearSel(){ _sel=''; render(); }
   function toggleExtra(){ _showExtra=!_showExtra; render(); }
   // 画面ど真ん中に出す警告（最下部だと気づきにくいため）
-  function ctoast(msg,ok){const t=document.getElementById('cardToast');if(!t)return;t.textContent=msg;t.className='card-toast show'+(ok?' ok':'');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2200);}
+  function ctoast(msg,ok,ms,wide){const t=document.getElementById('cardToast');if(!t)return;t.innerHTML=msg;t.className='card-toast show'+(ok?' ok':'')+(wide?' wide':'');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},ms||2200);}
   function out(){
     const name=_sel;
     if(!name){ctoast('持ち出す人を選んでください');return;}
@@ -6277,6 +6278,7 @@ const Card = (function(){
     fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id});
     open.return_at=nowStr();
     _sel='';                 // 返却後は持ち出す人の選択を解除
+    ctoast('返却しました<br>伝票に氏名・用途を明記の上、経理まで速やかに提出してください',true,5000,true);
     render(); setTimeout(loadAll,3000);
   }
   return { loadAll, render, out, ret, sel, clearSel, toggleExtra, prevWeek, nextWeek, thisWeek };
