@@ -24,20 +24,20 @@ There is no build or test tooling. To work here:
 1. **`spa/spa.html`** — the **live product** and essentially the whole app. A single ~470KB file containing all 12 screens. Almost every change targets this file.
 2. **`register.html`** — the only other live page: an independent mobile-only product-add tool (`dept=inventory`). Kept deliberately; not part of the SPA, distributed by its own URL/home-screen icon.
 
-The legacy standalone MPA pages (`index/project/sales/inventory/vehicle/overtime/labor/daily/portal.html`) and the old standalone `alcohol.html` / `forklift.html` / `safety.html` were **deleted** — the app is now pure-SPA. アルコールチェック (`dept=alcohol`, sheet `alcohol_checks`, nav 点呼) and フォークリフト点検 (`dept=forklift`, sheet `forklift_checks`, nav リフト) are now SPA screens (IIFEs `Alc`/`Fork`). Kiosk tablets open them via `spa/spa.html?go=alcohol|forklift&mode=full`. `sw.js` `PRECACHE_URLS` now lists only `register.html`/`manifest.json`/icons.
+The legacy standalone MPA pages (`index/project/sales/inventory/vehicle/overtime/labor/daily/portal.html`) and the old standalone `alcohol.html` / `forklift.html` / `safety.html` were **deleted** — the app is now pure-SPA. アルコールチェック (`dept=alcohol`, sheet `alcohol_checks`, nav 点呼), フォークリフト点検 (`dept=forklift`, sheet `forklift_checks`, nav リフト), and いないカード＝ホームセンター売掛カードの持ち出し/返却 (`dept=card`, sheet `card_loans`, nav カード, IIFE `Card`) are now SPA screens (IIFEs `Alc`/`Fork`/`Card`). Kiosk tablets (事務所前の27インチMegPad・縦置き運用) open them via `spa/spa.html?go=alcohol|forklift|card&mode=kiosk` (点検モード). `sw.js` `PRECACHE_URLS` now lists only `register.html`/`manifest.json`/icons.
 
 ### SPA structure (`spa/spa.html`)
 
-Each screen is a **self-contained IIFE namespace** (`Prod`, `Proj`, `Inv`, `Veh`, `Sales`, `Labor`, `Daily`, `Ot`, `Portal`, `Cases`, `Alc`, `Fork`) with private state and a uniform public surface: **`loadAll()`, `render()`, `init()`** plus whatever `onclick` handlers it exposes.
+Each screen is a **self-contained IIFE namespace** (`Prod`, `Proj`, `Inv`, `Veh`, `Sales`, `Labor`, `Daily`, `Ot`, `Portal`, `Cases`, `Alc`, `Fork`, `Card`) with private state and a uniform public surface: **`loadAll()`, `render()`, `init()`** plus whatever `onclick` handlers it exposes.
 
 The **`App` registry** (search `const App = {`) is the orchestrator:
-- `App.REG` lists every app as `{key, ns:()=>Namespace, section:'view-x', nav:'navX', zone}`. Registering a new screen = add one row here. `zone` (`field`/`shared`/`office`) drives 端末モード: `App.mode` (`floor`/`full`, from localStorage or URL `?mode=`) hides `office` zones in floor mode. `?go=<key>` deep-links a screen on load.
+- `App.REG` lists every app as `{key, ns:()=>Namespace, section:'view-x', nav:'navX', zone}`. Registering a new screen = add one row here. `zone` (`field`/`shared`/`office`) drives 端末モード: `App.mode` (`floor`/`full`/`kiosk`, from localStorage or URL `?mode=`) — `floor` hides `office` zones, `kiosk` (点検モード, 事務所前タブレット用) shows only `KIOSK_KEYS`=日報/点呼/リフト/カード via the `data-kiosk` attribute. `?go=<key>` deep-links a screen on load.
 - `App.nav(name)` toggles section `display` and nav `.on` state — **no page reload, ~0s switching**. Lazy-loads data on first visit only (`_loaded`/`_loading` guards).
 - Auto-refresh: `setInterval` every 5 min, guarded by `document.visibilityState==='visible'` and `_bgBusy`; **only the currently-visible app's `loadAll()` runs** (never hits GAS for background apps).
 
 ### Backend: one GAS endpoint, `?dept=` routing
 
-Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every request carries a `dept` param routing to a department handler (`production`/`project`/`sales`/`inventory`/`overtime`/`vehicle`/`daily`/`labor`/`attendance`/`drive`/`factory`/`alcohol`/`forklift`/`cases`). Each IIFE has its **own** `apiGet`/`apiPost`/`fireAndForget` with its `dept` baked in — they are intentionally duplicated per-namespace, not shared.
+Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every request carries a `dept` param routing to a department handler (`production`/`project`/`sales`/`inventory`/`overtime`/`vehicle`/`daily`/`labor`/`attendance`/`drive`/`factory`/`alcohol`/`forklift`/`cases`/`card`). Each IIFE has its **own** `apiGet`/`apiPost`/`fireAndForget` with its `dept` baked in — they are intentionally duplicated per-namespace, not shared.
 
 - **Reads**: `fetch(API+'?dept=...&action=...')` → JSON.
 - **Writes**: `no-cors` POST (`fireAndForget`) — response is opaque, so writes use **optimistic update**: mutate the local array immediately, then `setTimeout(loadAll, 3000)` to reconcile with GAS's real ID assignment. `mergeWithTmp(...)` reconciles optimistic temp rows against server data by a composite key.

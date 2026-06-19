@@ -7,11 +7,11 @@
 
 https://kotobuki-tent.github.io/app/spa/spa.html
 
-ブラウザのお気に入りに登録するか、ホーム画面に追加してアプリのように開く。12画面（ポータル＋11アプリ）をヘッダーのタブで切り替える。
+ブラウザのお気に入りに登録するか、ホーム画面に追加してアプリのように開く。13画面（ポータル＋12アプリ）をヘッダーのタブで切り替える。
 
 ## 画面構成
 
-SPA本体（`spa/spa.html`）に12画面を統合。1ファイルで全機能完結、画面間の切り替えはページ遷移なし。
+SPA本体（`spa/spa.html`）に13画面を統合。1ファイルで全機能完結、画面間の切り替えはページ遷移なし。
 
 | 画面 | 役割 |
 |---|---|
@@ -20,6 +20,7 @@ SPA本体（`spa/spa.html`）に12画面を統合。1ファイルで全機能完
 | 時間外 | 残業申告・休日出勤希望・出勤管理 |
 | 点呼 | アルコールチェック記録（安全運転管理者制度対応） |
 | リフト | フォークリフト始業前点検 |
+| カード | ホームセンター売掛カードの持ち出し/返却記録（いないカード） |
 | 案件 | 案件を1回登録して生産/企画制作/販売へ振り分け・伝票一括・状態連動 |
 | 生産 | 工場ボード・出荷済・管理・製作図連携 |
 | 企画制作 | ガントチャート・車両バッティング・貸出期間表示・管理 |
@@ -28,11 +29,11 @@ SPA本体（`spa/spa.html`）に12画面を統合。1ファイルで全機能完
 | 在庫 | 商品台帳・貸出/予約・メンテ・在庫確認 |
 | 車両 | 車両台帳・寸法・期限アラート |
 
-旧来の単独HTML（各画面のMPA版・ACFL単独アプリ等12ファイル）は廃止し、純粋にSPAへ一本化済み。残る単独ページは `register.html`（スマホ特化の商品追加専用ツール）のみ。アルコールチェック（点呼）・フォークリフト点検（リフト）はSPAに内包され、据え置きタブレットへは `?go=alcohol` / `?go=forklift` のディープリンク＋`?mode=full` で配布する。
+旧来の単独HTML（各画面のMPA版・ACFL単独アプリ等12ファイル）は廃止し、純粋にSPAへ一本化済み。残る単独ページは `register.html`（スマホ特化の商品追加専用ツール）のみ。アルコールチェック（点呼）・フォークリフト点検（リフト）・いないカード（カード）はSPAに内包され、据え置きタブレットへは `?go=alcohol` / `?go=forklift` / `?go=card` のディープリンク＋`?mode=kiosk`（または `full`）で配布する。
 
-ヘッダー：`HOME｜日報｜時間外 │ 点呼 リフト  [spacer]  案件 │ 生産 企画制作 販売 │ 工数 │ 在庫 │ 車両  [↻更新]`
+ヘッダー：`HOME｜日報｜時間外 │ 点呼 リフト │ カード  [spacer]  案件 │ 生産 企画制作 販売 │ 工数 │ 在庫 │ 車両  [↻更新]`
 
-端末モード：`現場`（field）/`フル`（full）を localStorage または URL `?mode=floor|full` で切替。現場モードでは事務所向け画面（点呼/リフト/案件/販売/工数/在庫/車両）を隠し、工場の据え置きタブレット等で現場系（日報/時間外/生産/企画制作）だけを出す。
+端末モード：`現場`（field）/`フル`（full）/`点検`（kiosk）を localStorage または URL `?mode=floor|full|kiosk` で切替。現場モードは事務所向け画面（点呼/リフト/カード/案件/販売/工数/在庫/車両）を隠し現場系（日報/時間外/生産/企画制作）だけを出す。点検モードは事務所前タブレット（27インチMegPad・縦置き運用）向けで、日報/点呼/リフト/カードのみ表示する。各画面の zone（field/shared/office）でモードごとの表示可否を制御。
 
 ## スプレッドシート構成
 
@@ -45,7 +46,7 @@ SPA本体（`spa/spa.html`）に12画面を統合。1ファイルで全機能完
 | `inventory` | 商品マスタ（カテゴリ・商品名・保有数） |
 | `rentals` | 貸出/予約台帳（ステータス・期間・数量） |
 | `vehicles` | 車両台帳。車種(name)・名称(type)・ナンバー(plate)・寸法(length/width/height＝全長/全幅/全高 mm)・車検/自賠責/任意保険の満了日・備考。GASはヘッダー名で汎用read/write（列追加で自動対応）。旧フォームのusage/status/oil_*/tire_*/current_km列は残存するが現フォーム未使用 |
-| `staff` | スタッフ名簿（employee_no・name・name_kana・dept・position＋各画面の表示フラグ in_overtime / in_attendance / in_daily / in_factory_order / in_factory_receive） |
+| `staff` | スタッフ名簿（employee_no・name・name_kana・dept・position＋各画面の表示フラグ in_overtime / in_attendance / in_daily / in_factory_order / in_factory_receive / in_card） |
 | `overtime` | 時間外申告データ |
 | `ot_requests` | 休日出勤希望データ |
 | `daily_reports` | 日報データ（date・employee_no・project・work・minutes） |
@@ -55,6 +56,7 @@ SPA本体（`spa/spa.html`）に12画面を統合。1ファイルで全機能完
 | `daily_reports_YYYY年度` | 日報の年度アーカイブ（決算後に手動退避。例: `daily_reports_2024年度`） |
 | `alcohol_checks` | アルコールチェック記録（道交法・安全運転管理者制度）。運転者×日×運転前/後。確認者/車両/検知器使用/対面区分/酒気帯び有無/測定値(mg/L)/指示事項。SPAの「点呼」画面から記録、1年保存 |
 | `forklift_checks` | フォークリフト始業前点検（機体×日）。点検者/判定(良/否)/否の項目JSON(ng)/備考。SPAの「リフト」画面から記録。既定すべて良・否のみ記録、機種(エンジン/バッテリー)で項目出し分け |
+| `card_loans` | いないカード（ホームセンター売掛カード）の持ち出し/返却ログ。name・out_at・return_at。SPAの「カード」画面から記録。氏名は staff の `in_card`=TRUE で絞り込み |
 
 ## バックアップ・運用（GAS）
 
@@ -100,6 +102,14 @@ GAS（`Code.gs`）に運用系の関数を同梱。**ソースの正本は iClou
 - 機体×日付の始業前点検記録。点検者・判定（良/否）・否の項目・備考
 - 既定はすべて「良」、否のみ記録。機種（エンジン/バッテリー）で点検項目を出し分け
 - 据え置きタブレット運用（倉庫）。記録は `forklift_checks` シートに保存
+
+### カード（いないカード）
+
+- ホームセンターの売掛カード1枚の持ち出し/返却を記録（誰が今カードを持っているか＝犯人探し用）
+- 氏名を選んで持ち出し／返却、日時は自動。氏名は `in_card`=TRUE のスタッフに絞り込み
+- 左に氏名選択＋持ち出し/返却、右に週ごとの持ち出し記録（持ち出し中バッジ）。記録は `card_loans` シートに保存
+- 返却すると「伝票に氏名・用途を明記し経理へ提出」のリマインダを画面中央に表示＋チャイム
+- 据え置きタブレット運用（事務所前・点検モード）
 
 ### 案件
 
@@ -164,11 +174,11 @@ GAS（`Code.gs`）に運用系の関数を同梱。**ソースの正本は iClou
 
 ## 技術
 
-- **SPA構成**：HTML / CSS / JavaScript（フレームワークなし）、`spa/spa.html` 1ファイルに12画面のIIFE名前空間を統合、Appレジストリ（key/ns/section/nav/zone）で画面切替・遅延ロード・自動更新・端末モードを管理
+- **SPA構成**：HTML / CSS / JavaScript（フレームワークなし）、`spa/spa.html` 1ファイルに13画面のIIFE名前空間を統合、Appレジストリ（key/ns/section/nav/zone）で画面切替・遅延ロード・自動更新・端末モードを管理
 - **画面切替**：ページ遷移なし、初回ロード後は2回目以降ほぼ0秒で切替
 - **PWA**：`spa/manifest.json`＋PWA用メタタグでホーム画面アイコン化、`display:standalone`で全画面表示
 - **キャッシュ戦略**：sw.js の `NO_CACHE_PATTERNS` に `/spa/` を含め、SPAはService Workerのキャッシュ対象外。常にネットワークから最新を取得（CACHE_VERSION管理不要）。純SPA化に伴いプリキャッシュ対象は `register.html`／`manifest.json`／アイコンのみ
-- **Google Apps Script**：API v7、deptパラメータで部門振り分け（production / project / sales / inventory / overtime / vehicle / daily / labor / attendance / drive / factory / alcohol / forklift / cases）。GASソースの正本は `Code.gs`（iCloud `♿️SEQUENCE LAB/`）。工数アーカイブは dept=labor の POST（archive/unarchive）で `labor_archived` を切替
+- **Google Apps Script**：API v7、deptパラメータで部門振り分け（production / project / sales / inventory / overtime / vehicle / daily / labor / attendance / drive / factory / alcohol / forklift / cases / card）。GASソースの正本は `Code.gs`（iCloud `♿️SEQUENCE LAB/`）。工数アーカイブは dept=labor の POST（archive/unarchive）で `labor_archived` を切替
 - **Google スプレッドシート**：データベース
 - **Google Drive**：製作図ファイル連携、フォルダID `16iDJrBWXdbIHq-aqJVgHZpA9tRGXMUwc`
 - **GitHub Pages**：ホスティング
@@ -179,10 +189,12 @@ GAS（`Code.gs`）に運用系の関数を同梱。**ソースの正本は iClou
 - **並行実行競合対策**：attendanceはLockServiceでシリアライズ、cleanupはclearContent + setValues一括書き込みで高速化
 - **スマホ対応**：全画面で `max-width:768px` メディアクエリ対応、テーブルは `:nth-of-type` + `::before` 疑似要素でカード型に変換、検索バーや日付バーをモバイル用に再配置
 - **縦画面＝モバイル表示**：モバイル用CSS（`@media(max-width:480px)` 系）の条件に `(orientation:portrait)` を併記。1F工場の27インチ縦置きタブレットなど**幅が広くても縦向きならカード表示**になり、管理画面の横スクロールを解消。2F横置き・事務所PC（横向き）はテーブルのまま不変
+- **キオスク3画面（点呼/リフト/カード）の共通UI**：白基調の左右2ペイン（左=氏名選択＋操作、右=本日の記録）。氏名ボタンは横4列、再タップで選択解除。横置き(27インチ)は固定高で左右ペインが画面いっぱい・内部スクロール、縦置き(事務所前タブレット1080×1920)はペイン縦積み＋入力ボタン控えめ・記録大きめに最適化（`@media(orientation:portrait) and (min-width:900px)`）
+- **効果音／中央トースト**：キオスク操作に Web Audio の効果音（成功＝上昇2音／重大＝酒気帯び有・否ありの警告音／エラー＝下降音、音源ファイル不要・タップ起点でiOS制約クリア）。トーストは全アプリ画面中央表示（最下部だと記録成功に気づかず二重登録するため）。事務系は音なし・中央表示のみ
 - **iOSスクロール対策**：`html`/`body` に `overscroll-behavior-y:none` でブラウザのpull-to-refreshを抑止、`scrollbar-gutter:stable` でWindowsのスクロールバー幅起因の横ズレ対策
 - **DOMフィルター方式の検索**：全タブ対応、input focus維持
 - **OGP対応**：`og:title`・`og:description`・`og:image`・`twitter:card` 等のメタタグを実装、他サービスでURL共有された時のプレビュー表示を制御
-- **favicon**：インラインSVG漢字アイコン
+- **アイコン**：favicon はインラインSVGの「KT」レターマーク、アプリアイコン（apple-touch-icon / icon-192 / icon-512）は「KOTOBUKI / TENT」2段を黒地に配したPNG
 
 ## Credit
 
