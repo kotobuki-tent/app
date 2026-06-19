@@ -3003,7 +3003,7 @@ function initMobileFilters(){
   }).observe(document.body,{childList:true,subtree:true});
 }
 
-function toast(msg,err){const t=$('toast');if(!t)return;t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(t._tm);t._tm=setTimeout(()=>t.className='toast',2500);}
+function toast(msg,err){ showCenter(msg, err?'err':'ok'); }   // 共通トーストも画面中央に（最下部だと登録成功に気づかず二重登録が起きるため）
 
 // ===== 効果音（キオスク用・Web Audio／音源ファイル不要・ユーザータップ起点でiOS制約クリア） =====
 let _sndCtx=null;
