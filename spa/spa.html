@@ -1489,25 +1489,28 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-card .card-panes{height:calc(100dvh - 48px - 40px);grid-template-rows:minmax(0,1fr);align-items:stretch}
   #view-card .card-pane{min-height:0;overflow-y:auto}
 }
-/* 縦画面キオスク（事務所前タブレット 1080×1920）：入力ボタンは控えめに揃え、本日の記録を大きく一目瞭然に */
+/* 縦画面キオスク（事務所前タブレット 1080×1920）：省スペース優先。余白・高さを詰めて記録を上に出す */
 @media (orientation:portrait) and (min-width:900px){
-  html #view-alcohol .kiosk, html #view-forklift .kiosk{gap:20px;padding:22px}
-  html .card-wrap{padding:22px}
-  html .card-panes{gap:20px}
-  html #view-alcohol .pane h2, html #view-forklift .pane h2, html .card-pane .cp-title{font-size:19px}
-  /* 選択バナー・氏名ボタン：ほどほどに */
-  html #view-alcohol .selbar, html .card-pane .cp-selbar{height:88px}
-  html #view-alcohol .selbar .who, html .card-pane .cp-sel-who{font-size:34px}
-  html #view-alcohol .namebtn, html #view-forklift .namebtn, html .card-pane .cp-nbtn{font-size:18px;padding:20px 8px}
-  html #view-forklift .inspgrid .namebtn{padding:20px 8px}
-  html #view-alcohol .ngrid, html #view-forklift .ngrid, html #view-forklift .inspgrid, html .card-pane .cp-grid{gap:12px}
-  html #view-alcohol .alc2 button{font-size:18px;padding:14px 30px}
-  /* 記録ボタンは氏名ボタンとの差を詰める（でかすぎ解消） */
-  html #view-alcohol .commit{gap:14px;margin-top:14px}
-  html #view-alcohol .commit button{height:118px;font-size:32px;border-radius:16px}
-  html #view-alcohol .commit button small{font-size:13px}
-  html #view-forklift .btn-rec{height:96px;font-size:30px}
-  html .card-pane .cp-btn{height:118px;font-size:32px;border-radius:16px}
+  html #view-alcohol .kiosk, html #view-forklift .kiosk{gap:14px;padding:16px}
+  html .card-wrap{padding:16px}
+  html .card-panes{gap:14px}
+  html #view-alcohol .pane, html #view-forklift .pane, html .card-pane{padding-bottom:14px}
+  html #view-alcohol .pane h2, html #view-forklift .pane h2, html .card-pane .cp-title{font-size:19px;padding-top:14px;padding-bottom:10px;margin-bottom:12px}
+  /* 選択バナー・氏名ボタン：詰める */
+  html #view-alcohol .selbar, html .card-pane .cp-selbar{height:64px;margin-bottom:12px}
+  html #view-alcohol .selbar .who, html .card-pane .cp-sel-who{font-size:30px}
+  html #view-alcohol .namebtn, html #view-forklift .namebtn, html .card-pane .cp-nbtn{font-size:18px;padding:12px 8px}
+  html #view-forklift .inspgrid .namebtn{padding:12px 8px}
+  html #view-alcohol .ngrid, html #view-forklift .ngrid, html #view-forklift .inspgrid, html .card-pane .cp-grid{gap:9px}
+  html #view-alcohol .fldrow{margin:12px 0}
+  html #view-alcohol .ctl{padding-top:12px}
+  html #view-alcohol .alc2 button{font-size:18px;padding:11px 28px}
+  /* 記録ボタン：高さを詰める */
+  html #view-alcohol .commit{gap:12px;margin-top:10px}
+  html #view-alcohol .commit button{height:92px;font-size:30px;border-radius:14px}
+  html #view-alcohol .commit button small{font-size:12px}
+  html #view-forklift .btn-rec{height:84px;font-size:28px;margin-top:10px}
+  html .card-pane .cp-btn{height:96px;font-size:30px;border-radius:14px}
   /* 本日の記録：縦でやや控えめに（実機で少し大きかったため） */
   html #view-alcohol .mtx td{padding:11px 8px}
   html #view-alcohol .mtx td.nm{font-size:19px}
