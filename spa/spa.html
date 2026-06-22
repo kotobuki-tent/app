@@ -2218,8 +2218,12 @@ table.jobs tr:last-child td{border-bottom:none}
       </div>
       <div class="mo-row full">
         <div class="mo-field"><label>ステータス</label>
-          <input type="hidden" id="f_status">
-          <div class="st-opts open sales-st" id="salesStOpts"></div>
+          <select id="f_status">
+            <option value="見積中">見積中</option><option value="受注">受注</option>
+            <option value="発注済">発注済</option><option value="入荷済">入荷済</option>
+            <option value="納品済">納品済</option>
+            <option value="見送り">見送り</option>
+          </select>
         </div>
       </div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="f_notes" placeholder="値引き・運賃・特記事項など"></textarea></div></div>
@@ -5462,7 +5466,7 @@ const Sales = (function(){
     h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
     h+=`<button class="st-toggle" id="salesStToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
     h+='<div class="st-opts" id="salesStOpts">';
-    ACTIVE_ST.forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${esc(s)}">${esc(s)}</button>`});
+    ALL_ST.forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${esc(s)}">${esc(s)}</button>`});
     h+='</div></div>';
     $('viewContent').innerHTML=h;
     const stgl=$('salesStToggle'),sopts=$('salesStOpts');
@@ -5477,9 +5481,6 @@ const Sales = (function(){
   function closeView(){$('viewBg').classList.remove('show')}
 
   // ===== 編集モーダル =====
-  const SALES_ST=['見積中','受注','発注済','入荷済','納品済','見送り'];
-  function renderSalesSt(){ const el=$('salesStOpts'); if(!el)return; const cur=$('f_status').value; el.innerHTML=SALES_ST.map(s=>`<button type="button" class="st-opt${cur===s?' on':''}" data-st="${s}" onclick="Sales.setSalesStatus('${s}')">${s}</button>`).join(''); }
-  function setSalesStatus(s){ $('f_status').value=s; renderSalesSt(); }
   function openMo(id){
     const isEdit=!!id;let e={};
     if(isEdit)e=allEntries.find(x=>String(x.id)===String(id))||{};
@@ -5496,7 +5497,6 @@ const Sales = (function(){
     $('f_created_at').value=isEdit?fmtDate(e.created_at):fmtDate(new Date());
     $('f_deadline').value=isEdit?fmtDate(e.deadline):'';
     $('f_status').value=isEdit?(e.status||'見積中'):'見積中';
-    renderSalesSt();
     $('f_notes').value=isEdit?(e.notes||''):'';
     refreshDatalists();
     const isArchS=isEdit&&String(e.archived||'').toUpperCase()==='TRUE';
@@ -5578,7 +5578,7 @@ const Sales = (function(){
   return {
     loadAll, init,
     setView, setBoardFilter, openSlog, closeSlog, clearSlog,
-    openView, closeView, openMo, closeMo, saveEntry, setSalesStatus,
+    openView, closeView, openMo, closeMo, saveEntry,
     changeStatus, toggleInvoiced, delEntry, unifiedSearch,
     archiveSales, unarchiveSales
   };
