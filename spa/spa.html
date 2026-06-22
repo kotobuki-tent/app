@@ -6584,7 +6584,7 @@ const Cases = (function(){
 
   // ===== 案件タブ：登録 / 一覧 / 完了 / アーカイブ / 管理 =====
   function render(){
-    const tabs=[['list','一覧'],['done','完了'],['arch','アーカイブ'],['manage','管理']];
+    const tabs=[['list','一覧'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
     const bar=`<div class="sub-tabs">`
       +`<span class="subtab-date">${dateJP(today)}</span>`
       +tabs.map(([k,l])=>`<button class="sub-tab${_tab===k?' on':''}" onclick="Cases.tab('${k}')">${l}</button>`).join('')
@@ -6602,7 +6602,8 @@ const Cases = (function(){
     const pane=$('casesPane');
     let rows=_cases.slice();
     if(t==='list') rows=rows.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
-    else if(t==='done') rows=rows.filter(c=>!_arch(c.archived)&&(c.status==='完了'||c.status==='見送り'));
+    else if(t==='done') rows=rows.filter(c=>!_arch(c.archived)&&c.status==='完了');
+    else if(t==='kill') rows=rows.filter(c=>!_arch(c.archived)&&c.status==='見送り');
     else if(t==='arch') rows=rows.filter(c=>_arch(c.archived));
     if(t==='manage'){
       if(_stf==='__arch') rows=rows.filter(c=>_arch(c.archived));
