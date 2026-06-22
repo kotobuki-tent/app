@@ -2637,6 +2637,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol .rc-del{position:absolute;top:5px;right:6px;background:var(--surface);border:1px solid var(--border);color:var(--text-faint);font:600 10px/1 'Noto Sans JP';padding:3px 7px;border-radius:6px;cursor:pointer}
 #view-alcohol .rc-del:hover{border-color:var(--red);color:var(--red)}
 #view-alcohol .rc-chk{font-size:12px;color:var(--text-dim);font-weight:600;margin-top:9px}
+#view-alcohol .almgr{margin-left:auto;font-size:13px;font-weight:700;color:var(--text-dim)}
 #view-alcohol .mtx{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:15px}
 #view-alcohol .mtx th{color:var(--text-faint);font-weight:800;font-size:12px;text-align:center;padding:0 8px 4px;letter-spacing:.05em}
 #view-alcohol .mtx th:first-child{text-align:left;padding-left:16px}
@@ -2743,7 +2744,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
   <!-- ===== 右：本日の状況 ===== -->
   <div class="pane">
-    <h2>本日の点呼状況 <span class="daydate" id="alDayLabel"></span></h2>
+    <h2>本日の点呼状況 <span class="daydate" id="alDayLabel"></span><span class="almgr" id="alMgrLabel"></span></h2>
     <input type="hidden" id="f_date">
     <div id="dayMtx"><div class="empty">読み込み中...</div></div>
 
@@ -6953,6 +6954,7 @@ function fillSelect(sel,arr,blank){const v=sel.value;sel.innerHTML=(blank?'<opti
 function applyBoot(b){
   drivers=(b.drivers||[]).map(d=>typeof d==='string'?{name:d,reg:true}:d);
   vehicles=b.vehicles||[]; checkerDefault=b.checker||'杉山雄一';
+  (function(){const el=$('alMgrLabel');if(el)el.textContent='安全運転管理者 '+checkerDefault;})();
   const vehNames=vehicles.map(v=>v.plate?`${v.name}（${v.plate}）`:v.name);
   const checkerOpts=Array.from(new Set([checkerDefault,...drivers.map(d=>d.name)]));
   fillSelect($('f_vehicle'),vehNames,'－');
@@ -7046,11 +7048,10 @@ function renderToday(){
     </div>`;
   };
   el.innerHTML=`<div class="rec-grid">${
-    names.map(n=>{const d=byD[n];const chk=(d['運転前']||d['運転後']||{}).checker||'';
+    names.map(n=>{const d=byD[n];
       return `<div class="rec-card">
         <div class="rc-name">${esc(n)}</div>
         <div class="rc-slots">${slot(d['運転前'],'運転前')}${slot(d['運転後'],'運転後')}</div>
-        ${chk?`<div class="rc-chk">確認者 ${esc(chk)}</div>`:''}
       </div>`;}).join('')
   }</div>`;
 }
