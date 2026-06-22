@@ -2612,6 +2612,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol .commit .post{background:var(--text)}
 #view-alcohol .commit button:active{transform:scale(.97)}
 #view-alcohol .commit button:disabled{background:var(--surface3);color:var(--text-faint);cursor:not-allowed}
+#view-alcohol .daydate{font-size:14px;font-weight:700;color:var(--text-dim);margin-bottom:14px}
 #view-alcohol .dayhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 #view-alcohol .dayhead .field{margin:0;flex:1}
 #view-alcohol .rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
@@ -2738,16 +2739,8 @@ table.jobs tr:last-child td{border-bottom:none}
   <!-- ===== 右：本日の状況 ===== -->
   <div class="pane">
     <h2>本日の点呼状況</h2>
-    <div class="dayhead">
-      <div class="field" style="margin:0;flex:1"><label>表示日</label>
-        <div class="dnav">
-          <button type="button" class="dnav-btn" onclick="Alc.shiftDay(-1)">◀</button>
-          <input type="date" id="f_date" onchange="Alc.loadDay($('f_date').value)">
-          <button type="button" class="dnav-btn" onclick="Alc.shiftDay(1)">▶</button>
-          <button type="button" class="dnav-today" onclick="Alc.goToday()">今日</button>
-        </div>
-      </div>
-    </div>
+    <input type="hidden" id="f_date">
+    <div class="daydate" id="alDayLabel"></div>
     <div id="dayMtx"><div class="empty">読み込み中...</div></div>
 
     <div class="divider"></div>
@@ -2869,6 +2862,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift .btn-rec.ng{background:var(--red)}
 #view-forklift .btn-rec:active{transform:scale(.98)}
 #view-forklift .btn-rec:disabled{background:var(--surface3);color:var(--text-faint);cursor:not-allowed}
+#view-forklift .daydate{font-size:14px;font-weight:700;color:var(--text-dim);margin-bottom:14px}
 #view-forklift .dayhead{margin-bottom:12px}
 #view-forklift .frec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 #view-forklift .frec-card{background:var(--surface2);border:1px solid var(--border-light);border-radius:14px;padding:14px 16px}
@@ -2928,14 +2922,8 @@ table.jobs tr:last-child td{border-bottom:none}
   <!-- 右：当日状況 -->
   <div class="pane">
     <h2>本日の点検</h2>
-    <div class="dayhead"><div class="field" style="margin:0"><label>表示日</label>
-      <div class="dnav">
-        <button type="button" class="dnav-btn" onclick="Fork.shiftDay(-1)">◀</button>
-        <input type="date" id="fk_f_date" onchange="Fork.loadDay($('fk_f_date').value)">
-        <button type="button" class="dnav-btn" onclick="Fork.shiftDay(1)">▶</button>
-        <button type="button" class="dnav-today" onclick="Fork.goToday()">今日</button>
-      </div>
-    </div></div>
+    <input type="hidden" id="fk_f_date">
+    <div class="daydate" id="fkDayLabel"></div>
     <div id="fk_dayList"><div class="empty">読み込み中...</div></div>
     <div class="divider"></div>
     <h2>📤 月次CSV出力（保存用）</h2>
@@ -6965,6 +6953,7 @@ function applyBoot(b){
 }
 async function boot(){
   $('f_date').value=todayStr();
+  (function(){const d=new Date(),dl=$('alDayLabel');if(dl)dl.textContent=`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${'日月火水木金土'[d.getDay()]}）`;})();
   $('f_month').value=monthStr();
   // キャッシュを即適用（名前が一瞬で出る）→ 裏で最新取得して差し替え
   const cached=localStorage.getItem('alc_boot');
@@ -7219,6 +7208,7 @@ function apiPost(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:tru
 
 async function boot(){
   $('fk_f_date').value=todayStr();$('fk_f_month').value=monthStr();
+  (function(){const d=new Date(),dl=$('fkDayLabel');if(dl)dl.textContent=`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${'日月火水木金土'[d.getDay()]}）`;})();
   renderMachines();
   // キャッシュを即適用（点検者が一瞬で出る）→ 裏で最新取得して差し替え
   const cached=localStorage.getItem('fk_boot');
