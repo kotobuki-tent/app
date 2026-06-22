@@ -6569,7 +6569,7 @@ const Cases = (function(){
   const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
   const VH=['load_in','setup','event','teardown','rental_out','rental_return'];
   const CASE_ST=['見積中','受注','完了','見送り'];
-  let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='';
+  let _cases=[], _tab='list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='';
   const C_RANK={production:{'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4},project:{'見積中':0,'受注':1,'準備中':2,'現場中':3,'レンタル中':3,'完了':4},sales:{'見積中':0,'受注':1,'発注済':2,'入荷済':3,'納品済':4}};
   function cRank(k){ return (C_RANK[k.dept]&&C_RANK[k.dept][k.status])!=null?C_RANK[k.dept][k.status]:0; }
   // 案件の進捗＝見送り以外の子のうち一番遅れてる子のランク（全子終端なら4、見積中の子が居れば0）。子なしは-1で末尾へ。
@@ -6630,7 +6630,7 @@ const Cases = (function(){
       const p=_childf.split(':'); return ks.some(k=>k.dept===p[0]&&k.status===p[1]); });
     const q=_q.trim().toLowerCase();
     if(q) rows=rows.filter(c=>['name','client','contact','our_person','order_no','estimate_no'].some(k=>String(c[k]||'').toLowerCase().includes(q)));
-    if(_sort.col==='__prog') rows.sort((a,b)=>(_sort.asc?1:-1)*(caseProgress(a.id)-caseProgress(b.id)));
+    if(_sort.col==='__prog') rows.sort((a,b)=>((_sort.asc?1:-1)*(caseProgress(a.id)-caseProgress(b.id)))||String(b.created_at||'').localeCompare(String(a.created_at||'')));
     else if(_sort.col==='__dept') rows.sort((a,b)=>(_sort.asc?1:-1)*caseDeptKey(a.id).localeCompare(caseDeptKey(b.id)));
     else if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
     else rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
