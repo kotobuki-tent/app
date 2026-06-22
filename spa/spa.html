@@ -1447,6 +1447,17 @@ table.jobs tr:last-child td{border-bottom:none}
 .cp-tbl .t-ret{font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
 .cp-tbl .t-now{font-size:13px;font-weight:800;color:var(--orange);background:var(--orange-dim);padding:5px 12px;border-radius:999px}
 .cp-empty{color:var(--text-faint);font-size:14px;padding:24px 2px;text-align:center}
+.loan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.loan-card{background:var(--surface2);border:1px solid var(--border-light);border-radius:14px;padding:14px 16px}
+.loan-card.out{border-color:var(--orange);background:var(--orange-dim)}
+.loan-card .lc-name{font-size:18px;font-weight:800;color:var(--text);margin-bottom:10px}
+.loan-card .lc-rows{display:flex;flex-direction:column;gap:6px}
+.loan-card .lc-row{display:flex;align-items:center;justify-content:space-between}
+.loan-card .lc-k{font-size:13px;font-weight:700;color:var(--text-dim)}
+.loan-card .lc-v{font-size:18px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.loan-card .lc-v.ret{color:var(--green)}
+.loan-card .lc-now{font-size:13px;font-weight:800;color:var(--orange);background:#fff;padding:5px 12px;border-radius:999px}
+.loan-card .lc-date{font-size:13px;color:var(--text-dim);font-weight:600;margin-top:10px}
 .card-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);padding:30px 48px;border-radius:18px;font:800 30px/1.4 'Noto Sans JP',sans-serif;color:#fff;background:var(--red);box-shadow:0 16px 48px rgba(0,0,0,.32);z-index:9999;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;text-align:center;max-width:84vw}
 .card-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .card-toast.ok{background:var(--accent)}
@@ -2603,6 +2614,23 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol .commit button:disabled{background:var(--surface3);color:var(--text-faint);cursor:not-allowed}
 #view-alcohol .dayhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 #view-alcohol .dayhead .field{margin:0;flex:1}
+#view-alcohol .rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+#view-alcohol .rec-card{background:var(--surface2);border:1px solid var(--border-light);border-radius:14px;padding:14px 16px}
+#view-alcohol .rc-name{font-size:18px;font-weight:800;color:var(--text);margin-bottom:10px}
+#view-alcohol .rc-slots{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#view-alcohol .rc-slot{position:relative;border-radius:10px;padding:10px 8px;min-height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--surface3);cursor:pointer}
+#view-alcohol .rc-slot.ok{background:var(--green-dim,#e6f6ee)}
+#view-alcohol .rc-slot.ng{background:var(--red-dim)}
+#view-alcohol .rc-slot.none{cursor:default}
+#view-alcohol .rc-k{font-size:11px;font-weight:700;color:var(--text-dim);letter-spacing:.03em}
+#view-alcohol .rc-v{font-size:21px;font-weight:800;color:var(--text-faint)}
+#view-alcohol .rc-slot.ok .rc-v{color:var(--green)}
+#view-alcohol .rc-slot.ng .rc-v{color:var(--red)}
+#view-alcohol .rc-st{font-size:11px;font-weight:700;color:var(--text-dim)}
+#view-alcohol .rc-slot.none .rc-st{display:none}
+#view-alcohol .rc-del{position:absolute;top:5px;right:6px;background:var(--surface);border:1px solid var(--border);color:var(--text-faint);font:600 10px/1 'Noto Sans JP';padding:3px 7px;border-radius:6px;cursor:pointer}
+#view-alcohol .rc-del:hover{border-color:var(--red);color:var(--red)}
+#view-alcohol .rc-chk{font-size:12px;color:var(--text-dim);font-weight:600;margin-top:9px}
 #view-alcohol .mtx{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:15px}
 #view-alcohol .mtx th{color:var(--text-faint);font-weight:800;font-size:12px;text-align:center;padding:0 8px 4px;letter-spacing:.05em}
 #view-alcohol .mtx th:first-child{text-align:left;padding-left:16px}
@@ -2842,6 +2870,19 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift .btn-rec:active{transform:scale(.98)}
 #view-forklift .btn-rec:disabled{background:var(--surface3);color:var(--text-faint);cursor:not-allowed}
 #view-forklift .dayhead{margin-bottom:12px}
+#view-forklift .frec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+#view-forklift .frec-card{background:var(--surface2);border:1px solid var(--border-light);border-radius:14px;padding:14px 16px}
+#view-forklift .frec-card.ng{border-color:var(--red);background:var(--red-dim)}
+#view-forklift .frec-card.optimistic{opacity:.65;border-style:dashed}
+#view-forklift .frc-top{display:flex;align-items:center;gap:10px}
+#view-forklift .frc-mc{font-size:18px;font-weight:800;color:var(--text)}
+#view-forklift .frc-jd{font:800 13px/1 'Noto Sans JP';padding:6px 12px;border-radius:20px;white-space:nowrap}
+#view-forklift .frc-jd.ok{background:var(--green-dim,#e6f6ee);color:#0d7a42}
+#view-forklift .frc-jd.ng{background:#fff;color:var(--red)}
+#view-forklift .frc-del{margin-left:auto;background:var(--surface);border:1px solid var(--border);color:var(--text-faint);font:600 11px/1 'Noto Sans JP';padding:6px 9px;border-radius:7px;cursor:pointer}
+#view-forklift .frc-del:hover{border-color:var(--red);color:var(--red)}
+#view-forklift .frc-meta{font-size:14px;color:var(--text-dim);font-weight:600;margin-top:8px}
+#view-forklift .frc-ng{font-size:13px;color:var(--red);font-weight:600;margin-top:8px;line-height:1.5}
 #view-forklift .rec{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface2);border:1px solid var(--border-light);border-radius:12px;margin-bottom:10px}
 #view-forklift .rec.optimistic{opacity:.65;border-style:dashed}
 #view-forklift .rec .mc{font-size:18px;font-weight:800;color:var(--text);flex:0 0 auto}
@@ -6276,14 +6317,20 @@ const Card = (function(){
     h+='<div class="card-pane"><div class="cp-title">持ち出し記録</div>';
     h+=`<div class="wknav"><button class="wk-btn" onclick="Card.prevWeek()">◀</button><span class="wk-label">${lbl(_wk)} 〜 ${lbl(wkEnd)}</span><button class="wk-btn" onclick="Card.nextWeek()">▶</button><button class="wk-today" onclick="Card.thisWeek()">今週</button></div>`;
     if(inWk.length){
-      h+='<table class="cp-tbl"><thead><tr><th>日付</th><th>氏名</th><th>持ち出し</th><th>返却</th></tr></thead><tbody>';
+      h+='<div class="loan-grid">';
       inWk.forEach(l=>{
         const op=parseTs(l.out_at), rp=l.return_at?parseTs(l.return_at):null;
         const dd=new Date(op.date+'T00:00:00');
-        const ret=rp?`<span class="t-ret">${rp.hm}</span>`:'<span class="t-now">持ち出し中</span>';
-        h+=`<tr><td class="t-day">${lbl(dd)}</td><td class="t-nm">${esc(l.name||'')}</td><td class="t-out">${op?op.hm:''}</td><td>${ret}</td></tr>`;
+        const out=!rp;
+        const ret=rp?`<span class="lc-v ret">${rp.hm}</span>`:'<span class="lc-now">持ち出し中</span>';
+        h+=`<div class="loan-card${out?' out':''}">`
+          +`<div class="lc-name">${esc(l.name||'')}</div>`
+          +`<div class="lc-rows"><div class="lc-row"><span class="lc-k">持ち出し</span><span class="lc-v">${op?op.hm:''}</span></div>`
+          +`<div class="lc-row"><span class="lc-k">返却</span>${ret}</div></div>`
+          +`<div class="lc-date">${lbl(dd)}</div>`
+          +`</div>`;
       });
-      h+='</tbody></table>';
+      h+='</div>';
     }else{
       h+='<div class="cp-empty">この週の記録はありません</div>';
     }
@@ -6988,18 +7035,24 @@ function renderToday(){
   // 新しい順：各運転者の最新記録時刻（運転前/後のうち遅いほう）で降順
   const latestOf=n=>{const d=byD[n];let t='';['運転前','運転後'].forEach(ph=>{const r=d[ph];if(r){const tt=fmtTime(r.time)||'';if(tt>t)t=tt;}});return t;};
   const names=Object.keys(byD).sort((a,b)=>latestOf(b).localeCompare(latestOf(a)));
-  const cell=r=>{
-    if(!r)return '<td class="cell-none">—</td>';
+  const slot=(r,label)=>{
+    if(!r)return `<div class="rc-slot none"><span class="rc-k">${label}</span><span class="rc-v">—</span></div>`;
     const ng=r.alcohol==='有';
-    return `<td class="cell-done ${ng?'ng':'ok'}">
-      <span class="ct" onclick="Alc.openEdit('${r.id}')"><span class="al-tm">${esc(fmtTime(r.time)||'✓')}</span><span class="al-st">酒気${esc(r.alcohol||'無')}</span></span>
-      <button class="celldel" onclick="Alc.delById('${r.id}')">取消</button>
-    </td>`;
+    return `<div class="rc-slot ${ng?'ng':'ok'}" onclick="Alc.openEdit('${r.id}')">
+      <span class="rc-k">${label}</span>
+      <span class="rc-v">${esc(fmtTime(r.time)||'✓')}</span>
+      <span class="rc-st">酒気${esc(r.alcohol||'無')}</span>
+      <button class="rc-del" onclick="event.stopPropagation();Alc.delById('${r.id}')">取消</button>
+    </div>`;
   };
-  el.innerHTML=`<table class="mtx"><thead><tr><th>運転者</th><th>運転前</th><th>運転後</th><th>確認者</th></tr></thead><tbody>${
+  el.innerHTML=`<div class="rec-grid">${
     names.map(n=>{const d=byD[n];const chk=(d['運転前']||d['運転後']||{}).checker||'';
-      return `<tr><td class="nm">${esc(n)}</td>${cell(d['運転前'])}${cell(d['運転後'])}<td>${esc(chk)}</td></tr>`;}).join('')
-  }</tbody></table>`;
+      return `<div class="rec-card">
+        <div class="rc-name">${esc(n)}</div>
+        <div class="rc-slots">${slot(d['運転前'],'運転前')}${slot(d['運転後'],'運転後')}</div>
+        ${chk?`<div class="rc-chk">確認者 ${esc(chk)}</div>`:''}
+      </div>`;}).join('')
+  }</div>`;
 }
 
 function record(phase){
@@ -7281,17 +7334,16 @@ function renderDayList(){
   if(!records.length){el.innerHTML='<div class="empty">この日の点検はまだありません</div>';return;}
   const order=MACHINES.map(m=>m.id);
   const sorted=[...records].sort((a,b)=>order.indexOf(a.machine)-order.indexOf(b.machine));
-  el.innerHTML=sorted.map(r=>{
+  el.innerHTML=`<div class="frec-grid">${sorted.map(r=>{
     let ng=[];try{ng=JSON.parse(r.ng||'[]');}catch(e){}
     const isNg=r.status==='否';
-    const ngLine=isNg&&ng.length?`<div class="rec-ng">否：${ng.map(x=>esc(x.label)+(x.memo?'（'+esc(x.memo)+'）':'')).join('／')}</div>`:'';
-    return `<div class="rec${r._optimistic?' optimistic':''}">
-        <span class="mc">${esc(r.machine)}</span>
-        <span class="jd ${isNg?'ng':'ok'}">${isNg?'否あり':'良'}</span>
-        <span class="ins">${esc(r.inspector||'')}</span>
-        <button class="rdel" onclick="Fork.delById('${r.id}')">取消</button>
-      </div>${ngLine}`;
-  }).join('');
+    const ngLine=isNg&&ng.length?`<div class="frc-ng">否：${ng.map(x=>esc(x.label)+(x.memo?'（'+esc(x.memo)+'）':'')).join('／')}</div>`:'';
+    return `<div class="frec-card${isNg?' ng':''}${r._optimistic?' optimistic':''}">
+        <div class="frc-top"><span class="frc-mc">${esc(r.machine)}</span><span class="frc-jd ${isNg?'ng':'ok'}">${isNg?'否あり':'良'}</span><button class="frc-del" onclick="Fork.delById('${r.id}')">取消</button></div>
+        <div class="frc-meta">点検者 ${esc(r.inspector||'')}${r.time?' ・ '+esc(r.time):''}</div>
+        ${ngLine}
+      </div>`;
+  }).join('')}</div>`;
 }
 function delById(id){
   const r=records.find(x=>String(x.id)===String(id));if(!r)return;
