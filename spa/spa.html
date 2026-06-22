@@ -2995,7 +2995,7 @@ function mergeWithTmp(serverData, currentLocal, keyFn){
 // モバイルフィルター：各.fv-sumの隣に<select>を自動生成。PCでは非表示、モバイル時のみ表示。
 // 各IIFEに手を入れず、.fv-sumの内容変化をMutationObserverで監視して同期する。
 function buildMobileFilter(sumEl){
-  if(!sumEl)return;
+  if(!sumEl || !sumEl.parentNode)return;   // 再描画でDOMから外れた古い.fv-sumには触らない（insertBefore on null 回避）
   let sel=sumEl.nextElementSibling;
   if(!sel || !sel.classList || !sel.classList.contains('fv-flt-mb')){
     sel=document.createElement('select');
