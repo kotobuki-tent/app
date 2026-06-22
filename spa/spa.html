@@ -2833,6 +2833,14 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift .gl{font-size:12px;font-weight:800;color:var(--text-faint);letter-spacing:.08em;margin:14px 2px 11px}
 #view-forklift .ngrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
 #view-forklift .namebtn{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 16px/1.25 'Noto Sans JP';color:var(--text);cursor:pointer;transition:.12s;text-align:center}
+#view-forklift #fk_machineGrid .namebtn{min-height:128px;gap:7px}
+#view-forklift #fk_machineGrid .mname{font-size:18px;font-weight:800}
+#view-forklift .mst{font-size:12px;font-weight:800;padding:5px 14px;border-radius:20px;margin-top:2px}
+#view-forklift .mst.ok{background:var(--green-dim,#e6f6ee);color:#0d7a42}
+#view-forklift .mst.ng{background:var(--red-dim);color:var(--red)}
+#view-forklift .mst.todo{background:var(--surface3);color:var(--text-faint)}
+#view-forklift #fk_machineGrid .namebtn.sel .mst.todo{background:rgba(255,255,255,.25);color:#fff}
+#view-forklift #fk_machineGrid .namebtn.sel .sub{color:#cfe0fb}
 #view-forklift .namebtn:hover{border-color:var(--accent);background:var(--accent-dim)}
 #view-forklift .namebtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(59,130,246,.3)}
 #view-forklift .namebtn .sub{display:block;font-size:12px;font-weight:600;color:var(--text-faint);margin-top:4px}
@@ -7226,9 +7234,11 @@ async function boot(){
 }
 
 function renderMachines(){
-  $('fk_machineGrid').innerHTML=MACHINES.map(m=>
-    `<button class="namebtn${machine===m.id?' sel':''}" onclick="Fork.selectMachine('${esc(m.id)}')">${esc(m.id)}<span class="sub">${esc(m.tag)}</span></button>`
-  ).join('');
+  $('fk_machineGrid').innerHTML=MACHINES.map(m=>{
+    const rec=records.find(r=>r.machine===m.id);
+    const st=rec?(rec.status==='否'?'<span class="mst ng">否あり</span>':'<span class="mst ok">✓ 点検済</span>'):'<span class="mst todo">未点検</span>';
+    return `<button class="namebtn${machine===m.id?' sel':''}" onclick="Fork.selectMachine('${esc(m.id)}')"><span class="mname">${esc(m.id)}</span><span class="sub">${esc(m.tag)}</span>${st}</button>`;
+  }).join('');
 }
 function selectMachine(id){
   if(machine===id){ machine=null;machineType=null;itemState={};$('fk_afterMachine').classList.add('hide');renderMachines();return; }  // 同じ機体を再タップで選択解除
@@ -7320,7 +7330,7 @@ function record(){
 async function loadDay(date,silent){
   if(!silent)$('fk_dayList').innerHTML='<div class="empty">読み込み中...</div>';
   try{const r=await apiGet({action:'list',date});records=(r.data||[]);}catch(e){records=[];}
-  renderDayList();
+  renderDayList(); renderMachines();
 }
 function renderDayList(){
   const el=$('fk_dayList');
