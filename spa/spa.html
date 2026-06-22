@@ -1754,6 +1754,14 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cdept-project{background:#5a9e3a}
   #view-cases .cdept-sales{background:#c763b0}
   #view-cases .cdept-none{color:var(--text-faint)}
+  #view-cases .cchip{display:inline-flex;align-items:center;gap:4px;padding:2px 7px 2px 3px;border-radius:7px;font-size:11px;font-weight:600;margin:1px 4px 1px 0;background:#f4f4f5;border:1px solid var(--border);white-space:nowrap;vertical-align:middle}
+  #view-cases .cchip .cl{display:inline-block;width:16px;height:16px;line-height:16px;text-align:center;border-radius:4px;color:#fff;font-weight:700;font-size:10px}
+  #view-cases .cchip-production .cl{background:#d99a00}
+  #view-cases .cchip-project .cl{background:#5a9e3a}
+  #view-cases .cchip-sales .cl{background:#c763b0}
+  #view-cases .cchip.is-done{background:#eaf7ea;border-color:#bcdfbc;color:#2e7d32}
+  #view-cases .cchip.is-active{background:#fff6e3;border-color:#eecf8e;color:#9a6a00}
+  #view-cases .cchip.is-kill{opacity:.5;text-decoration:line-through}
   #view-cases .cf-chip.dept.on{background:var(--text);border-color:var(--text)}
   </style>
   <div id="casesBody" style="padding:0 0 80px"></div>
@@ -6638,14 +6646,17 @@ const Cases = (function(){
     const arr=c=>_sort.col===c?(_sort.asc?'▲':'▼'):'';
     const th=(label,col)=>`<th onclick="Cases.sortBy('${col}')" style="cursor:pointer">${label}<span class="arrow">${arr(col)}</span></th>`;
     let h='<div class="tbl-wrap"><table><thead><tr>'
-      +th('案件名','name')+th('部門','__dept')+th('得意先','client')+th('受注番号','order_no')+th('見積番号','estimate_no')+th('担当','our_person')+th('状態','status')
+      +th('案件名','name')+th('部門・状態','__dept')+th('得意先','client')+th('受注番号','order_no')+th('見積番号','estimate_no')+th('担当','our_person')+th('状態','status')
       +'<th>伝票</th>'+th('登録','created_at')+'<th>操作</th></tr></thead><tbody>';
     const dlbl=[['production','生',' 生産'],['project','企',' 企画'],['sales','販',' 販売']];
     rows.forEach(c=>{
       const id=esc(c.id), archd=_arch(c.archived);
       const stop=' onclick="event.stopPropagation()"';
-      const dps=caseDepts(c.id);
-      const badges=dlbl.filter(d=>dps[d[0]]).map(d=>`<span class="cdept cdept-${d[0]}" title="${d[2].trim()}">${d[1]}</span>`).join('')||'<span class="cdept-none">—</span>';
+      const dord={production:0,project:1,sales:2}, dlet={production:'生',project:'企',sales:'販'}, dnm={production:'生産',project:'企画',sales:'販売'}, DONE_ST={'出荷済':1,'完了':1,'納品済':1};
+      const kids=(_children[String(c.id)]||[]).slice().sort((a,b)=>(dord[a.dept]==null?9:dord[a.dept])-(dord[b.dept]==null?9:dord[b.dept]));
+      const badges=kids.length
+        ? kids.map(k=>{const cl=k.status==='見送り'?'is-kill':(DONE_ST[k.status]?'is-done':'is-active');return `<span class="cchip cchip-${k.dept} ${cl}" title="${dnm[k.dept]||k.dept}"><span class="cl">${dlet[k.dept]||'?'}</span>${esc(k.status||'—')}</span>`;}).join('')
+        : '<span class="cdept-none">—</span>';
       h+=`<tr${archd?' class="arch"':''} onclick="Cases.openEdit('${id}')" style="cursor:pointer">`
         +`<td>${esc(c.name||'')}</td>`
         +`<td style="white-space:nowrap">${badges}</td>`
