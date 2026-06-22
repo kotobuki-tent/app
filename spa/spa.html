@@ -1762,6 +1762,8 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cchip.is-done{background:#eaf7ea;border-color:#bcdfbc;color:#2e7d32}
   #view-cases .cchip.is-active{background:#fff6e3;border-color:#eecf8e;color:#9a6a00}
   #view-cases .cchip.is-kill{opacity:.5;text-decoration:line-through}
+  #view-cases .child-flt{margin-left:auto;align-self:center;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;color:var(--text);cursor:pointer;max-width:300px}
+  #view-cases .child-flt:focus{outline:none;border-color:var(--accent)}
   #view-cases .cf-chip.dept.on{background:var(--text);border-color:var(--text)}
   </style>
   <div id="casesBody" style="padding:0 0 80px"></div>
@@ -6567,7 +6569,11 @@ const Cases = (function(){
   const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
   const VH=['load_in','setup','event','teardown','rental_out','rental_return'];
   const CASE_ST=['見積中','受注','完了','見送り'];
-  let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='', _children={}, _deptf='', _staff=[];
+  let _cases=[], _tab='list', _q='', _sort={col:'',asc:true}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='';
+  const C_RANK={production:{'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4},project:{'見積中':0,'受注':1,'準備中':2,'現場中':3,'レンタル中':3,'完了':4},sales:{'見積中':0,'受注':1,'発注済':2,'入荷済':3,'納品済':4}};
+  function cRank(k){ return (C_RANK[k.dept]&&C_RANK[k.dept][k.status])!=null?C_RANK[k.dept][k.status]:0; }
+  // 案件の進捗＝見送り以外の子のうち一番遅れてる子のランク（全子終端なら4、見積中の子が居れば0）。子なしは-1で末尾へ。
+  function caseProgress(id){ const ks=(_children[String(id)]||[]).filter(k=>k.status!=='見送り'); if(!ks.length)return -1; return Math.min.apply(null, ks.map(cRank)); }
   function caseDepts(id){ const s={}; (_children[String(id)]||[]).forEach(k=>s[k.dept]=1); return s; }
   function caseDeptKey(id){ const d=caseDepts(id); return ((d.production?'1':'')+(d.project?'2':'')+(d.sales?'3':''))||'9'; }
 
@@ -6618,12 +6624,17 @@ const Cases = (function(){
       else { rows=rows.filter(c=>!_arch(c.archived)); if(_stf) rows=rows.filter(c=>c.status===_stf); }
     }
     if(_deptf) rows=rows.filter(c=>caseDepts(c.id)[_deptf]);
+    if(_childf) rows=rows.filter(c=>{ const ks=_children[String(c.id)]||[];
+      if(_childf==='__term') return ks.some(k=>cRank(k)===4);
+      if(_childf==='__active') return ks.some(k=>k.status!=='見送り'&&cRank(k)>=1&&cRank(k)<4);
+      const p=_childf.split(':'); return ks.some(k=>k.dept===p[0]&&k.status===p[1]); });
     const q=_q.trim().toLowerCase();
     if(q) rows=rows.filter(c=>['name','client','contact','our_person','order_no','estimate_no'].some(k=>String(c[k]||'').toLowerCase().includes(q)));
-    if(_sort.col==='__dept') rows.sort((a,b)=>(_sort.asc?1:-1)*caseDeptKey(a.id).localeCompare(caseDeptKey(b.id)));
+    if(_sort.col==='__prog') rows.sort((a,b)=>(_sort.asc?1:-1)*(caseProgress(a.id)-caseProgress(b.id)));
+    else if(_sort.col==='__dept') rows.sort((a,b)=>(_sort.asc?1:-1)*caseDeptKey(a.id).localeCompare(caseDeptKey(b.id)));
     else if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
     else rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
-    const inner = deptChips() + (t==='manage' ? statusChips() : '');
+    const inner = deptChips() + childStatusFilter() + (t==='manage' ? statusChips() : '');
     pane.innerHTML=`<div class="fv-sum">${inner}</div>` + (rows.length?caseTable(rows,t):'<div class="cases-empty">該当する案件はありません</div>');
   }
   function deptChips(){
@@ -6632,6 +6643,15 @@ const Cases = (function(){
     return `${si('全部門','',_cases.length)}${si('生産','production',count('production'))}${si('企画','project',count('project'))}${si('販売','sales',count('sales'))}`;
   }
   function setDeptf(v){ _deptf=(_deptf===v?'':v); render(); }
+  function childStatusFilter(){
+    const groups=[['production','生産',['見積中','受注','製作中','完成','出荷済']],['project','企画',['見積中','受注','準備中','現場中','レンタル中','完了']],['sales','販売',['見積中','受注','発注済','入荷済','納品済']]];
+    const opt=(v,l)=>`<option value="${v}"${_childf===v?' selected':''}>${l}</option>`;
+    let h=`<select class="child-flt" onchange="Cases.setChildf(this.value)">`;
+    h+=opt('','子の状態：すべて')+opt('__term','◆ 終端のみ（出荷済/完了/納品済）')+opt('__active','◇ 進行中の子あり');
+    groups.forEach(g=>{ h+=`<optgroup label="${g[1]}">`+g[2].map(s=>opt(g[0]+':'+s,g[1]+'：'+s)).join('')+`</optgroup>`; });
+    return h+`</select>`;
+  }
+  function setChildf(v){ _childf=v; render(); }
   function statusChips(){
     const nonArch=_cases.filter(c=>!_arch(c.archived));
     const all=nonArch.length;
@@ -6646,7 +6666,7 @@ const Cases = (function(){
     const arr=c=>_sort.col===c?(_sort.asc?'▲':'▼'):'';
     const th=(label,col)=>`<th onclick="Cases.sortBy('${col}')" style="cursor:pointer">${label}<span class="arrow">${arr(col)}</span></th>`;
     let h='<div class="tbl-wrap"><table><thead><tr>'
-      +th('案件名','name')+th('部門・状態','__dept')+th('得意先','client')+th('受注番号','order_no')+th('見積番号','estimate_no')+th('担当','our_person')+th('状態','status')
+      +th('案件名','name')+th('部門・状態','__prog')+th('得意先','client')+th('受注番号','order_no')+th('見積番号','estimate_no')+th('担当','our_person')+th('状態','status')
       +'<th>伝票</th>'+th('登録','created_at')+'<th>操作</th></tr></thead><tbody>';
     const dlbl=[['production','生',' 生産'],['project','企',' 企画'],['sales','販',' 販売']];
     rows.forEach(c=>{
@@ -6923,7 +6943,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf };
 })();
 
 const Alc=(function(){
