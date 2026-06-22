@@ -2612,7 +2612,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol .commit .post{background:var(--text)}
 #view-alcohol .commit button:active{transform:scale(.97)}
 #view-alcohol .commit button:disabled{background:var(--surface3);color:var(--text-faint);cursor:not-allowed}
-#view-alcohol .daydate{font-size:14px;font-weight:700;color:var(--text-dim);margin-bottom:14px}
+#view-alcohol .daydate{font-size:14px;font-weight:700;color:var(--text-dim)}
 #view-alcohol .dayhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 #view-alcohol .dayhead .field{margin:0;flex:1}
 #view-alcohol .rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
@@ -2738,9 +2738,8 @@ table.jobs tr:last-child td{border-bottom:none}
 
   <!-- ===== 右：本日の状況 ===== -->
   <div class="pane">
-    <h2>本日の点呼状況</h2>
+    <h2>本日の点呼状況 <span class="daydate" id="alDayLabel"></span></h2>
     <input type="hidden" id="f_date">
-    <div class="daydate" id="alDayLabel"></div>
     <div id="dayMtx"><div class="empty">読み込み中...</div></div>
 
     <div class="divider"></div>
@@ -2862,7 +2861,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift .btn-rec.ng{background:var(--red)}
 #view-forklift .btn-rec:active{transform:scale(.98)}
 #view-forklift .btn-rec:disabled{background:var(--surface3);color:var(--text-faint);cursor:not-allowed}
-#view-forklift .daydate{font-size:14px;font-weight:700;color:var(--text-dim);margin-bottom:14px}
+#view-forklift .daydate{font-size:14px;font-weight:700;color:var(--text-dim)}
 #view-forklift .dayhead{margin-bottom:12px}
 #view-forklift .frec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 #view-forklift .frec-card{background:var(--surface2);border:1px solid var(--border-light);border-radius:14px;padding:14px 16px}
@@ -2921,9 +2920,8 @@ table.jobs tr:last-child td{border-bottom:none}
 
   <!-- 右：当日状況 -->
   <div class="pane">
-    <h2>本日の点検</h2>
+    <h2>本日の点検 <span class="daydate" id="fkDayLabel"></span></h2>
     <input type="hidden" id="fk_f_date">
-    <div class="daydate" id="fkDayLabel"></div>
     <div id="fk_dayList"><div class="empty">読み込み中...</div></div>
     <div class="divider"></div>
     <h2>📤 月次CSV出力（保存用）</h2>
