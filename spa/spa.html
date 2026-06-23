@@ -1771,6 +1771,25 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cchip.is-kill{opacity:.5;text-decoration:line-through}
   #view-cases .child-flt{margin-left:auto;align-self:center;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;color:var(--text);cursor:pointer;max-width:300px}
   #view-cases .child-flt:focus{outline:none;border-color:var(--accent)}
+  #view-cases .sub-tab.has-todo{color:#c0392b;font-weight:700}
+  #view-cases .todo-wrap{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+  #view-cases .todo-card{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);flex-wrap:wrap}
+  #view-cases .todo-l{flex:1;min-width:240px}
+  #view-cases .todo-name{font-size:15px;font-weight:700;color:var(--text);cursor:pointer;display:inline-block}
+  #view-cases .todo-name:hover{color:var(--accent)}
+  #view-cases .todo-meta{font-size:12px;color:var(--text-dim);margin-top:2px}
+  #view-cases .todo-chips{margin-top:7px;display:flex;flex-wrap:wrap}
+  #view-cases .todo-r{display:flex;flex-direction:column;align-items:flex-end;gap:9px}
+  #view-cases .todo-flags{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+  #view-cases .todo-flag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap}
+  #view-cases .todo-flag.tf-hi{background:#fdeaea;color:#c0392b;border:1px solid #f1b9b3}
+  #view-cases .todo-flag.tf-mid{background:#fff3df;color:#9a6a00;border:1px solid #eecf8e}
+  #view-cases .todo-flag.tf-ok{background:#eaf2fb;color:#2f6fb0;border:1px solid #bcd6ef}
+  #view-cases .todo-acts{display:flex;gap:8px}
+  #view-cases .todo-btn{padding:9px 15px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:600 13px/1 inherit;cursor:pointer;white-space:nowrap}
+  #view-cases .todo-btn.closex{background:var(--accent);color:#fff;border-color:var(--accent)}
+  #view-cases .todo-btn.arch{background:#2f6fb0;color:#fff;border-color:#2f6fb0}
+  #view-cases .todo-btn:hover{filter:brightness(.95)}
   #view-cases .cf-chip.dept.on{background:var(--text);border-color:var(--text)}
   </style>
   <div id="casesBody" style="padding:0 0 80px"></div>
@@ -6599,6 +6618,54 @@ const Cases = (function(){
   function caseProgress(id){ const ks=(_children[String(id)]||[]).filter(k=>k.status!=='見送り'); if(!ks.length)return -1; return Math.min.apply(null, ks.map(cRank)); }
   function caseDepts(id){ const s={}; (_children[String(id)]||[]).forEach(k=>s[k.dept]=1); return s; }
   function caseDeptKey(id){ const d=caseDepts(id); return ((d.production?'1':'')+(d.project?'2':'')+(d.sales?'3':''))||'9'; }
+  // ===== 要対応（ステータス放置）検知 =====
+  function _lastD(s){ if(!s)return null; let m=null; String(s).split(',').forEach(x=>{const d=parseD(x.trim()); if(d&&(!m||d>m))m=d;}); return m; }
+  function _firstD(s){ if(!s)return null; let m=null; String(s).split(',').forEach(x=>{const d=parseD(x.trim()); if(d&&(!m||d<m))m=d;}); return m; }
+  function _today0(){ const t=new Date(); t.setHours(0,0,0,0); return t; }
+  // 子が「終わってるはず」の日（企画=撤去/本番、生産/販売=納期）と「始まってるはず」の日（企画=搬入/設営、生産=作業開始）
+  function _childDoneDate(k){ return k.dept==='project' ? (_lastD(k.date_teardown)||_lastD(k.date_event)) : parseD(k.deadline); }
+  function _childStartDate(k){ return k.dept==='project' ? (_firstD(k.date_load_in)||_firstD(k.date_setup)) : parseD(k.start_date); }
+  function caseFlags(c){
+    if(!c||_arch(c.archived)) return [];
+    const kids=_children[String(c.id)]||[]; const t=_today0();
+    const st=c.status, inv=_inv(c.invoiced), terminal=(st==='完了'||st==='見送り');
+    const out=[];
+    if(st==='完了' && inv) out.push({lv:'ok',t:'締め待ち',d:'完了・伝票済。アーカイブで片付けられる'});
+    if(inv && !terminal) out.push({lv:'hi',t:'伝票済・未完了',d:'伝票は出てるのに案件が未完了のまま'});
+    let doneOverdue=false, notStarted=false;
+    kids.forEach(k=>{ if(k.status==='見送り')return; const term=cRank(k)===4;
+      const dd=_childDoneDate(k); if(!term && dd && dd<t) doneOverdue=true;
+      const sd=_childStartDate(k); if((k.status==='見積中'||k.status==='受注') && sd && sd<t) notStarted=true; });
+    if(doneOverdue && !terminal) out.push({lv:'hi',t:'予定日経過・未完了',d:'本番/納期を過ぎてるのに完了になってない'});
+    if(notStarted && !terminal) out.push({lv:'mid',t:'着手遅れ',d:'着手予定を過ぎても見積中/受注のまま'});
+    return out;
+  }
+  function todoCount(){ return _cases.filter(c=>caseFlags(c).length>0).length; }
+  function caseTodoList(rows){
+    const dord={production:0,project:1,sales:2}, dlet={production:'生',project:'企',sales:'販'}, DONE_ST={'出荷済':1,'完了':1,'納品済':1};
+    let h='<div class="todo-wrap">';
+    rows.forEach(c=>{
+      const id=esc(c.id), flags=caseFlags(c);
+      const fb=flags.map(f=>`<span class="todo-flag tf-${f.lv}" title="${esc(f.d)}">${esc(f.t)}</span>`).join('');
+      const kids=(_children[String(c.id)]||[]).slice().sort((a,b)=>(dord[a.dept]==null?9:dord[a.dept])-(dord[b.dept]==null?9:dord[b.dept]));
+      const chips=kids.map(k=>{const cl=k.status==='見送り'?'is-kill':(DONE_ST[k.status]?'is-done':'is-active');return `<span class="cchip cchip-${k.dept} ${cl}"><span class="cl">${dlet[k.dept]||'?'}</span>${esc(k.status||'—')}</span>`;}).join('');
+      const acts = c.status==='完了'
+        ? `<button class="todo-btn arch" onclick="Cases.archive('${id}')">アーカイブ</button>`
+        : `<button class="todo-btn closex" onclick="Cases.closeArch('${id}')">完了＋アーカイブ</button>`;
+      h+=`<div class="todo-card">
+        <div class="todo-l">
+          <div class="todo-name" onclick="Cases.openEdit('${id}')">${esc(c.name||'(無題)')}</div>
+          <div class="todo-meta">${esc(c.client||'')}${c.our_person?' ・ '+esc(c.our_person):''}${c.order_no?' ・ '+esc(c.order_no):''}</div>
+          <div class="todo-chips">${chips}</div>
+        </div>
+        <div class="todo-r">
+          <div class="todo-flags">${fb}</div>
+          <div class="todo-acts">${acts}<button class="todo-btn open" onclick="Cases.openEdit('${id}')">開く</button></div>
+        </div>
+      </div>`;
+    });
+    return h+'</div>';
+  }
 
   async function loadAll(){
     if(_tab!=='form') $('casesBody').innerHTML='<div class="cases-loading">読み込み中...</div>';
@@ -6609,7 +6676,7 @@ const Cases = (function(){
       _staff=(st&&st.data)||[];
       const dl=$('caseStaffList'); if(dl) dl.innerHTML=_staff.map(s=>`<option value="${esc(s.name)}">`).join('');
       _children={};
-      const add=(dept,rows)=>{(rows||[]).forEach(r=>{const cid=String(r.case_id||'').trim(); if(!cid)return; (_children[cid]=_children[cid]||[]).push({dept,id:r.id,project:r.project,status:r.status,invoiced:r.invoiced});});};
+      const add=(dept,rows)=>{(rows||[]).forEach(r=>{const cid=String(r.case_id||'').trim(); if(!cid)return; (_children[cid]=_children[cid]||[]).push({dept,id:r.id,project:r.project,status:r.status,invoiced:r.invoiced,deadline:r.deadline,start_date:r.start_date,date_load_in:r.date_load_in,date_setup:r.date_setup,date_event:r.date_event,date_teardown:r.date_teardown});});};
       add('production',(od&&od.data)); add('project',(pj&&pj.data)); add('sales',(sl&&sl.data));
     }catch(e){}
     if(_tab!=='form') render();
@@ -6621,10 +6688,11 @@ const Cases = (function(){
 
   // ===== 案件タブ：登録 / 一覧 / 完了 / アーカイブ / 管理 =====
   function render(){
-    const tabs=[['list','一覧'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
+    const _tc=todoCount();
+    const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
     const bar=`<div class="sub-tabs">`
       +`<span class="subtab-date">${dateJP(today)}</span>`
-      +tabs.map(([k,l])=>`<button class="sub-tab${_tab===k?' on':''}" onclick="Cases.tab('${k}')">${l}</button>`).join('')
+      +tabs.map(([k,l])=>`<button class="sub-tab${_tab===k?' on':''}${k==='todo'&&_tc?' has-todo':''}" onclick="Cases.tab('${k}')">${l}</button>`).join('')
       +`<button class="sub-tab cases-new${_tab==='form'?' on':''}" onclick="Cases.tab('form')">＋ 新規登録</button>`
       +`<button class="slog-btn" id="casesSlogBtn" onclick="Cases.openSlog()">ステータスログ</button>`
       +`<input class="subtab-search" id="casesSearch" placeholder="検索..." value="${esc(_q)}" oninput="Cases.search(this.value)">`
@@ -6638,6 +6706,14 @@ const Cases = (function(){
   function renderCaseList(t){
     const pane=$('casesPane');
     let rows=_cases.slice();
+    if(t==='todo'){
+      rows=rows.filter(c=>caseFlags(c).length>0);
+      const sev=c=>{const f=caseFlags(c); return f.some(x=>x.lv==='hi')?0:f.some(x=>x.lv==='mid')?1:2;};
+      rows.sort((a,b)=>sev(a)-sev(b)||String(b.created_at||'').localeCompare(String(a.created_at||'')));
+      if(_deptf) rows=rows.filter(c=>caseDepts(c.id)[_deptf]);
+      pane.innerHTML=`<div class="fv-sum">${deptChips()}</div>`+(rows.length?caseTodoList(rows):'<div class="cases-empty">放置されてる案件はありません 🎉</div>');
+      return;
+    }
     if(t==='list') rows=rows.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
     else if(t==='done') rows=rows.filter(c=>!_arch(c.archived)&&c.status==='完了');
     else if(t==='kill') rows=rows.filter(c=>!_arch(c.archived)&&c.status==='見送り');
@@ -6727,6 +6803,10 @@ const Cases = (function(){
   function closeSlog(){ $('caseSlogBg').classList.remove('show'); }
   function toggleInv(id){ const c=_find(id); if(!c)return; const nv=!_inv(c.invoiced); c.invoiced=nv; fireAndForget({dept:'cases',action:'invoiced',id,invoiced:nv}); _invalidateDepts(); }
   function archive(id){ const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); }
+  // 要対応から一発で締める：完了（子へ波及）＋アーカイブ
+  function closeArch(id){ const c=_find(id); if(!c)return; if(!confirm('「'+(c.name||'')+'」を完了にしてアーカイブします。\n（生産/企画/販売の子も完了側に揃います）\n\nよろしいですか？'))return;
+    if(c.status!=='完了'){ logStatus(c,c.status,'完了'); c.status='完了'; fireAndForget({dept:'cases',action:'status',id,status:'完了'}); _invalidateDepts(); }
+    c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('完了にしてアーカイブしました'); render(); }
   function unarchive(id){ const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); }
   function del(id){ if(!confirm('この案件を削除しますか？（生産/企画制作の明細は残ります）'))return; _cases=_cases.filter(c=>String(c.id)!==String(id)); fireAndForget({dept:'cases',action:'delete',id}); toast('削除しました'); render(); }
   function search(v){ _q=v; const qq=v.trim().toLowerCase(); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||tr.textContent.toLowerCase().includes(qq))?'':'none'; }); }
@@ -6975,7 +7055,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept, closeArch };
 })();
 
 const Alc=(function(){
