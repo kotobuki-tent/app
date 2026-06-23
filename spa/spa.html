@@ -1749,6 +1749,13 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .ce-cst{flex:0 0 auto;font-size:12px;color:var(--text-dim)}
   #view-cases .ce-cgo{flex:0 0 auto;font-size:11px;color:var(--accent);font-weight:700}
   #view-cases .ce-nochild{color:var(--text-dim);font-size:13px;padding:6px 2px}
+  #view-cases .ce-adddept{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
+  #view-cases .ce-add-lbl{font-size:12px;color:var(--text-dim);margin-right:2px}
+  #view-cases .ce-add-btn{padding:7px 14px;border-radius:8px;border:1px dashed var(--border);background:var(--surface);color:var(--text);font:600 13px/1 inherit;cursor:pointer}
+  #view-cases .ce-add-btn:hover{border-style:solid;border-color:var(--accent);color:var(--accent)}
+  #view-cases .ce-add-production:hover{border-color:#d99a00;color:#d99a00}
+  #view-cases .ce-add-project:hover{border-color:#5a9e3a;color:#5a9e3a}
+  #view-cases .ce-add-sales:hover{border-color:#c763b0;color:#c763b0}
   #view-cases .cdept{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:5px;font-size:11px;font-weight:700;color:#fff;margin-right:3px}
   #view-cases .cdept-production{background:#d99a00}
   #view-cases .cdept-project{background:#5a9e3a}
@@ -1776,7 +1783,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="ce_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="ce_order_no"></div></div>
       <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="ce_client"></div><div class="mo-field f3"><label>窓口</label><input id="ce_contact"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
-      <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div></div>
+      <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div><div id="ce_adddept" class="ce-adddept"></div></div>
       <div class="mo-foot"><button class="cancel" onclick="Cases.closeEdit()">閉じる</button><button class="save" onclick="Cases.saveEdit()">保存</button></div>
     </div>
   </div>
@@ -3548,8 +3555,11 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
     $('prodMoBg').classList.add('show');
 
     requestAnimationFrame(()=>{$('prodMoBg').scrollTop=0;const _mo=$('prodMoBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
-  function closeProdMo(){$('prodMoBg').classList.remove('show')}
+  function closeProdMo(){$('prodMoBg').classList.remove('show');_addCaseId=''}
   function editProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(d)openProdMo(d)}
+  // 既存案件に生産を後付け：case_idと案件ヘッダを引き継いだ新規入力で開く
+  let _addCaseId='';
+  function addToCase(c){openProdMo(null);$('pf_project').value=c.name||'';$('pf_our_person').value=c.our_person||'';$('pf_estimate_no').value=c.estimate_no||'';$('pf_order_no').value=c.order_no||'';$('pf_client').value=c.client||'';$('pf_person').value=c.contact||'';$('pf_status').value='受注';_addCaseId=String(c.id||'');$('prodMoTitleText').textContent='生産を追加：'+(c.name||'');}
 
   // ===== 保存（楽観的更新） =====
   let _savingProd=false;
@@ -3560,6 +3570,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
     const editId=$('pf_id').value;
     const body={dept:'production',action:'save',id:editId||undefined,project:name,our_person:$('pf_our_person').value.trim(),estimate_no:$('pf_estimate_no').value.trim(),order_no:$('pf_order_no').value.trim(),client:$('pf_client').value.trim(),person:$('pf_person').value.trim(),section:$('pf_section').value,status:$('pf_status').value,subcontractor:$('pf_subcontractor').value.trim(),start_date:$('pf_start_date').value,deadline:$('pf_deadline').value,notes:$('pf_notes').value.trim()};
     const isNew=!editId;
+    if(isNew && _addCaseId){ body.case_id=_addCaseId; _addCaseId=''; }
     if(editId){
       const idx=prodData.findIndex(x=>String(x.id)===String(editId));
       if(idx!==-1)prodData[idx]={...prodData[idx],...body};
@@ -3604,7 +3615,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
     loadAll, render, init,
     openSlog, closeSlog, clearSlog,
     openStaff, closeStaff,
-    openProdMo, closeProdMo, editProd, saveProd, delProd,
+    openProdMo, closeProdMo, editProd, saveProd, delProd, addToCase,
     changeStatus, toggleInvoiced,
     archiveProd, unarchiveProd,
     viewProd, openFilePicker, closeFilePicker, linkFile, unlinkFile,
@@ -4010,8 +4021,11 @@ const Proj = (function(){
       else el.classList.remove('rental-disabled');
     });
   }
-  function closeProjMo(){$('projMoBg').classList.remove('show')}
+  function closeProjMo(){$('projMoBg').classList.remove('show');_addCaseId=''}
   function editProj(id){const d=projData.find(x=>x.id===id);if(d)openProjMo(d)}
+  // 既存案件に企画を後付け：case_idと案件ヘッダを引き継いだ新規入力で開く
+  let _addCaseId='';
+  function addToCase(c){openProjMo(null);$('xf_project').value=c.name||'';$('xf_our_person').value=c.our_person||'';$('xf_estimate_no').value=c.estimate_no||'';$('xf_order_no').value=c.order_no||'';$('xf_client').value=c.client||'';$('xf_person').value=c.contact||'';$('xf_status').value='受注';_addCaseId=String(c.id||'');$('projMoTitleText').textContent='企画を追加：'+(c.name||'');}
 
   // ===== 保存（楽観的更新） =====
   let _savingProj=false;
@@ -4024,6 +4038,7 @@ const Proj = (function(){
     const type=isRental?'レンタル':'現場';
     const body={dept:'project',action:'save',id:editId||undefined,project:name,type:type,our_person:$('xf_our_person').value.trim(),estimate_no:$('xf_estimate_no').value.trim(),order_no:$('xf_order_no').value.trim(),client:$('xf_client').value.trim(),person:$('xf_person').value.trim(),venue:$('xf_venue').value.trim(),address:$('xf_address').value.trim(),status:$('xf_status').value,date_load_in:isRental?'':getDatesFromList('xf_dates_load_in'),date_setup:isRental?'':getDatesFromList('xf_dates_setup'),date_event:isRental?'':getDatesFromList('xf_dates_event'),date_teardown:isRental?'':getDatesFromList('xf_dates_teardown'),date_rental_out:getDatesFromList('xf_dates_rental_out'),date_rental_return:getDatesFromList('xf_dates_rental_return'),people_load_in:isRental?'':$('xf_people_load_in').value,people_setup:isRental?'':$('xf_people_setup').value,people_event:isRental?'':$('xf_people_event').value,people_teardown:isRental?'':$('xf_people_teardown').value,vehicles_load_in:isRental?'':getVehiclesFromPhase('load_in'),vehicles_setup:isRental?'':getVehiclesFromPhase('setup'),vehicles_event:isRental?'':getVehiclesFromPhase('event'),vehicles_teardown:isRental?'':getVehiclesFromPhase('teardown'),vehicles_rental_out:getVehiclesFromPhase('rental_out'),vehicles_rental_return:getVehiclesFromPhase('rental_return'),rentals:$('xf_rentals').value.trim(),notes:$('xf_notes').value.trim()};
     const isNew=!editId;
+    if(isNew && _addCaseId){ body.case_id=_addCaseId; _addCaseId=''; }
     if(editId){
       const idx=projData.findIndex(x=>String(x.id)===String(editId));
       if(idx!==-1)projData[idx]={...projData[idx],...body};
@@ -4124,7 +4139,7 @@ const Proj = (function(){
   return {
     loadAll, render, init,
     openSlog, closeSlog, clearSlog,
-    openProjMo, closeProjMo, editProj, saveProj, delProj, toggleProjType,
+    openProjMo, closeProjMo, editProj, saveProj, delProj, toggleProjType, addToCase,
     changeProjStatus, toggleProjInvoiced,
     archiveProj, unarchiveProj,
     viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput,
@@ -5521,7 +5536,10 @@ const Sales = (function(){
 
     requestAnimationFrame(()=>{$('moBg').scrollTop=0;const _mo=$('moBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
   }
-  function closeMo(){$('moBg').classList.remove('show')}
+  function closeMo(){$('moBg').classList.remove('show');_addCaseId=''}
+  // 既存案件に販売を後付け：case_idと案件ヘッダを引き継いだ新規入力で開く
+  let _addCaseId='';
+  function addToCase(c){openMo('');$('f_project').value=c.name||'';$('f_our_person').value=c.our_person||'';$('f_estimate_no').value=c.estimate_no||'';$('f_order_no').value=c.order_no||'';$('f_client').value=c.client||'';$('f_person').value=c.contact||'';$('f_status').value='受注';_addCaseId=String(c.id||'');$('moTitleText').textContent='販売を追加：'+(c.name||'');}
   let _savingEntry=false;
   function saveEntry(){
     if(_savingEntry) return;
@@ -5538,7 +5556,8 @@ const Sales = (function(){
     }else{
       const tempId='s_'+Date.now();
       allEntries.unshift({id:tempId,...payload,updated_at:today});
-      apiPost({action:'save',...payload});
+      apiPost({action:'save',...payload,...(_addCaseId?{case_id:_addCaseId}:{})});
+      _addCaseId='';
       toast('登録しました');
       setTimeout(()=>{loadAll()},1500);
     }
@@ -5592,7 +5611,7 @@ const Sales = (function(){
   return {
     loadAll, init,
     setView, setBoardFilter, openSlog, closeSlog, clearSlog,
-    openView, closeView, openMo, closeMo, saveEntry,
+    openView, closeView, openMo, closeMo, saveEntry, addToCase,
     changeStatus, toggleInvoiced, delEntry, unifiedSearch,
     archiveSales, unarchiveSales
   };
@@ -6721,8 +6740,17 @@ const Cases = (function(){
     $('ce_children').innerHTML = kids.length
       ? kids.map(k=>`<button type="button" class="ce-child" onclick="Cases.jumpChild('${k.dept}','${esc(String(k.id))}')"><span class="ce-cdept ce-${k.dept}">${lbl[k.dept]||k.dept}</span><span class="ce-cname">${esc(k.project||'(無題)')}</span><span class="ce-cst">${esc(k.status||'')}</span><span class="ce-cgo">開く →</span></button>`).join('')
       : '<div class="ce-nochild">紐付く明細はありません</div>';
+    const present=caseDepts(id);
+    const addable=[['production','生産'],['project','企画'],['sales','販売']].filter(d=>!present[d[0]]);
+    $('ce_adddept').innerHTML = addable.length
+      ? '<span class="ce-add-lbl">部門を後から追加：</span>'+addable.map(d=>`<button type="button" class="ce-add-btn ce-add-${d[0]}" onclick="Cases.addDept('${d[0]}')">＋ ${d[1]}</button>`).join('')
+      : '';
     $('caseEditBg').classList.add('show'); }
   function closeEdit(){ $('caseEditBg').classList.remove('show'); _editId=''; }
+  function addDept(dept){ const c=_find(_editId); if(!c)return; closeEdit(); const key={production:'prod',project:'proj',sales:'sales'}[dept]; if(!key)return;
+    App._loaded.cases=false; // 戻った時に案件を取り直して新しい子を反映
+    App.nav(key); // セクション切替は同期・データ取得は裏。モーダルはネット待ちせず即開く
+    setTimeout(()=>{ try{ if(dept==='production')Prod.addToCase(c); else if(dept==='project')Proj.addToCase(c); else if(dept==='sales')Sales.addToCase(c); }catch(e){} }, 0); }
   async function jumpChild(dept,id){ closeEdit(); const key={production:'prod',project:'proj',sales:'sales'}[dept]; if(!key)return; try{ await App.nav(key); }catch(e){}
     try{ if(dept==='production')Prod.editProd(id); else if(dept==='project')Proj.editProj(id); else if(dept==='sales')Sales.openMo(id); }catch(e){} }
   function saveEdit(){ if(!_editId)return; const c=_find(_editId); if(!c){closeEdit();return;}
@@ -6947,7 +6975,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept };
 })();
 
 const Alc=(function(){
