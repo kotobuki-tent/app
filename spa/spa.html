@@ -1793,7 +1793,9 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .todo-btn.closex{background:var(--accent);color:#fff;border-color:var(--accent)}
   #view-cases .todo-btn.arch{background:#2f6fb0;color:#fff;border-color:#2f6fb0}
   #view-cases .todo-btn:hover{filter:brightness(.95)}
-  #view-cases .todo-chase{font-size:12px;color:var(--text-dim);font-weight:600;padding:9px 0;white-space:nowrap}
+  #view-cases .todo-chase{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#9a6a00;font-weight:600;padding:8px 12px;border-radius:8px;background:#fff6e3;border:1px solid #eecf8e;white-space:nowrap}
+  #view-cases .todo-chase b{font-size:14px;font-weight:800;color:#7a5300}
+  #view-cases .todo-chase-none{color:var(--text-dim);background:var(--surface);border-color:var(--border)}
   #view-cases .cf-chip.dept.on{background:var(--text);border-color:var(--text)}
   </style>
   <div id="casesBody" style="padding:0 0 80px"></div>
@@ -6673,12 +6675,15 @@ const Cases = (function(){
       const kids=(_children[String(c.id)]||[]).slice().sort((a,b)=>(dord[a.dept]==null?9:dord[a.dept])-(dord[b.dept]==null?9:dord[b.dept]));
       const chips=kids.map(k=>{const cl=k.status==='見送り'?'is-kill':(DONE_ST[k.status]?'is-done':'is-active');return `<span class="cchip cchip-${k.dept} ${cl}"><span class="cl">${dlet[k.dept]||'?'}</span>${esc(k.status||'—')}</span>`;}).join('');
       // 事務は状態を変えない（現場に直させる）。締め待ち＝現場が完了済→アーカイブ整理だけ事務の仕事。
+      const chase = c.our_person
+        ? `<span class="todo-chase">督促先 <b>${esc(c.our_person)}</b></span>`
+        : `<span class="todo-chase todo-chase-none">担当者未設定</span>`;
       const acts = c.status==='完了'
         ? `<button class="todo-btn arch" onclick="Cases.archive('${id}')">アーカイブ</button>`
-        : `<span class="todo-chase">現場に状態更新を依頼</span>`;
+        : chase;
       h+=`<div class="todo-card">
         <div class="todo-name" onclick="Cases.openEdit('${id}')">${esc(c.name||'(無題)')}</div>
-        <div class="todo-meta">${esc(c.client||'')}${c.our_person?' ・ '+esc(c.our_person):''}${c.order_no?' ・ '+esc(c.order_no):''}</div>
+        <div class="todo-meta">${esc(c.client||'')}${c.order_no?' ・ '+esc(c.order_no):''}</div>
         <div class="todo-chips">${chips}</div>
         <div class="todo-flags">${fb}</div>
         <div class="todo-acts">${acts}<button class="todo-btn open" onclick="Cases.openEdit('${id}')">開く</button></div>
