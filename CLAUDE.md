@@ -14,8 +14,9 @@ There is no build or test tooling. To work here:
 
 - **Edit** the relevant `.html` / `.js` file directly.
 - **Preview** by opening the file in a browser (or serve the dir, e.g. `python3 -m http.server`). Note: a Service Worker is active — see caching rules below.
-- **Deploy** = commit + `git push origin main`. GitHub Pages serves `main` directly. The remote is SSH (`git@github.com:kotobuki-tent/app.git`).
-- **Caching**: editing `register.html` (the only HTML still in `PRECACHE_URLS`) requires a `CACHE_VERSION` bump in `sw.js` — but **iller does this manually; never touch `sw.js`** (see Operational rules). The SPA (`spa/spa.html`) is exempt anyway — it's in `NO_CACHE_PATTERNS` and always fetched fresh.
+- **Deploy** = commit + `git push origin main` (GitHub Pages serves `main` directly). Details/conventions in `.claude/rules/working-with-iller.md`.
+- **Caching**: `spa/spa.html` is in `NO_CACHE_PATTERNS` (always fresh). `register.html` is the only HTML in `PRECACHE_URLS` — editing it needs a `CACHE_VERSION` bump in `sw.js`, but **never touch `sw.js`** (see `.claude/rules/guardrails.md`).
+- **Change the GAS backend** (`Code.gs`): follow the `gas-update` skill.
 
 ## Architecture
 
@@ -42,7 +43,7 @@ Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every
 - **Reads**: `fetch(API+'?dept=...&action=...')` → JSON.
 - **Writes**: `no-cors` POST (`fireAndForget`) — response is opaque, so writes use **optimistic update**: mutate the local array immediately, then `setTimeout(loadAll, 3000)` to reconcile with GAS's real ID assignment. `mergeWithTmp(...)` reconciles optimistic temp rows against server data by a composite key.
 - Google Sheets are the DB; sheet/column layout is documented in `README.md`. Google Drive integration (`dept=drive`) links 製作図 files to 生産 orders.
-- **GAS source of truth = `Code.gs`** (kept in iCloud `♿️SEQUENCE LAB/`, NOT in this git repo; ~1500 lines). To change GAS: edit `Code.gs`, syntax-check with JavaScriptCore (`/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc` via `new Function(src)`), then in Apps Script do 全消し→貼る + save. Redeploy ("new version of the existing deployment") only when web handlers change — manual/trigger functions just need save. `dept=factory` (資材, front-end currently hidden) and the 工数 archive (`dept=labor` POST → `archive`/`unarchive` flips the `labor_archived` column on `orders`, independent of 生産's `archived`) both live here.
+- **GAS source of truth = `Code.gs`** (kept in iCloud `♿️SEQUENCE LAB/`, NOT in this git repo; ~1500 lines). **To change/deploy it, follow the `gas-update` skill.** `dept=factory` (資材, front-end currently hidden) and the 工数 archive (`dept=labor` POST → `archive`/`unarchive` flips the `labor_archived` column on `orders`, independent of 生産's `archived`) both live here.
 
 ### GAS infrastructure & failure modes
 
@@ -58,15 +59,13 @@ Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every
 - **Mobile**: every screen has `max-width:768px` media queries; tables convert to cards via `:nth-of-type` + `::before` pseudo-elements. iOS pull-to-refresh suppressed via `overscroll-behavior-y:none`. The mobile blocks (`@media(max-width:480px){`) also fire on `(orientation:portrait)` — so a wide **portrait** screen (1F's 27" vertical tablet) gets the card layout (no horizontal-scroll tables); landscape (2F / office PC) stays tabular.
 - **Search** is DOM-filter style (hides rows, keeps input focus), not a re-render.
 
-## Operational rules (not inferable from the code)
+## Rules & procedures (separate files)
 
-- **Never edit `sw.js`.** `CACHE_VERSION` is managed manually by iller. Do not touch the file, do not bump the version, and do not ask whether it was pushed.
-- **Edit by diff, not by rewrite.** Change only the affected lines. Never do a wholesale clear-and-paste of an entire file.
-- **Two separate manifests — always confirm which one.** `spa/manifest.json` (SPA, `start_url`=`./spa.html`) and root `manifest.json` (now also points at the SPA, `start_url`=`./spa/spa.html`) are different files. Conflating them has broken `start_url` before. Check which manifest you mean before editing either. Both use a white `theme_color` (#ffffff).
-- **Never touch in the Google Sheet**: row 1 (the header row) or column A (the `id` column) of any sheet — the GAS handlers key off these. Corrupting them breaks reads/writes app-wide.
-- **Never delete the `.hidden` CSS rule** (`display:none!important`) — section switching and show/hide logic across the SPA depend on it.
-- **Edit the GAS in the REAL project, not a backup copy.** `weeklyBackup` makes full spreadsheet copies, and each copy carries its own editable bound Apps Script. Always reach the live GAS via the 業務管理 spreadsheet → 拡張機能 → Apps Script. Tell-tale: if "デプロイを管理" shows *no deployments*, you've opened a backup copy — back out.
-- **Working with iller**: be terse — no preamble, no option menus. Don't unilaterally split work into stages or down-prioritize it with "is this worth the effort?" reasoning. If told to do something, do it. Don't slap a "low real-world impact" label on a bug on your own judgment.
+Operational constraints and how-tos live in dedicated `.claude/` files (loaded as rules / invoked as skills), not here:
+
+- **`.claude/rules/guardrails.md`** — hard prohibitions that break the whole app/data: never edit `sw.js`, don't conflate the two manifests, never touch Google Sheet row 1 / column A, never delete the `.hidden` CSS rule.
+- **`.claude/rules/working-with-iller.md`** — tone, judgment, deploy/commit conventions, how to show iller visuals (`show_widget`, not `preview_screenshot`).
+- **`.claude/skills/gas-update`** — the procedure to change & deploy the GAS backend (`Code.gs`): edit → JavaScriptCore syntax-check → paste into Apps Script → redeploy only for web-handler changes. Includes the real-vs-backup-project tell-tale and the "never change the API URL" rule.
 
 ## Reference
 
