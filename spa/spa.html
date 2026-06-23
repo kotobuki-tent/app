@@ -1773,6 +1773,10 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .child-flt{margin-left:auto;align-self:center;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;color:var(--text);cursor:pointer;max-width:300px}
   #view-cases .child-flt:focus{outline:none;border-color:var(--accent)}
   #view-cases .sub-tab.has-todo{color:#c0392b;font-weight:700}
+  #view-cases .todo-bulkbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 16px;margin-bottom:14px;border:1px solid #bcd6ef;background:#eef5fc;border-radius:10px}
+  #view-cases .todo-bulkbar .tb-txt{font-size:13px;color:var(--text)}
+  #view-cases .todo-bulk-btn{padding:9px 16px;border-radius:8px;border:1px solid #2f6fb0;background:#2f6fb0;color:#fff;font:700 13px/1 inherit;cursor:pointer;white-space:nowrap}
+  #view-cases .todo-bulk-btn:hover{filter:brightness(.95)}
   #view-cases .todo-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-top:4px}
   #view-cases .todo-card{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
   #view-cases .todo-name{font-size:15px;font-weight:700;color:var(--text);cursor:pointer;display:inline-block}
@@ -6727,7 +6731,9 @@ const Cases = (function(){
       const sev=c=>{const f=caseFlags(c); return f.some(x=>x.lv==='hi')?0:f.some(x=>x.lv==='mid')?1:2;};
       rows.sort((a,b)=>sev(a)-sev(b)||String(b.created_at||'').localeCompare(String(a.created_at||'')));
       if(_deptf) rows=rows.filter(c=>caseDepts(c.id)[_deptf]);
-      pane.innerHTML=`<div class="fv-sum">${deptChips()}</div>`+(rows.length?caseTodoList(rows):'<div class="cases-empty">放置されてる案件はありません 🎉</div>');
+      const settled=_cases.filter(c=>!_arch(c.archived)&&c.status==='完了'&&_inv(c.invoiced)).length;
+      const bar = settled ? `<div class="todo-bulkbar"><span class="tb-txt">締め待ち（現場が完了済・伝票済）が <b>${settled}件</b>。アーカイブで片付けられます。</span><button class="todo-bulk-btn" onclick="Cases.archiveSettled()">締め待ち ${settled}件を一括アーカイブ</button></div>` : '';
+      pane.innerHTML=`<div class="fv-sum">${deptChips()}</div>`+bar+(rows.length?caseTodoList(rows):'<div class="cases-empty">放置されてる案件はありません 🎉</div>');
       return;
     }
     if(t==='list') rows=rows.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
@@ -6819,6 +6825,15 @@ const Cases = (function(){
   function closeSlog(){ $('caseSlogBg').classList.remove('show'); }
   function toggleInv(id){ const c=_find(id); if(!c)return; const nv=!_inv(c.invoiced); c.invoiced=nv; fireAndForget({dept:'cases',action:'invoiced',id,invoiced:nv}); _invalidateDepts(); }
   function archive(id){ const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); }
+  // 締め待ち（完了・伝票済）を一括アーカイブ。状態変更の代行ではなく、現場が完了済のものの書類整理。
+  function archiveSettled(){
+    const settled=_cases.filter(c=>!_arch(c.archived)&&c.status==='完了'&&_inv(c.invoiced));
+    if(!settled.length){ toast('締め待ちはありません'); return; }
+    if(!confirm('締め待ち '+settled.length+'件を一括アーカイブします。\n（現場が完了にした・伝票済の案件を書類整理）\n\nよろしいですか？'))return;
+    settled.forEach((c,i)=>{ c.archived=true; setTimeout(()=>fireAndForget({dept:'cases',action:'archive',id:c.id}), i*120); });
+    toast(settled.length+'件をアーカイブしました'); render();
+    setTimeout(loadAll, settled.length*120+2500);
+  }
   function unarchive(id){ const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); }
   function del(id){ if(!confirm('この案件を削除しますか？（生産/企画制作の明細は残ります）'))return; _cases=_cases.filter(c=>String(c.id)!==String(id)); fireAndForget({dept:'cases',action:'delete',id}); toast('削除しました'); render(); }
   function search(v){ _q=v; const qq=v.trim().toLowerCase(); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||tr.textContent.toLowerCase().includes(qq))?'':'none'; }); }
@@ -7067,7 +7082,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept, archiveSettled };
 })();
 
 const Alc=(function(){
