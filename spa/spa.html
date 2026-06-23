@@ -1796,6 +1796,27 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .todo-chase{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#9a6a00;font-weight:500;padding:8px 12px;border-radius:8px;background:#fff6e3;border:1px solid #eecf8e;white-space:nowrap}
   #view-cases .todo-chase b{font-size:14px;font-weight:700;color:#7a5300}
   #view-cases .todo-chase-none{color:var(--text-dim);background:var(--surface);border-color:var(--border);font-weight:600}
+  #view-cases .cal-controls{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  #view-cases .cal-nav{display:flex;gap:8px}
+  #view-cases .cal-nav button,#view-cases .cal-period{padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font:600 13px/1 inherit;cursor:pointer}
+  #view-cases .cal-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+  #view-cases .cal-grid{display:grid;min-width:max-content}
+  #view-cases .cal-corner{position:sticky;left:0;z-index:3;background:var(--surface);border-bottom:1px solid var(--border)}
+  #view-cases .cal-dhd{text-align:center;padding:6px 2px;color:var(--text-dim);font-size:11px;line-height:1.25;border-bottom:1px solid var(--border);border-left:1px solid #eee}
+  #view-cases .cal-dhd span{font-size:10px}
+  #view-cases .cal-dhd.today{background:#eef5fc;color:#2f6fb0;font-weight:700}
+  #view-cases .cal-dhd.sun{color:#c0392b}
+  #view-cases .cal-dhd.sat{color:#2f6fb0}
+  #view-cases .cal-rlabel{position:sticky;left:0;z-index:2;background:var(--surface);display:flex;align-items:center;gap:5px;padding:7px 8px;border-bottom:1px solid var(--border);cursor:pointer;overflow:hidden}
+  #view-cases .cal-rlabel:hover{background:#f4f4f5}
+  #view-cases .cal-dept{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:4px;color:#fff;font-size:10px;font-weight:700;flex-shrink:0}
+  #view-cases .cal-rname{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #view-cases .cal-cell{min-height:34px;border-bottom:1px solid var(--border);border-left:1px solid #eee;padding:3px;display:flex;flex-direction:column;gap:2px;cursor:pointer}
+  #view-cases .cal-cell.today{background:#f5faff}
+  #view-cases .cal-ev{color:#fff;border-radius:3px;text-align:center;padding:2px 0;font-size:10px;font-weight:600;white-space:nowrap}
+  #view-cases .cal-empty{padding:30px;text-align:center;color:var(--text-dim);font-size:13px}
+  #view-cases .cal-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:11px;color:var(--text-dim)}
+  #view-cases .cal-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
   #view-cases .cf-chip.dept.on{background:var(--text);border-color:var(--text)}
   </style>
   <div id="casesBody" style="padding:0 0 80px"></div>
@@ -6692,6 +6713,53 @@ const Cases = (function(){
     return h+'</div>';
   }
 
+  // ===== 段取り俯瞰カレンダー：生産納期＋企画(搬入/設営/本番/撤去)＋販売納品を案件横断で =====
+  let _calStart=null, _calDays=14;
+  const CAL_EV=[
+    {dept:'project',f:'date_load_in',t:'搬入',c:'#378ADD'},
+    {dept:'project',f:'date_setup',t:'設営',c:'#639922'},
+    {dept:'project',f:'date_event',t:'本番',c:'#BA7517'},
+    {dept:'project',f:'date_teardown',t:'撤去',c:'#D85A30'},
+    {dept:'production',f:'deadline',t:'納期',c:'#854F0B'},
+    {dept:'sales',f:'deadline',t:'納品',c:'#c763b0'}
+  ];
+  function caseEvents(id){ const ks=_children[String(id)]||[]; const evs=[];
+    ks.forEach(k=>{ if(k.status==='見送り')return; CAL_EV.forEach(et=>{ if(k.dept!==et.dept)return;
+      String(k[et.f]||'').split(',').forEach(s=>{ const d=parseD(s.trim()); if(d) evs.push({date:d,t:et.t,c:et.c}); }); }); });
+    return evs; }
+  function calInit(){ const d=new Date(today); const off=(d.getDay()+6)%7; d.setDate(d.getDate()-off); _calStart=d; }
+  function calMove(n){ if(!_calStart)calInit(); _calStart.setDate(_calStart.getDate()+n); render(); }
+  function calToday(){ calInit(); render(); }
+  function calSetDays(v){ _calDays=+v; render(); }
+  function renderCalendar(pane){
+    if(!_calStart)calInit();
+    const dates=[]; for(let i=0;i<_calDays;i++){ const d=new Date(_calStart); d.setDate(d.getDate()+i); dates.push(d); }
+    const lo=dateStr(dates[0]), hi=dateStr(dates[dates.length-1]);
+    const inWin=d=>{ const s=dateStr(d); return s>=lo&&s<=hi; };
+    let rows=_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り')
+      .map(c=>({c,evs:caseEvents(c.id).filter(e=>inWin(e.date))})).filter(r=>r.evs.length);
+    if(_deptf) rows=rows.filter(r=>caseDepts(r.c.id)[_deptf]);
+    rows.sort((a,b)=>Math.min.apply(null,a.evs.map(e=>+e.date))-Math.min.apply(null,b.evs.map(e=>+e.date)));
+    const wlbl=['日','月','火','水','木','金','土'];
+    let h=`<div class="fv-sum">${deptChips()}</div>`;
+    h+='<div class="cal-controls"><div class="cal-nav"><button onclick="Cases.calMove(-7)">◀ 1週</button><button onclick="Cases.calToday()">今日</button><button onclick="Cases.calMove(7)">1週 ▶</button></div>';
+    h+=`<select class="cal-period" onchange="Cases.calSetDays(this.value)"><option value="7"${_calDays===7?' selected':''}>1週</option><option value="14"${_calDays===14?' selected':''}>2週</option><option value="28"${_calDays===28?' selected':''}>4週</option></select></div>`;
+    h+=`<div class="cal-scroll"><div class="cal-grid" style="grid-template-columns:190px repeat(${_calDays},minmax(46px,1fr))">`;
+    h+='<div class="cal-corner"></div>';
+    dates.forEach(d=>{ const isT=dateStr(d)===dateStr(today); const wd=d.getDay(); h+=`<div class="cal-dhd${isT?' today':''}${wd===0?' sun':''}${wd===6?' sat':''}">${d.getMonth()+1}/${d.getDate()}<br><span>${wlbl[wd]}</span></div>`; });
+    if(!rows.length){ h+='<div class="cal-empty" style="grid-column:1/-1">この期間に動く案件はありません</div>'; }
+    rows.forEach(r=>{ const id=esc(r.c.id); const dps=caseDepts(r.c.id);
+      const badges=[['production','生','#d99a00'],['project','企','#5a9e3a'],['sales','販','#c763b0']].filter(d=>dps[d[0]]).map(d=>`<span class="cal-dept" style="background:${d[2]}">${d[1]}</span>`).join('');
+      h+=`<div class="cal-rlabel" onclick="Cases.openEdit('${id}')">${badges}<span class="cal-rname">${esc(r.c.name||'(無題)')}</span></div>`;
+      dates.forEach(d=>{ const ds=dateStr(d); const isT=ds===dateStr(today); const evs=r.evs.filter(e=>dateStr(e.date)===ds);
+        h+=`<div class="cal-cell${isT?' today':''}" onclick="Cases.openEdit('${id}')">`;
+        evs.forEach(e=>{ h+=`<span class="cal-ev" style="background:${e.c}">${e.t}</span>`; });
+        h+='</div>'; }); });
+    h+='</div></div>';
+    h+='<div class="cal-legend">'+CAL_EV.map(e=>`<span><i style="background:${e.c}"></i>${e.t}</span>`).join('')+'</div>';
+    pane.innerHTML=h;
+  }
+
   async function loadAll(){
     if(_tab!=='form') $('casesBody').innerHTML='<div class="cases-loading">読み込み中...</div>';
     try{
@@ -6714,7 +6782,7 @@ const Cases = (function(){
   // ===== 案件タブ：登録 / 一覧 / 完了 / アーカイブ / 管理 =====
   function render(){
     const _tc=todoCount();
-    const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
+    const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['cal','カレンダー'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
     const bar=`<div class="sub-tabs">`
       +`<span class="subtab-date">${dateJP(today)}</span>`
       +tabs.map(([k,l])=>`<button class="sub-tab${_tab===k?' on':''}${k==='todo'&&_tc?' has-todo':''}" onclick="Cases.tab('${k}')">${l}</button>`).join('')
@@ -6731,6 +6799,7 @@ const Cases = (function(){
   function renderCaseList(t){
     const pane=$('casesPane');
     let rows=_cases.slice();
+    if(t==='cal'){ renderCalendar(pane); return; }
     if(t==='todo'){
       rows=rows.filter(c=>caseFlags(c).length>0);
       const sev=c=>{const f=caseFlags(c); return f.some(x=>x.lv==='hi')?0:f.some(x=>x.lv==='mid')?1:2;};
@@ -7087,7 +7156,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept, archiveSettled };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept, archiveSettled, calMove, calToday, calSetDays };
 })();
 
 const Alc=(function(){
