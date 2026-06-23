@@ -1773,20 +1773,18 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .child-flt{margin-left:auto;align-self:center;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;color:var(--text);cursor:pointer;max-width:300px}
   #view-cases .child-flt:focus{outline:none;border-color:var(--accent)}
   #view-cases .sub-tab.has-todo{color:#c0392b;font-weight:700}
-  #view-cases .todo-wrap{display:flex;flex-direction:column;gap:10px;margin-top:4px;max-width:1180px}
-  #view-cases .todo-card{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);flex-wrap:wrap}
-  #view-cases .todo-l{flex:1;min-width:240px}
+  #view-cases .todo-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-top:4px}
+  #view-cases .todo-card{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
   #view-cases .todo-name{font-size:15px;font-weight:700;color:var(--text);cursor:pointer;display:inline-block}
   #view-cases .todo-name:hover{color:var(--accent)}
-  #view-cases .todo-meta{font-size:12px;color:var(--text-dim);margin-top:2px}
-  #view-cases .todo-chips{margin-top:7px;display:flex;flex-wrap:wrap}
-  #view-cases .todo-r{display:flex;flex-direction:column;align-items:flex-end;gap:9px}
-  #view-cases .todo-flags{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+  #view-cases .todo-meta{font-size:12px;color:var(--text-dim)}
+  #view-cases .todo-chips{display:flex;flex-wrap:wrap}
+  #view-cases .todo-flags{display:flex;flex-wrap:wrap;gap:6px}
   #view-cases .todo-flag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap}
   #view-cases .todo-flag.tf-hi{background:#fdeaea;color:#c0392b;border:1px solid #f1b9b3}
   #view-cases .todo-flag.tf-mid{background:#fff3df;color:#9a6a00;border:1px solid #eecf8e}
   #view-cases .todo-flag.tf-ok{background:#eaf2fb;color:#2f6fb0;border:1px solid #bcd6ef}
-  #view-cases .todo-acts{display:flex;gap:8px}
+  #view-cases .todo-acts{display:flex;gap:8px;align-items:center;margin-top:auto;padding-top:4px}
   #view-cases .todo-btn{padding:9px 15px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:600 13px/1 inherit;cursor:pointer;white-space:nowrap}
   #view-cases .todo-btn.closex{background:var(--accent);color:#fff;border-color:var(--accent)}
   #view-cases .todo-btn.arch{background:#2f6fb0;color:#fff;border-color:#2f6fb0}
@@ -6675,15 +6673,11 @@ const Cases = (function(){
         ? `<button class="todo-btn arch" onclick="Cases.archive('${id}')">アーカイブ</button>`
         : `<span class="todo-chase">現場に状態更新を依頼</span>`;
       h+=`<div class="todo-card">
-        <div class="todo-l">
-          <div class="todo-name" onclick="Cases.openEdit('${id}')">${esc(c.name||'(無題)')}</div>
-          <div class="todo-meta">${esc(c.client||'')}${c.our_person?' ・ '+esc(c.our_person):''}${c.order_no?' ・ '+esc(c.order_no):''}</div>
-          <div class="todo-chips">${chips}</div>
-        </div>
-        <div class="todo-r">
-          <div class="todo-flags">${fb}</div>
-          <div class="todo-acts">${acts}<button class="todo-btn open" onclick="Cases.openEdit('${id}')">開く</button></div>
-        </div>
+        <div class="todo-name" onclick="Cases.openEdit('${id}')">${esc(c.name||'(無題)')}</div>
+        <div class="todo-meta">${esc(c.client||'')}${c.our_person?' ・ '+esc(c.our_person):''}${c.order_no?' ・ '+esc(c.order_no):''}</div>
+        <div class="todo-chips">${chips}</div>
+        <div class="todo-flags">${fb}</div>
+        <div class="todo-acts">${acts}<button class="todo-btn open" onclick="Cases.openEdit('${id}')">開く</button></div>
       </div>`;
     });
     return h+'</div>';
