@@ -1818,7 +1818,8 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cal-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:11px;color:var(--text-dim)}
   #view-cases .cal-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
   #view-cases .cal-undated{margin-top:18px;padding-top:14px;border-top:1px dashed var(--border)}
-  #view-cases .cal-und-hd{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px}
+  #view-cases .cal-und-hd{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;cursor:pointer;user-select:none;display:inline-block}
+  #view-cases .cal-und-caret{color:var(--text-dim);font-size:11px}
   #view-cases .cal-und-hd b{color:#9a6a00}
   #view-cases .cal-und-note{font-size:11px;font-weight:400;color:var(--text-dim);margin-left:8px}
   #view-cases .cal-und-list{display:flex;flex-wrap:wrap;gap:8px}
@@ -6723,7 +6724,7 @@ const Cases = (function(){
   }
 
   // ===== 段取り俯瞰カレンダー：生産納期＋企画(搬入/設営/本番/撤去)＋販売納品を案件横断で =====
-  let _calStart=null, _calDays=14;
+  let _calStart=null, _calDays=14, _undOpen=false;
   const CAL_EV=[
     {dept:'project',f:'date_load_in',t:'搬入',c:'#378ADD'},
     {dept:'project',f:'date_setup',t:'設営',c:'#639922'},
@@ -6743,15 +6744,18 @@ const Cases = (function(){
     if(_deptf) und=und.filter(c=>caseDepts(c.id)[_deptf]);
     if(!und.length) return '';
     const dB=[['production','生','#d99a00'],['project','企','#5a9e3a'],['sales','販','#c763b0']];
-    let h=`<div class="cal-undated"><div class="cal-und-hd">日程未定 <b>${und.length}件</b><span class="cal-und-note">納期・日程が決まったら案件に入れるとカレンダーに乗る（仮日付は不要）</span></div><div class="cal-und-list">`;
-    und.forEach(c=>{ const dps=caseDepts(c.id);
-      const b=dB.filter(d=>dps[d[0]]).map(d=>`<span class="cal-dept" style="background:${d[2]}">${d[1]}</span>`).join('');
-      h+=`<button class="cal-und-card" onclick="Cases.openEdit('${esc(c.id)}')">${b}<span class="cal-und-name">${esc(c.name||'(無題)')}</span><span class="cal-und-st">${esc(c.status||'')}</span></button>`; });
-    return h+'</div></div>';
+    let h=`<div class="cal-undated"><div class="cal-und-hd" onclick="Cases.toggleUnd()"><span class="cal-und-caret">${_undOpen?'▼':'▶'}</span> 日程未定 <b>${und.length}件</b><span class="cal-und-note">納期・日程が決まったら案件に入れるとカレンダーに乗る（仮日付は不要）</span></div>`;
+    if(_undOpen){ h+='<div class="cal-und-list">';
+      und.forEach(c=>{ const dps=caseDepts(c.id);
+        const b=dB.filter(d=>dps[d[0]]).map(d=>`<span class="cal-dept" style="background:${d[2]}">${d[1]}</span>`).join('');
+        h+=`<button class="cal-und-card" onclick="Cases.openEdit('${esc(c.id)}')">${b}<span class="cal-und-name">${esc(c.name||'(無題)')}</span><span class="cal-und-st">${esc(c.status||'')}</span></button>`; });
+      h+='</div>'; }
+    return h+'</div>';
   }
   function calMove(n){ if(!_calStart)calInit(); _calStart.setDate(_calStart.getDate()+n); render(); }
   function calToday(){ calInit(); render(); }
   function calSetDays(v){ _calDays=+v; render(); }
+  function toggleUnd(){ _undOpen=!_undOpen; render(); }
   function renderCalendar(pane){
     if(!_calStart)calInit();
     const dates=[]; for(let i=0;i<_calDays;i++){ const d=new Date(_calStart); d.setDate(d.getDate()+i); dates.push(d); }
@@ -7178,7 +7182,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept, archiveSettled, calMove, calToday, calSetDays };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd };
 })();
 
 const Alc=(function(){
