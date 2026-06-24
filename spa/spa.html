@@ -1817,6 +1817,15 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cal-empty{padding:30px;text-align:center;color:var(--text-dim);font-size:13px}
   #view-cases .cal-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:11px;color:var(--text-dim)}
   #view-cases .cal-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  #view-cases .cal-undated{margin-top:18px;padding-top:14px;border-top:1px dashed var(--border)}
+  #view-cases .cal-und-hd{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px}
+  #view-cases .cal-und-hd b{color:#9a6a00}
+  #view-cases .cal-und-note{font-size:11px;font-weight:400;color:var(--text-dim);margin-left:8px}
+  #view-cases .cal-und-list{display:flex;flex-wrap:wrap;gap:8px}
+  #view-cases .cal-und-card{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;font:inherit;max-width:280px}
+  #view-cases .cal-und-card:hover{border-color:var(--accent)}
+  #view-cases .cal-und-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #view-cases .cal-und-st{font-size:11px;color:var(--text-dim);flex-shrink:0}
   #view-cases .cf-chip.dept.on{background:var(--text);border-color:var(--text)}
   </style>
   <div id="casesBody" style="padding:0 0 80px"></div>
@@ -6728,6 +6737,18 @@ const Cases = (function(){
       String(k[et.f]||'').split(',').forEach(s=>{ const d=parseD(s.trim()); if(d) evs.push({date:d,t:et.t,c:et.c}); }); }); });
     return evs; }
   function calInit(){ const d=new Date(today); const off=(d.getDay()+6)%7; d.setDate(d.getDate()-off); _calStart=d; }
+  // 日程未定：日付がどこにも入ってないアクティブ案件（仮日付を入れさせず忘れ防止）
+  function undatedHtml(){
+    let und=_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り'&&!caseEvents(c.id).length);
+    if(_deptf) und=und.filter(c=>caseDepts(c.id)[_deptf]);
+    if(!und.length) return '';
+    const dB=[['production','生','#d99a00'],['project','企','#5a9e3a'],['sales','販','#c763b0']];
+    let h=`<div class="cal-undated"><div class="cal-und-hd">日程未定 <b>${und.length}件</b><span class="cal-und-note">納期・日程が決まったら案件に入れるとカレンダーに乗る（仮日付は不要）</span></div><div class="cal-und-list">`;
+    und.forEach(c=>{ const dps=caseDepts(c.id);
+      const b=dB.filter(d=>dps[d[0]]).map(d=>`<span class="cal-dept" style="background:${d[2]}">${d[1]}</span>`).join('');
+      h+=`<button class="cal-und-card" onclick="Cases.openEdit('${esc(c.id)}')">${b}<span class="cal-und-name">${esc(c.name||'(無題)')}</span><span class="cal-und-st">${esc(c.status||'')}</span></button>`; });
+    return h+'</div></div>';
+  }
   function calMove(n){ if(!_calStart)calInit(); _calStart.setDate(_calStart.getDate()+n); render(); }
   function calToday(){ calInit(); render(); }
   function calSetDays(v){ _calDays=+v; render(); }
@@ -6757,6 +6778,7 @@ const Cases = (function(){
         h+='</div>'; }); });
     h+='</div></div>';
     h+='<div class="cal-legend">'+CAL_EV.map(e=>`<span><i style="background:${e.c}"></i>${e.t}</span>`).join('')+'</div>';
+    h+=undatedHtml();
     pane.innerHTML=h;
   }
 
