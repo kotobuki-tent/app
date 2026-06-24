@@ -6698,6 +6698,8 @@ const Cases = (function(){
       const sd=_childStartDate(k); if((k.status==='見積中'||k.status==='受注') && sd && sd<t) notStarted=true; });
     if(doneOverdue && !terminal) out.push({lv:'hi',t:'予定日経過・未完了',d:'本番/納期を過ぎてるのに完了になってない'});
     if(notStarted && !terminal) out.push({lv:'mid',t:'着手遅れ',d:'着手予定を過ぎても見積中/受注のまま'});
+    const td=parseD(String(c.target_date||'').slice(0,10));
+    if(td && td<t && !terminal && !doneOverdue) out.push({lv:'mid',t:'社内納期超過',d:'社内の目標日(仮)を過ぎてる。納品/完了したか確認'});
     return out;
   }
   function todoCount(){ return _cases.filter(c=>caseFlags(c).length>0).length; }
