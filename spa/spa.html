@@ -6749,6 +6749,7 @@ const Cases = (function(){
   function undatedHtml(){
     let und=_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り'&&!caseEvents(c.id).length);
     if(_deptf) und=und.filter(c=>caseDepts(c.id)[_deptf]);
+    und.sort((a,b)=>(CASE_ST.indexOf(b.status)-CASE_ST.indexOf(a.status))||String(b.created_at||'').localeCompare(String(a.created_at||'')));
     if(!und.length) return '';
     const dB=[['production','生','#d99a00'],['project','企','#5a9e3a'],['sales','販','#c763b0']];
     let h=`<div class="cal-undated"><div class="cal-und-hd" onclick="Cases.toggleUnd()"><span class="cal-und-caret">${_undOpen?'▼':'▶'}</span> 日程未定 <b>${und.length}件</b><span class="cal-und-note">日付が決まれば案件に入れるとカレンダーに乗る。仮でよければ開いて「社内納期」を入れると点線で表示</span></div>`;
