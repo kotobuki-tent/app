@@ -6730,7 +6730,7 @@ const Cases = (function(){
   }
 
   // ===== 段取り俯瞰カレンダー：生産納期＋企画(搬入/設営/本番/撤去)＋販売納品を案件横断で =====
-  let _calStart=null, _calDays=14, _undOpen=false;
+  let _calStart=null, _calDays=14, _undOpen=true;
   const CAL_EV=[
     {dept:'project',f:'date_load_in',t:'搬入',c:'#378ADD'},
     {dept:'project',f:'date_setup',t:'設営',c:'#639922'},
