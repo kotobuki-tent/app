@@ -1428,6 +1428,11 @@ table.jobs tr:last-child td{border-bottom:none}
 .pm-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
 @media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:repeat(4,1fr);gap:18px 8px}}
+/* 現場モードのみ：現場アイコンを使用頻度順（日報→時間外→生産→企画）に。fullのDOM順は不変 */
+.portal-grid.mode-floor .portal-card[onclick*="nav('daily')"]{order:1}
+.portal-grid.mode-floor .portal-card[onclick*="nav('ot')"]{order:2}
+.portal-grid.mode-floor .portal-card[onclick*="nav('prod')"]{order:3}
+.portal-grid.mode-floor .portal-card[onclick*="nav('proj')"]{order:4}
 
 /* いないカード持ち出し（点呼・リフトと同じキオスク型） */
 .card-wrap{max-width:1820px;margin:0 auto;padding:20px}
@@ -2579,14 +2584,6 @@ table.jobs tr:last-child td{border-bottom:none}
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L13 14l-4 1 1-4z"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">案件管理</div></div>
       </a>
-      <a class="portal-card" data-zone="field" data-kiosk onclick="App.nav('daily')">
-        <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
-        <div class="portal-card-body"><div class="portal-card-title">日報</div></div>
-      </a>
-      <a class="portal-card" data-zone="field" onclick="App.nav('ot')">
-        <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-        <div class="portal-card-body"><div class="portal-card-title">時間外ボード</div></div>
-      </a>
       <a class="portal-card" data-zone="field" onclick="App.nav('prod')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V11l6 3.5V11l6 3.5V8l6 4.5V21z"/><path d="M2.5 21h19"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">生産部</div></div>
@@ -2598,6 +2595,14 @@ table.jobs tr:last-child td{border-bottom:none}
       <a class="portal-card" data-zone="office" onclick="App.nav('sales')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l7-7h7v7l-7 7z"/><circle cx="14.5" cy="9.5" r="1.3"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">販売管理</div></div>
+      </a>
+      <a class="portal-card" data-zone="field" data-kiosk onclick="App.nav('daily')">
+        <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+        <div class="portal-card-body"><div class="portal-card-title">日報</div></div>
+      </a>
+      <a class="portal-card" data-zone="field" onclick="App.nav('ot')">
+        <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <div class="portal-card-body"><div class="portal-card-title">時間外ボード</div></div>
       </a>
       <a class="portal-card" data-zone="office" onclick="App.nav('labor')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M10 20V5M16 20V14"/><path d="M2.5 20.5h19"/></svg></div>
@@ -7699,6 +7704,7 @@ const App = {
   _allowed(key){ if(key==='portal')return true; if(this.mode==='kiosk') return this.KIOSK_KEYS.indexOf(key)>=0; const r=this.reg(key); return !r||!r.zone||this.allowedZones().indexOf(r.zone)>=0; },
   setMode(m){ this.mode=m; try{localStorage.setItem('spa_mode',m);}catch(e){} this.applyMode(); const c=this.current; if(c&&!this._allowed(c)) this.nav('portal'); if(typeof Portal!=='undefined'&&Portal.render)Portal.render(); },
   applyMode(){ const kiosk=this.mode==='kiosk', allow=this.allowedZones(); document.querySelectorAll('[data-zone]').forEach(b=>{ const show=kiosk?b.hasAttribute('data-kiosk'):allow.indexOf(b.getAttribute('data-zone'))>=0; b.classList.toggle('hidden',!show); }); document.querySelectorAll('.pm-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-m')===this.mode));
+    const pg=document.querySelector('.portal-grid'); if(pg) pg.classList.toggle('mode-floor',this.mode==='floor'); // 現場モードだけ現場アイコンを使用頻度順に
     const inner=document.querySelector('.hdr-inner'); if(inner){ const kids=[...inner.children]; kids.forEach((el,i)=>{ if(!el.classList.contains('nav-div'))return; let has=false; for(let j=i+1;j<kids.length;j++){ const k=kids[j]; if(k.classList.contains('nav-div')||k.classList.contains('nav-spacer')||k.id==='refreshBtn')break; if(k.classList.contains('nav-link')&&!k.classList.contains('hidden')){has=true;break;} } el.classList.toggle('hidden',!has); }); } },
   _loaded:{},
   _loading:{},
