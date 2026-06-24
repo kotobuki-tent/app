@@ -6671,12 +6671,21 @@ const Cases = (function(){
   const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
   const VH=['load_in','setup','event','teardown','rental_out','rental_return'];
   const CASE_ST=['見積中','受注','完了','見送り'];
+  // 部門マスタ（短ラベル/長ラベル/色/並び順）。色や名前を変える時はここだけ。
+  const DEPTS=[
+    {k:'production', s:'生', n:'生産', c:'#d99a00'},
+    {k:'project',    s:'企', n:'企画', c:'#5a9e3a'},
+    {k:'sales',      s:'販', n:'販売', c:'#c763b0'}
+  ];
+  const DEPT=Object.fromEntries(DEPTS.map((d,i)=>[d.k,{s:d.s,n:d.n,c:d.c,o:i}]));
   let _cases=[], _tab='list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='';
   const C_RANK={production:{'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4},project:{'見積中':0,'受注':1,'準備中':2,'現場中':3,'レンタル中':3,'完了':4},sales:{'見積中':0,'受注':1,'発注済':2,'入荷済':3,'納品済':4}};
   function cRank(k){ return (C_RANK[k.dept]&&C_RANK[k.dept][k.status])!=null?C_RANK[k.dept][k.status]:0; }
   // 案件の進捗＝見送り以外の子のうち一番遅れてる子のランク（全子終端なら4、見積中の子が居れば0）。子なしは-1で末尾へ。
   function caseProgress(id){ const ks=(_children[String(id)]||[]).filter(k=>k.status!=='見送り'); if(!ks.length)return -1; return Math.min.apply(null, ks.map(cRank)); }
   function caseDepts(id){ const s={}; (_children[String(id)]||[]).forEach(k=>s[k.dept]=1); return s; }
+  // 案件の部門バッジ（生/企/販）。日程未定リストとカレンダー行ラベルで共用。
+  function deptBadges(id){ const dps=caseDepts(id); return DEPTS.filter(d=>dps[d.k]).map(d=>`<span class="cal-dept" style="background:${d.c}">${d.s}</span>`).join(''); }
   function caseDeptKey(id){ const d=caseDepts(id); return ((d.production?'1':'')+(d.project?'2':'')+(d.sales?'3':''))||'9'; }
   // ===== 要対応（ステータス放置）検知 =====
   function _lastD(s){ if(!s)return null; let m=null; String(s).split(',').forEach(x=>{const d=parseD(x.trim()); if(d&&(!m||d>m))m=d;}); return m; }
@@ -6704,13 +6713,13 @@ const Cases = (function(){
   }
   function todoCount(){ return _cases.filter(c=>caseFlags(c).length>0).length; }
   function caseTodoList(rows){
-    const dord={production:0,project:1,sales:2}, dlet={production:'生',project:'企',sales:'販'}, DONE_ST={'出荷済':1,'完了':1,'納品済':1};
+    const dord=d=>DEPT[d]?DEPT[d].o:9, DONE_ST={'出荷済':1,'完了':1,'納品済':1};
     let h='<div class="todo-wrap">';
     rows.forEach(c=>{
       const id=esc(c.id), flags=caseFlags(c);
       const fb=flags.map(f=>`<span class="todo-flag tf-${f.lv}" title="${esc(f.d)}">${esc(f.t)}</span>`).join('');
-      const kids=(_children[String(c.id)]||[]).slice().sort((a,b)=>(dord[a.dept]==null?9:dord[a.dept])-(dord[b.dept]==null?9:dord[b.dept]));
-      const chips=kids.map(k=>{const cl=k.status==='見送り'?'is-kill':(DONE_ST[k.status]?'is-done':'is-active');return `<span class="cchip cchip-${k.dept} ${cl}"><span class="cl">${dlet[k.dept]||'?'}</span>${esc(k.status||'—')}</span>`;}).join('');
+      const kids=(_children[String(c.id)]||[]).slice().sort((a,b)=>dord(a.dept)-dord(b.dept));
+      const chips=kids.map(k=>{const cl=k.status==='見送り'?'is-kill':(DONE_ST[k.status]?'is-done':'is-active');return `<span class="cchip cchip-${k.dept} ${cl}"><span class="cl">${DEPT[k.dept]?DEPT[k.dept].s:'?'}</span>${esc(k.status||'—')}</span>`;}).join('');
       // 事務は状態を変えない（現場に直させる）。締め待ち＝現場が完了済→アーカイブ整理だけ事務の仕事。
       const chase = c.our_person
         ? `<span class="todo-chase">督促先 <b>${esc(c.our_person)}</b></span>`
@@ -6751,12 +6760,10 @@ const Cases = (function(){
     if(_deptf) und=und.filter(c=>caseDepts(c.id)[_deptf]);
     und.sort((a,b)=>(CASE_ST.indexOf(b.status)-CASE_ST.indexOf(a.status))||String(b.created_at||'').localeCompare(String(a.created_at||'')));
     if(!und.length) return '';
-    const dB=[['production','生','#d99a00'],['project','企','#5a9e3a'],['sales','販','#c763b0']];
     let h=`<div class="cal-undated"><div class="cal-und-hd" onclick="Cases.toggleUnd()"><span class="cal-und-caret">${_undOpen?'▼':'▶'}</span> 日程未定 <b>${und.length}件</b><span class="cal-und-note">日付が決まれば案件に入れるとカレンダーに乗る。仮でよければ開いて「社内納期」を入れると点線で表示</span></div>`;
     if(_undOpen){ h+='<div class="cal-und-list">';
-      und.forEach(c=>{ const dps=caseDepts(c.id);
-        const b=dB.filter(d=>dps[d[0]]).map(d=>`<span class="cal-dept" style="background:${d[2]}">${d[1]}</span>`).join('');
-        h+=`<button class="cal-und-card" onclick="Cases.openEdit('${esc(c.id)}')">${b}<span class="cal-und-name">${esc(c.name||'(無題)')}</span><span class="cal-und-st">${esc(c.status||'')}</span></button>`; });
+      und.forEach(c=>{
+        h+=`<button class="cal-und-card" onclick="Cases.openEdit('${esc(c.id)}')">${deptBadges(c.id)}<span class="cal-und-name">${esc(c.name||'(無題)')}</span><span class="cal-und-st">${esc(c.status||'')}</span></button>`; });
       h+='</div>'; }
     return h+'</div>';
   }
@@ -6781,9 +6788,8 @@ const Cases = (function(){
     h+='<div class="cal-corner"></div>';
     dates.forEach(d=>{ const isT=dateStr(d)===dateStr(today); const wd=d.getDay(); h+=`<div class="cal-dhd${isT?' today':''}${wd===0?' sun':''}${wd===6?' sat':''}">${d.getMonth()+1}/${d.getDate()}<br><span>${wlbl[wd]}</span></div>`; });
     if(!rows.length){ h+='<div class="cal-empty" style="grid-column:1/-1">この期間に動く案件はありません</div>'; }
-    rows.forEach(r=>{ const id=esc(r.c.id); const dps=caseDepts(r.c.id);
-      const badges=[['production','生','#d99a00'],['project','企','#5a9e3a'],['sales','販','#c763b0']].filter(d=>dps[d[0]]).map(d=>`<span class="cal-dept" style="background:${d[2]}">${d[1]}</span>`).join('');
-      h+=`<div class="cal-rlabel" onclick="Cases.openEdit('${id}')">${badges}<span class="cal-rname">${esc(r.c.name||'(無題)')}</span></div>`;
+    rows.forEach(r=>{ const id=esc(r.c.id);
+      h+=`<div class="cal-rlabel" onclick="Cases.openEdit('${id}')">${deptBadges(r.c.id)}<span class="cal-rname">${esc(r.c.name||'(無題)')}</span></div>`;
       dates.forEach(d=>{ const ds=dateStr(d); const isT=ds===dateStr(today); const evs=r.evs.filter(e=>dateStr(e.date)===ds);
         h+=`<div class="cal-cell${isT?' today':''}" onclick="Cases.openEdit('${id}')">`;
         evs.forEach(e=>{ h+=`<span class="cal-ev${e.tentative?' tentative':''}" style="background:${e.c}">${e.t}</span>`; });
@@ -6869,11 +6875,11 @@ const Cases = (function(){
   function deptChips(){
     const count=d=>_cases.filter(c=>caseDepts(c.id)[d]).length;
     const si=(label,val,n)=>`<div class="fv-si${_deptf===val?' on':''}" data-f="dept:${val}" onclick="Cases.setDeptf('${val}')"><div class="n">${n}</div><div class="l">${label}</div></div>`;
-    return `${si('全部門','',_cases.length)}${si('生産','production',count('production'))}${si('企画','project',count('project'))}${si('販売','sales',count('sales'))}`;
+    return si('全部門','',_cases.length)+DEPTS.map(d=>si(d.n,d.k,count(d.k))).join('');
   }
   function setDeptf(v){ _deptf=(_deptf===v?'':v); render(); }
   function childStatusFilter(){
-    const groups=[['production','生産',['見積中','受注','製作中','完成','出荷済']],['project','企画',['見積中','受注','準備中','現場中','レンタル中','完了']],['sales','販売',['見積中','受注','発注済','入荷済','納品済']]];
+    const groups=DEPTS.map(d=>[d.k,d.n,Object.keys(C_RANK[d.k])]);
     const opt=(v,l)=>`<option value="${v}"${_childf===v?' selected':''}>${l}</option>`;
     let h=`<select class="child-flt" onchange="Cases.setChildf(this.value)">`;
     h+=opt('','子の状態：すべて')+opt('__term','◆ 終端のみ（出荷済/完了/納品済）')+opt('__active','◇ 進行中の子あり');
@@ -6897,14 +6903,13 @@ const Cases = (function(){
     let h='<div class="tbl-wrap"><table><thead><tr>'
       +th('案件名','name')+th('部門・状態','__prog')+th('得意先','client')+th('受注番号','order_no')+th('見積番号','estimate_no')+th('担当','our_person')+th('状態','status')
       +'<th>伝票</th>'+th('登録','created_at')+'<th>操作</th></tr></thead><tbody>';
-    const dlbl=[['production','生',' 生産'],['project','企',' 企画'],['sales','販',' 販売']];
+    const dord=d=>DEPT[d]?DEPT[d].o:9, DONE_ST={'出荷済':1,'完了':1,'納品済':1};
     rows.forEach(c=>{
       const id=esc(c.id), archd=_arch(c.archived);
       const stop=' onclick="event.stopPropagation()"';
-      const dord={production:0,project:1,sales:2}, dlet={production:'生',project:'企',sales:'販'}, dnm={production:'生産',project:'企画',sales:'販売'}, DONE_ST={'出荷済':1,'完了':1,'納品済':1};
-      const kids=(_children[String(c.id)]||[]).slice().sort((a,b)=>(dord[a.dept]==null?9:dord[a.dept])-(dord[b.dept]==null?9:dord[b.dept]));
+      const kids=(_children[String(c.id)]||[]).slice().sort((a,b)=>dord(a.dept)-dord(b.dept));
       const badges=kids.length
-        ? kids.map(k=>{const cl=k.status==='見送り'?'is-kill':(DONE_ST[k.status]?'is-done':'is-active');return `<span class="cchip cchip-${k.dept} ${cl}" title="${dnm[k.dept]||k.dept}"><span class="cl">${dlet[k.dept]||'?'}</span>${esc(k.status||'—')}</span>`;}).join('')
+        ? kids.map(k=>{const cl=k.status==='見送り'?'is-kill':(DONE_ST[k.status]?'is-done':'is-active');return `<span class="cchip cchip-${k.dept} ${cl}" title="${DEPT[k.dept]?DEPT[k.dept].n:k.dept}"><span class="cl">${DEPT[k.dept]?DEPT[k.dept].s:'?'}</span>${esc(k.status||'—')}</span>`;}).join('')
         : '<span class="cdept-none">—</span>';
       h+=`<tr${archd?' class="arch"':''} onclick="Cases.openEdit('${id}')" style="cursor:pointer">`
         +`<td>${esc(c.name||'')}</td>`
@@ -6951,14 +6956,13 @@ const Cases = (function(){
     $('ce_name').value=c.name||''; $('ce_client').value=c.client||''; $('ce_contact').value=c.contact||''; $('ce_our_person').value=c.our_person||'';
     $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; $('ce_status').value=CASE_ST.indexOf(c.status)>=0?c.status:'受注'; $('ce_note').value=c.note||''; $('ce_target_date').value=String(c.target_date||'').slice(0,10);
     const kids=_children[String(id)]||[];
-    const lbl={production:'生産',project:'企画',sales:'販売'};
     $('ce_children').innerHTML = kids.length
-      ? kids.map(k=>`<button type="button" class="ce-child" onclick="Cases.jumpChild('${k.dept}','${esc(String(k.id))}')"><span class="ce-cdept ce-${k.dept}">${lbl[k.dept]||k.dept}</span><span class="ce-cname">${esc(k.project||'(無題)')}</span><span class="ce-cst">${esc(k.status||'')}</span><span class="ce-cgo">開く →</span></button>`).join('')
+      ? kids.map(k=>`<button type="button" class="ce-child" onclick="Cases.jumpChild('${k.dept}','${esc(String(k.id))}')"><span class="ce-cdept ce-${k.dept}">${DEPT[k.dept]?DEPT[k.dept].n:k.dept}</span><span class="ce-cname">${esc(k.project||'(無題)')}</span><span class="ce-cst">${esc(k.status||'')}</span><span class="ce-cgo">開く →</span></button>`).join('')
       : '<div class="ce-nochild">紐付く明細はありません</div>';
     const present=caseDepts(id);
-    const addable=[['production','生産'],['project','企画'],['sales','販売']].filter(d=>!present[d[0]]);
+    const addable=DEPTS.filter(d=>!present[d.k]);
     $('ce_adddept').innerHTML = addable.length
-      ? '<span class="ce-add-lbl">部門を後から追加：</span>'+addable.map(d=>`<button type="button" class="ce-add-btn ce-add-${d[0]}" onclick="Cases.addDept('${d[0]}')">＋ ${d[1]}</button>`).join('')
+      ? '<span class="ce-add-lbl">部門を後から追加：</span>'+addable.map(d=>`<button type="button" class="ce-add-btn ce-add-${d.k}" onclick="Cases.addDept('${d.k}')">＋ ${d.n}</button>`).join('')
       : '';
     $('caseEditBg').classList.add('show'); }
   function closeEdit(){ $('caseEditBg').classList.remove('show'); _editId=''; }
