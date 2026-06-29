@@ -4092,7 +4092,7 @@ const Proj = (function(){
     requestAnimationFrame(()=>{$('projViewBg').scrollTop=0;const _mo=$('projViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
 
   // ===== モーダル操作 =====
-  function openProjMo(d){$('projMoTitleText').textContent=d?'現場編集':'現場登録';$('xf_id').value=d?d.id:'';$('xf_project').value=d?d.project:'';$('xf_our_person').value=d?d.our_person||'':'';$('xf_estimate_no').value=d?d.estimate_no||'':'';$('xf_order_no').value=d?d.order_no||'':'';$('xf_client').value=d?d.client||'':'';$('xf_person').value=d?d.person||'':'';$('xf_venue').value=d?d.venue||'':'';$('xf_address').value=d?d.address||'':'';$('xf_status').value=d?d.status||'受注':'受注';['load_in','setup','event','teardown','rental_out','rental_return'].forEach(phase=>{const key='date_'+phase;const el=$('xf_dates_'+phase);el.innerHTML='';const vals=d&&d[key]?String(d[key]).split(',').map(s=>s.trim()).filter(Boolean):[];if(vals.length)vals.forEach(v=>addDateInput('xf_dates_'+phase,v));else addDateInput('xf_dates_'+phase)});$('xf_people_load_in').value=d?d.people_load_in||'':'';$('xf_people_setup').value=d?d.people_setup||'':'';$('xf_people_event').value=d?d.people_event||'':'';$('xf_people_teardown').value=d?d.people_teardown||'':'';$('xf_rentals').value=d?d.rentals||'':'';$('xf_notes').value=d?d.notes||'':'';VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));$('xf_is_rental').checked=(d&&d.type==='レンタル');applyProjTypeUI();
+  function openProjMo(d){$('projMoTitleText').textContent=d?'現場編集':'現場登録';$('xf_id').value=d?d.id:'';$('xf_project').value=d?d.project:'';$('xf_our_person').value=d?d.our_person||'':'';$('xf_estimate_no').value=d?d.estimate_no||'':'';$('xf_order_no').value=d?d.order_no||'':'';$('xf_client').value=d?d.client||'':'';$('xf_person').value=d?d.person||'':'';$('xf_venue').value=d?d.venue||'':'';$('xf_address').value=d?d.address||'':'';$('xf_status').value=d?d.status||'受注':'受注';['load_in','setup','event','teardown','rental_out','rental_return'].forEach(phase=>{const key='date_'+phase;const el=$('xf_dates_'+phase);el.innerHTML='';const vals=d&&d[key]?String(d[key]).split(',').map(s=>s.trim()).filter(Boolean):[];if(vals.length)vals.forEach(v=>addDateInput('xf_dates_'+phase,v));else addDateInput('xf_dates_'+phase)});$('xf_people_load_in').value=d?d.people_load_in||'':'';$('xf_people_setup').value=d?d.people_setup||'':'';$('xf_people_event').value=d?d.people_event||'':'';$('xf_people_teardown').value=d?d.people_teardown||'':'';$('xf_rentals').value=d?d.rentals||'':'';$('xf_notes').value=d?d.notes||'':'';VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));_xfType=(d&&d.type)||'現場';$('xf_is_rental').checked=(_xfType==='レンタル');applyProjTypeUI();
     const isEditP=!!d, isArchP=isEditP&&String(d.archived||'').toUpperCase()==='TRUE';
     $('xfDel').classList.toggle('hidden',!isEditP);
     $('xfArch').classList.toggle('hidden',!isEditP||isArchP);
@@ -4101,19 +4101,23 @@ const Proj = (function(){
 
     requestAnimationFrame(()=>{$('projMoBg').scrollTop=0;const _mo=$('projMoBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
   function toggleProjType(){
+    _xfType=$('xf_is_rental').checked?'レンタル':(_xfType==='納品'?'納品':'現場');
     applyProjTypeUI();
   }
   function applyProjTypeUI(){
     const isRental=$('xf_is_rental').checked;
+    const isNouhin=(!isRental && _xfType==='納品');
     document.querySelectorAll('#projMoBg .setup-only, #projMoBg .setup-only-hd').forEach(el=>{
-      if(isRental)el.classList.add('rental-disabled');
-      else el.classList.remove('rental-disabled');
+      el.classList.toggle('rental-disabled', isRental||isNouhin);
     });
+    // 納品：貸出日→納品日のラベル、返却日は無効
+    const ob=$('xf_dates_rental_out').closest('.date-phase-block'); if(ob){const l=ob.querySelector('.date-phase-label'); if(l)l.textContent=isNouhin?'納品日':'貸出日';}
+    const rb=$('xf_dates_rental_return').closest('.date-phase-block'); if(rb)rb.classList.toggle('rental-disabled', isNouhin);
   }
   function closeProjMo(){$('projMoBg').classList.remove('show');_addCaseId=''}
   function editProj(id){const d=projData.find(x=>x.id===id);if(d)openProjMo(d)}
   // 既存案件に企画を後付け：case_idと案件ヘッダを引き継いだ新規入力で開く
-  let _addCaseId='';
+  let _addCaseId='', _xfType='現場';
   function addToCase(c){openProjMo(null);$('xf_project').value=c.name||'';$('xf_our_person').value=c.our_person||'';$('xf_estimate_no').value=c.estimate_no||'';$('xf_order_no').value=c.order_no||'';$('xf_client').value=c.client||'';$('xf_person').value=c.contact||'';$('xf_status').value='受注';_addCaseId=String(c.id||'');$('projMoTitleText').textContent='企画を追加：'+(c.name||'');}
 
   // ===== 保存（楽観的更新） =====
@@ -4124,7 +4128,7 @@ const Proj = (function(){
     if(!name){toast('物件名を入力してください',true);return}
     const editId=$('xf_id').value;
     const isRental=$('xf_is_rental').checked;
-    const type=isRental?'レンタル':'現場';
+    const type=isRental?'レンタル':(_xfType==='納品'?'納品':'現場');
     const body={dept:'project',action:'save',id:editId||undefined,project:name,type:type,our_person:$('xf_our_person').value.trim(),estimate_no:$('xf_estimate_no').value.trim(),order_no:$('xf_order_no').value.trim(),client:$('xf_client').value.trim(),person:$('xf_person').value.trim(),venue:$('xf_venue').value.trim(),address:$('xf_address').value.trim(),status:$('xf_status').value,date_load_in:isRental?'':getDatesFromList('xf_dates_load_in'),date_setup:isRental?'':getDatesFromList('xf_dates_setup'),date_event:isRental?'':getDatesFromList('xf_dates_event'),date_teardown:isRental?'':getDatesFromList('xf_dates_teardown'),date_rental_out:getDatesFromList('xf_dates_rental_out'),date_rental_return:getDatesFromList('xf_dates_rental_return'),people_load_in:isRental?'':$('xf_people_load_in').value,people_setup:isRental?'':$('xf_people_setup').value,people_event:isRental?'':$('xf_people_event').value,people_teardown:isRental?'':$('xf_people_teardown').value,vehicles_load_in:isRental?'':getVehiclesFromPhase('load_in'),vehicles_setup:isRental?'':getVehiclesFromPhase('setup'),vehicles_event:isRental?'':getVehiclesFromPhase('event'),vehicles_teardown:isRental?'':getVehiclesFromPhase('teardown'),vehicles_rental_out:getVehiclesFromPhase('rental_out'),vehicles_rental_return:getVehiclesFromPhase('rental_return'),rentals:$('xf_rentals').value.trim(),notes:$('xf_notes').value.trim()};
     const isNew=!editId;
     if(isNew && _addCaseId){ body.case_id=_addCaseId; _addCaseId=''; }
