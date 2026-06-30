@@ -4105,6 +4105,8 @@ const Proj = (function(){
     applyProjTypeUI();
   }
   function applyProjTypeUI(){
+    // 納品案件は案件登録から作るもの＝このフォームで種別変更させない（レンタルへの誤変換で納品日が貸出日に化けるのを防ぐ）
+    $('xf_is_rental').disabled=(_xfType==='納品');
     const isRental=$('xf_is_rental').checked;
     const isNouhin=(!isRental && _xfType==='納品');
     document.querySelectorAll('#projMoBg .setup-only, #projMoBg .setup-only-hd').forEach(el=>{
