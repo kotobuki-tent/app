@@ -149,6 +149,7 @@ function apiPost(body){
   fetch(API,{
     method:'POST',
     mode:'no-cors',
+    keepalive:true,
     headers:{'Content-Type':'text/plain'},
     body:JSON.stringify({dept:'inventory',...body})
   });
