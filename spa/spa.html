@@ -5921,7 +5921,7 @@ const Daily = (function(){
   const WORK_PROJECT=['設営','撤去','施工','メンテナンス','準備','下見','積み込み','運搬'];
   const WORK_COMMON=['事務','打ち合わせ','清掃','車両運行'];
   let curView='write';
-  let staffList=[],prodProjects=[],projProjects=[],allReports=[],absenceList=[];
+  let staffList=[],prodProjects=[],projProjects=[],allReports=[],absenceList=[],absenceRange=[];
   let _absenceLoadedDate=null;
   let viewingDate=new Date();
   let writeDate=new Date();
@@ -5937,6 +5937,7 @@ const Daily = (function(){
   async function loadProjects(){try{const r=await fetch(API+'?dept=daily&action=projects');const j=await r.json();if(j.success){prodProjects=j.production||[];projProjects=j.projects||[]}}catch(e){}}
   async function loadReports(){try{const to=new Date();const from=new Date();from.setDate(from.getDate()-30);const r=await fetch(API+'?dept=daily&action=read&date_from='+dateStr(from)+'&date_to='+dateStr(to));const j=await r.json();if(j.success)allReports=mergeWithTmp(j.data||[],allReports,r=>String(r.employee_no||'')+'|'+String(r.date||'')+'|'+String(r.project||'')+'|'+String(r.work||r.action||''))}catch(e){}}
   async function loadAbsenceList(date){try{const r=await fetch(API+'?dept=daily&action=read_absence&date='+date);const j=await r.json();if(j.success)absenceList=j.data||[];else absenceList=[]}catch(e){absenceList=[]}}
+  async function loadAbsenceRange(){try{const to=new Date();const from=new Date();from.setDate(from.getDate()-30);const r=await fetch(API+'?dept=daily&action=read_absence&date_from='+dateStr(from)+'&date_to='+dateStr(to));const j=await r.json();if(j.success)absenceRange=j.data||[]}catch(e){}}
   async function loadAll(){
     const cached=_getCache('daily');
     if(cached){
@@ -5950,7 +5951,7 @@ const Daily = (function(){
         initWhoSelect();render();
       }catch(e){}
     }
-    await Promise.all([loadStaff(),loadProjects(),loadReports(),loadAbsenceList(dateStr(viewingDate))]);
+    await Promise.all([loadStaff(),loadProjects(),loadReports(),loadAbsenceList(dateStr(viewingDate)),loadAbsenceRange()]);
     _absenceLoadedDate=dateStr(viewingDate);
     initWhoSelect();
     _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
@@ -5990,13 +5991,17 @@ const Daily = (function(){
     const bizSet=new Set(bizDays); const N=bizDays.length;
     const byEmp={}; allReports.forEach(r=>{ const e=String(r.employee_no||''); const dt=String(r.date||'').slice(0,10);
       if(!e||!bizSet.has(dt))return; (byEmp[e]=byEmp[e]||new Set()).add(dt); });
-    const rows=staffList.map(s=>{ const done=(byEmp[String(s.employee_no)]||new Set()).size; const miss=Math.max(0,N-done);
-      return {name:s.name, done, miss, rate:N?Math.round(done/N*100):0}; });
+    const absByEmp={}; absenceRange.forEach(a=>{ const e=String(a.employee_no||''); const dt=String(a.date||'').slice(0,10);
+      if(!e||!bizSet.has(dt))return; (absByEmp[e]=absByEmp[e]||new Set()).add(dt); });
+    const rows=staffList.map(s=>{ const key=String(s.employee_no);
+      const absN=(absByEmp[key]||new Set()).size; const target=Math.max(0,N-absN);
+      const done=(byEmp[key]||new Set()).size; const miss=Math.max(0,target-done);
+      return {name:s.name, done, miss, target, rate:target?Math.round(done/target*100):100}; });
     rows.sort((a,b)=>b.miss-a.miss||a.rate-b.rate||a.name.localeCompare(b.name));
-    const totalDone=rows.reduce((s,r)=>s+r.done,0), totalPoss=rows.length*N;
+    const totalDone=rows.reduce((s,r)=>s+r.done,0), totalPoss=rows.reduce((s,r)=>s+r.target,0);
     const overall=totalPoss?Math.round(totalDone/totalPoss*100):0;
     let h=`<div class="stats-head"><div class="stats-sub">直近30日の営業日 <b>${N}日</b>（土日祝を除く）／ 全体記入率 <b>${overall}%</b></div>`
-      +`<div class="stats-note">※出勤日ベース（欠勤は未考慮）。日報が1件でもある日を「記入」とカウント。</div></div>`;
+      +`<div class="stats-note">※出勤日ベース。欠勤日は除外して計算。日報が1件でもある日を「記入」とカウント。</div></div>`;
     h+='<div class="stats-list">';
     rows.forEach((r,i)=>{ const col=r.rate>=80?'var(--green)':r.rate>=50?'var(--orange)':'var(--red)';
       h+=`<div class="stats-row">`
