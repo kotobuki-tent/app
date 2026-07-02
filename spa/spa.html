@@ -1692,6 +1692,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navForklift" data-zone="office" data-kiosk onclick="App.nav('forklift')">リフト</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navCard" data-zone="office" data-kiosk onclick="App.nav('card')">カード</button>
+    <button class="nav-link hidden" id="navHr" onclick="App.nav('hr')">人事考課</button>
     <div class="nav-spacer"></div>
     <span class="nav-div"></span>
     <button class="nav-link" id="navCases" data-zone="office" onclick="App.nav('cases')">案件</button>
@@ -2653,6 +2654,78 @@ table.jobs tr:last-child td{border-bottom:none}
 <section id="view-card" class="hidden">
   <div class="card-wrap"><div id="cardBody"></div></div>
   <div id="cardToast" class="card-toast"></div>
+</section>
+
+<section id="view-hr" class="hidden">
+<style>
+#view-hr{--hrpad:16px;padding:0 0 120px}
+#view-hr .hr-head{display:flex;align-items:center;justify-content:space-between;padding:16px var(--hrpad) 6px}
+#view-hr .hr-who{font-size:18px;font-weight:900;color:var(--text)}
+#view-hr .hr-kind{font-size:12px;font-weight:700;color:#7c3aed;background:#f3e8ff;border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+#view-hr .hr-period{font-size:13px;font-weight:700;color:var(--text-dim)}
+#view-hr .hr-tabs{display:flex;gap:6px;padding:6px var(--hrpad) 10px;flex-wrap:wrap}
+#view-hr .hr-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:700 13px/1 'Noto Sans JP',sans-serif;padding:9px 16px;border-radius:999px;cursor:pointer}
+#view-hr .hr-tab.on{background:#ede9fe;color:#6d28d9}
+#view-hr .hr-sec{background:#fff;border-radius:14px;margin:10px var(--hrpad);padding:18px 16px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+#view-hr .hr-sech{font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px}
+#view-hr .hr-hint,#view-hr .hr-note{font-size:11px;color:var(--text-dim);line-height:1.5}
+#view-hr .hr-hint{margin-bottom:12px}
+#view-hr .hr-grid{display:flex;flex-direction:column;gap:2px}
+#view-hr .hr-row{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid #f0f1f5}
+#view-hr .hr-it{flex:1;min-width:0}
+#view-hr .hr-itn{display:block;font-size:14px;font-weight:700;color:var(--text)}
+#view-hr .hr-ita{display:block;font-size:11px;color:var(--text-dim);line-height:1.4}
+#view-hr .hr-w{font-size:11px;color:#a0a4b8;font-weight:700;width:30px;text-align:center;flex-shrink:0}
+#view-hr .hr-opts{display:flex;gap:4px;flex-shrink:0}
+#view-hr .hr-opt{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#f2f3f7;color:var(--text-dim);font-weight:800;font-size:14px;cursor:pointer;user-select:none}
+#view-hr .hr-opt input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+#view-hr .hr-opt.on{background:#7c3aed;color:#fff}
+#view-hr .hr-opt.ro{cursor:default}
+#view-hr .hr-opt.ro.on{background:#c4b5fd;color:#3b0764}
+#view-hr .hr-qh{font-size:14px;font-weight:800;color:#6d28d9;margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid #ede9fe}
+#view-hr .hr-flab{display:block;font-size:12px;font-weight:700;color:var(--text-dim);margin:10px 0 4px}
+#view-hr .hr-in,#view-hr .hr-ta,#view-hr .hr-sel{width:100%;border:1.5px solid #e5e7ef;border-radius:9px;padding:10px 12px;font:400 15px/1.5 'Noto Sans JP',sans-serif;color:var(--text);background:#fafbfd}
+#view-hr .hr-in:focus,#view-hr .hr-ta:focus,#view-hr .hr-sel:focus{outline:none;border-color:#a855f7;background:#fff}
+#view-hr .hr-ta{min-height:66px;resize:vertical}
+#view-hr .hr-goal{background:#faf9fe;border:1px solid #eee7fb;border-radius:10px;padding:10px 12px;margin-bottom:10px}
+#view-hr .hr-grow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+#view-hr .hr-grow .hr-sel{width:auto;min-width:70px}
+#view-hr .hr-actbar{display:flex;align-items:center;gap:12px;padding:6px var(--hrpad);flex-wrap:wrap}
+#view-hr .hr-save{background:#7c3aed;color:#fff;border:none;border-radius:11px;padding:14px 30px;font:800 15px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+#view-hr .hr-save:active{transform:scale(.98)}
+#view-hr .hr-saveh{font-size:11px;color:var(--text-dim)}
+#view-hr .hr-back{background:none;border:none;color:#7c3aed;font:700 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;padding:0 0 10px}
+#view-hr .hr-plist{display:flex;flex-direction:column;gap:8px}
+#view-hr .hr-pbtn{display:flex;align-items:center;gap:10px;background:#fafbfd;border:1.5px solid #e5e7ef;border-radius:10px;padding:14px 16px;cursor:pointer;text-align:left}
+#view-hr .hr-pn{font-size:15px;font-weight:800;color:var(--text);flex:1}
+#view-hr .hr-pk{font-size:11px;font-weight:700;color:#7c3aed;background:#f3e8ff;border-radius:6px;padding:2px 8px}
+#view-hr .hr-pd{font-size:12px;font-weight:700;color:var(--text-dim)}
+#view-hr .hr-pd.ok{color:#16a34a}
+#view-hr .hr-tblwrap{overflow-x:auto}
+#view-hr .hr-tbl{width:100%;border-collapse:collapse;font-size:13px}
+#view-hr .hr-tbl th,#view-hr .hr-tbl td{padding:9px 8px;text-align:center;white-space:nowrap;border-bottom:1px solid #eef0f5}
+#view-hr .hr-tbl th{font-size:11px;color:var(--text-dim);font-weight:700;background:#f7f8fb}
+#view-hr .hr-tbl td:first-child,#view-hr .hr-tbl th:first-child{text-align:left;font-weight:700}
+#view-hr .hr-tbl tbody tr{cursor:pointer}
+#view-hr .hr-tbl tbody tr:hover{background:#faf9fe}
+#view-hr .hr-fin{font-weight:800}
+#view-hr .hr-rk{font-weight:900}
+#view-hr .rk-A,#view-hr .rk-B{color:#16a34a}#view-hr .rk-C{color:#2563eb}#view-hr .rk-D{color:#d97706}#view-hr .rk-E,#view-hr .rk-F,#view-hr .rk-G{color:#dc2626}
+#view-hr .hr-prog{font-size:11px;color:var(--text-dim)}
+#view-hr .hr-lock{max-width:460px;margin:60px auto;text-align:center;color:var(--text-dim);font-size:14px;line-height:1.7;padding:0 20px}
+#view-hr .hr-lock-i{font-size:40px;margin-bottom:12px}
+#view-hr .hr-empty{color:var(--text-dim);font-size:13px;padding:8px 0}
+#view-hr .hr-toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);padding:14px 28px;border-radius:12px;font:700 14px/1 'Noto Sans JP',sans-serif;z-index:9999;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+#view-hr .hr-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#view-hr .hr-toast.ok{background:#16a34a;color:#fff}#view-hr .hr-toast.err{background:#dc2626;color:#fff}
+@media(max-width:480px),(orientation:portrait){
+  #view-hr .hr-row{flex-wrap:wrap}
+  #view-hr .hr-it{flex-basis:100%}
+  #view-hr .hr-w{width:auto;margin-right:auto}
+}
+</style>
+  <div id="hrBody"></div>
+  <div id="hrToast" class="hr-toast"></div>
 </section>
 
 <section id="view-alcohol" class="hidden">
@@ -6555,6 +6628,225 @@ const Card = (function(){
   return { loadAll, render, out, ret, sel, clearSel, toggleExtra, prevWeek, nextWeek, thisWeek };
 })();
 
+/* ========================================================================
+   Hr：人事考課（自己評価・自己申告書の入力／考課者の一次考課／経営の集計）
+   - 認証は内緒URLのトークン方式（合言葉レベル。日報の記入状況ゲートと同発想）
+       個人 : ?go=hr&hr=<個人トークン>      → 自分の自己評価＋申告書のみ
+       考課者: 個人トークンで、担当部下の一次考課も入力可（自分の被考課は不可）
+       経営 : ?go=hr&hrm=<マスターキー>     → 全員の集計・ランク＋二次考課入力
+   - 様式2種：一般(A×75%+B×25%)／管理職(A×50%+B×50%)。項目・重みはデータで切替
+   - GAS: dept=hr（whoami / get / save_self / save_primary / save_secondary / aggregate）
+   ======================================================================== */
+const Hr = (function(){
+  const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const IMP=[5,5,5,5,5,5,5,5,5,5,10,10,10,10,10];              // 重要度（両様式共通）
+  const WEIGHTS={ '一般':[0.75,0.25], '管理職':[0.50,0.50] };  // [一次, 二次]
+  const ITEMS={
+    '一般':[
+      ['職務知識','担当業務の基本的な流れが理解できているか'],['企画力','実態に即した自発的な企画・提案ができているか'],
+      ['判断力','内外に対する一般的な判断能力を有しているか'],['表現力','考えを効果的に相手に伝えることができているか'],
+      ['改善能力','職場環境・業務内容等の改善に積極的であるか'],['責任性','最後までやり抜く強い意志で臨んでいるか'],
+      ['行動力','迅速・積極的に業務に取組んでいるか'],['協調性','社員間・部門間の連携に自発的に取り組めているか'],
+      ['問題意識','社内外の課題等に対する問題意識を持っていたか'],['勤務状況','職場内の規律を遵守した勤務状況であるか'],
+      ['正確性','業務遂行結果に過ちや修正がありはしないか'],['迅速性','期限・時間・時宜に応じた的確な対応ができているか'],
+      ['目標達成度','設定された目標に対しての成果は十分なものか'],['業務能率度','効率よく短時間で成果を上げることができているか'],
+      ['相手満足度','取引先等の実質的な理解・満足を得られているか']
+    ],
+    '管理職':[
+      ['職務知識','担当する業務の基本的な流れが理解できているか'],['指導感化力','部下に対する十分な指導力を有しているか'],
+      ['判断力','対外的に高度な判断能力を有しているか'],['統率力','担当部門の中心となり得る能力を有しているか'],
+      ['人間関係力','会社内外の人との交渉・折衝能力を有しているか'],['責任性','最後までやり抜く強い意志で臨んでいるか'],
+      ['行動力','迅速・積極的に業務に取組んでいるか'],['規律性','会社内外の規範・慣習等の遵守ができているか'],
+      ['経営意識','経営者的な感覚・意識を常に持っているか'],['問題意識','改善・改革項目の発見について意識しているか'],
+      ['正確性','業務遂行結果に過ちや修正がありはしないか'],['迅速性','期限・時宜に応じた的確な対応ができているか'],
+      ['課題成果度','客観的に満足できる結果・数値等を残しているか'],['社外評価度','事業成果は対外的に高い評価を得ているか'],
+      ['社員育成度','部下の業務改善や意識改革を指導できているか']
+    ]
+  };
+  const RANK_TBL=[[450,'A'],[400,'B'],[350,'C'],[250,'D'],[200,'E'],[150,'F'],[0,'G']];
+  function rankOf(x){ for(const [th,r] of RANK_TBL) if(x>=th) return r; return 'G'; }
+  function kindOf(k){ return k==='管理職'?'管理職':'一般'; }
+  function period(){ const d=new Date(); const y=d.getMonth()>=3?d.getFullYear():d.getFullYear()-1; return y+'年度'; }
+  function calc(kind,p,s){
+    const A=IMP.reduce((a,w,i)=>a+w*(+p[i]||0),0), B=IMP.reduce((a,w,i)=>a+w*(+s[i]||0),0);
+    const [wa,wb]=WEIGHTS[kindOf(kind)];
+    const fin=A*wa+B*wb;
+    return { A, B, final:fin, rank:rankOf(fin), pDone:p.filter(v=>+v>0).length, sDone:s.filter(v=>+v>0).length };
+  }
+
+  let me=null, view='self', curEval=null, _busy=false, _loadedKey=null;
+  function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
+  function keys(){ const p=new URLSearchParams(location.search); return {master:p.get('hrm')||'', token:p.get('hr')||''}; }
+  function hasKey(){ const k=keys(); return !!(k.master||k.token); }
+  async function apiGet(qs){ try{ const r=await fetch(API+'?dept=hr&'+qs); return await r.json(); }catch(e){ return null; } }
+  function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'hr',...body})}); }catch(e){} }
+  function toast(msg,ok){ const t=$('hrToast'); if(!t)return; t.textContent=msg; t.className='hr-toast show'+(ok===false?' err':' ok'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600); }
+
+  async function loadAll(){
+    const k=keys();
+    if(!k.master && !k.token){ me=null; render(); return; }
+    const q = (k.master ? 'action=whoami&hrm='+encodeURIComponent(k.master)
+                        : 'action=whoami&hr='+encodeURIComponent(k.token))
+              + '&period='+encodeURIComponent(period());
+    const j = await apiGet(q);
+    me = (j&&j.success)? j : (j? {error:j.error||'不許可'} : {error:'通信エラー'});
+    _loadedKey = k.master||k.token;
+    if(me && me.role==='master'){ const a=await apiGet('action=aggregate&hrm='+encodeURIComponent(k.master)+'&period='+encodeURIComponent(period())); me.people = (a&&a.success)?(a.people||[]):[]; view='master'; }
+    else if(me && me.role==='person'){ view = (me.self&&me.self.some?'self':'self'); }
+    render();
+  }
+
+  // ---- 1〜5 のスコアグリッド（editable/readonly） ----
+  function scoreGrid(kind,vals,pre,editable){
+    const its=ITEMS[kindOf(kind)]; vals=vals||[];
+    let h='<div class="hr-grid">';
+    its.forEach((it,i)=>{
+      const v=+vals[i]||0;
+      h+=`<div class="hr-row"><div class="hr-it"><span class="hr-itn">${esc(it[0])}</span><span class="hr-ita">${esc(it[1])}</span></div>`
+        +`<div class="hr-w">×${IMP[i]}</div><div class="hr-opts">`;
+      for(let n=1;n<=5;n++){
+        if(editable) h+=`<label class="hr-opt${v===n?' on':''}"><input type="radio" name="${pre}_${i}" value="${n}"${v===n?' checked':''} onchange="Hr._pick(this)">${n}</label>`;
+        else h+=`<span class="hr-opt ro${v===n?' on':''}">${n}</span>`;
+      }
+      h+='</div></div>';
+    });
+    h+='</div>';
+    return h;
+  }
+  function _pick(inp){ const g=inp.closest('.hr-opts'); if(g) g.querySelectorAll('.hr-opt').forEach(l=>l.classList.toggle('on', l.querySelector('input')===inp)); }
+  function collect(pre,kind){ const out=[]; for(let i=0;i<15;i++){ const c=document.querySelector('input[name="'+pre+'_'+i+'"]:checked'); out.push(c?+c.value:0); } return out; }
+
+  // ---- 自己申告書フォーム ----
+  function reportForm(kind,rep){
+    rep=rep||{}; const g=rep.goals||[{},{},{}];
+    const q2 = kindOf(kind)==='管理職'
+      ? [['q2a','部下の育成・指導において今期取り組んだこと'],['q2b','部門の課題と、その解決に向けて取り組んだこと']]
+      : [['q2a','業務の中で工夫・改善した点'],['q2b','困難だった業務と、その解決に向けて取り組んだこと']];
+    const ach=v=>['A','B','C','D'].map(o=>`<option value="${o}"${v===o?' selected':''}>${o}</option>`).join('');
+    let h='<div class="hr-rep">';
+    h+='<div class="hr-qh">問1. 今期の重点目標と達成状況（3つ）</div>';
+    for(let i=0;i<3;i++){ const gi=g[i]||{};
+      h+=`<div class="hr-goal"><div class="hr-gl">⑴⑵⑶`.slice(0,0)+`</div>`
+        +`<label class="hr-flab">重点目標 ${i+1}</label><input class="hr-in" id="hr_goal${i}" value="${esc(gi.goal)}">`
+        +`<div class="hr-grow"><span class="hr-flab">達成状況</span><select class="hr-sel" id="hr_ach${i}"><option value="">—</option>${ach(gi.achieve)}</select>`
+        +`<span class="hr-note">A:100%↑ / B:80〜99% / C:60〜79% / D:60%未満</span></div>`
+        +`<label class="hr-flab">具体的な成果</label><textarea class="hr-ta" id="hr_res${i}">${esc(gi.result)}</textarea></div>`;
+    }
+    h+='<div class="hr-qh">問2. '+(kindOf(kind)==='管理職'?'部門マネジメントについて':'日常業務への取り組みについて')+'</div>';
+    q2.forEach(q=>{ h+=`<label class="hr-flab">${esc(q[1])}</label><textarea class="hr-ta" id="hr_${q[0]}">${esc(rep[q[0]])}</textarea>`; });
+    h+='<div class="hr-qh">問3. 次期に向けて</div>';
+    h+=`<label class="hr-flab">次期の重点目標（数値目標を含めて具体的に）</label><textarea class="hr-ta" id="hr_q3a">${esc(rep.q3a)}</textarea>`;
+    h+=`<label class="hr-flab">目標達成のために自身が改善・強化すべき点</label><textarea class="hr-ta" id="hr_q3b">${esc(rep.q3b)}</textarea>`;
+    h+='</div>';
+    return h;
+  }
+  function collectReport(){
+    const goals=[]; for(let i=0;i<3;i++){ goals.push({goal:$('hr_goal'+i).value.trim(),achieve:$('hr_ach'+i).value,result:$('hr_res'+i).value.trim()}); }
+    return { goals, q2a:$('hr_q2a').value.trim(), q2b:$('hr_q2b').value.trim(), q3a:$('hr_q3a').value.trim(), q3b:$('hr_q3b').value.trim() };
+  }
+
+  function render(){
+    const el=$('hrBody'); if(!el) return;
+    if(!hasKey()){ el.innerHTML='<div class="hr-lock"><div class="hr-lock-i">🔒</div><div>この画面は個人ごとの内緒URLからのみ開けます。<br>配布された自分専用のURLでアクセスしてください。</div></div>'; return; }
+    if(!me){ el.innerHTML='<div class="hr-lock">読み込み中…</div>'; return; }
+    if(me.error){ el.innerHTML='<div class="hr-lock"><div class="hr-lock-i">🚫</div><div>アクセスできません（'+esc(me.error)+'）。<br>URLをご確認ください。</div></div>'; return; }
+
+    // タブ（本人＝自己評価／考課者は担当考課／経営はマスター）
+    const tabs=[];
+    if(me.role==='person'){ tabs.push(['self','自己評価・申告書']); if((me.evaluatees||[]).length) tabs.push(['evaluate','担当の考課']); }
+    if(me.role==='master'){ tabs.push(['master','集計・ランク']); }
+    let h='';
+    h+=`<div class="hr-head"><div class="hr-who">${esc(me.name||'')}<span class="hr-kind">${esc(me.kind||'')}</span></div><div class="hr-period">${esc(period())}</div></div>`;
+    if(tabs.length>1){ h+='<div class="hr-tabs">'+tabs.map(t=>`<button class="hr-tab${view===t[0]?' on':''}" onclick="Hr.go('${t[0]}')">${t[1]}</button>`).join('')+'</div>'; }
+    if(view==='self' && me.role==='person') h+=renderSelf();
+    else if(view==='evaluate' && me.role==='person') h+=renderEvaluate();
+    else if(view==='master') h+=renderMaster();
+    el.innerHTML=h;
+  }
+
+  function renderSelf(){
+    const kind=me.kind, self=me.self||[], rep=me.report||{};
+    let h='<div class="hr-sec">';
+    h+='<div class="hr-sech">評価シート（自己評価）</div><div class="hr-hint">各項目を1〜5で。5=標準を大幅に上回る／3=標準とほぼ同じ／1=相当な努力を要する</div>';
+    h+=scoreGrid(kind,self,'s',true);
+    h+='</div><div class="hr-sec">';
+    h+='<div class="hr-sech">自己申告書</div>';
+    h+=reportForm(kind,rep);
+    h+='</div>';
+    h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveSelf()">保存する</button><span class="hr-saveh">※途中保存OK。URLから何度でも開いて続きを書けます</span></div>';
+    return h;
+  }
+  function saveSelf(){
+    if(guard())return;
+    const self=collect('s',me.kind), report=collectReport();
+    fire({action:'save_self', hr:keys().token, period:period(), self:JSON.stringify(self), report:JSON.stringify(report)});
+    me.self=self; me.report=report;
+    toast('保存しました',true);
+  }
+
+  function renderEvaluate(){
+    const evs=me.evaluatees||[];
+    if(curEval==null){
+      let h='<div class="hr-sec"><div class="hr-sech">担当する部下の一次考課</div><div class="hr-hint">名前を選んで一次考課（1〜5）を入力してください。※自分自身は対象に含まれません</div><div class="hr-plist">';
+      evs.forEach((p,i)=>{ const done=(p.primary||[]).filter(v=>+v>0).length; h+=`<button class="hr-pbtn" onclick="Hr.pickEval(${i})"><span class="hr-pn">${esc(p.name)}</span><span class="hr-pk">${esc(p.kind)}</span><span class="hr-pd ${done>=15?'ok':''}">${done}/15</span></button>`; });
+      h+='</div></div>'; return h;
+    }
+    const p=evs[curEval]; const prim=p.primary||[];
+    let h='<div class="hr-sec"><button class="hr-back" onclick="Hr.pickEval(null)">← 一覧へ</button>';
+    h+=`<div class="hr-sech">${esc(p.name)} <span class="hr-kind">${esc(p.kind)}</span> の一次考課</div>`;
+    h+=scoreGrid(p.kind,prim,'p',true);
+    h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.savePrimary()">一次考課を保存</button></div></div>';
+    return h;
+  }
+  function pickEval(i){ curEval=i; render(); }
+  function savePrimary(){
+    if(guard())return;
+    const p=me.evaluatees[curEval]; const prim=collect('p',p.kind);
+    fire({action:'save_primary', hr:keys().token, period:period(), person_id:p.person_id, primary:JSON.stringify(prim)});
+    p.primary=prim;
+    toast(p.name+' の一次考課を保存',true);
+  }
+
+  function renderMaster(){
+    const ppl=me.people||[];
+    let h='<div class="hr-sec"><div class="hr-sech">人事考課 集計（'+esc(period())+'）</div>';
+    h+='<div class="hr-hint">最終得点＝一般:A×75%+B×25% / 管理職:A×50%+B×50%。補正係数は代表取締役判断で別途。行をタップで二次考課を入力。</div>';
+    if(!ppl.length){ h+='<div class="hr-empty">対象者がまだ登録されていません（hr_people シート）。</div></div>'; return h; }
+    const rows=ppl.map(p=>{ const c=calc(p.kind,p.primary||[],p.secondary||[]); return {p,c}; })
+                  .sort((a,b)=>b.c.final-a.c.final);
+    h+='<div class="hr-tblwrap"><table class="hr-tbl"><thead><tr><th>氏名</th><th>区分</th><th>A(一次)</th><th>B(二次)</th><th>最終</th><th>ランク</th><th>進捗</th></tr></thead><tbody>';
+    rows.forEach(({p,c})=>{
+      const prog=(c.pDone>=15?'一次✓':'一次'+c.pDone+'/15')+' '+(c.sDone>=15?'二次✓':'二次'+c.sDone+'/15');
+      h+=`<tr onclick="Hr.openSec('${esc(p.person_id)}')"><td>${esc(p.name)}</td><td>${esc(p.kind)}</td><td>${c.A}</td><td>${c.B}</td><td class="hr-fin">${c.final%1?c.final.toFixed(2):c.final}</td><td class="hr-rk rk-${c.rank}">${c.rank}</td><td class="hr-prog">${prog}</td></tr>`;
+    });
+    h+='</tbody></table></div></div>';
+    if(curEval!=null){
+      const p=ppl.find(x=>x.person_id===curEval); if(p){
+        h+='<div class="hr-sec"><button class="hr-back" onclick="Hr.openSec(null)">← 閉じる</button>';
+        h+=`<div class="hr-sech">${esc(p.name)} <span class="hr-kind">${esc(p.kind)}</span> の二次考課</div>`;
+        h+=scoreGrid(p.kind,p.secondary||[],'x',true);
+        h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveSecondary()">二次考課を保存</button></div></div>';
+      }
+    }
+    return h;
+  }
+  function openSec(id){ curEval=id; render(); if(id){ const el=$('view-hr'); if(el) el.scrollTop=el.scrollHeight; } }
+  function saveSecondary(){
+    if(guard())return;
+    const p=(me.people||[]).find(x=>x.person_id===curEval); if(!p)return;
+    const sec=collect('x',p.kind);
+    fire({action:'save_secondary', hrm:keys().master, period:period(), person_id:p.person_id, secondary:JSON.stringify(sec)});
+    p.secondary=sec;
+    toast(p.name+' の二次考課を保存',true);
+  }
+
+  function go(v){ view=v; curEval=null; render(); }
+  function init(){ /* ナビの表示制御は App.applyMode 後に App 側で行う */ }
+  return { loadAll, render, init, go, saveSelf, pickEval, savePrimary, openSec, saveSecondary, _pick, hasKey };
+})();
+
 const Portal = (function(){
   // リンク集のみ。データ取得なし。
   async function loadAll(){}
@@ -7769,6 +8061,7 @@ const App = {
     {key:'ot',   ns:()=>Ot,   section:'view-ot',   nav:'navOt',zone:'field'},
     {key:'alcohol',ns:()=>Alc,section:'view-alcohol',nav:'navAlcohol',zone:'office'},
     {key:'forklift',ns:()=>Fork,section:'view-forklift',nav:'navForklift',zone:'office'},
+    {key:'hr',   ns:()=>Hr,   section:'view-hr',   nav:'navHr'},
     {key:'portal',ns:()=>Portal,section:'view-portal',nav:'navHome'},
   ],
   mode:(function(){ try{var m=new URLSearchParams(location.search).get('mode'); if(m==='floor'||m==='full'||m==='kiosk'){localStorage.setItem('spa_mode',m); history.replaceState({},'',location.pathname);} }catch(e){} try{return localStorage.getItem('spa_mode')||'full';}catch(e){return 'full';} })(),
@@ -7841,6 +8134,8 @@ window.addEventListener('load', ()=>{
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   initMobileFilters();
   App.applyMode();
+  // 人事考課ナビは内緒URL（?hr= / ?hrm=）を持っている端末だけに出す
+  try{ if(typeof Hr!=='undefined' && Hr.hasKey()){ const nb=$('navHr'); if(nb) nb.classList.remove('hidden'); } }catch(e){}
   App.current=null;
   App.nav((_deepGo && App.reg(_deepGo)) ? _deepGo : 'portal');
 });
