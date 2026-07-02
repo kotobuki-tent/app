@@ -5978,14 +5978,11 @@ const Daily = (function(){
     if(w&&curView==='write')openAddForm(true);
   }
 
-  // 記入状況は「URLを知ってる経営だけ」：spa.html?stats=キー で開いた端末を解錠(localStorage記憶)、?stats=off で施錠
+  // 記入状況は「URLを知ってる経営だけ」：spa.html?stats=キー で開いた時だけ表示。
+  // 記憶しない＝内緒URLで開いてる間だけ見える（通常URLなら出ない・共用端末でも痕跡なし）。キーはこの1行を書き換えるだけ。
   const STATS_KEY='kotobuki';
   function statsUnlocked(){
-    try{ const q=new URLSearchParams(location.search);
-      if(q.get('stats')===STATS_KEY) localStorage.setItem('spa_stats_ok','1');
-      if(q.get('stats')==='off') localStorage.removeItem('spa_stats_ok');
-      return localStorage.getItem('spa_stats_ok')==='1';
-    }catch(e){ return false; }
+    try{ return new URLSearchParams(location.search).get('stats')===STATS_KEY; }catch(e){ return false; }
   }
   function render(){
     const unlocked=statsUnlocked(); const st=$('statsTab'); if(st) st.style.display=unlocked?'':'none';
