@@ -1154,6 +1154,21 @@ table.jobs tr:last-child td{border-bottom:none}
 #dailyViewContent{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;align-items:start}
 #dailyViewContent>.card{grid-column:1/-1;margin-bottom:0}
 #dailyViewContent>.member-group{margin-bottom:0}
+/* 記入状況ランキング */
+#statsView .stats-head{margin-bottom:12px}
+#statsView .stats-sub{font-size:14px;color:var(--text)}
+#statsView .stats-sub b{color:var(--accent)}
+#statsView .stats-note{font-size:11px;color:var(--text-dim);margin-top:2px}
+#statsView .stats-list{display:flex;flex-direction:column;gap:6px}
+#statsView .stats-row{display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--surface);border:1px solid var(--border-light);border-radius:8px}
+#statsView .stats-rank{width:22px;text-align:center;font-weight:700;color:var(--text-dim);flex:0 0 auto}
+#statsView .stats-name{flex:0 0 120px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#statsView .stats-bar-wrap{flex:1;min-width:40px;height:14px;background:var(--surface2);border-radius:7px;overflow:hidden}
+#statsView .stats-bar{display:block;height:100%;border-radius:7px}
+#statsView .stats-rate{width:46px;text-align:right;font-weight:700;color:var(--text);flex:0 0 auto}
+#statsView .stats-miss{width:92px;text-align:right;font-size:12px;color:var(--text-dim);flex:0 0 auto}
+#statsView .stats-miss b{color:var(--text)}
+@media(max-width:480px),(orientation:portrait){#statsView .stats-name{flex-basis:84px}#statsView .stats-miss{width:70px}}
 @media(max-width:480px),(orientation:portrait){#view-daily .app{padding:14px 10px}}
 @media(max-width:480px),(orientation:portrait){
   .mobile-date{display:none!important}
@@ -2392,6 +2407,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="dailyPcDate"></span>
     <button class="sub-tab on" data-view="write">自分で書く</button>
     <button class="sub-tab" data-view="view">みんなの日報</button>
+    <button class="sub-tab" data-view="stats">記入状況</button>
     <input class="subtab-search" id="dailyPcSearch" placeholder="検索...">
   </div>
 
@@ -2454,6 +2470,7 @@ table.jobs tr:last-child td{border-bottom:none}
       </div>
       <div id="dailyViewContent"></div>
     </div>
+    <div id="statsView" class="hidden"></div>
   </div>
 </section>
 
@@ -5961,9 +5978,36 @@ const Daily = (function(){
   }
 
   function render(){
-    ['writeView','viewView'].forEach(id=>$(id).classList.add('hidden'));
+    ['writeView','viewView','statsView'].forEach(id=>$(id).classList.add('hidden'));
     if(curView==='write'){$('writeView').classList.remove('hidden');renderWrite()}
+    else if(curView==='stats'){$('statsView').classList.remove('hidden');renderStats()}
     else{$('viewView').classList.remove('hidden');renderView()}
+  }
+  // 記入状況：直近30日の営業日で、各スタッフの日報記入日数・未記入日数・記入率を集計してランキング＋横棒に
+  function renderStats(){
+    const el=$('statsView'); const today0=new Date(); today0.setHours(0,0,0,0);
+    const bizDays=[]; for(let i=0;i<30;i++){ const d=new Date(today0); d.setDate(d.getDate()-i); if(!isOffDay(d)) bizDays.push(dateStr(d)); }
+    const bizSet=new Set(bizDays); const N=bizDays.length;
+    const byEmp={}; allReports.forEach(r=>{ const e=String(r.employee_no||''); const dt=String(r.date||'').slice(0,10);
+      if(!e||!bizSet.has(dt))return; (byEmp[e]=byEmp[e]||new Set()).add(dt); });
+    const rows=staffList.map(s=>{ const done=(byEmp[String(s.employee_no)]||new Set()).size; const miss=Math.max(0,N-done);
+      return {name:s.name, done, miss, rate:N?Math.round(done/N*100):0}; });
+    rows.sort((a,b)=>b.miss-a.miss||a.rate-b.rate||a.name.localeCompare(b.name));
+    const totalDone=rows.reduce((s,r)=>s+r.done,0), totalPoss=rows.length*N;
+    const overall=totalPoss?Math.round(totalDone/totalPoss*100):0;
+    let h=`<div class="stats-head"><div class="stats-sub">直近30日の営業日 <b>${N}日</b>（土日祝を除く）／ 全体記入率 <b>${overall}%</b></div>`
+      +`<div class="stats-note">※出勤日ベース（欠勤は未考慮）。日報が1件でもある日を「記入」とカウント。</div></div>`;
+    h+='<div class="stats-list">';
+    rows.forEach((r,i)=>{ const col=r.rate>=80?'var(--green)':r.rate>=50?'var(--orange)':'var(--red)';
+      h+=`<div class="stats-row">`
+        +`<span class="stats-rank">${i+1}</span>`
+        +`<span class="stats-name">${esc(r.name)}</span>`
+        +`<span class="stats-bar-wrap"><span class="stats-bar" style="width:${r.rate}%;background:${col}"></span></span>`
+        +`<span class="stats-rate">${r.rate}%</span>`
+        +`<span class="stats-miss">未記入 <b>${r.miss}</b>日</span>`
+      +`</div>`; });
+    h+='</div>';
+    el.innerHTML=h;
   }
 
   // ===== 自分で書く =====
