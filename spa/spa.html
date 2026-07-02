@@ -2407,7 +2407,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="dailyPcDate"></span>
     <button class="sub-tab on" data-view="write">自分で書く</button>
     <button class="sub-tab" data-view="view">みんなの日報</button>
-    <button class="sub-tab" data-view="stats" data-zone="office">記入状況</button>
+    <button class="sub-tab" data-view="stats" id="statsTab" style="display:none">記入状況</button>
     <input class="subtab-search" id="dailyPcSearch" placeholder="検索...">
   </div>
 
@@ -5978,9 +5978,18 @@ const Daily = (function(){
     if(w&&curView==='write')openAddForm(true);
   }
 
+  // 記入状況は「URLを知ってる経営だけ」：spa.html?stats=キー で開いた端末を解錠(localStorage記憶)、?stats=off で施錠
+  const STATS_KEY='kotobuki';
+  function statsUnlocked(){
+    try{ const q=new URLSearchParams(location.search);
+      if(q.get('stats')===STATS_KEY) localStorage.setItem('spa_stats_ok','1');
+      if(q.get('stats')==='off') localStorage.removeItem('spa_stats_ok');
+      return localStorage.getItem('spa_stats_ok')==='1';
+    }catch(e){ return false; }
+  }
   function render(){
-    // 記入状況は経営(事務所=fullモード)だけ。現場(floor/kiosk)ではタブを隠す＋選択中でも中身を出さない
-    if(curView==='stats' && !(typeof App!=='undefined' && App.mode==='full')) curView='view';
+    const unlocked=statsUnlocked(); const st=$('statsTab'); if(st) st.style.display=unlocked?'':'none';
+    if(curView==='stats' && !unlocked) curView='view';
     ['writeView','viewView','statsView'].forEach(id=>$(id).classList.add('hidden'));
     if(curView==='write'){$('writeView').classList.remove('hidden');renderWrite()}
     else if(curView==='stats'){$('statsView').classList.remove('hidden');renderStats()}
