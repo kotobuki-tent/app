@@ -2683,6 +2683,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-hr .hr-opt.ro{cursor:default}
 #view-hr .hr-opt.ro.on{background:#c4b5fd;color:#3b0764}
 #view-hr .hr-qh{font-size:14px;font-weight:800;color:#6d28d9;margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid #ede9fe}
+#view-hr .hr-suqh{font-size:13px;font-weight:800;color:#6d28d9;margin:16px 0 6px}
 #view-hr .hr-flab{display:block;font-size:12px;font-weight:700;color:var(--text-dim);margin:10px 0 4px}
 #view-hr .hr-in,#view-hr .hr-ta,#view-hr .hr-sel{width:100%;border:1.5px solid #e5e7ef;border-radius:9px;padding:10px 12px;font:400 15px/1.5 'Noto Sans JP',sans-serif;color:var(--text);background:#fafbfd}
 #view-hr .hr-in:focus,#view-hr .hr-ta:focus,#view-hr .hr-sel:focus{outline:none;border-color:#a855f7;background:#fff}
@@ -6694,7 +6695,7 @@ const Hr = (function(){
     me = (j&&j.success)? j : (j? {error:j.error||'不許可'} : {error:'通信エラー'});
     _loadedKey = k.master||k.token;
     if(me && me.role==='master'){ const a=await apiGet('action=aggregate&hrm='+encodeURIComponent(k.master)+'&period='+encodeURIComponent(period())); me.people = (a&&a.success)?(a.people||[]):[]; view='master'; }
-    else if(me && me.role==='person'){ view = (me.self&&me.self.some?'self':'self'); }
+    else if(me && me.role==='person'){ view = (me.is_target===false ? 'evaluate' : 'self'); }
     render();
   }
 
@@ -6755,8 +6756,9 @@ const Hr = (function(){
 
     // タブ（本人＝自己評価／考課者は担当考課／経営はマスター）
     const tabs=[];
-    if(me.role==='person'){ tabs.push(['self','自己評価・申告書']); if((me.evaluatees||[]).length) tabs.push(['evaluate','担当の考課']); }
+    if(me.role==='person'){ if(me.is_target!==false) tabs.push(['self','自己評価・申告書']); if((me.evaluatees||[]).length) tabs.push(['evaluate','担当の考課']); }
     if(me.role==='master'){ tabs.push(['master','集計・ランク']); }
+    if(view==='self' && me.is_target===false) view='evaluate';
     let h='';
     h+=`<div class="hr-head"><div class="hr-who">${esc(me.name||'')}<span class="hr-kind">${esc(me.kind||'')}</span></div><div class="hr-period">${esc(period())}</div></div>`;
     if(tabs.length>1){ h+='<div class="hr-tabs">'+tabs.map(t=>`<button class="hr-tab${view===t[0]?' on':''}" onclick="Hr.go('${t[0]}')">${t[1]}</button>`).join('')+'</div>'; }
@@ -6825,7 +6827,11 @@ const Hr = (function(){
     if(curEval!=null){
       const p=ppl.find(x=>x.person_id===curEval); if(p){
         h+='<div class="hr-sec"><button class="hr-back" onclick="Hr.openSec(null)">← 閉じる</button>';
-        h+=`<div class="hr-sech">${esc(p.name)} <span class="hr-kind">${esc(p.kind)}</span> の二次考課</div>`;
+        h+=`<div class="hr-sech">${esc(p.name)} <span class="hr-kind">${esc(p.kind)}</span></div>`;
+        h+='<div class="hr-suqh">一次考課'+(p.evaluator1?'（担当: '+esc(p.evaluator1)+'）':'')+'</div>';
+        h+=scoreGrid(p.kind,p.primary||[],'mp',true);
+        h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveMasterPrimary()">一次考課を保存</button></div>';
+        h+='<div class="hr-suqh">二次考課</div>';
         h+=scoreGrid(p.kind,p.secondary||[],'x',true);
         h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveSecondary()">二次考課を保存</button></div></div>';
       }
@@ -6833,6 +6839,14 @@ const Hr = (function(){
     return h;
   }
   function openSec(id){ curEval=id; render(); if(id){ const el=$('view-hr'); if(el) el.scrollTop=el.scrollHeight; } }
+  function saveMasterPrimary(){
+    if(guard())return;
+    const p=(me.people||[]).find(x=>x.person_id===curEval); if(!p)return;
+    const prim=collect('mp',p.kind);
+    fire({action:'save_primary', hrm:keys().master, period:period(), person_id:p.person_id, primary:JSON.stringify(prim)});
+    p.primary=prim;
+    toast(p.name+' の一次考課を保存',true);
+  }
   function saveSecondary(){
     if(guard())return;
     const p=(me.people||[]).find(x=>x.person_id===curEval); if(!p)return;
@@ -6844,7 +6858,7 @@ const Hr = (function(){
 
   function go(v){ view=v; curEval=null; render(); }
   function init(){ /* ナビの表示制御は App.applyMode 後に App 側で行う */ }
-  return { loadAll, render, init, go, saveSelf, pickEval, savePrimary, openSec, saveSecondary, _pick, hasKey };
+  return { loadAll, render, init, go, saveSelf, pickEval, savePrimary, openSec, saveSecondary, saveMasterPrimary, _pick, hasKey };
 })();
 
 const Portal = (function(){
