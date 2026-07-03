@@ -2688,6 +2688,8 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-hr .hr-ylab{font-size:12px;font-weight:700;color:var(--text-dim);margin-right:2px}
 #view-hr .hr-ybtn{background:#f0f1f5;border:none;color:var(--text-dim);font:700 12px/1 'Noto Sans JP',sans-serif;padding:7px 14px;border-radius:999px;cursor:pointer}
 #view-hr .hr-ybtn.on{background:#ede9fe;color:#6d28d9}
+#view-hr .hr-ybtn.has{color:var(--text)}
+#view-hr .hr-yempty{font-size:10px;color:#b6b9c6;font-weight:700}
 #view-hr .hr-repview{background:#faf9fe;border:1px solid #eee7fb;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.6;color:var(--text)}
 #view-hr .hr-rvh{font-size:12px;font-weight:800;color:#6d28d9;margin:12px 0 4px}
 #view-hr .hr-rvh:first-child{margin-top:0}
@@ -6849,9 +6851,15 @@ const Hr = (function(){
   async function setPeriod(p){ if(p===curPeriod)return; curPeriod=p; curEval=null; const b=$('hrBody'); if(b)b.innerHTML='<div class="hr-lock">読み込み中…</div>'; await loadAgg(); render(); }
   function renderMaster(){
     const ppl=me.people||[];
-    const plist=[...new Set([period(),...(me.periods||[])])].sort().reverse();
-    let h='';
-    if(plist.length>1){ h+='<div class="hr-yearbar"><span class="hr-ylab">年度</span>'+plist.map(pp=>`<button class="hr-ybtn${pp===curPeriod?' on':''}" onclick="Hr.setPeriod('${esc(pp)}')">${esc(pp)}</button>`).join('')+'</div>'; }
+    // 年度セレクタ：データの有無に関わらず前後の年度も並べて行き来できる
+    const ynum=s=>{ const m=/(\d+)/.exec(s||''); return m?+m[1]:0; };
+    const cy=ynum(period())||new Date().getFullYear();
+    const gen=[]; for(let y=cy+1;y>=cy-3;y--) gen.push(y+'年度');
+    const have=new Set(me.periods||[]);
+    const plist=[...new Set([...gen,...(me.periods||[]),curPeriod])].sort((a,b)=>ynum(b)-ynum(a));
+    let h='<div class="hr-yearbar"><span class="hr-ylab">年度</span>'
+      +plist.map(pp=>`<button class="hr-ybtn${pp===curPeriod?' on':''}${have.has(pp)?' has':''}" onclick="Hr.setPeriod('${esc(pp)}')">${esc(pp)}${have.has(pp)?'':' <span class="hr-yempty">空</span>'}</button>`).join('')
+      +'</div>';
     h+='<div class="hr-sec"><div class="hr-sech">人事考課 集計（'+esc(curPeriod)+'）</div>';
     h+='<div class="hr-hint">最終得点＝一般:A×75%+B×25% / 管理職:A×50%+B×50%。一次考課が無い人（社長評価のみ等）は二次単独。補正係数は代表取締役判断で別途。行をタップで一次・二次を入力。</div>';
     if(!ppl.length){ h+='<div class="hr-empty">対象者がまだ登録されていません（staffシートで in_hr=TRUE に）。</div></div>'; return h; }
