@@ -3180,13 +3180,16 @@ const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO8
 /* 秘密の「経営者モード」：?boss=<キー> 一本で 本当のフルモード＝全ゾーン＋日報の記入状況ランキング＋人事考課マスター を解錠。
    URL自体が合言葉（localStorage不使用・端末に痕跡を残さない）。旧 ?stats= / ?hrm= も後方互換で有効。 */
 const BOSS_KEY='kotobuki-keiei';
-/* ?boss=キー で解錠しlocalStorageに保持（ホーム画面アプリでも維持）。?boss=off で解除。 */
+/* boss解錠。PCブラウザ等の通常タブは「URLに ?boss=キー がある時だけ」＝保持しない（共用PCで漏れない）。
+   ホーム画面アプリ(standalone/PWA)の時だけ localStorage に保持＝アイコン起動でも維持。?boss=off で解除。 */
+function bossStandalone(){ try{ return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true; }catch(e){ return false; } }
 function bossOn(){
   try{
     const v=new URLSearchParams(location.search).get('boss');
     if(v==='off'){ try{localStorage.removeItem('spa_boss');}catch(e){} return false; }
-    if(v===BOSS_KEY){ try{localStorage.setItem('spa_boss','1');}catch(e){} return true; }
-    try{ return localStorage.getItem('spa_boss')==='1'; }catch(e){ return false; }
+    if(v===BOSS_KEY){ if(bossStandalone()){ try{localStorage.setItem('spa_boss','1');}catch(e){} } return true; }
+    if(bossStandalone()){ try{ return localStorage.getItem('spa_boss')==='1'; }catch(e){} }
+    return false;
   }catch(e){ return false; }
 }
 const dow='日月火水木金土';
