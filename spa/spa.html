@@ -3188,7 +3188,9 @@ function bossOn(){
     const v=new URLSearchParams(location.search).get('boss');
     if(v==='off'){ try{localStorage.removeItem('spa_boss');}catch(e){} return false; }
     if(v===BOSS_KEY){ if(bossStandalone()){ try{localStorage.setItem('spa_boss','1');}catch(e){} } return true; }
-    try{ return localStorage.getItem('spa_boss')==='1'; }catch(e){ return false; }
+    /* 保持を読むのはホーム画面アプリ(standalone)の時だけ＝通常ブラウザはURLに ?boss= が無ければ常にOFF（残骸で居座らない・共用PCで漏れない） */
+    if(bossStandalone()){ try{ return localStorage.getItem('spa_boss')==='1'; }catch(e){} }
+    return false;
   }catch(e){ return false; }
 }
 /* ポータルの「寿テント」を素早く7回タップ→キー入力で経営者モードON（保持）。iOSのホーム画面アプリ用の確実な入口。もう一度7回で解除。 */
