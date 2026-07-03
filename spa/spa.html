@@ -2693,6 +2693,11 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-hr .hr-modal-x{background:none;border:none;font-size:26px;line-height:1;color:var(--text-dim);cursor:pointer;padding:0 4px;flex-shrink:0}
 #view-hr .hr-modal-x:hover{color:var(--text)}
 #view-hr .hr-modal-body{padding:4px 18px 20px;overflow-y:auto}
+#view-hr .hr-mstats{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0 12px;border-bottom:1px solid #f0f1f5}
+#view-hr .hr-mstat{display:flex;flex-direction:column;align-items:center;gap:2px;background:#faf9fe;border:1px solid #eee7fb;border-radius:9px;padding:8px 16px;min-width:64px}
+#view-hr .hr-mstat span{font-size:10px;color:var(--text-dim);font-weight:700}
+#view-hr .hr-mstat b{font-size:18px;font-weight:900}
+#view-hr .hr-mstat.solo{justify-content:center;color:#d97706;font-weight:800;font-size:12px;background:#fff7ed;border-color:#fed7aa}
 #view-hr .hr-modal-body .hr-actbar{padding:8px 0}
 #view-hr .hr-yearbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px var(--hrpad) 10px}
 #view-hr .hr-ylab{font-size:12px;font-weight:700;color:var(--text-dim);margin-right:2px}
@@ -6900,9 +6905,11 @@ const Hr = (function(){
     h+='</tbody></table></div></div>';
     if(curEval!=null){
       const p=ppl.find(x=>x.person_id===curEval); if(p){
-        h+='<div class="hr-modal-bg" onclick="Hr.openSec(null)"><div class="hr-modal" onclick="event.stopPropagation()">';
+        const mc=calc(p.kind,p.primary||[],p.secondary||[]);
+        h+='<div class="hr-modal-bg"><div class="hr-modal">';
         h+=`<div class="hr-modal-hd"><div class="hr-sech">${esc(p.name)} <span class="hr-kind">${esc(p.kind)}</span></div><button class="hr-modal-x" onclick="Hr.openSec(null)" aria-label="閉じる">×</button></div>`;
         h+='<div class="hr-modal-body">';
+        h+=`<div class="hr-mstats"><div class="hr-mstat"><span>A(一次)</span><b>${mc.A}</b></div><div class="hr-mstat"><span>B(二次)</span><b>${mc.B}</b></div><div class="hr-mstat"><span>最終</span><b>${mc.final%1?mc.final.toFixed(2):mc.final}</b></div><div class="hr-mstat"><span>ランク</span><b class="hr-rk rk-${mc.rank}">${mc.rank}</b></div>${mc.solo?'<div class="hr-mstat solo">二次単独</div>':''}</div>`;
         if((p.self&&p.self.some(v=>+v>0)) || hasReport(p.report)){
           h+='<div class="hr-suqh">本人の自己評価・自己申告書</div>';
           if(p.self&&p.self.some(v=>+v>0)) h+=scoreGrid(p.kind,p.self,'sv',false);
@@ -6927,6 +6934,7 @@ const Hr = (function(){
     fire({action:'save_primary', hrm:keys().master, period:curPeriod, person_id:p.person_id, primary:JSON.stringify(prim)});
     p.primary=prim;
     toast(p.name+' の一次考課を保存',true);
+    render();
   }
   function saveSecondary(){
     if(guard())return;
@@ -6935,6 +6943,7 @@ const Hr = (function(){
     fire({action:'save_secondary', hrm:keys().master, period:curPeriod, person_id:p.person_id, secondary:JSON.stringify(sec)});
     p.secondary=sec;
     toast(p.name+' の二次考課を保存',true);
+    render();
   }
 
   function go(v){ view=v; curEval=null; render(); }
