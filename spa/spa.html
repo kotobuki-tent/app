@@ -3171,6 +3171,10 @@ table.jobs tr:last-child td{border-bottom:none}
    API dow pad parseD esc vr $ _getCache _setCache fireAndForget toast safeRefresh centerActiveNav
    ======================================================================== */
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+/* 秘密の「経営者モード」：?boss=<キー> 一本で 本当のフルモード＝全ゾーン＋日報の記入状況ランキング＋人事考課マスター を解錠。
+   URL自体が合言葉（localStorage不使用・端末に痕跡を残さない）。旧 ?stats= / ?hrm= も後方互換で有効。 */
+const BOSS_KEY='kotobuki-keiei';
+function bossOn(){ try{ return new URLSearchParams(location.search).get('boss')===BOSS_KEY; }catch(e){ return false; } }
 const dow='日月火水木金土';
 const today=new Date();today.setHours(0,0,0,0);
 const pad=n=>String(n).padStart(2,'0');
@@ -6084,7 +6088,7 @@ const Daily = (function(){
   // 記憶しない＝内緒URLで開いてる間だけ見える（通常URLなら出ない・共用端末でも痕跡なし）。キーはこの1行を書き換えるだけ。
   const STATS_KEY='kotobuki';
   function statsUnlocked(){
-    try{ return new URLSearchParams(location.search).get('stats')===STATS_KEY; }catch(e){ return false; }
+    try{ return bossOn() || new URLSearchParams(location.search).get('stats')===STATS_KEY; }catch(e){ return false; }
   }
   function render(){
     const unlocked=statsUnlocked(); const st=$('statsTab'); if(st) st.style.display=unlocked?'':'none';
@@ -6711,7 +6715,7 @@ const Hr = (function(){
   let me=null, view='self', curEval=null, _busy=false, _loadedKey=null, curPeriod=period();
   let aggCache={}, _aggLoading=false;
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
-  function keys(){ const p=new URLSearchParams(location.search); return {master:p.get('hrm')||'', token:p.get('hr')||''}; }
+  function keys(){ const p=new URLSearchParams(location.search); return {master:p.get('hrm')||(bossOn()?BOSS_KEY:''), token:p.get('hr')||''}; }
   function hasKey(){ const k=keys(); return !!(k.master||k.token); }
   async function apiGet(qs){ try{ const r=await fetch(API+'?dept=hr&'+qs); return await r.json(); }catch(e){ return null; } }
   function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'hr',...body})}); }catch(e){} }
@@ -8237,7 +8241,9 @@ setInterval(()=>{
 window.addEventListener('load', ()=>{
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   initMobileFilters();
-  // 人事考課ナビは内緒URL（?hr= / ?hrm=）を持っている端末だけに出す（applyMode前に解錠＝仕切り線も正しく出す）
+  // 経営者モード（?boss=）＝本当のフルモード：全ゾーン表示に強制（localStorageには保存しない＝URLでだけ有効）
+  if(bossOn()) App.mode='full';
+  // 人事考課ナビは内緒URL（?boss= / ?hr= / ?hrm=）を持っている端末だけに出す（applyMode前に解錠＝仕切り線も正しく出す）
   try{ if(typeof Hr!=='undefined' && Hr.hasKey()){ const nb=$('navHr'); if(nb) nb.classList.remove('hidden'); } }catch(e){}
   App.applyMode();
   App.current=null;
