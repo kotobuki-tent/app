@@ -3185,6 +3185,8 @@ const BOSS_KEY='kotobuki-keiei';
 function bossStandalone(){ try{ return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true; }catch(e){ return false; } }
 function bossOn(){
   try{
+    /* 点検モード端末（事務所前・工場のタブレット）は経営者モードにしない＝共用kioskで人事考課等が絶対に出ない安全ガード */
+    try{ if(localStorage.getItem('spa_mode')==='kiosk'){ localStorage.removeItem('spa_boss'); return false; } }catch(e){}
     const v=new URLSearchParams(location.search).get('boss');
     if(v==='off'){ try{localStorage.removeItem('spa_boss');}catch(e){} return false; }
     if(v===BOSS_KEY){ if(bossStandalone()){ try{localStorage.setItem('spa_boss','1');}catch(e){} } return true; }
