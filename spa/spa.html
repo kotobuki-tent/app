@@ -1692,7 +1692,6 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navForklift" data-zone="office" data-kiosk onclick="App.nav('forklift')">リフト</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navCard" data-zone="office" data-kiosk onclick="App.nav('card')">カード</button>
-    <button class="nav-link hidden" id="navHr" onclick="App.nav('hr')">人事考課</button>
     <div class="nav-spacer"></div>
     <span class="nav-div"></span>
     <button class="nav-link" id="navCases" data-zone="office" onclick="App.nav('cases')">案件</button>
@@ -1706,6 +1705,8 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navInv" data-zone="office" onclick="App.nav('inv')">在庫</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navVeh" data-zone="office" onclick="App.nav('veh')">車両</button>
+    <span class="nav-div"></span>
+    <button class="nav-link hidden" id="navHr" onclick="App.nav('hr')">人事考課</button>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
 </div>
@@ -8216,9 +8217,9 @@ setInterval(()=>{
 window.addEventListener('load', ()=>{
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   initMobileFilters();
-  App.applyMode();
-  // 人事考課ナビは内緒URL（?hr= / ?hrm=）を持っている端末だけに出す
+  // 人事考課ナビは内緒URL（?hr= / ?hrm=）を持っている端末だけに出す（applyMode前に解錠＝仕切り線も正しく出す）
   try{ if(typeof Hr!=='undefined' && Hr.hasKey()){ const nb=$('navHr'); if(nb) nb.classList.remove('hidden'); } }catch(e){}
+  App.applyMode();
   App.current=null;
   App.nav((_deepGo && App.reg(_deepGo)) ? _deepGo : 'portal');
 });
