@@ -2684,6 +2684,13 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-hr .hr-opt.ro.on{background:#c4b5fd;color:#3b0764}
 #view-hr .hr-qh{font-size:14px;font-weight:800;color:#6d28d9;margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid #ede9fe}
 #view-hr .hr-suqh{font-size:13px;font-weight:800;color:#6d28d9;margin:16px 0 6px}
+#view-hr .hr-repview{background:#faf9fe;border:1px solid #eee7fb;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.6;color:var(--text)}
+#view-hr .hr-rvh{font-size:12px;font-weight:800;color:#6d28d9;margin:12px 0 4px}
+#view-hr .hr-rvh:first-child{margin-top:0}
+#view-hr .hr-rvitem{margin:4px 0}
+#view-hr .hr-rvsub{color:var(--text-dim);font-size:12px;margin:2px 0 0 14px}
+#view-hr .hr-rvlab{display:inline-block;font-size:11px;font-weight:700;color:#7c3aed;background:#f3e8ff;border-radius:5px;padding:1px 7px;margin-right:6px}
+#view-hr .hr-rvach{font-size:11px;font-weight:700;color:#16a34a;margin-left:4px}
 #view-hr .hr-flab{display:block;font-size:12px;font-weight:700;color:var(--text-dim);margin:10px 0 4px}
 #view-hr .hr-in,#view-hr .hr-ta,#view-hr .hr-sel{width:100%;border:1.5px solid #e5e7ef;border-radius:9px;padding:10px 12px;font:400 15px/1.5 'Noto Sans JP',sans-serif;color:var(--text);background:#fafbfd}
 #view-hr .hr-in:focus,#view-hr .hr-ta:focus,#view-hr .hr-sel:focus{outline:none;border-color:#a855f7;background:#fff}
@@ -6750,6 +6757,23 @@ const Hr = (function(){
     const goals=[]; for(let i=0;i<3;i++){ goals.push({goal:$('hr_goal'+i).value.trim(),achieve:$('hr_ach'+i).value,result:$('hr_res'+i).value.trim()}); }
     return { goals, q2a:$('hr_q2a').value.trim(), q2b:$('hr_q2b').value.trim(), q3a:$('hr_q3a').value.trim(), q3b:$('hr_q3b').value.trim() };
   }
+  // ---- 自己申告書の読み取り専用表示（マスターで各人の申告書を読む用）----
+  function hasReport(rep){ if(!rep)return false; const g=rep.goals||[]; return g.some(x=>x&&(String(x.goal||'').trim()||String(x.result||'').trim()))||[rep.q2a,rep.q2b,rep.q3a,rep.q3b].some(v=>String(v||'').trim()); }
+  function reportView(rep){
+    rep=rep||{}; const has=v=>String(v||'').trim();
+    const nl=t=>esc(t).replace(/\n/g,'<br>');
+    let h='<div class="hr-repview">';
+    const goals=(rep.goals||[]).filter(x=>x&&(has(x.goal)||has(x.result)||has(x.achieve)));
+    if(goals.length){
+      h+='<div class="hr-rvh">問1 今期の重点目標と達成状況</div>';
+      goals.forEach((x,i)=>{ h+=`<div class="hr-rvitem"><b>(${i+1})</b> ${nl(x.goal)}${x.achieve?' <span class="hr-rvach">達成 '+esc(x.achieve)+'</span>':''}${has(x.result)?'<div class="hr-rvsub">成果：'+nl(x.result)+'</div>':''}</div>`; });
+    }
+    const q=(lab,v)=>has(v)?`<div class="hr-rvitem"><span class="hr-rvlab">${lab}</span>${nl(v)}</div>`:'';
+    if(has(rep.q2a)||has(rep.q2b)){ h+='<div class="hr-rvh">問2 日常業務／マネジメント</div>'+q('工夫・改善（育成）',rep.q2a)+q('困難と解決（課題）',rep.q2b); }
+    if(has(rep.q3a)||has(rep.q3b)){ h+='<div class="hr-rvh">問3 次期に向けて</div>'+q('次期の重点目標',rep.q3a)+q('自己改善・強化点',rep.q3b); }
+    h+='</div>';
+    return h;
+  }
 
   function render(){
     const el=$('hrBody'); if(!el) return;
@@ -6831,6 +6855,11 @@ const Hr = (function(){
       const p=ppl.find(x=>x.person_id===curEval); if(p){
         h+='<div class="hr-sec"><button class="hr-back" onclick="Hr.openSec(null)">← 閉じる</button>';
         h+=`<div class="hr-sech">${esc(p.name)} <span class="hr-kind">${esc(p.kind)}</span></div>`;
+        if((p.self&&p.self.some(v=>+v>0)) || hasReport(p.report)){
+          h+='<div class="hr-suqh">本人の自己評価・自己申告書</div>';
+          if(p.self&&p.self.some(v=>+v>0)) h+=scoreGrid(p.kind,p.self,'sv',false);
+          if(hasReport(p.report)) h+=reportView(p.report);
+        }
         h+='<div class="hr-suqh">一次考課'+(p.evaluator1?'（担当: '+esc(p.evaluator1)+'）':'')+'</div>';
         h+=scoreGrid(p.kind,p.primary||[],'mp',true);
         h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveMasterPrimary()">一次考課を保存</button></div>';
