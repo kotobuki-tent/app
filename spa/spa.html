@@ -123,7 +123,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .boss-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:250;pointer-events:none;display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:999px;font:800 12px/1 'Noto Sans JP',sans-serif;color:#7a5300;background:linear-gradient(135deg,#fde68a,#fbbf24);border:1px solid #f0a900;white-space:nowrap;box-shadow:0 2px 8px rgba(217,138,0,.4);letter-spacing:.08em}
 .boss-badge .boss-crown{font-size:14px;line-height:1}
 body.boss .hdr{border-bottom:2px solid #f0a900}
-@media(max-width:600px){ .boss-badge{font-size:0;gap:0;padding:6px 9px;margin:0 6px 0 2px} .boss-badge .boss-crown{font-size:15px} }
+@media(max-width:600px){ .boss-badge{font-size:0;gap:0;padding:6px 9px} .boss-badge .boss-crown{font-size:15px} .boss-badge .boss-crown:last-child{display:none} }
 .nav-link{background:transparent;border:none;color:var(--text-dim);font:500 13px/1 'Noto Sans JP',sans-serif;padding:0 13px;border-radius:8px 8px 0 0;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;margin-bottom:0;position:relative;white-space:nowrap}
 .nav-link:hover{color:var(--text);background:var(--surface3)}
 .nav-link.on{background:transparent;color:var(--text);font-weight:700}
@@ -1713,7 +1713,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link hidden" id="navHr" onclick="App.nav('hr')">人事考課</button>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
-  <div class="boss-badge hidden" id="bossBadge" title="BOSS MODE（?boss=）で開いています"><span class="boss-crown">♛</span>BOSS MODE</div>
+  <div class="boss-badge hidden" id="bossBadge" title="BOSS MODE（?boss=）で開いています"><span class="boss-crown">♛</span>BOSS MODE<span class="boss-crown">♛</span></div>
 </div>
 
 <!-- ===== 案件登録 section ===== -->
