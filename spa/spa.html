@@ -2597,7 +2597,7 @@ table.jobs tr:last-child td{border-bottom:none}
 <!-- ===== ポータル section（入口・リンク集） ===== -->
 <section id="view-portal">
   <div class="portal-wrap">
-    <div class="portal-logo">寿テント</div>
+    <div class="portal-logo" onclick="bossTap()">寿テント</div>
     <div class="portal-sub">業務管理システム</div>
     <div class="portal-modeswitch">
       <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
@@ -3188,9 +3188,26 @@ function bossOn(){
     const v=new URLSearchParams(location.search).get('boss');
     if(v==='off'){ try{localStorage.removeItem('spa_boss');}catch(e){} return false; }
     if(v===BOSS_KEY){ if(bossStandalone()){ try{localStorage.setItem('spa_boss','1');}catch(e){} } return true; }
-    if(bossStandalone()){ try{ return localStorage.getItem('spa_boss')==='1'; }catch(e){} }
-    return false;
+    try{ return localStorage.getItem('spa_boss')==='1'; }catch(e){ return false; }
   }catch(e){ return false; }
+}
+/* ポータルの「寿テント」を素早く7回タップ→キー入力で経営者モードON（保持）。iOSのホーム画面アプリ用の確実な入口。もう一度7回で解除。 */
+function bossTap(){
+  try{
+    var f=bossTap, now=Date.now();
+    if(!f._t || now-f._t>1500) f._n=0;
+    f._t=now; f._n=(f._n||0)+1;
+    if(f._n>=7){
+      f._n=0;
+      if(localStorage.getItem('spa_boss')==='1'){
+        if(confirm('経営者モードを解除しますか？')){ try{localStorage.removeItem('spa_boss');}catch(e){} location.reload(); }
+      }else{
+        var k=prompt('経営者キーを入力');
+        if(k===BOSS_KEY){ try{localStorage.setItem('spa_boss','1');}catch(e){} location.reload(); }
+        else if(k!=null){ alert('キーが違います'); }
+      }
+    }
+  }catch(e){}
 }
 const dow='日月火水木金土';
 const today=new Date();today.setHours(0,0,0,0);
