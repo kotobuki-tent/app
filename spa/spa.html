@@ -2685,6 +2685,15 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-hr .hr-opt.ro.on{background:#c4b5fd;color:#3b0764}
 #view-hr .hr-qh{font-size:14px;font-weight:800;color:#6d28d9;margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid #ede9fe}
 #view-hr .hr-suqh{font-size:13px;font-weight:800;color:#6d28d9;margin:16px 0 6px}
+#view-hr .hr-modal-bg{position:fixed;inset:0;background:rgba(20,16,40,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;animation:hrfade .15s ease}
+@keyframes hrfade{from{opacity:0}to{opacity:1}}
+#view-hr .hr-modal{background:#fff;border-radius:16px;width:100%;max-width:640px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+#view-hr .hr-modal-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 18px;border-bottom:1px solid #eee7fb;flex-shrink:0}
+#view-hr .hr-modal-hd .hr-sech{margin:0}
+#view-hr .hr-modal-x{background:none;border:none;font-size:26px;line-height:1;color:var(--text-dim);cursor:pointer;padding:0 4px;flex-shrink:0}
+#view-hr .hr-modal-x:hover{color:var(--text)}
+#view-hr .hr-modal-body{padding:4px 18px 20px;overflow-y:auto}
+#view-hr .hr-modal-body .hr-actbar{padding:8px 0}
 #view-hr .hr-yearbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px var(--hrpad) 10px}
 #view-hr .hr-ylab{font-size:12px;font-weight:700;color:var(--text-dim);margin-right:2px}
 #view-hr .hr-ybtn{background:#f0f1f5;border:none;color:var(--text-dim);font:700 12px/1 'Noto Sans JP',sans-serif;padding:7px 14px;border-radius:999px;cursor:pointer}
@@ -6891,8 +6900,9 @@ const Hr = (function(){
     h+='</tbody></table></div></div>';
     if(curEval!=null){
       const p=ppl.find(x=>x.person_id===curEval); if(p){
-        h+='<div class="hr-sec"><button class="hr-back" onclick="Hr.openSec(null)">← 閉じる</button>';
-        h+=`<div class="hr-sech">${esc(p.name)} <span class="hr-kind">${esc(p.kind)}</span></div>`;
+        h+='<div class="hr-modal-bg" onclick="Hr.openSec(null)"><div class="hr-modal" onclick="event.stopPropagation()">';
+        h+=`<div class="hr-modal-hd"><div class="hr-sech">${esc(p.name)} <span class="hr-kind">${esc(p.kind)}</span></div><button class="hr-modal-x" onclick="Hr.openSec(null)" aria-label="閉じる">×</button></div>`;
+        h+='<div class="hr-modal-body">';
         if((p.self&&p.self.some(v=>+v>0)) || hasReport(p.report)){
           h+='<div class="hr-suqh">本人の自己評価・自己申告書</div>';
           if(p.self&&p.self.some(v=>+v>0)) h+=scoreGrid(p.kind,p.self,'sv',false);
@@ -6903,12 +6913,13 @@ const Hr = (function(){
         h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveMasterPrimary()">一次考課を保存</button></div>';
         h+='<div class="hr-suqh">二次考課</div>';
         h+=scoreGrid(p.kind,p.secondary||[],'x',true);
-        h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveSecondary()">二次考課を保存</button></div></div>';
+        h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveSecondary()">二次考課を保存</button></div>';
+        h+='</div></div></div>';
       }
     }
     return h;
   }
-  function openSec(id){ curEval=id; render(); if(id){ const el=$('view-hr'); if(el) el.scrollTop=el.scrollHeight; } }
+  function openSec(id){ curEval=id; render(); }
   function saveMasterPrimary(){
     if(guard())return;
     const p=(me.people||[]).find(x=>x.person_id===curEval); if(!p)return;
