@@ -6711,7 +6711,13 @@ const Hr = (function(){
     const j = await apiGet(q);
     me = (j&&j.success)? j : (j? {error:j.error||'不許可'} : {error:'通信エラー'});
     _loadedKey = k.master||k.token;
-    if(me && me.role==='master'){ await loadAgg(true); view='master'; }
+    if(me && me.role==='master'){
+      await loadAgg(true);
+      // 現年度が空でデータのある年度があれば、最新のデータ年度を開く
+      const hasData=arr=>arr&&arr.some(p=>(p.primary&&p.primary.length)||(p.secondary&&p.secondary.length));
+      if((me.periods||[]).length && !hasData(me.people) && me.periods.indexOf(curPeriod)<0){ curPeriod=me.periods[0]; await loadAgg(true); }
+      view='master';
+    }
     else if(me && me.role==='person'){ view = (me.is_target===false ? 'evaluate' : 'self'); }
     render();
   }
@@ -6864,9 +6870,9 @@ const Hr = (function(){
     // 年度セレクタ：データの有無に関わらず前後の年度も並べて行き来できる
     const ynum=s=>{ const m=/(\d+)/.exec(s||''); return m?+m[1]:0; };
     const cy=ynum(period())||new Date().getFullYear();
-    const gen=[]; for(let y=cy+1;y>=cy-3;y--) gen.push(y+'年度');
+    const gen=[]; for(let y=cy-2;y<=cy;y++) gen.push(y+'年度');   // 現年度と前2年
     const have=new Set(me.periods||[]);
-    const plist=[...new Set([...gen,...(me.periods||[]),curPeriod])].sort((a,b)=>ynum(b)-ynum(a));
+    const plist=[...new Set([...gen,...(me.periods||[]),curPeriod])].sort((a,b)=>ynum(a)-ynum(b));  // 昇順＝左が古い
     let h='<div class="hr-yearbar"><span class="hr-ylab">年度</span>'
       +plist.map(pp=>`<button class="hr-ybtn${pp===curPeriod?' on':''}${have.has(pp)?' has':''}" onclick="Hr.setPeriod('${esc(pp)}')">${esc(pp)}${have.has(pp)?'':' <span class="hr-yempty">空</span>'}</button>`).join('')
       +'</div>';
