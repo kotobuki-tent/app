@@ -6694,6 +6694,7 @@ const Hr = (function(){
   }
 
   let me=null, view='self', curEval=null, _busy=false, _loadedKey=null, curPeriod=period();
+  let aggCache={}, _aggLoading=false;
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   function keys(){ const p=new URLSearchParams(location.search); return {master:p.get('hrm')||'', token:p.get('hr')||''}; }
   function hasKey(){ const k=keys(); return !!(k.master||k.token); }
@@ -6710,7 +6711,7 @@ const Hr = (function(){
     const j = await apiGet(q);
     me = (j&&j.success)? j : (j? {error:j.error||'不許可'} : {error:'通信エラー'});
     _loadedKey = k.master||k.token;
-    if(me && me.role==='master'){ await loadAgg(); view='master'; }
+    if(me && me.role==='master'){ await loadAgg(true); view='master'; }
     else if(me && me.role==='person'){ view = (me.is_target===false ? 'evaluate' : 'self'); }
     render();
   }
@@ -6844,11 +6845,20 @@ const Hr = (function(){
     toast(p.name+' の一次考課を保存',true);
   }
 
-  async function loadAgg(){
+  async function loadAgg(force){
+    if(!force && aggCache[curPeriod]){ me.people=aggCache[curPeriod].people; me.periods=aggCache[curPeriod].periods||me.periods; return; }
     const a=await apiGet('action=aggregate&hrm='+encodeURIComponent(keys().master)+'&period='+encodeURIComponent(curPeriod));
-    if(a&&a.success){ me.people=a.people||[]; me.periods=a.periods||[]; } else { me.people=[]; me.periods=me.periods||[]; }
+    if(a&&a.success){ aggCache[curPeriod]={people:a.people||[],periods:a.periods||[]}; me.people=a.people||[]; me.periods=a.periods||[]; }
+    else { me.people=[]; me.periods=me.periods||[]; }
   }
-  async function setPeriod(p){ if(p===curPeriod)return; curPeriod=p; curEval=null; const b=$('hrBody'); if(b)b.innerHTML='<div class="hr-lock">読み込み中…</div>'; await loadAgg(); render(); }
+  async function setPeriod(p){
+    if(p===curPeriod)return;
+    curPeriod=p; curEval=null;
+    if(aggCache[p]){ me.people=aggCache[p].people; me.periods=aggCache[p].periods||me.periods; render(); return; } // キャッシュ有＝即
+    _aggLoading=true; render();      // 年度バーは残したまま読み込み表示
+    await loadAgg();
+    _aggLoading=false; render();
+  }
   function renderMaster(){
     const ppl=me.people||[];
     // 年度セレクタ：データの有無に関わらず前後の年度も並べて行き来できる
@@ -6862,6 +6872,7 @@ const Hr = (function(){
       +'</div>';
     h+='<div class="hr-sec"><div class="hr-sech">人事考課 集計（'+esc(curPeriod)+'）</div>';
     h+='<div class="hr-hint">最終得点＝一般:A×75%+B×25% / 管理職:A×50%+B×50%。一次考課が無い人（社長評価のみ等）は二次単独。補正係数は代表取締役判断で別途。行をタップで一次・二次を入力。</div>';
+    if(_aggLoading){ h+='<div class="hr-empty">読み込み中…</div></div>'; return h; }
     if(!ppl.length){ h+='<div class="hr-empty">対象者がまだ登録されていません（staffシートで in_hr=TRUE に）。</div></div>'; return h; }
     const rows=ppl.map(p=>{ const c=calc(p.kind,p.primary||[],p.secondary||[]); return {p,c}; })
                   .sort((a,b)=>b.c.final-a.c.final);
