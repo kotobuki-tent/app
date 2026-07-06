@@ -6060,7 +6060,9 @@ const Labor = (function(){
   function closeDetail(){$('detailModal').classList.remove('show')}
   function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
   function setArchive(id,on){
-    if(_arcBusy)return;_arcBusy=true;setTimeout(()=>_arcBusy=false,1500);
+    if(_arcBusy)return;
+    if(!confirm(on?'この工数をアーカイブへ移しますか？（一覧から見えなくなります）':'アーカイブを解除して一覧に戻しますか？'))return;
+    _arcBusy=true;setTimeout(()=>_arcBusy=false,1500);
     const job=allJobs.find(x=>String(x.id)===String(id));if(!job){_arcBusy=false;return}
     job.labor_archived=on?'TRUE':'';
     _setCache('labor',{jobs:allJobs});
@@ -7491,7 +7493,7 @@ const Cases = (function(){
     $('caseSlogBg').classList.add('show'); }
   function closeSlog(){ $('caseSlogBg').classList.remove('show'); }
   function toggleInv(id){ const c=_find(id); if(!c)return; const nv=!_inv(c.invoiced); c.invoiced=nv; fireAndForget({dept:'cases',action:'invoiced',id,invoiced:nv}); _invalidateDepts(); }
-  function archive(id){ const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); }
+  function archive(id){ if(!confirm('この案件をアーカイブへ移しますか？（一覧から見えなくなります）'))return; const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); }
   // 締め待ち（完了・伝票済）を一括アーカイブ。状態変更の代行ではなく、現場が完了済のものの書類整理。
   function archiveSettled(){
     const settled=_cases.filter(c=>!_arch(c.archived)&&c.status==='完了'&&_inv(c.invoiced));
@@ -7501,7 +7503,7 @@ const Cases = (function(){
     toast(settled.length+'件をアーカイブしました'); render();
     setTimeout(loadAll, settled.length*120+2500);
   }
-  function unarchive(id){ const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); }
+  function unarchive(id){ if(!confirm('この案件を一覧に戻しますか？'))return; const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); }
   function del(id){ if(!confirm('この案件を削除しますか？（生産/企画制作の明細は残ります）'))return; _cases=_cases.filter(c=>String(c.id)!==String(id)); fireAndForget({dept:'cases',action:'delete',id}); toast('削除しました'); render(); }
   function search(v){ _q=v; const qq=v.trim().toLowerCase(); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||tr.textContent.toLowerCase().includes(qq))?'':'none'; }); }
   function sortBy(col){ if(_sort.col===col)_sort.asc=!_sort.asc; else {_sort.col=col;_sort.asc=true;} render(); }
