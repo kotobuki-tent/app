@@ -3821,6 +3821,8 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
   function unlinkFile(fileId){
     if(_busyFile)return;
     const d=prodData.find(x=>String(x.id)===String(currentViewId));if(!d)return;
+    const _f=(driveFiles||[]).find(x=>x.id===fileId);const _nm=_f?_f.name:'この製作図';
+    if(!confirm('「'+_nm+'」の紐付けを解除しますか？\n（図面ファイル自体は消えません。後から付け直せます）'))return;
     _busyFile=true;
     const ids=getLinkedFileIds(d).filter(x=>x!==fileId);
     d.files=ids.join(',');
