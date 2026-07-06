@@ -1159,6 +1159,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #dailyViewContent{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;align-items:start}
 #dailyViewContent>.card{grid-column:1/-1;margin-bottom:0}
 #dailyViewContent>.member-group{margin-bottom:0}
+#dailyViewContent>.dv-tblwrap{grid-column:1/-1}
 /* 記入状況ランキング */
 #statsView .stats-head{margin-bottom:12px}
 #statsView .stats-sub{font-size:14px;color:var(--text)}
@@ -1650,6 +1651,37 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-daily .member-group h3{background:linear-gradient(90deg,var(--accent-dim),transparent);border-left:3px solid var(--accent)}
 #view-daily .status-section.status-notwritten{background:var(--red-dim);border-radius:12px}
 #view-daily .status-item{border-radius:10px}
+/* みんなの日報：横画面は表で一覧（1行=1作業・人ごとにまとめ）。縦画面はカード風に畳む */
+#view-daily .dv-tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#view-daily .dv-tbl{width:100%;border-collapse:collapse;font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+#view-daily .dv-tbl thead th{text-align:left;font-size:11px;font-weight:700;color:var(--text-dim);padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--border-light);white-space:nowrap}
+#view-daily .dv-tbl thead th.r{text-align:right}
+#view-daily .dv-tbl td{padding:9px 14px;border-bottom:1px solid var(--border-light);vertical-align:top}
+#view-daily .dv-emp td{background:linear-gradient(90deg,var(--accent-dim),transparent);border-top:2px solid var(--border);padding:8px 14px}
+#view-daily .dv-empname{font-weight:800;font-size:14px;color:var(--text)}
+#view-daily .dv-me{color:var(--accent);font-size:11px;font-weight:600;margin-left:5px}
+#view-daily .dv-empmeta{color:var(--text-dim);font-size:12px;margin-left:10px}
+#view-daily .dv-proj{font-weight:600;color:var(--text);width:100%;min-width:200px}
+#view-daily .dv-work{padding-right:28px}
+#view-daily .dv-note{color:var(--text-faint);font-size:12px;font-style:italic;margin-top:2px;font-weight:400}
+#view-daily .dv-work{color:var(--accent);font-weight:600;white-space:nowrap}
+#view-daily .dv-min{text-align:right;white-space:nowrap;color:var(--text-dim);font-variant-numeric:tabular-nums}
+#view-daily .dv-actc{text-align:right;white-space:nowrap;width:1%}
+#view-daily .dv-edit{padding:4px 10px;font-size:12px}
+#view-daily .dv-row:hover td{background:var(--surface2)}
+@media(orientation:portrait){
+  #view-daily .dv-tblwrap{overflow-x:visible}
+  #view-daily .dv-tbl{border:none;background:transparent}
+  #view-daily .dv-tbl thead{display:none}
+  #view-daily .dv-tbl,#view-daily .dv-tbl tbody,#view-daily .dv-tbl tr,#view-daily .dv-tbl td{display:block;width:auto}
+  #view-daily .dv-emp td{border-radius:10px 10px 0 0;border-top:none;margin-top:12px}
+  #view-daily .dv-row{background:var(--surface);border:1px solid var(--border);border-top:none}
+  #view-daily .dv-row td{border-bottom:1px dashed var(--border-light);padding:7px 14px}
+  #view-daily .dv-row td:last-child:empty{display:none}
+  #view-daily .dv-proj{min-width:0}
+  #view-daily .dv-min,#view-daily .dv-actc{text-align:left}
+  #view-daily .dv-tbl td[data-l]::before{content:attr(data-l) '：';color:var(--text-faint);font-size:11px;font-weight:600;margin-right:6px}
+}
 
 /* 時間外：週バー・日行に奥行き、チップに滑らかさと選択時の浮き */
 #view-ot .week-bar{border-bottom:none;box-shadow:0 1px 2px rgba(16,24,40,.05);position:relative;z-index:1}
@@ -6358,22 +6390,22 @@ const Daily = (function(){
       el.innerHTML=`<div class="card"><div class="empty-msg">${msg}</div></div>`;return;
     }
     if(viewIsOffDay&&!reports.length&&absenceList.length===0){el.innerHTML='<div class="card"><div class="empty-msg">この日は休日のため、出勤した人だけが記録します</div></div>';return}
+    let dvRows='';
     empOrder.forEach(empNo=>{
       const entries=byEmp[empNo];if(!entries||!entries.length)return;
       const st=staffList.find(s=>String(s.employee_no)===String(empNo));const name=st?st.name:('社員'+empNo);
       const totalMins=entries.reduce((sum,e)=>sum+(parseInt(e.minutes,10)||0),0);
-      const totalLabel=totalMins?`<span style="color:var(--text-dim);font-weight:500;margin-left:8px">合計 ${totalMins}分</span>`:'';
       const isMe=String(empNo)===String(me);
-      h+=`<div class="member-group"><h3>${esc(name)}${isMe?' <span style="color:var(--accent);font-size:11px;font-weight:500;margin-left:4px">（自分）</span>':''}<span class="mb-count">${entries.length}件</span>${totalLabel}</h3><div class="member-entries">`;
+      dvRows+=`<tr class="dv-emp"><td colspan="4"><span class="dv-empname">${esc(name)}</span>${isMe?'<span class="dv-me">（自分）</span>':''}<span class="dv-empmeta">${entries.length}件 ・ 合計 ${totalMins}分</span></td></tr>`;
       entries.forEach(e=>{
         const mins=parseInt(e.minutes,10)||0;
-        const minsLabel=mins?`<span style="color:var(--text-faint);font-size:11px;margin-left:6px">${mins}分</span>`:'';
         const isTmp=String(e.id).startsWith('tmp_');const editable=isMe&&!isTmp;
-        const editBtn=editable?`<button class="act-btn" onclick="Daily.gotoEditFromView('${esc(e.id)}','${esc(e.date||'')}')" style="margin-top:6px">編集</button>`:'';
-        h+=`<div class="member-entry"><div class="me-proj">${esc(e.project_name||'(案件不明)')}</div><div class="me-action">${esc(e.work||e.action||'')}${minsLabel}</div><div class="me-note">${esc(e.note||'')}</div>${editBtn}</div>`;
+        const editBtn=editable?`<button class="act-btn dv-edit" onclick="Daily.gotoEditFromView('${esc(e.id)}','${esc(e.date||'')}')">編集</button>`:'';
+        const note=e.note?`<div class="dv-note">${esc(e.note)}</div>`:'';
+        dvRows+=`<tr class="dv-row"><td class="dv-proj" data-l="物件">${esc(e.project_name||'(案件不明)')}${note}</td><td class="dv-work" data-l="作業">${esc(e.work||e.action||'')}</td><td class="dv-min" data-l="時間">${mins?mins+'分':''}</td><td class="dv-actc">${editBtn}</td></tr>`;
       });
-      h+='</div></div>';
     });
+    if(dvRows) h+=`<div class="dv-tblwrap"><table class="dv-tbl"><thead><tr><th>物件</th><th>作業</th><th class="r">時間</th><th></th></tr></thead><tbody>${dvRows}</tbody></table></div>`;
     el.innerHTML=h;
   }
   function markAbsent(empNo,name){
