@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>アルコネクト 部材計算</title>
+<style>
+  :root{ --bd:#dcdcd6; --bd2:#bfbfb8; --fg:#1c1c1a; --dim:#6b6b66; --muted:#9a9a93; --warn:#a6701a; --accent:#2563eb; }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;color:var(--fg);background:#faf9f6;line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 60px}
+  h1{font-size:18px;font-weight:700;margin:0 0 4px}
+  .sub{font-size:12px;color:var(--muted);margin:0 0 18px}
+  .ctrls{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;margin-bottom:16px;padding:14px;background:#fff;border:1px solid var(--bd);border-radius:12px}
+  .grp{display:flex;align-items:center;gap:8px}
+  .lbl{font-size:13px;color:var(--dim)}
+  select#maguchi{padding:8px 12px;border:1px solid var(--bd2);background:#fff;color:var(--fg);border-radius:8px;font:600 15px/1 inherit;cursor:pointer}
+  h1 .mg{color:var(--accent);font-size:22px}
+  input#depth{width:80px;padding:8px 10px;border:1px solid var(--bd2);border-radius:8px;font:700 17px/1 inherit;text-align:right}
+  .unit{font-weight:600;color:var(--dim);margin-left:4px}
+  .arrow{color:var(--muted);margin:0 6px}
+  #spans{font-weight:700;color:var(--fg)}
+  .spans{margin-left:auto;display:flex;align-items:baseline;gap:6px}
+  .spans b{font-size:26px;font-weight:700}
+  table{width:100%;border-collapse:collapse;font-size:14px;background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+  th,td{padding:9px 10px}
+  thead th{text-align:left;font-weight:600;color:var(--dim);font-size:12px;border-bottom:1px solid var(--bd2);background:#f4f3ee}
+  th.r,td.r{text-align:right}
+  th.c,td.c{text-align:center}
+  tbody tr{border-bottom:1px solid var(--bd)}
+  tbody tr:last-child{border-bottom:none}
+  td.spec{color:var(--dim);font-size:12px}
+  td.fl{color:var(--muted);font-size:12px;text-align:center}
+  td.qty{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+  .warn{color:var(--warn)}
+  .note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.7}
+  @media(max-width:520px){
+    .wrap{padding:14px 12px 50px}
+    .spans{margin-left:0;width:100%}
+    th.spec,td.spec{display:none}
+    table{font-size:13px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="title">アルコネクト <span class="mg" id="mg">6m</span></h1>
+  <p class="sub">部材計算 ・ 試作版（重量・3間/4間は今後）</p>
+
+  <div class="ctrls">
+    <div class="grp"><span class="lbl">間口</span>
+      <select id="maguchi"><option value="6m">6m</option><option value="8m">8m</option></select>
+    </div>
+    <div class="grp"><span class="lbl">奥行</span>
+      <input id="depth" type="number" min="3" step="3" value="3"><span class="unit">m</span>
+      <span class="arrow">→</span><span class="lbl"><span id="spans">1</span> スパン</span>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr>
+      <th>部材</th><th class="spec">規格</th><th class="c">式</th><th class="r">必要数</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <p class="note" id="note"></p>
+</div>
+<script>
+(function(){
+  var SPANLEN={'6m':3,'8m':3};
+  var SPEC={
+    '6m':{柱:'48×84×3t L2190',斜材G1:'48×84×3t L3124',B1:'40×40×2t L2952',水下:'台形 L2952',間柱:'48×102×3t L3165',妻つなぎ:'39×53×2.5t L2859',門型:'35×77×2t L2912',T3:'L2950'},
+    '8m':{柱:'48×84×3t L2190',斜材G1:'48×84×3t L4245',B1:'40×40×2t L2952',水下:'台形 L2952',間柱:'48×102×3t L3546',妻つなぎ:'39×53×2.5t L3912',門型:'35×77×2t L2912',T3:'L2950',T4:'L3950'}
+  };
+  var PARTS=[
+    {n:'柱C1',sk:'柱',f:function(N){return 2*N+2},fl:'2N+2'},
+    {n:'斜材G1（梁）',sk:'斜材G1',f:function(N){return 2*N+2},fl:'2N+2'},
+    {n:'つなぎ材B1',sk:'B1',f:function(N,m){return m==='6m'?N:3*N},flf:function(m){return m==='6m'?'N':'3N'}},
+    {n:'水下つなぎ材',sk:'水下',f:function(N){return 2*N},fl:'2N'},
+    {n:'間柱',sk:'間柱',f:function(){return 2},fl:'固定'},
+    {n:'妻つなぎ材',sk:'妻つなぎ',f:function(){return 4},fl:'固定'},
+    {n:'門型',sk:'門型',f:function(N){return N===1?2:4},fl:'1→2/他4'},
+    {n:'テンションバー3m',sk:'T3',f:function(N,m){return m==='6m'?2*N+4:2*N},flf:function(m){return m==='6m'?'2N+4':'2N'}},
+    {n:'テンションバー4m',sk:'T4',f:function(N,m){return m==='6m'?0:4},fl:'固定4'},
+    {n:'頂部金物',f:function(N){return N+1},fl:'N+1'},
+    {n:'肩口金物',f:function(N){return 2*N+2},fl:'2N+2'},
+    {n:'ベース',f:function(N){return 2*N+4},fl:'2N+4'},
+    {n:'スピンドル',f:function(N){return 2*N+2},fl:'2N+2'},
+    {n:'ワイヤーブレス',f:function(N){return N===1?4:8},fl:'1→4/他8'},
+    {n:'組立ボルト',f:function(){return '1式'},fl:'—'},
+    {n:'テンションバージョイント',f:function(N){return 2*N+8},fl:'2N+8'}
+  ];
+  function $(id){return document.getElementById(id)}
+  function render(){
+    var maguchi=$('maguchi').value;
+    var depth=Math.max(3,parseInt($('depth').value||'3',10));
+    var N=Math.max(1,Math.round(depth/SPANLEN[maguchi]));
+    $('spans').textContent=N;
+    var sp=SPEC[maguchi],html='';
+    PARTS.forEach(function(P){
+      var q=P.f(N,maguchi);
+      if(q===0) return;
+      var fl=P.flf?P.flf(maguchi):(P.fl||'');
+      var spec=P.sk?(sp[P.sk]||'—'):'—';
+      html+='<tr><td>'+P.n+(P.p?' <span class="warn">*</span>':'')+'</td>'
+        +'<td class="spec">'+spec+'</td>'
+        +'<td class="fl">'+fl+'</td>'
+        +'<td class="qty">'+q+'</td></tr>';
+    });
+    $('rows').innerHTML=html;
+    $('mg').textContent=maguchi;
+    $('note').innerHTML='全部材を原価計算書（6m/8m×3〜15m）で検証済み＝1〜5スパン実物一致。門型・ワイヤーブレスは1スパンだけ少ない（N=1で門型2/ワイヤー4、N≥2で4/8）。テンションバーは3m(L2950)/4m(L3950)に分離。重量は未組み込み。';
+  }
+  $('maguchi').onchange=render;
+  $('depth').oninput=render;
+  render();
+})();
+</script>
+</body>
+</html>
