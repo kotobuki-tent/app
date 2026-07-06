@@ -2723,6 +2723,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-hr .hr-opt.ro.on{background:#c4b5fd;color:#3b0764}
 #view-hr .hr-qh{font-size:14px;font-weight:800;color:#6d28d9;margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid #ede9fe}
 #view-hr .hr-suqh{font-size:13px;font-weight:800;color:#6d28d9;margin:16px 0 6px}
+#view-hr .hr-dirlab{font-size:13px;font-weight:700;color:var(--text);margin:12px 0 2px;padding:4px 10px;background:#f3e8ff;border-radius:7px;display:inline-block}
 #view-hr .hr-modal-bg{position:fixed;inset:0;background:rgba(20,16,40,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;animation:hrfade .15s ease}
 @keyframes hrfade{from{opacity:0}to{opacity:1}}
 #view-hr .hr-modal{background:#fff;border-radius:16px;width:100%;max-width:640px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
@@ -6788,6 +6789,25 @@ const Hr = (function(){
     const fin = solo ? B : (A*wa+B*wb);
     return { A, B, final:fin, rank:rankOf(fin), pDone, sDone, solo };
   }
+  // 管理職を考課する取締役（社長・副社長・専務）
+  const DIRECTORS=['岸田沙織','三好智依','岸田平'];
+  function dirScored(ds){ ds=ds||{}; return DIRECTORS.filter(n=>Array.isArray(ds[n])&&ds[n].some(v=>+v>0)); }
+  function dirAvg(ds){ ds=ds||{}; const dirs=dirScored(ds); const avg=[]; for(let i=0;i<15;i++){let s=0,c=0;dirs.forEach(n=>{const v=+ds[n][i]||0;if(v>0){s+=v;c++;}});avg[i]=c?s/c:0;} return avg; }
+  // 1人ぶんの評価（素点・補正・最終・ランク）。管理職で取締役スコアがあれば取締役平均、無ければ従来通り。
+  function evalPerson(p){
+    const kind=kindOf(p.kind), corr=+p.correction||0;
+    const dirs=dirScored(p.director_scores);
+    let A=0,B=0,base=0,mode='',pDone=0,sDone=0,panel=false;
+    if(kind==='管理職' && dirs.length){
+      panel=true; const avg=dirAvg(p.director_scores);
+      B=IMP.reduce((a,w,i)=>a+w*avg[i],0); base=B; mode='取締役'+dirs.length+'名平均';
+    }else{
+      const c=calc(p.kind,p.primary||[],p.secondary||[]); A=c.A; B=c.B; pDone=c.pDone; sDone=c.sDone;
+      base=c.final; if(c.solo) mode='二次単独';
+    }
+    const final=base+corr;
+    return { A,B,base,corr,final,rank:rankOf(final), mode, pDone, sDone, panel, dirCount:dirs.length };
+  }
 
   let me=null, view='self', curEval=null, _busy=false, _loadedKey=null, curPeriod=period();
   let aggCache={}, _aggLoading=false;
@@ -6973,35 +6993,47 @@ const Hr = (function(){
       +plist.map(pp=>`<button class="hr-ybtn${pp===curPeriod?' on':''}${have.has(pp)?' has':''}" onclick="Hr.setPeriod('${esc(pp)}')">${esc(pp)}${have.has(pp)?'':' <span class="hr-yempty">空</span>'}</button>`).join('')
       +'</div>';
     h+='<div class="hr-sec"><div class="hr-sech">人事考課 集計（'+esc(curPeriod)+'）</div>';
-    h+='<div class="hr-hint">最終得点＝一般:A×75%+B×25% / 管理職:A×50%+B×50%。一次考課が無い人（社長評価のみ等）は二次単独。補正係数は代表取締役判断で別途。行をタップで一次・二次を入力。</div>';
+    h+='<div class="hr-hint">最終得点＝一般:A×75%+B×25% / 管理職:取締役（社長・副社長・専務）の平均。補正（±10〜50）を加えて最終ランク。行をタップで入力。</div>';
     if(_aggLoading){ h+='<div class="hr-empty">読み込み中…</div></div>'; return h; }
     if(!ppl.length){ h+='<div class="hr-empty">対象者がまだ登録されていません（staffシートで in_hr=TRUE に）。</div></div>'; return h; }
-    const rows=ppl.map(p=>{ const c=calc(p.kind,p.primary||[],p.secondary||[]); return {p,c}; })
-                  .sort((a,b)=>b.c.final-a.c.final);
-    h+='<div class="hr-tblwrap"><table class="hr-tbl"><thead><tr><th>氏名</th><th>区分</th><th>A(一次)</th><th>B(二次)</th><th>最終</th><th>ランク</th><th>進捗</th></tr></thead><tbody>';
+    const fmt=v=>v%1?(+v).toFixed(2):v;
+    const rows=ppl.map(p=>{ const c=evalPerson(p); return {p,c}; }).sort((a,b)=>b.c.final-a.c.final);
+    h+='<div class="hr-tblwrap"><table class="hr-tbl"><thead><tr><th>氏名</th><th>区分</th><th>A</th><th>B</th><th>素点</th><th>補正</th><th>最終</th><th>ランク</th><th>進捗</th></tr></thead><tbody>';
     rows.forEach(({p,c})=>{
-      const prog=c.solo?'二次単独':((c.pDone>=15?'一次✓':'一次'+c.pDone+'/15')+' '+(c.sDone>=15?'二次✓':'二次'+c.sDone+'/15'));
-      h+=`<tr onclick="Hr.openSec('${esc(p.person_id)}')"><td>${esc(p.name)}</td><td>${esc(p.kind)}</td><td>${c.A}</td><td>${c.B}</td><td class="hr-fin">${c.final%1?c.final.toFixed(2):c.final}</td><td class="hr-rk rk-${c.rank}">${c.rank}</td><td class="hr-prog">${prog}</td></tr>`;
+      const prog=c.panel?('取締役 '+c.dirCount+'/3'):(c.mode==='二次単独'?'二次単独':((c.pDone>=15?'一次✓':'一次'+c.pDone+'/15')+' '+(c.sDone>=15?'二次✓':'二次'+c.sDone+'/15')));
+      const corrStr=c.corr?(c.corr>0?'+'+c.corr:''+c.corr):'—';
+      h+=`<tr onclick="Hr.openSec('${esc(p.person_id)}')"><td>${esc(p.name)}</td><td>${esc(p.kind)}</td><td>${c.A}</td><td>${fmt(c.B)}</td><td>${fmt(c.base)}</td><td>${corrStr}</td><td class="hr-fin">${fmt(c.final)}</td><td class="hr-rk rk-${c.rank}">${c.rank}</td><td class="hr-prog">${prog}</td></tr>`;
     });
     h+='</tbody></table></div></div>';
     if(curEval!=null){
       const p=ppl.find(x=>x.person_id===curEval); if(p){
-        const mc=calc(p.kind,p.primary||[],p.secondary||[]);
+        const mc=evalPerson(p), isMgr=kindOf(p.kind)==='管理職';
         h+='<div class="hr-modal-bg"><div class="hr-modal">';
         h+=`<div class="hr-modal-hd"><div class="hr-sech">${esc(p.name)} <span class="hr-kind">${esc(p.kind)}</span></div><button class="hr-modal-x" onclick="Hr.openSec(null)" aria-label="閉じる">×</button></div>`;
         h+='<div class="hr-modal-body">';
-        h+=`<div class="hr-mstats"><div class="hr-mstat"><span>A(一次)</span><b>${mc.A}</b></div><div class="hr-mstat"><span>B(二次)</span><b>${mc.B}</b></div><div class="hr-mstat"><span>最終</span><b>${mc.final%1?mc.final.toFixed(2):mc.final}</b></div><div class="hr-mstat"><span>ランク</span><b class="hr-rk rk-${mc.rank}">${mc.rank}</b></div>${mc.solo?'<div class="hr-mstat solo">二次単独</div>':''}</div>`;
+        h+=`<div class="hr-mstats"><div class="hr-mstat"><span>素点</span><b>${fmt(mc.base)}</b></div><div class="hr-mstat"><span>補正</span><b>${mc.corr?(mc.corr>0?'+'+mc.corr:''+mc.corr):'0'}</b></div><div class="hr-mstat"><span>最終</span><b>${fmt(mc.final)}</b></div><div class="hr-mstat"><span>ランク</span><b class="hr-rk rk-${mc.rank}">${mc.rank}</b></div>${mc.mode?'<div class="hr-mstat solo">'+esc(mc.mode)+'</div>':''}</div>`;
         if((p.self&&p.self.some(v=>+v>0)) || hasReport(p.report)){
           h+='<div class="hr-suqh">本人の自己評価・自己申告書</div>';
           if(p.self&&p.self.some(v=>+v>0)) h+=scoreGrid(p.kind,p.self,'sv',false);
           if(hasReport(p.report)) h+=reportView(p.report);
         }
-        h+='<div class="hr-suqh">一次考課'+(p.evaluator1?'（担当: '+esc(p.evaluator1)+'）':'')+'</div>';
-        h+=scoreGrid(p.kind,p.primary||[],'mp',true);
-        h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveMasterPrimary()">一次考課を保存</button></div>';
-        h+='<div class="hr-suqh">二次考課</div>';
-        h+=scoreGrid(p.kind,p.secondary||[],'x',true);
-        h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveSecondary()">二次考課を保存</button></div>';
+        if(isMgr){
+          h+='<div class="hr-suqh">取締役考課（社長・副社長・専務／項目ごとに平均）</div>';
+          DIRECTORS.forEach((dn,di)=>{
+            const dv=(p.director_scores&&p.director_scores[dn])||[];
+            h+=`<div class="hr-dirlab">${esc(dn)}</div>`+scoreGrid(p.kind,dv,'d'+di,true)
+              +`<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveDirector(${di})">${esc(dn)}の考課を保存</button></div>`;
+          });
+        }else{
+          h+='<div class="hr-suqh">一次考課'+(p.evaluator1?'（担当: '+esc(p.evaluator1)+'）':'')+'</div>';
+          h+=scoreGrid(p.kind,p.primary||[],'mp',true);
+          h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveMasterPrimary()">一次考課を保存</button></div>';
+          h+='<div class="hr-suqh">二次考課</div>';
+          h+=scoreGrid(p.kind,p.secondary||[],'x',true);
+          h+='<div class="hr-actbar"><button class="hr-save" onclick="Hr.saveSecondary()">二次考課を保存</button></div>';
+        }
+        h+='<div class="hr-suqh">補正（代表取締役／±10〜50）</div>';
+        h+=`<div class="hr-actbar"><input id="hr_corr" type="number" step="10" value="${mc.corr||0}" style="width:90px" class="hr-in"><button class="hr-save" onclick="Hr.saveCorrection()">補正を保存</button></div>`;
         h+='</div></div></div>';
       }
     }
@@ -7026,10 +7058,28 @@ const Hr = (function(){
     toast(p.name+' の二次考課を保存',true);
     render();
   }
+  function saveDirector(di){
+    if(guard())return;
+    const p=(me.people||[]).find(x=>x.person_id===curEval); if(!p)return;
+    const dn=DIRECTORS[di]; const sc=collect('d'+di,p.kind);
+    fire({action:'save_director', hrm:keys().master, period:curPeriod, person_id:p.person_id, director:dn, scores:JSON.stringify(sc)});
+    p.director_scores=p.director_scores||{}; p.director_scores[dn]=sc;
+    toast(dn+' の考課を保存',true);
+    render();
+  }
+  function saveCorrection(){
+    if(guard())return;
+    const p=(me.people||[]).find(x=>x.person_id===curEval); if(!p)return;
+    const c=parseInt($('hr_corr').value,10)||0;
+    fire({action:'save_correction', hrm:keys().master, period:curPeriod, person_id:p.person_id, correction:c});
+    p.correction=c;
+    toast('補正を保存（'+(c>0?'+'+c:c)+'）',true);
+    render();
+  }
 
   function go(v){ view=v; curEval=null; render(); }
   function init(){ /* ナビの表示制御は App.applyMode 後に App 側で行う */ }
-  return { loadAll, render, init, go, saveSelf, pickEval, savePrimary, openSec, saveSecondary, saveMasterPrimary, setPeriod, _pick, hasKey };
+  return { loadAll, render, init, go, saveSelf, pickEval, savePrimary, openSec, saveSecondary, saveMasterPrimary, saveDirector, saveCorrection, setPeriod, _pick, hasKey };
 })();
 
 const Portal = (function(){
