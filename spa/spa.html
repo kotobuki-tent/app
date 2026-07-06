@@ -2726,7 +2726,8 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-hr .hr-dirlab{font-size:13px;font-weight:700;color:var(--text);margin:12px 0 2px;padding:4px 10px;background:#f3e8ff;border-radius:7px;display:inline-block}
 #view-hr .hr-dirb{font-size:11px;font-weight:800;color:#6d28d9;margin-left:6px}
 #view-hr .hr-dirempty{font-size:11px;font-weight:600;color:var(--text-faint);margin-left:6px}
-#view-hr .hr-dirsum{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 4px}
+#view-hr .hr-dirsum{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 4px}
+#view-hr .hr-dirsl{font-size:12px;font-weight:800;color:var(--text-dim)}
 #view-hr .hr-dirsi{display:flex;flex-direction:column;align-items:center;gap:2px;background:#faf9fe;border:1px solid #eee7fb;border-radius:9px;padding:7px 14px;min-width:72px}
 #view-hr .hr-dirsi.avg{background:#ede9fe;border-color:#ddd6fe}
 #view-hr .hr-dirsn{font-size:11px;color:var(--text-dim);font-weight:700}
@@ -7021,9 +7022,9 @@ const Hr = (function(){
         h+=`<div class="hr-modal-hd"><div class="hr-sech">${esc(p.name)} <span class="hr-kind">${esc(p.kind)}</span></div><button class="hr-modal-x" onclick="Hr.openSec(null)" aria-label="閉じる">×</button></div>`;
         h+='<div class="hr-modal-body">';
         const dB=dn=>{ const v=(p.director_scores&&p.director_scores[dn])||[]; return v.some(x=>+x>0)?IMP.reduce((a,w,i)=>a+w*(+v[i]||0),0):null; };
-        h+=`<div class="hr-mstats"><div class="hr-mstat"><span>素点</span><b>${fmt(mc.base)}</b></div><div class="hr-mstat"><span>補正</span><b>${mc.corr?(mc.corr>0?'+'+mc.corr:''+mc.corr):'0'}</b></div><div class="hr-mstat"><span>最終</span><b>${fmt(mc.final)}</b></div><div class="hr-mstat"><span>ランク</span><b class="hr-rk rk-${mc.rank}">${mc.rank}</b></div>${mc.mode?'<div class="hr-mstat solo">'+esc(mc.mode)+'</div>':''}</div>`;
+        h+=`<div class="hr-mstats"><div class="hr-mstat"><span>素点</span><b>${fmt(mc.base)}</b></div><div class="hr-mstat"><span>補正</span><b>${mc.corr?(mc.corr>0?'+'+mc.corr:''+mc.corr):'0'}</b></div><div class="hr-mstat"><span>最終</span><b>${fmt(mc.final)}</b></div><div class="hr-mstat"><span>ランク</span><b class="hr-rk rk-${mc.rank}">${mc.rank}</b></div>${(mc.mode&&!mc.panel)?'<div class="hr-mstat solo">'+esc(mc.mode)+'</div>':''}</div>`;
         if(isMgr){
-          h+='<div class="hr-dirsum">'+DIRECTORS.map(dn=>{ const b=dB(dn); return `<div class="hr-dirsi"><span class="hr-dirsn">${esc(dn)}</span><b>${b==null?'—':b}</b></div>`; }).join('')+`<div class="hr-dirsi avg"><span class="hr-dirsn">平均(B)</span><b>${mc.B%1?mc.B.toFixed(1):mc.B}</b></div></div>`;
+          h+='<div class="hr-dirsum"><span class="hr-dirsl">取締役</span>'+DIRECTORS.map(dn=>{ const b=dB(dn); return `<div class="hr-dirsi"><span class="hr-dirsn">${esc(dn)}</span><b>${b==null?'—':b}</b></div>`; }).join('')+'</div>';
         }
         h+='<div class="hr-corrbar"><span class="hr-corrlab">補正（±10〜50）</span><input id="hr_corr" type="number" step="10" value="'+(mc.corr||0)+'" class="hr-in" style="width:84px"><button class="hr-save" onclick="Hr.saveCorrection()">補正を保存</button></div>';
         if((p.self&&p.self.some(v=>+v>0)) || hasReport(p.report)){
