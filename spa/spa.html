@@ -2739,9 +2739,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-prow.alt .wb-name{background:#eef2f6}
 #view-wb .wb-prow .wb-name{border-bottom:none}
 #view-wb .wb-cells{display:flex;flex:1 1 auto;min-width:0}
-#view-wb .wb-cell{position:relative;flex:1 1 0;min-width:var(--wb-dayw);box-sizing:border-box;border-right:1px solid #eceff2;cursor:pointer}
-#view-wb .wb-add{position:absolute;left:0;right:0;bottom:1px;text-align:center;font-style:normal;font-size:13px;font-weight:700;line-height:15px;color:#0C447C;opacity:0;pointer-events:none;transition:opacity .08s}
-#view-wb .wb-cell:hover .wb-add{opacity:.55}
+#view-wb .wb-cell{flex:1 1 0;min-width:var(--wb-dayw);box-sizing:border-box;border-right:1px solid #eceff2;cursor:pointer}
 #view-wb .wb-cell.sat{background:#e9f1fc}
 #view-wb .wb-cell.sun{background:#fdf6f6}
 #view-wb .wb-cell:hover{background:#eef6ff}
@@ -2773,6 +2771,8 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-del{border:1px solid #dc2626;color:#dc2626;background:#fff;border-radius:8px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer}
 #view-wb .wb-cancel{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer}
 #view-wb .wb-save{border:none;background:#0C447C;color:#fff;border-radius:8px;padding:9px 20px;font-size:15px;font-weight:700;cursor:pointer}
+#view-wb .wb-addmore{width:100%;border:1px dashed #0C447C;color:#0C447C;background:#fff;border-radius:8px;padding:9px 12px;font-size:14px;font-weight:700;cursor:pointer}
+#view-wb .wb-addmore:hover{background:#eef6ff}
 #view-wb .wb-picklist{display:flex;flex-wrap:wrap;gap:8px;max-height:52vh;overflow:auto;padding:2px}
 #view-wb .wb-pick{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:9px 15px;font-size:15px;cursor:pointer;color:var(--text)}
 #view-wb .wb-pick:hover{background:#eef6ff;border-color:#0C447C}
@@ -2792,6 +2792,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="wb-mrow col"><span class="wb-mlab">分類</span><div id="wbmCats" class="wb-cats"></div></div>
     <div class="wb-mrow col"><span class="wb-mlab">見出し（板に表示）</span><input type="text" id="wbmHead" class="wb-head"></div>
     <div class="wb-mrow col"><span class="wb-mlab">メモ（詳細・タップで表示）</span><textarea id="wbmText" class="wb-ta" rows="4"></textarea></div>
+    <div class="wb-mrow" id="wbmMore" style="display:none"><button type="button" class="wb-addmore" onclick="Wb.addSameDay()">＋ この人の同じ日にもう1件</button></div>
     <div class="wb-macts"><button class="wb-del" id="wbmDel" onclick="Wb.delNote()">削除</button><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closeModal()">閉じる</button><button class="wb-save" onclick="Wb.saveNote()">保存</button></div>
   </div>
 </div>
@@ -7013,14 +7014,14 @@ const Wb = (function(){
     // 人ごとの行
     people.forEach((p,idx)=>{
       const mine=lanesFor(p.name, start, N);
-      const rowH = mine.lanes * 32 + 16;   // 下に空きを広めに＝同日追加の的を確保
+      const rowH = mine.lanes * 32 + 8;
       h+=`<div class="wb-prow${idx%2?' alt':''}" style="height:${rowH}px">`;
       h+=`<div class="wb-name"><div class="wb-reord"><button class="wb-rb" title="上へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',-1)">▲</button><button class="wb-rb" title="下へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',1)">▼</button></div><span onclick="Wb.editPerson('${esc(p.id)}')" title="${esc(p.name)}（タップで名前変更・削除）">${esc(p.name)}</span></div>`;
       h+=`<div class="wb-cells">`;
       for(let i=0;i<N;i++){
         const dt=addDays(start,i), dow=dt.getDay();
         const cls = (holName(dt)?'hol':(dow===0?'sun':(dow===6?'sat':'')))+(dt.getDate()===1?' mstart':'')+(ymd(dt)===today?' today':'');
-        h+=`<div class="wb-cell ${cls}" onclick="Wb.openCell('${esc(p.id)}','${ymd(dt)}')"><i class="wb-add">＋</i></div>`;
+        h+=`<div class="wb-cell ${cls}" onclick="Wb.openCell('${esc(p.id)}','${ymd(dt)}')"></div>`;
       }
       h+=`</div>`;
       h+=`<div class="wb-notes">`;
@@ -7062,10 +7063,12 @@ const Wb = (function(){
     document.getElementById('wbmHead').value=_edit.head||'';
     document.getElementById('wbmText').value=_edit.memo||'';
     document.getElementById('wbmDel').style.display=_edit.id?'':'none';
+    document.getElementById('wbmMore').style.display=_edit.id?'':'none';   // 編集時のみ「同じ日にもう1件」
     m.classList.remove('hidden');
     setTimeout(()=>{ const t=document.getElementById('wbmHead'); if(t)t.focus(); },50);
   }
   function closeModal(){ const m=document.getElementById('wbModal'); if(m)m.classList.add('hidden'); }
+  function addSameDay(){ const p=people.find(x=>x.name===_edit.person), ds=_edit.date_from; closeModal(); if(p&&ds) openCell(p.id, ds); }
   function saveNote(){
     let from=document.getElementById('wbmFrom').value, to=document.getElementById('wbmTo').value||from;
     const head=document.getElementById('wbmHead').value.trim();
@@ -7162,7 +7165,7 @@ const Wb = (function(){
       body.addEventListener('mouseout', e=>{ const n=e.target.closest('.wb-note'); if(n) hideTip(); });
     }
   }
-  return { loadAll, render, init, prevPage, nextPage, goToday, openCell, openNote, setCat, saveNote, delNote, closeModal, addPerson, closePick, pickPerson, editPerson, movePerson };
+  return { loadAll, render, init, prevPage, nextPage, goToday, openCell, openNote, setCat, saveNote, delNote, closeModal, addSameDay, addPerson, closePick, pickPerson, editPerson, movePerson };
 })();
 
 /* ========================================================================
