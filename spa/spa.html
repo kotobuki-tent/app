@@ -6867,7 +6867,7 @@ const Wb = (function(){
     {k:'その他',bg:'#EEF1F4', fg:'#3A4453'},
   ];
   function catOf(k){ return CATS.find(c=>c.k===k)||CATS[2]; }
-  let notes=[], people=[], staff=[], _busy=false, _edit={}, _tombN=new Set(), _tombP=new Set();
+  let notes=[], people=[], staff=[], _busy=false, _edit={}, _tombN=new Set(), _tombP=new Set(), _tombKey=new Set();
   // 本日基準のローリング表示：前WB_BACK日＋当日＋先WB_FWD日。送りはWB_STEP日（1週=7。2週にするなら14）
   const WB_BACK=3, WB_FWD=14, WB_N=WB_BACK+1+WB_FWD, WB_STEP=7;
   function todayStart(){ const d=new Date(); return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
@@ -6892,6 +6892,12 @@ const Wb = (function(){
       // 楽観的削除：サーバにまだ残っていても削除済みidは隠す
       let sN=rawN.filter(n=>!_tombN.has(String(n.id)));
       let sP=rawP.filter(p=>!_tombP.has(String(p.id)));
+      // 内容キー墓標：tmp削除でreal id不明のものは、一致するサーバ実ノートを隠す＋実IDで削除発火（サーバから消えたら解除）
+      if(_tombKey.size){
+        const seen=new Set();
+        sN=sN.filter(n=>{ const k=nkey(n); if(_tombKey.has(k)){ seen.add(k); if(!isTmp(n.id)) fire({action:'delete_note', id:n.id}); return false; } return true; });
+        _tombKey.forEach(k=>{ if(!seen.has(k)) _tombKey.delete(k); });
+      }
       // 楽観的追加：サーバ未反映のtmp_行はローカルを残す（同内容がサーバに来たら自然に置換）
       const sk=new Set(sN.map(nkey));
       sN=sN.concat(notes.filter(n=>isTmp(n.id) && !sk.has(nkey(n))));
@@ -7042,8 +7048,10 @@ const Wb = (function(){
     if(!_edit.id)return;
     if(!confirm('このメモを削除しますか？'))return;
     if(guard())return;
+    const dn=notes.find(x=>String(x.id)===String(_edit.id));
     fire({ action:'delete_note', id:_edit.id });
-    if(!isTmp(_edit.id)) _tombN.add(String(_edit.id));
+    if(isTmp(_edit.id)){ if(dn) _tombKey.add(nkey(dn)); }   // 追加直後(tmp)＝real id不明→内容キーで墓標。reconcileで実ノートを実IDで削除
+    else _tombN.add(String(_edit.id));
     notes=notes.filter(n=>String(n.id)!==String(_edit.id));
     closeModal(); render(); setTimeout(loadAll,3000);
   }
