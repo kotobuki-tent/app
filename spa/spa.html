@@ -2740,6 +2740,9 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-notes{position:absolute;top:0;bottom:0;left:var(--wb-namew);right:0;pointer-events:none}
 #view-wb .wb-note{position:absolute;min-height:20px;border-radius:5px;padding:2px 6px;font-size:12px;line-height:14px;font-weight:600;white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;pointer-events:auto;cursor:pointer;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 #view-wb .wb-empty{padding:34px;text-align:center;color:var(--text-dim);font-size:14px}
+#view-wb .wb-tip{position:fixed;z-index:1200;max-width:300px;background:#1f2937;color:#fff;border-radius:8px;padding:8px 11px;font-size:13px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.28);pointer-events:none}
+#view-wb .wb-tip-h{font-weight:700}
+#view-wb .wb-tip-m{opacity:.9;white-space:pre-wrap;margin-top:2px}
 #view-wb .wb-hint{margin:8px 2px 0;font-size:12px;color:var(--text-dim);line-height:1.6}
 /* モーダル（枠外クリックでは閉じない＝×/閉じるのみ） */
 #view-wb .wb-modal{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
@@ -2771,6 +2774,7 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 </style>
 <div id="wbBody"></div>
+<div id="wbTip" class="wb-tip hidden"></div>
 <div class="wb-hint">セルをタップ＝メモ追加／メモをタップ＝編集・削除。出張・休みは期間で選ぶと帯になります。左の名前をタップ＝名前変更・削除、名前の横の ▲▼ で並べ替え。</div>
 <div id="wbModal" class="wb-modal hidden">
   <div class="wb-mcard">
@@ -6981,9 +6985,10 @@ const Wb = (function(){
       mine.items.forEach(it=>{
         const c=catOf(it.n.category);
         const wpct = (it.e - it.s + 1)*100/N, left = it.s*100/N;   // メモは自分の日数ぶんだけ（伸ばさない＝単発が複数日に見えない）
-        const full = it.n.text||it.n.category||'';
-        const face = esc(full.split('\n')[0]);                     // 板には1行目（見出し）だけ。詳細はモーダルで
-        h+=`<div class="wb-note" style="left:${left}%;width:calc(${wpct}% - 3px);top:${it.lane*32+3}px;background:${c.bg};color:${c.fg}" onclick="event.stopPropagation();Wb.openNote('${esc(it.n.id)}')" title="${esc(full)}">${face}</div>`;
+        const t = it.n.text||'';
+        const head = t.split('\n')[0] || it.n.category || '';       // 板の見出し
+        const memo = it.n.memo || t.split('\n').slice(1).join('\n'); // 詳細（旧データは2行目以降）
+        h+=`<div class="wb-note" data-head="${esc(head)}" data-memo="${esc(memo)}" style="left:${left}%;width:calc(${wpct}% - 3px);top:${it.lane*32+3}px;background:${c.bg};color:${c.fg}" onclick="event.stopPropagation();Wb.openNote('${esc(it.n.id)}')">${esc(head)}</div>`;
       });
       h+=`</div></div>`;
     });
@@ -7091,7 +7096,28 @@ const Wb = (function(){
     render(); setTimeout(loadAll,3000);
   }
 
-  function init(){}
+  // マウスオーバーで見出し＋詳細メモをふわっと表示（PC用。タッチはタップでモーダル）
+  function showTip(n){
+    const tip=document.getElementById('wbTip'); if(!tip)return;
+    const head=n.getAttribute('data-head')||'', memo=n.getAttribute('data-memo')||'';
+    if(!head && !memo){ hideTip(); return; }
+    tip.innerHTML=(head?`<div class="wb-tip-h">${esc(head)}</div>`:'')+(memo?`<div class="wb-tip-m">${esc(memo)}</div>`:'');
+    tip.classList.remove('hidden');
+    const r=n.getBoundingClientRect(), tw=tip.offsetWidth, th=tip.offsetHeight;
+    let left=r.left, top=r.bottom+6;
+    if(left+tw>window.innerWidth-8) left=window.innerWidth-8-tw;
+    if(top+th>window.innerHeight-8) top=r.top-6-th;   // 下に入らなければ上に出す
+    tip.style.left=Math.max(8,left)+'px';
+    tip.style.top=Math.max(8,top)+'px';
+  }
+  function hideTip(){ const t=document.getElementById('wbTip'); if(t)t.classList.add('hidden'); }
+  function init(){
+    const body=document.getElementById('wbBody');
+    if(body){
+      body.addEventListener('mouseover', e=>{ const n=e.target.closest('.wb-note'); if(n) showTip(n); });
+      body.addEventListener('mouseout', e=>{ const n=e.target.closest('.wb-note'); if(n) hideTip(); });
+    }
+  }
   return { loadAll, render, init, prevPage, nextPage, goToday, openCell, openNote, setCat, saveNote, delNote, closeModal, addPerson, closePick, pickPerson, editPerson, movePerson };
 })();
 
