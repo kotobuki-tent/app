@@ -2704,7 +2704,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 #view-wb .wb-nav{display:flex;align-items:center;gap:6px}
 #view-wb .wb-mbtn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:5px 11px;font-size:15px;cursor:pointer;line-height:1}
-#view-wb .wb-mlabel{font-size:17px;font-weight:800;min-width:118px;text-align:center;color:var(--text)}
+#view-wb .wb-mlabel{font-size:16px;font-weight:800;min-width:158px;text-align:center;color:var(--text);white-space:nowrap}
 #view-wb .wb-today{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--text)}
 #view-wb .wb-addp{border:1px solid #0C447C;color:#0C447C;background:#fff;border-radius:8px;padding:7px 14px;font-size:14px;font-weight:700;cursor:pointer}
 #view-wb .wb-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
@@ -2726,6 +2726,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-dh.sun{background:#fdeeee}
 #view-wb .wb-dh.sun i{color:#dc2626}
 #view-wb .wb-dh.today b{color:#fff;background:#f59e0b;border-radius:50%;width:19px;height:19px;line-height:19px;margin:0 auto;display:block}
+#view-wb .wb-dh.mstart,#view-wb .wb-cell.mstart{border-left:2px solid #c3cbd6}
 #view-wb .wb-prow{display:flex;position:relative;border-bottom:1px solid var(--border)}
 #view-wb .wb-prow .wb-name{border-bottom:none}
 #view-wb .wb-cells{display:flex}
@@ -2762,7 +2763,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-pick:hover{background:#eef6ff;border-color:#0C447C}
 #view-wb .wb-pick-empty{color:var(--text-dim);font-size:14px;padding:10px 2px}
 @media(max-width:480px){
-  #view-wb .wb-mlabel{min-width:96px;font-size:16px}
+  #view-wb .wb-mlabel{min-width:150px;font-size:15px}
 }
 </style>
 <div id="wbBody"></div>
@@ -6858,7 +6859,11 @@ const Wb = (function(){
   ];
   function catOf(k){ return CATS.find(c=>c.k===k)||CATS[2]; }
   let notes=[], people=[], staff=[], _busy=false, _edit={}, _tombN=new Set(), _tombP=new Set();
-  let _m=(function(){ const d=new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
+  // 本日基準のローリング表示：前WB_BACK日＋当日＋先WB_FWD日。送りはWB_STEP日（1週=7。2週にするなら14）
+  const WB_BACK=3, WB_FWD=14, WB_N=WB_BACK+1+WB_FWD, WB_STEP=7;
+  function todayStart(){ const d=new Date(); return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
+  function addDays(d,n){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n); }
+  let _start=addDays(todayStart(),-WB_BACK);
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   function pad(n){ return String(n).padStart(2,'0'); }
   function ymd(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
@@ -6894,13 +6899,13 @@ const Wb = (function(){
     render();
   }
 
-  function prevMonth(){ _m=new Date(_m.getFullYear(), _m.getMonth()-1, 1); render(); }
-  function nextMonth(){ _m=new Date(_m.getFullYear(), _m.getMonth()+1, 1); render(); }
-  function thisMonth(){ const d=new Date(); _m=new Date(d.getFullYear(), d.getMonth(), 1); render(); }
+  function prevPage(){ _start=addDays(_start,-WB_STEP); render(); }
+  function nextPage(){ _start=addDays(_start, WB_STEP); render(); }
+  function goToday(){ _start=addDays(todayStart(),-WB_BACK); render(); }
 
   // 指定人の当月ノートをレーン割り当て（重ならないよう縦に段組み）
-  function lanesFor(name, y, mo, N){
-    const mStart=new Date(y,mo,1), mEnd=new Date(y,mo,N);
+  function lanesFor(name, start, N){
+    const mStart=start, mEnd=addDays(start,N-1);
     const arr=[];
     notes.forEach(n=>{
       if(n.person!==name) return;
@@ -6932,36 +6937,38 @@ const Wb = (function(){
 
   function render(){
     const el=document.getElementById('wbBody'); if(!el)return;
-    const y=_m.getFullYear(), mo=_m.getMonth(), N=daysInMonth(y,mo);
+    const start=_start, N=WB_N, end=addDays(start,N-1);
     const today=ymd(new Date());
+    const rangeLbl=`${start.getFullYear()}年 ${start.getMonth()+1}/${start.getDate()} 〜 ${end.getMonth()+1}/${end.getDate()}`;
     let h='';
     h+=`<div class="wb-top">`
-      +`<div class="wb-nav"><button class="wb-mbtn" onclick="Wb.prevMonth()">◀</button>`
-      +`<span class="wb-mlabel">${y}年 ${mo+1}月</span>`
-      +`<button class="wb-mbtn" onclick="Wb.nextMonth()">▶</button>`
-      +`<button class="wb-today" onclick="Wb.thisMonth()">今月</button></div>`
+      +`<div class="wb-nav"><button class="wb-mbtn" onclick="Wb.prevPage()">◀</button>`
+      +`<span class="wb-mlabel">${rangeLbl}</span>`
+      +`<button class="wb-mbtn" onclick="Wb.nextPage()">▶</button>`
+      +`<button class="wb-today" onclick="Wb.goToday()">今日</button></div>`
       +`<button class="wb-addp" onclick="Wb.addPerson()">＋ 人を追加</button>`
       +`</div>`;
     h+=`<div class="wb-legend">`+CATS.map(c=>`<span class="wb-lg" style="background:${c.bg};color:${c.fg}">${c.k}</span>`).join('')+`</div>`;
     h+=`<div class="wb-scroll"><div class="wb-grid" style="--wb-n:${N}">`;
     // ヘッダ行（日付・曜日）
     h+=`<div class="wb-hrow"><div class="wb-name wb-corner"></div>`;
-    for(let d=1; d<=N; d++){
-      const dt=new Date(y,mo,d), dow=dt.getDay();
-      const cls = dow===0?'sun':(dow===6?'sat':'');
-      h+=`<div class="wb-dh ${cls}${ymd(dt)===today?' today':''}"><b>${d}</b><i>${DOW[dow]}</i></div>`;
+    for(let i=0;i<N;i++){
+      const dt=addDays(start,i), dow=dt.getDay(), dn=dt.getDate();
+      const cls = (dow===0?'sun':(dow===6?'sat':''))+(dn===1?' mstart':'');
+      const dlab = dn===1 ? `${dt.getMonth()+1}/1` : `${dn}`;
+      h+=`<div class="wb-dh ${cls}${ymd(dt)===today?' today':''}"><b>${dlab}</b><i>${DOW[dow]}</i></div>`;
     }
     h+=`</div>`;
     // 人ごとの行
     people.forEach(p=>{
-      const mine=lanesFor(p.name, y, mo, N);
+      const mine=lanesFor(p.name, start, N);
       const rowH = mine.lanes * 32 + 8;
       h+=`<div class="wb-prow" style="height:${rowH}px">`;
       h+=`<div class="wb-name"><div class="wb-reord"><button class="wb-rb" title="上へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',-1)">▲</button><button class="wb-rb" title="下へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',1)">▼</button></div><span onclick="Wb.editPerson('${esc(p.id)}')" title="${esc(p.name)}（タップで名前変更・削除）">${esc(p.name)}</span></div>`;
       h+=`<div class="wb-cells">`;
-      for(let d=1; d<=N; d++){
-        const dt=new Date(y,mo,d), dow=dt.getDay();
-        const cls = dow===0?'sun':(dow===6?'sat':'');
+      for(let i=0;i<N;i++){
+        const dt=addDays(start,i), dow=dt.getDay();
+        const cls = (dow===0?'sun':(dow===6?'sat':''))+(dt.getDate()===1?' mstart':'');
         h+=`<div class="wb-cell ${cls}" onclick="Wb.openCell('${esc(p.id)}','${ymd(dt)}')"></div>`;
       }
       h+=`</div>`;
@@ -7076,7 +7083,7 @@ const Wb = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, prevMonth, nextMonth, thisMonth, openCell, openNote, setCat, saveNote, delNote, closeModal, addPerson, closePick, pickPerson, editPerson, movePerson };
+  return { loadAll, render, init, prevPage, nextPage, goToday, openCell, openNote, setCat, saveNote, delNote, closeModal, addPerson, closePick, pickPerson, editPerson, movePerson };
 })();
 
 /* ========================================================================
