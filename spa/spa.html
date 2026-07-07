@@ -2757,6 +2757,10 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-del{border:1px solid #dc2626;color:#dc2626;background:#fff;border-radius:8px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer}
 #view-wb .wb-cancel{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer}
 #view-wb .wb-save{border:none;background:#0C447C;color:#fff;border-radius:8px;padding:9px 20px;font-size:15px;font-weight:700;cursor:pointer}
+#view-wb .wb-picklist{display:flex;flex-wrap:wrap;gap:8px;max-height:52vh;overflow:auto;padding:2px}
+#view-wb .wb-pick{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:9px 15px;font-size:15px;cursor:pointer;color:var(--text)}
+#view-wb .wb-pick:hover{background:#eef6ff;border-color:#0C447C}
+#view-wb .wb-pick-empty{color:var(--text-dim);font-size:14px;padding:10px 2px}
 @media(max-width:480px){
   #view-wb .wb-mlabel{min-width:96px;font-size:16px}
 }
@@ -2771,6 +2775,13 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="wb-mrow col"><span class="wb-mlab">分類</span><div id="wbmCats" class="wb-cats"></div></div>
     <div class="wb-mrow col"><span class="wb-mlab">内容（ホテル・便・誰と会う等 自由に）</span><textarea id="wbmText" class="wb-ta" rows="4" placeholder="例：ANA789 羽田8:00発／東横イン青森／10時に高田さんと"></textarea></div>
     <div class="wb-macts"><button class="wb-del" id="wbmDel" onclick="Wb.delNote()">削除</button><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closeModal()">閉じる</button><button class="wb-save" onclick="Wb.saveNote()">保存</button></div>
+  </div>
+</div>
+<div id="wbPickModal" class="wb-modal hidden">
+  <div class="wb-mcard">
+    <div class="wb-mhead"><span>人を追加</span><button class="wb-mx" onclick="Wb.closePick()">×</button></div>
+    <div class="wb-mrow col"><span class="wb-mlab">staffから選ぶ（追加後、名前タップで表記を短くできます）</span><div id="wbPickList" class="wb-picklist"></div></div>
+    <div class="wb-macts"><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closePick()">閉じる</button></div>
   </div>
 </div>
 </section>
@@ -6847,7 +6858,7 @@ const Wb = (function(){
     {k:'その他',bg:'#EEF1F4', fg:'#3A4453'},
   ];
   function catOf(k){ return CATS.find(c=>c.k===k)||CATS[4]; }
-  let notes=[], people=[], _busy=false, _edit={};
+  let notes=[], people=[], staff=[], _busy=false, _edit={};
   let _m=(function(){ const d=new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   function pad(n){ return String(n).padStart(2,'0'); }
@@ -6857,7 +6868,7 @@ const Wb = (function(){
 
   async function apiGet(){ try{ const r=await fetch(API+'?dept=wb&action=read'); return await r.json(); }catch(e){ return null; } }
   function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'wb',...body})}); }catch(e){} }
-  async function loadAll(){ const d=await apiGet(); if(d&&d.success){ notes=d.notes||[]; people=d.people||[]; } render(); }
+  async function loadAll(){ const d=await apiGet(); if(d&&d.success){ notes=d.notes||[]; people=d.people||[]; staff=(d.staff||[]).map(x=>typeof x==='string'?x:(x&&x.name)||'').filter(Boolean); } render(); }
 
   function prevMonth(){ _m=new Date(_m.getFullYear(), _m.getMonth()-1, 1); render(); }
   function nextMonth(){ _m=new Date(_m.getFullYear(), _m.getMonth()+1, 1); render(); }
@@ -6982,12 +6993,23 @@ const Wb = (function(){
     closeModal(); render(); setTimeout(loadAll,3000);
   }
   function addPerson(){
-    const name=(prompt('追加する人の名前')||'').trim(); if(!name)return;
+    const m=document.getElementById('wbPickModal'); if(!m)return;
+    const have=new Set(people.map(p=>p.name));
+    const avail=staff.filter(n=>!have.has(n));
+    const list=document.getElementById('wbPickList');
+    list.innerHTML = avail.length
+      ? avail.map(n=>`<button type="button" class="wb-pick" onclick="Wb.pickPerson('${esc(n)}')">${esc(n)}</button>`).join('')
+      : '<div class="wb-pick-empty">追加できるstaffがいません（全員追加済み／staffシート未取得）</div>';
+    m.classList.remove('hidden');
+  }
+  function closePick(){ const m=document.getElementById('wbPickModal'); if(m)m.classList.add('hidden'); }
+  function pickPerson(name){
+    if(!name)return;
     if(guard())return;
     const id='tmp_'+Date.now();
     fire({ action:'add_person', name });
     people.push({ id, name, sort:(people.reduce((a,p)=>Math.max(a,p.sort||0),0))+1 });
-    render(); setTimeout(loadAll,3000);
+    closePick(); render(); setTimeout(loadAll,3000);
   }
   function editPerson(pid){
     const p=people.find(x=>x.id===pid); if(!p)return;
@@ -7019,7 +7041,7 @@ const Wb = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, prevMonth, nextMonth, thisMonth, openCell, openNote, setCat, saveNote, delNote, closeModal, addPerson, editPerson, movePerson };
+  return { loadAll, render, init, prevMonth, nextMonth, thisMonth, openCell, openNote, setCat, saveNote, delNote, closeModal, addPerson, closePick, pickPerson, editPerson, movePerson };
 })();
 
 /* ========================================================================
