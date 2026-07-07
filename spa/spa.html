@@ -2755,6 +2755,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-cats{display:flex;gap:6px;flex-wrap:wrap}
 #view-wb .wb-mcat{border:1.5px solid var(--border);background:var(--surface);border-radius:20px;padding:5px 13px;font-size:13px;font-weight:700;cursor:pointer;color:var(--text-dim)}
 #view-wb .wb-mcat.on{background:var(--cbg);color:var(--cfg);border-color:var(--cfg)}
+#view-wb .wb-head{border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:15px;font-family:inherit;background:var(--surface);color:var(--text);width:100%;box-sizing:border-box}
 #view-wb .wb-ta{border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:15px;font-family:inherit;background:var(--surface);color:var(--text);resize:vertical;line-height:1.5}
 #view-wb .wb-macts{display:flex;align-items:center;gap:8px;padding:16px}
 #view-wb .wb-macts .wb-sp{flex:1}
@@ -2777,7 +2778,8 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="wb-mrow"><span class="wb-mlab">対象</span><span id="wbmPerson" class="wb-mperson"></span></div>
     <div class="wb-mrow"><span class="wb-mlab">期間</span><input type="date" id="wbmFrom" class="wb-date"><span class="wb-mto">〜</span><input type="date" id="wbmTo" class="wb-date"></div>
     <div class="wb-mrow col"><span class="wb-mlab">分類</span><div id="wbmCats" class="wb-cats"></div></div>
-    <div class="wb-mrow col"><span class="wb-mlab">内容（1行目＝見出し・板に表示／2行目以降＝詳細）</span><textarea id="wbmText" class="wb-ta" rows="4"></textarea></div>
+    <div class="wb-mrow col"><span class="wb-mlab">見出し（板に表示）</span><input type="text" id="wbmHead" class="wb-head" placeholder="例：かんたんてんと納品"></div>
+    <div class="wb-mrow col"><span class="wb-mlab">メモ（詳細・タップで表示）</span><textarea id="wbmText" class="wb-ta" rows="4" placeholder="例：関金ラグビー場／ホテル・便・誰と会う等"></textarea></div>
     <div class="wb-macts"><button class="wb-del" id="wbmDel" onclick="Wb.delNote()">削除</button><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closeModal()">閉じる</button><button class="wb-save" onclick="Wb.saveNote()">保存</button></div>
   </div>
 </div>
@@ -6876,7 +6878,7 @@ const Wb = (function(){
   async function apiGet(){ try{ const r=await fetch(API+'?dept=wb&action=read'); return await r.json(); }catch(e){ return null; } }
   function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'wb',...body})}); }catch(e){} }
   function isTmp(id){ return String(id).indexOf('tmp_')===0; }
-  function nkey(n){ return [n.person,n.date_from||'',n.date_to||'',n.category||'',n.text||''].join('|'); }
+  function nkey(n){ return [n.person,n.date_from||'',n.date_to||'',n.category||'',n.text||'',n.memo||''].join('|'); }
   // 楽観更新をreconcileで消さない：サーバ確定を土台に、未反映のtmp追加は残し、削除済みidは隠し、並び順はローカル優先
   async function loadAll(){
     const d=await apiGet();
@@ -6992,12 +6994,14 @@ const Wb = (function(){
 
   function openCell(pid, ds){
     const p=people.find(x=>x.id===pid); if(!p)return;
-    _edit={ id:'', person:p.name, date_from:ds, date_to:ds, category:'その他', text:'' };
+    _edit={ id:'', person:p.name, date_from:ds, date_to:ds, category:'その他', head:'', memo:'' };
     showModal();
   }
   function openNote(id){
     const n=notes.find(x=>String(x.id)===String(id)); if(!n)return;
-    _edit={ id:n.id, person:n.person, date_from:(n.date_from||'').slice(0,10), date_to:(n.date_to||n.date_from||'').slice(0,10), category:n.category||'出張', text:n.text||'' };
+    let head=n.text||'', memo=n.memo||'';
+    if(!memo && head.indexOf('\n')>=0){ const pt=head.split('\n'); head=pt[0]; memo=pt.slice(1).join('\n'); }  // 旧：改行区切りを見出し/メモに分割
+    _edit={ id:n.id, person:n.person, date_from:(n.date_from||'').slice(0,10), date_to:(n.date_to||n.date_from||'').slice(0,10), category:n.category||'その他', head, memo };
     showModal();
   }
   function setCat(k){ _edit.category=k; const box=document.getElementById('wbmCats'); if(box)[...box.children].forEach(b=>b.classList.toggle('on', b.getAttribute('data-k')===k)); }
@@ -7008,21 +7012,23 @@ const Wb = (function(){
     document.getElementById('wbmFrom').value=_edit.date_from;
     document.getElementById('wbmTo').value=_edit.date_to;
     document.getElementById('wbmCats').innerHTML=CATS.map(c=>`<button type="button" class="wb-mcat${c.k===_edit.category?' on':''}" data-k="${c.k}" style="--cbg:${c.bg};--cfg:${c.fg}" onclick="Wb.setCat('${c.k}')">${c.k}</button>`).join('');
-    document.getElementById('wbmText').value=_edit.text;
+    document.getElementById('wbmHead').value=_edit.head||'';
+    document.getElementById('wbmText').value=_edit.memo||'';
     document.getElementById('wbmDel').style.display=_edit.id?'':'none';
     m.classList.remove('hidden');
-    setTimeout(()=>{ const t=document.getElementById('wbmText'); if(t)t.focus(); },50);
+    setTimeout(()=>{ const t=document.getElementById('wbmHead'); if(t)t.focus(); },50);
   }
   function closeModal(){ const m=document.getElementById('wbModal'); if(m)m.classList.add('hidden'); }
   function saveNote(){
     let from=document.getElementById('wbmFrom').value, to=document.getElementById('wbmTo').value||from;
-    const text=document.getElementById('wbmText').value.trim();
+    const head=document.getElementById('wbmHead').value.trim();
+    const memo=document.getElementById('wbmText').value.trim();
     if(!from){ alert('開始日を入れてください'); return; }
     if(to<from){ const t=from; from=to; to=t; }
     if(guard())return;
     const id=_edit.id || ('tmp_'+Date.now());
-    const rec={ id, date_from:from, date_to:to, person:_edit.person, text, category:_edit.category };
-    fire({ action:'save_note', id:_edit.id||undefined, date_from:from, date_to:to, person:_edit.person, text, category:_edit.category });
+    const rec={ id, date_from:from, date_to:to, person:_edit.person, text:head, memo, category:_edit.category };
+    fire({ action:'save_note', id:_edit.id||undefined, date_from:from, date_to:to, person:_edit.person, text:head, memo, category:_edit.category });
     if(_edit.id){ const i=notes.findIndex(n=>String(n.id)===String(_edit.id)); if(i>=0) notes[i]=rec; else notes.push(rec); }
     else notes.push(rec);
     closeModal(); render(); setTimeout(loadAll,3000);
