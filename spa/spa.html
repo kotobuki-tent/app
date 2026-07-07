@@ -1743,6 +1743,8 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="nav-div"></span>
     <button class="nav-link" id="navVeh" data-zone="office" onclick="App.nav('veh')">車両</button>
     <span class="nav-div"></span>
+    <button class="nav-link" id="navWb" data-zone="office" onclick="App.nav('wb')">ボード</button>
+    <span class="nav-div"></span>
     <button class="nav-link hidden" id="navHr" onclick="App.nav('hr')">人事考課</button>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
@@ -2693,6 +2695,81 @@ table.jobs tr:last-child td{border-bottom:none}
 <section id="view-card" class="hidden">
   <div class="card-wrap"><div id="cardBody"></div></div>
   <div id="cardToast" class="card-toast"></div>
+</section>
+
+<!-- ===== 予定ボード（ホワイトボード） section ===== -->
+<section id="view-wb" class="hidden">
+<style>
+#view-wb{padding:12px 12px 120px}
+#view-wb .wb-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+#view-wb .wb-nav{display:flex;align-items:center;gap:6px}
+#view-wb .wb-mbtn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:5px 11px;font-size:15px;cursor:pointer;line-height:1}
+#view-wb .wb-mlabel{font-size:17px;font-weight:800;min-width:118px;text-align:center;color:var(--text)}
+#view-wb .wb-today{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--text)}
+#view-wb .wb-addp{border:1px solid #0C447C;color:#0C447C;background:#fff;border-radius:8px;padding:7px 14px;font-size:14px;font-weight:700;cursor:pointer}
+#view-wb .wb-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+#view-wb .wb-lg{font-size:12px;font-weight:700;border-radius:5px;padding:2px 9px}
+#view-wb .wb-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
+#view-wb .wb-grid{--wb-namew:82px;--wb-dayw:40px;width:max-content}
+#view-wb .wb-hrow{display:flex;position:sticky;top:0;z-index:3}
+#view-wb .wb-name{width:var(--wb-namew);min-width:var(--wb-namew);box-sizing:border-box;border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 8px;font-weight:700;font-size:14px;color:var(--text);background:var(--surface-1);position:sticky;left:0;z-index:2;cursor:pointer}
+#view-wb .wb-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#view-wb .wb-corner{cursor:default;z-index:4}
+#view-wb .wb-dh{width:var(--wb-dayw);min-width:var(--wb-dayw);box-sizing:border-box;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center;padding:3px 0;line-height:1.15;background:var(--surface-1)}
+#view-wb .wb-dh b{font-size:13px;font-weight:700;display:block;color:var(--text)}
+#view-wb .wb-dh i{font-size:10px;color:var(--text-dim);font-style:normal}
+#view-wb .wb-dh.sat{background:#eef4fb}
+#view-wb .wb-dh.sat i{color:#2563eb}
+#view-wb .wb-dh.sun{background:#fdeeee}
+#view-wb .wb-dh.sun i{color:#dc2626}
+#view-wb .wb-dh.today b{color:#fff;background:#f59e0b;border-radius:50%;width:19px;height:19px;line-height:19px;margin:0 auto;display:block}
+#view-wb .wb-prow{display:flex;position:relative;border-bottom:1px solid var(--border)}
+#view-wb .wb-prow .wb-name{border-bottom:none}
+#view-wb .wb-cells{display:flex}
+#view-wb .wb-cell{width:var(--wb-dayw);min-width:var(--wb-dayw);box-sizing:border-box;border-right:1px solid #eceff2;cursor:pointer}
+#view-wb .wb-cell.sat{background:#f6f9fd}
+#view-wb .wb-cell.sun{background:#fdf6f6}
+#view-wb .wb-cell:hover{background:#eef6ff}
+#view-wb .wb-notes{position:absolute;top:0;bottom:0;left:var(--wb-namew);width:calc(var(--wb-n) * var(--wb-dayw));pointer-events:none}
+#view-wb .wb-note{position:absolute;height:22px;line-height:22px;border-radius:5px;padding:0 7px;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:auto;cursor:pointer;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+#view-wb .wb-empty{padding:34px;text-align:center;color:var(--text-dim);font-size:14px}
+#view-wb .wb-hint{margin:8px 2px 0;font-size:12px;color:var(--text-dim);line-height:1.6}
+/* モーダル（枠外クリックでは閉じない＝×/閉じるのみ） */
+#view-wb .wb-modal{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+#view-wb .wb-mcard{background:var(--surface);border-radius:14px;width:min(440px,100%);max-height:90vh;overflow:auto;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+#view-wb .wb-mhead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);font-size:16px;font-weight:800;color:var(--text)}
+#view-wb .wb-mx{border:none;background:none;font-size:24px;line-height:1;cursor:pointer;color:var(--text-dim);padding:0 4px}
+#view-wb .wb-mrow{display:flex;align-items:center;gap:10px;padding:12px 16px 0}
+#view-wb .wb-mrow.col{flex-direction:column;align-items:stretch;gap:6px}
+#view-wb .wb-mlab{font-size:12px;font-weight:700;color:var(--text-dim);min-width:34px}
+#view-wb .wb-mperson{font-size:16px;font-weight:800;color:var(--text)}
+#view-wb .wb-date{border:1px solid var(--border);border-radius:8px;padding:7px 9px;font-size:15px;background:var(--surface);color:var(--text)}
+#view-wb .wb-mto{color:var(--text-dim)}
+#view-wb .wb-cats{display:flex;gap:6px;flex-wrap:wrap}
+#view-wb .wb-mcat{border:1.5px solid var(--border);background:var(--surface);border-radius:20px;padding:5px 13px;font-size:13px;font-weight:700;cursor:pointer;color:var(--text-dim)}
+#view-wb .wb-mcat.on{background:var(--cbg);color:var(--cfg);border-color:var(--cfg)}
+#view-wb .wb-ta{border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:15px;font-family:inherit;background:var(--surface);color:var(--text);resize:vertical;line-height:1.5}
+#view-wb .wb-macts{display:flex;align-items:center;gap:8px;padding:16px}
+#view-wb .wb-macts .wb-sp{flex:1}
+#view-wb .wb-del{border:1px solid #dc2626;color:#dc2626;background:#fff;border-radius:8px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer}
+#view-wb .wb-cancel{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer}
+#view-wb .wb-save{border:none;background:#0C447C;color:#fff;border-radius:8px;padding:9px 20px;font-size:15px;font-weight:700;cursor:pointer}
+@media(max-width:480px){
+  #view-wb .wb-mlabel{min-width:96px;font-size:16px}
+}
+</style>
+<div id="wbBody"></div>
+<div class="wb-hint">セルをタップ＝メモ追加／メモをタップ＝編集・削除。出張・休みは期間で選ぶと帯になります。左の名前をタップ＝名前変更・削除。</div>
+<div id="wbModal" class="wb-modal hidden">
+  <div class="wb-mcard">
+    <div class="wb-mhead"><span id="wbmTitle">メモ</span><button class="wb-mx" onclick="Wb.closeModal()">×</button></div>
+    <div class="wb-mrow"><span class="wb-mlab">対象</span><span id="wbmPerson" class="wb-mperson"></span></div>
+    <div class="wb-mrow"><span class="wb-mlab">期間</span><input type="date" id="wbmFrom" class="wb-date"><span class="wb-mto">〜</span><input type="date" id="wbmTo" class="wb-date"></div>
+    <div class="wb-mrow col"><span class="wb-mlab">分類</span><div id="wbmCats" class="wb-cats"></div></div>
+    <div class="wb-mrow col"><span class="wb-mlab">内容（ホテル・便・誰と会う等 自由に）</span><textarea id="wbmText" class="wb-ta" rows="4" placeholder="例：ANA789 羽田8:00発／東横イン青森／10時に高田さんと"></textarea></div>
+    <div class="wb-macts"><button class="wb-del" id="wbmDel" onclick="Wb.delNote()">削除</button><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closeModal()">閉じる</button><button class="wb-save" onclick="Wb.saveNote()">保存</button></div>
+  </div>
+</div>
 </section>
 
 <section id="view-hr" class="hidden">
@@ -6750,6 +6827,191 @@ const Card = (function(){
 })();
 
 /* ========================================================================
+   Wb：予定ボード（ホワイトボードのデジタル版。社長がパッと見る／全員が書ける）
+   物理WBそのまま：行=人（追加・削除可）× 列=日。単日メモ＋複数日バー。
+   LINE WORKSの個人予定とは別。社長にとって大事な物だけを集約する。
+   GAS: dept=wb（read / save_note / delete_note / add_person / del_person / rename_person）
+   ======================================================================== */
+const Wb = (function(){
+  const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const DOW=['日','月','火','水','木','金','土'];
+  const CATS=[
+    {k:'出張', bg:'#E6F1FB', fg:'#0C447C'},
+    {k:'納品', bg:'#E1F5EE', fg:'#0F6E56'},
+    {k:'約束', bg:'#FDECEC', fg:'#B42318'},
+    {k:'休み', bg:'#EFEDE6', fg:'#6B6A64'},
+    {k:'その他',bg:'#EEF1F4', fg:'#3A4453'},
+  ];
+  function catOf(k){ return CATS.find(c=>c.k===k)||CATS[4]; }
+  let notes=[], people=[], _busy=false, _edit={};
+  let _m=(function(){ const d=new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
+  function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function ymd(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+  function daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
+  function parseYmd(s){ const m=String(s||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})/); return m? new Date(+m[1],+m[2]-1,+m[3]) : null; }
+
+  async function apiGet(){ try{ const r=await fetch(API+'?dept=wb&action=read'); return await r.json(); }catch(e){ return null; } }
+  function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'wb',...body})}); }catch(e){} }
+  async function loadAll(){ const d=await apiGet(); if(d&&d.success){ notes=d.notes||[]; people=d.people||[]; } render(); }
+
+  function prevMonth(){ _m=new Date(_m.getFullYear(), _m.getMonth()-1, 1); render(); }
+  function nextMonth(){ _m=new Date(_m.getFullYear(), _m.getMonth()+1, 1); render(); }
+  function thisMonth(){ const d=new Date(); _m=new Date(d.getFullYear(), d.getMonth(), 1); render(); }
+
+  // 指定人の当月ノートをレーン割り当て（重ならないよう縦に段組み）
+  function lanesFor(name, y, mo, N){
+    const mStart=new Date(y,mo,1), mEnd=new Date(y,mo,N);
+    const arr=[];
+    notes.forEach(n=>{
+      if(n.person!==name) return;
+      const f=parseYmd(n.date_from), t=parseYmd(n.date_to)||f;
+      if(!f) return;
+      const from = t<f ? t : f, to = t<f ? f : t;
+      if(to<mStart || from>mEnd) return;             // 当月外は無視
+      const s=Math.max(0, Math.round((from-mStart)/86400000));
+      const e=Math.min(N-1, Math.round((to-mStart)/86400000));
+      arr.push({n, s, e});
+    });
+    arr.sort((a,b)=> a.s-b.s || a.e-b.e);
+    const laneEnd=[];
+    arr.forEach(it=>{
+      let placed=-1;
+      for(let l=0;l<laneEnd.length;l++){ if(laneEnd[l] < it.s){ placed=l; break; } }
+      if(placed<0){ placed=laneEnd.length; laneEnd.push(it.e); } else laneEnd[placed]=it.e;
+      it.lane=placed;
+    });
+    return { items:arr, lanes: Math.max(1, laneEnd.length) };
+  }
+
+  function render(){
+    const el=document.getElementById('wbBody'); if(!el)return;
+    const y=_m.getFullYear(), mo=_m.getMonth(), N=daysInMonth(y,mo);
+    const today=ymd(new Date());
+    let h='';
+    h+=`<div class="wb-top">`
+      +`<div class="wb-nav"><button class="wb-mbtn" onclick="Wb.prevMonth()">◀</button>`
+      +`<span class="wb-mlabel">${y}年 ${mo+1}月</span>`
+      +`<button class="wb-mbtn" onclick="Wb.nextMonth()">▶</button>`
+      +`<button class="wb-today" onclick="Wb.thisMonth()">今月</button></div>`
+      +`<button class="wb-addp" onclick="Wb.addPerson()">＋ 人を追加</button>`
+      +`</div>`;
+    h+=`<div class="wb-legend">`+CATS.map(c=>`<span class="wb-lg" style="background:${c.bg};color:${c.fg}">${c.k}</span>`).join('')+`</div>`;
+    h+=`<div class="wb-scroll"><div class="wb-grid" style="--wb-n:${N}">`;
+    // ヘッダ行（日付・曜日）
+    h+=`<div class="wb-hrow"><div class="wb-name wb-corner"></div>`;
+    for(let d=1; d<=N; d++){
+      const dt=new Date(y,mo,d), dow=dt.getDay();
+      const cls = dow===0?'sun':(dow===6?'sat':'');
+      h+=`<div class="wb-dh ${cls}${ymd(dt)===today?' today':''}"><b>${d}</b><i>${DOW[dow]}</i></div>`;
+    }
+    h+=`</div>`;
+    // 人ごとの行
+    people.forEach(p=>{
+      const mine=lanesFor(p.name, y, mo, N);
+      const rowH = mine.lanes * 26 + 8;
+      h+=`<div class="wb-prow" style="height:${rowH}px">`;
+      h+=`<div class="wb-name" onclick="Wb.editPerson('${esc(p.id)}')" title="タップで名前変更・削除"><span>${esc(p.name)}</span></div>`;
+      h+=`<div class="wb-cells">`;
+      for(let d=1; d<=N; d++){
+        const dt=new Date(y,mo,d), dow=dt.getDay();
+        const cls = dow===0?'sun':(dow===6?'sat':'');
+        h+=`<div class="wb-cell ${cls}" onclick="Wb.openCell('${esc(p.id)}','${ymd(dt)}')"></div>`;
+      }
+      h+=`</div>`;
+      h+=`<div class="wb-notes">`;
+      mine.items.forEach(it=>{
+        const c=catOf(it.n.category);
+        const left = it.s * 100 / N, width = (it.e - it.s + 1) * 100 / N;
+        h+=`<div class="wb-note" style="left:${left}%;width:calc(${width}% - 3px);top:${it.lane*26+3}px;background:${c.bg};color:${c.fg}" onclick="event.stopPropagation();Wb.openNote('${esc(it.n.id)}')" title="${esc(it.n.text||it.n.category)}">${esc(it.n.text||it.n.category||'')}</div>`;
+      });
+      h+=`</div></div>`;
+    });
+    if(!people.length) h+=`<div class="wb-empty">「＋ 人を追加」で行をつくってください</div>`;
+    h+=`</div></div>`;
+    el.innerHTML=h;
+  }
+
+  function openCell(pid, ds){
+    const p=people.find(x=>x.id===pid); if(!p)return;
+    _edit={ id:'', person:p.name, date_from:ds, date_to:ds, category:'出張', text:'' };
+    showModal();
+  }
+  function openNote(id){
+    const n=notes.find(x=>String(x.id)===String(id)); if(!n)return;
+    _edit={ id:n.id, person:n.person, date_from:(n.date_from||'').slice(0,10), date_to:(n.date_to||n.date_from||'').slice(0,10), category:n.category||'出張', text:n.text||'' };
+    showModal();
+  }
+  function setCat(k){ _edit.category=k; const box=document.getElementById('wbmCats'); if(box)[...box.children].forEach(b=>b.classList.toggle('on', b.getAttribute('data-k')===k)); }
+  function showModal(){
+    const m=document.getElementById('wbModal'); if(!m)return;
+    document.getElementById('wbmTitle').textContent = _edit.id ? 'メモを編集' : 'メモを追加';
+    document.getElementById('wbmPerson').textContent = _edit.person;
+    document.getElementById('wbmFrom').value=_edit.date_from;
+    document.getElementById('wbmTo').value=_edit.date_to;
+    document.getElementById('wbmCats').innerHTML=CATS.map(c=>`<button type="button" class="wb-mcat${c.k===_edit.category?' on':''}" data-k="${c.k}" style="--cbg:${c.bg};--cfg:${c.fg}" onclick="Wb.setCat('${c.k}')">${c.k}</button>`).join('');
+    document.getElementById('wbmText').value=_edit.text;
+    document.getElementById('wbmDel').style.display=_edit.id?'':'none';
+    m.classList.remove('hidden');
+    setTimeout(()=>{ const t=document.getElementById('wbmText'); if(t)t.focus(); },50);
+  }
+  function closeModal(){ const m=document.getElementById('wbModal'); if(m)m.classList.add('hidden'); }
+  function saveNote(){
+    let from=document.getElementById('wbmFrom').value, to=document.getElementById('wbmTo').value||from;
+    const text=document.getElementById('wbmText').value.trim();
+    if(!from){ alert('開始日を入れてください'); return; }
+    if(to<from){ const t=from; from=to; to=t; }
+    if(guard())return;
+    const id=_edit.id || ('tmp_'+Date.now());
+    const rec={ id, date_from:from, date_to:to, person:_edit.person, text, category:_edit.category };
+    fire({ action:'save_note', id:_edit.id||undefined, date_from:from, date_to:to, person:_edit.person, text, category:_edit.category });
+    if(_edit.id){ const i=notes.findIndex(n=>String(n.id)===String(_edit.id)); if(i>=0) notes[i]=rec; else notes.push(rec); }
+    else notes.push(rec);
+    closeModal(); render(); setTimeout(loadAll,3000);
+  }
+  function delNote(){
+    if(!_edit.id)return;
+    if(!confirm('このメモを削除しますか？'))return;
+    if(guard())return;
+    fire({ action:'delete_note', id:_edit.id });
+    notes=notes.filter(n=>String(n.id)!==String(_edit.id));
+    closeModal(); render(); setTimeout(loadAll,3000);
+  }
+  function addPerson(){
+    const name=(prompt('追加する人の名前')||'').trim(); if(!name)return;
+    if(guard())return;
+    const id='tmp_'+Date.now();
+    fire({ action:'add_person', name });
+    people.push({ id, name, sort:(people.reduce((a,p)=>Math.max(a,p.sort||0),0))+1 });
+    render(); setTimeout(loadAll,3000);
+  }
+  function editPerson(pid){
+    const p=people.find(x=>x.id===pid); if(!p)return;
+    const nn=prompt('名前を変更（空欄にすると この行を削除）', p.name);
+    if(nn===null)return;
+    const name=nn.trim();
+    if(!name){
+      if(!confirm(`「${p.name}」の行を削除しますか？\n（この人のメモも表示されなくなります）`))return;
+      if(guard())return;
+      fire({ action:'del_person', id:p.id });
+      people=people.filter(x=>x.id!==pid);
+      render(); setTimeout(loadAll,3000);
+      return;
+    }
+    if(name===p.name)return;
+    if(guard())return;
+    fire({ action:'rename_person', id:p.id, name });
+    notes.forEach(n=>{ if(n.person===p.name) n.person=name; });
+    p.name=name;
+    render(); setTimeout(loadAll,3000);
+  }
+
+  function init(){}
+  return { loadAll, render, init, prevMonth, nextMonth, thisMonth, openCell, openNote, setCat, saveNote, delNote, closeModal, addPerson, editPerson };
+})();
+
+/* ========================================================================
    Hr：人事考課（自己評価・自己申告書の入力／考課者の一次考課／経営の集計）
    - 認証は内緒URLのトークン方式（合言葉レベル。日報の記入状況ゲートと同発想）
        個人 : ?go=hr&hr=<個人トークン>      → 自分の自己評価＋申告書のみ
@@ -8303,6 +8565,7 @@ const App = {
     {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv',zone:'office'},
     {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh',zone:'office'},
     {key:'card', ns:()=>Card, section:'view-card', nav:'navCard',zone:'shared'},
+    {key:'wb',   ns:()=>Wb,   section:'view-wb',   nav:'navWb',zone:'office'},
     {key:'finv', ns:()=>FInv, section:'view-finv', nav:'navFinv',zone:'field'},
     {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales',zone:'office'},
     {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor',zone:'office'},
