@@ -2726,6 +2726,10 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-dh.sat i{color:#2563eb}
 #view-wb .wb-dh.sun{background:#fdeeee}
 #view-wb .wb-dh.sun i{color:#dc2626}
+#view-wb .wb-dh.hol{background:#fdeeee}
+#view-wb .wb-dh.hol b{color:#dc2626}
+#view-wb .wb-dh.hol i{color:#dc2626;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
+#view-wb .wb-cell.hol{background:#fdf6f6}
 #view-wb .wb-dh.today b{color:#fff;background:#f59e0b;border-radius:50%;width:19px;height:19px;line-height:19px;margin:0 auto;display:block}
 #view-wb .wb-dh.mstart,#view-wb .wb-cell.mstart{border-left:2px solid #c3cbd6}
 /* 本日の列を丸ごとハイライト（薄い色＋両脇に控えめなオレンジの縦線） */
@@ -6880,6 +6884,32 @@ const Wb = (function(){
   function ymd(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
   function daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
   function parseYmd(s){ const m=String(s||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})/); return m? new Date(+m[1],+m[2]-1,+m[3]) : null; }
+  // ---- 日本の祝日（春分/秋分は近似式、振替休日・国民の休日も算出。年ごとにキャッシュ） ----
+  let _holCache={};
+  function jpEquinox(y,spring){ return Math.floor((spring?20.8431:23.2488)+0.242194*(y-1980)-Math.floor((y-1980)/4)); }
+  function nthMonday(y,m,nth){ const f=new Date(y,m-1,1); return 1+((1-f.getDay()+7)%7)+(nth-1)*7; }
+  function buildJpHolidays(year){
+    if(_holCache[year]) return _holCache[year];
+    const base={}, put=(m,d,name)=>{ base[m+'-'+d]=name; };
+    put(1,1,'元日'); put(1,nthMonday(year,1,2),'成人の日'); put(2,11,'建国記念の日');
+    if(year>=2020) put(2,23,'天皇誕生日');
+    put(3,jpEquinox(year,true),'春分の日'); put(4,29,'昭和の日'); put(5,3,'憲法記念日'); put(5,4,'みどりの日'); put(5,5,'こどもの日');
+    put(7,nthMonday(year,7,3),'海の日'); put(8,11,'山の日'); put(9,nthMonday(year,9,3),'敬老の日'); put(9,jpEquinox(year,false),'秋分の日');
+    put(10,nthMonday(year,10,2),'スポーツの日'); put(11,3,'文化の日'); put(11,23,'勤労感謝の日');
+    const H=Object.assign({},base), kof=dt=>(dt.getMonth()+1)+'-'+dt.getDate();
+    // 国民の休日：前後が祝日で自身は非祝日の平日（例：2026-09-22）
+    for(let dt=new Date(year,0,1); dt.getFullYear()===year; dt.setDate(dt.getDate()+1)){
+      if(base.hasOwnProperty(kof(dt))||dt.getDay()===0) continue;
+      const p=new Date(dt); p.setDate(dt.getDate()-1); const n=new Date(dt); n.setDate(dt.getDate()+1);
+      if(base.hasOwnProperty(kof(p))&&base.hasOwnProperty(kof(n))) H[kof(dt)]='国民の休日';
+    }
+    // 振替休日：法定祝日が日曜→次の非祝日
+    for(const k in base){ const a=k.split('-'), hd=new Date(year,+a[0]-1,+a[1]);
+      if(hd.getDay()===0){ let nx=new Date(hd); do{ nx.setDate(nx.getDate()+1); }while(base.hasOwnProperty(kof(nx))); if(nx.getFullYear()===year) H[kof(nx)]='振替休日'; }
+    }
+    _holCache[year]=H; return H;
+  }
+  function holName(dt){ return buildJpHolidays(dt.getFullYear())[(dt.getMonth()+1)+'-'+dt.getDate()]||null; }
 
   async function apiGet(){ try{ const r=await fetch(API+'?dept=wb&action=read'); return await r.json(); }catch(e){ return null; } }
   function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'wb',...body})}); }catch(e){} }
@@ -6971,9 +7001,11 @@ const Wb = (function(){
     h+=`<div class="wb-hrow"><div class="wb-name wb-corner"></div>`;
     for(let i=0;i<N;i++){
       const dt=addDays(start,i), dow=dt.getDay(), dn=dt.getDate();
-      const cls = (dow===0?'sun':(dow===6?'sat':''))+(dn===1?' mstart':'');
+      const hol=holName(dt);
+      const cls = (hol?'hol':(dow===0?'sun':(dow===6?'sat':'')))+(dn===1?' mstart':'');
       const dlab = dn===1 ? `${dt.getMonth()+1}/1` : `${dn}`;
-      h+=`<div class="wb-dh ${cls}${ymd(dt)===today?' today':''}"><b>${dlab}</b><i>${DOW[dow]}</i></div>`;
+      const sub = hol ? esc(hol) : DOW[dow];
+      h+=`<div class="wb-dh ${cls}${ymd(dt)===today?' today':''}"${hol?` title="${esc(hol)}"`:''}><b>${dlab}</b><i>${sub}</i></div>`;
     }
     h+=`</div>`;
     // 人ごとの行
@@ -6985,7 +7017,7 @@ const Wb = (function(){
       h+=`<div class="wb-cells">`;
       for(let i=0;i<N;i++){
         const dt=addDays(start,i), dow=dt.getDay();
-        const cls = (dow===0?'sun':(dow===6?'sat':''))+(dt.getDate()===1?' mstart':'')+(ymd(dt)===today?' today':'');
+        const cls = (holName(dt)?'hol':(dow===0?'sun':(dow===6?'sat':'')))+(dt.getDate()===1?' mstart':'')+(ymd(dt)===today?' today':'');
         h+=`<div class="wb-cell ${cls}" onclick="Wb.openCell('${esc(p.id)}','${ymd(dt)}')"></div>`;
       }
       h+=`</div>`;
