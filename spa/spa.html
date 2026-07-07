@@ -2710,7 +2710,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 #view-wb .wb-lg{font-size:12px;font-weight:700;border-radius:5px;padding:2px 9px}
 #view-wb .wb-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
-#view-wb .wb-grid{--wb-namew:110px;--wb-dayw:40px;width:max-content}
+#view-wb .wb-grid{--wb-namew:110px;--wb-dayw:54px;width:max-content}
 #view-wb .wb-hrow{display:flex;position:sticky;top:0;z-index:3}
 #view-wb .wb-name{width:var(--wb-namew);min-width:var(--wb-namew);box-sizing:border-box;border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:4px;padding:0 6px;font-weight:700;font-size:14px;color:var(--text);background:var(--surface-1);position:sticky;left:0;z-index:2}
 #view-wb .wb-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;flex:1}
@@ -2734,7 +2734,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-cell.sun{background:#fdf6f6}
 #view-wb .wb-cell:hover{background:#eef6ff}
 #view-wb .wb-notes{position:absolute;top:0;bottom:0;left:var(--wb-namew);width:calc(var(--wb-n) * var(--wb-dayw));pointer-events:none}
-#view-wb .wb-note{position:absolute;height:22px;line-height:22px;border-radius:5px;padding:0 7px;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:auto;cursor:pointer;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+#view-wb .wb-note{position:absolute;width:max-content;min-height:20px;border-radius:5px;padding:2px 6px;font-size:12px;line-height:14px;font-weight:600;white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;pointer-events:auto;cursor:pointer;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 #view-wb .wb-empty{padding:34px;text-align:center;color:var(--text-dim);font-size:14px}
 #view-wb .wb-hint{margin:8px 2px 0;font-size:12px;color:var(--text-dim);line-height:1.6}
 /* モーダル（枠外クリックでは閉じない＝×/閉じるのみ） */
@@ -2773,7 +2773,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="wb-mrow"><span class="wb-mlab">対象</span><span id="wbmPerson" class="wb-mperson"></span></div>
     <div class="wb-mrow"><span class="wb-mlab">期間</span><input type="date" id="wbmFrom" class="wb-date"><span class="wb-mto">〜</span><input type="date" id="wbmTo" class="wb-date"></div>
     <div class="wb-mrow col"><span class="wb-mlab">分類</span><div id="wbmCats" class="wb-cats"></div></div>
-    <div class="wb-mrow col"><span class="wb-mlab">内容（ホテル・便・誰と会う等 自由に）</span><textarea id="wbmText" class="wb-ta" rows="4" placeholder="例：ANA789 羽田8:00発／東横イン青森／10時に高田さんと"></textarea></div>
+    <div class="wb-mrow col"><span class="wb-mlab">内容</span><textarea id="wbmText" class="wb-ta" rows="4"></textarea></div>
     <div class="wb-macts"><button class="wb-del" id="wbmDel" onclick="Wb.delNote()">削除</button><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closeModal()">閉じる</button><button class="wb-save" onclick="Wb.saveNote()">保存</button></div>
   </div>
 </div>
@@ -6921,6 +6921,13 @@ const Wb = (function(){
       if(placed<0){ placed=laneEnd.length; laneEnd.push(it.e); } else laneEnd[placed]=it.e;
       it.lane=placed;
     });
+    // 1日予定が右の空きへ伸びられる上限＝同レーンの次予定の開始（無ければ月末）
+    const byLane={};
+    arr.forEach(it=>{ (byLane[it.lane]||(byLane[it.lane]=[])).push(it); });
+    Object.keys(byLane).forEach(k=>{
+      const list=byLane[k].sort((a,b)=>a.s-b.s);
+      for(let i=0;i<list.length;i++) list[i].limit = (i+1<list.length)? list[i+1].s : N;
+    });
     return { items:arr, lanes: Math.max(1, laneEnd.length) };
   }
 
@@ -6949,7 +6956,7 @@ const Wb = (function(){
     // 人ごとの行
     people.forEach(p=>{
       const mine=lanesFor(p.name, y, mo, N);
-      const rowH = mine.lanes * 26 + 8;
+      const rowH = mine.lanes * 32 + 8;
       h+=`<div class="wb-prow" style="height:${rowH}px">`;
       h+=`<div class="wb-name"><div class="wb-reord"><button class="wb-rb" title="上へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',-1)">▲</button><button class="wb-rb" title="下へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',1)">▼</button></div><span onclick="Wb.editPerson('${esc(p.id)}')" title="${esc(p.name)}（タップで名前変更・削除）">${esc(p.name)}</span></div>`;
       h+=`<div class="wb-cells">`;
@@ -6962,8 +6969,10 @@ const Wb = (function(){
       h+=`<div class="wb-notes">`;
       mine.items.forEach(it=>{
         const c=catOf(it.n.category);
-        const left = it.s * 100 / N, width = (it.e - it.s + 1) * 100 / N;
-        h+=`<div class="wb-note" style="left:${left}%;width:calc(${width}% - 3px);top:${it.lane*26+3}px;background:${c.bg};color:${c.fg}" onclick="event.stopPropagation();Wb.openNote('${esc(it.n.id)}')" title="${esc(it.n.text||it.n.category)}">${esc(it.n.text||it.n.category||'')}</div>`;
+        const span = it.e - it.s + 1;
+        const avail = Math.max(span, (it.limit==null?N:it.limit) - it.s);   // 右の空きぶんまで伸ばせる
+        const left = it.s*100/N, minW = span*100/N, maxW = avail*100/N;
+        h+=`<div class="wb-note" style="left:${left}%;min-width:calc(${minW}% - 3px);max-width:calc(${maxW}% - 3px);top:${it.lane*32+3}px;background:${c.bg};color:${c.fg}" onclick="event.stopPropagation();Wb.openNote('${esc(it.n.id)}')" title="${esc(it.n.text||it.n.category)}">${esc(it.n.text||it.n.category||'')}</div>`;
       });
       h+=`</div></div>`;
     });
