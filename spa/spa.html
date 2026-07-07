@@ -2712,8 +2712,11 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
 #view-wb .wb-grid{--wb-namew:82px;--wb-dayw:40px;width:max-content}
 #view-wb .wb-hrow{display:flex;position:sticky;top:0;z-index:3}
-#view-wb .wb-name{width:var(--wb-namew);min-width:var(--wb-namew);box-sizing:border-box;border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 8px;font-weight:700;font-size:14px;color:var(--text);background:var(--surface-1);position:sticky;left:0;z-index:2;cursor:pointer}
-#view-wb .wb-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#view-wb .wb-name{width:var(--wb-namew);min-width:var(--wb-namew);box-sizing:border-box;border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:4px;padding:0 6px;font-weight:700;font-size:14px;color:var(--text);background:var(--surface-1);position:sticky;left:0;z-index:2}
+#view-wb .wb-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;flex:1}
+#view-wb .wb-reord{display:flex;flex-direction:column;flex-shrink:0}
+#view-wb .wb-rb{border:none;background:none;cursor:pointer;font-size:9px;line-height:11px;color:#b3bccb;padding:0 1px}
+#view-wb .wb-rb:hover{color:#0C447C}
 #view-wb .wb-corner{cursor:default;z-index:4}
 #view-wb .wb-dh{width:var(--wb-dayw);min-width:var(--wb-dayw);box-sizing:border-box;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center;padding:3px 0;line-height:1.15;background:var(--surface-1)}
 #view-wb .wb-dh b{font-size:13px;font-weight:700;display:block;color:var(--text)}
@@ -2759,7 +2762,7 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 </style>
 <div id="wbBody"></div>
-<div class="wb-hint">セルをタップ＝メモ追加／メモをタップ＝編集・削除。出張・休みは期間で選ぶと帯になります。左の名前をタップ＝名前変更・削除。</div>
+<div class="wb-hint">セルをタップ＝メモ追加／メモをタップ＝編集・削除。出張・休みは期間で選ぶと帯になります。左の名前をタップ＝名前変更・削除、名前の横の ▲▼ で並べ替え。</div>
 <div id="wbModal" class="wb-modal hidden">
   <div class="wb-mcard">
     <div class="wb-mhead"><span id="wbmTitle">メモ</span><button class="wb-mx" onclick="Wb.closeModal()">×</button></div>
@@ -6912,7 +6915,7 @@ const Wb = (function(){
       const mine=lanesFor(p.name, y, mo, N);
       const rowH = mine.lanes * 26 + 8;
       h+=`<div class="wb-prow" style="height:${rowH}px">`;
-      h+=`<div class="wb-name" onclick="Wb.editPerson('${esc(p.id)}')" title="タップで名前変更・削除"><span>${esc(p.name)}</span></div>`;
+      h+=`<div class="wb-name"><div class="wb-reord"><button class="wb-rb" title="上へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',-1)">▲</button><button class="wb-rb" title="下へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',1)">▼</button></div><span onclick="Wb.editPerson('${esc(p.id)}')" title="タップで名前変更・削除">${esc(p.name)}</span></div>`;
       h+=`<div class="wb-cells">`;
       for(let d=1; d<=N; d++){
         const dt=new Date(y,mo,d), dow=dt.getDay();
@@ -7007,8 +7010,16 @@ const Wb = (function(){
     render(); setTimeout(loadAll,3000);
   }
 
+  function movePerson(pid, dir){
+    const i=people.findIndex(p=>p.id===pid); if(i<0)return;
+    const j=i+dir; if(j<0||j>=people.length)return;   // 端は何もしない
+    const t=people[i]; people[i]=people[j]; people[j]=t;
+    fire({ action:'reorder', order:people.map(p=>p.id) });
+    render(); setTimeout(loadAll,3000);
+  }
+
   function init(){}
-  return { loadAll, render, init, prevMonth, nextMonth, thisMonth, openCell, openNote, setCat, saveNote, delNote, closeModal, addPerson, editPerson };
+  return { loadAll, render, init, prevMonth, nextMonth, thisMonth, openCell, openNote, setCat, saveNote, delNote, closeModal, addPerson, editPerson, movePerson };
 })();
 
 /* ========================================================================
