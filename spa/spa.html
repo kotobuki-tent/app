@@ -6874,8 +6874,8 @@ const Wb = (function(){
   ];
   function catOf(k){ return CATS.find(c=>c.k===k)||CATS[2]; }
   let notes=[], people=[], staff=[], _busy=false, _edit={}, _tombN=new Set(), _tombP=new Set(), _tombKey=new Set();
-  // 本日基準のローリング表示：前WB_BACK日＋当日＋先WB_FWD日。送りはWB_STEP日（1週=7。2週にするなら14）
-  const WB_BACK=3, WB_FWD=14, WB_N=WB_BACK+1+WB_FWD, WB_STEP=7;
+  // 本日基準のローリング表示：前WB_BACK日＋当日＋先WB_FWD日＝計21日(3週)。送りはWB_STEP日（1週=7）
+  const WB_BACK=3, WB_FWD=17, WB_N=WB_BACK+1+WB_FWD, WB_STEP=7;
   function todayStart(){ const d=new Date(); return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
   function addDays(d,n){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n); }
   let _start=addDays(todayStart(),-WB_BACK);
