@@ -6850,14 +6850,13 @@ const Wb = (function(){
   const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const DOW=['日','月','火','水','木','金','土'];
+  // 色を付けるのは「不在」＝出張・休みだけ。他はプレーンなメモ（その他）
   const CATS=[
     {k:'出張', bg:'#E6F1FB', fg:'#0C447C'},
-    {k:'納品', bg:'#E1F5EE', fg:'#0F6E56'},
-    {k:'約束', bg:'#FDECEC', fg:'#B42318'},
-    {k:'休み', bg:'#EFEDE6', fg:'#6B6A64'},
+    {k:'休み', bg:'#FBEAD7', fg:'#9A5A16'},
     {k:'その他',bg:'#EEF1F4', fg:'#3A4453'},
   ];
-  function catOf(k){ return CATS.find(c=>c.k===k)||CATS[4]; }
+  function catOf(k){ return CATS.find(c=>c.k===k)||CATS[2]; }
   let notes=[], people=[], staff=[], _busy=false, _edit={}, _tombN=new Set(), _tombP=new Set();
   let _m=(function(){ const d=new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
@@ -6983,7 +6982,7 @@ const Wb = (function(){
 
   function openCell(pid, ds){
     const p=people.find(x=>x.id===pid); if(!p)return;
-    _edit={ id:'', person:p.name, date_from:ds, date_to:ds, category:'出張', text:'' };
+    _edit={ id:'', person:p.name, date_from:ds, date_to:ds, category:'その他', text:'' };
     showModal();
   }
   function openNote(id){
