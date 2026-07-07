@@ -2710,7 +2710,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 #view-wb .wb-lg{font-size:12px;font-weight:700;border-radius:5px;padding:2px 9px}
 #view-wb .wb-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
-#view-wb .wb-grid{--wb-namew:82px;--wb-dayw:40px;width:max-content}
+#view-wb .wb-grid{--wb-namew:110px;--wb-dayw:40px;width:max-content}
 #view-wb .wb-hrow{display:flex;position:sticky;top:0;z-index:3}
 #view-wb .wb-name{width:var(--wb-namew);min-width:var(--wb-namew);box-sizing:border-box;border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:4px;padding:0 6px;font-weight:700;font-size:14px;color:var(--text);background:var(--surface-1);position:sticky;left:0;z-index:2}
 #view-wb .wb-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;flex:1}
@@ -6951,7 +6951,7 @@ const Wb = (function(){
       const mine=lanesFor(p.name, y, mo, N);
       const rowH = mine.lanes * 26 + 8;
       h+=`<div class="wb-prow" style="height:${rowH}px">`;
-      h+=`<div class="wb-name"><div class="wb-reord"><button class="wb-rb" title="上へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',-1)">▲</button><button class="wb-rb" title="下へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',1)">▼</button></div><span onclick="Wb.editPerson('${esc(p.id)}')" title="タップで名前変更・削除">${esc(p.name)}</span></div>`;
+      h+=`<div class="wb-name"><div class="wb-reord"><button class="wb-rb" title="上へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',-1)">▲</button><button class="wb-rb" title="下へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',1)">▼</button></div><span onclick="Wb.editPerson('${esc(p.id)}')" title="${esc(p.name)}（タップで名前変更・削除）">${esc(p.name)}</span></div>`;
       h+=`<div class="wb-cells">`;
       for(let d=1; d<=N; d++){
         const dt=new Date(y,mo,d), dow=dt.getDay();
