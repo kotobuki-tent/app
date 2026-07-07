@@ -7127,9 +7127,22 @@ const Wb = (function(){
     const memo=document.getElementById('wbmText').value.trim();
     if(!from){ alert('開始日を入れてください'); return; }
     if(to<from){ const t=from; from=to; to=t; }
+    const newRec={ date_from:from, date_to:to, person:_edit.person, text:head, memo, category:_edit.category };
+    // 追加直後(tmp)の編集：GASはtmp idでは実体を更新せず新行を作るため、
+    // 元を内容キーで削除予約→新規として作り直す（reconcileが実体を削除）
+    if(_edit.id && isTmp(_edit.id)){
+      const old=notes.find(n=>String(n.id)===String(_edit.id));
+      if(!old || nkey(old)===nkey(newRec)){ closeModal(); return; }   // 変更なしは何もしない
+      if(guard())return;
+      _tombKey.add(nkey(old));
+      notes=notes.filter(n=>String(n.id)!==String(_edit.id));
+      notes.push(Object.assign({id:'tmp_'+Date.now()}, newRec));
+      fire({ action:'save_note', date_from:from, date_to:to, person:_edit.person, text:head, memo, category:_edit.category });
+      closeModal(); render(); setTimeout(loadAll,3000);
+      return;
+    }
     if(guard())return;
-    const id=_edit.id || ('tmp_'+Date.now());
-    const rec={ id, date_from:from, date_to:to, person:_edit.person, text:head, memo, category:_edit.category };
+    const rec=Object.assign({id:_edit.id || ('tmp_'+Date.now())}, newRec);
     fire({ action:'save_note', id:_edit.id||undefined, date_from:from, date_to:to, person:_edit.person, text:head, memo, category:_edit.category });
     if(_edit.id){ const i=notes.findIndex(n=>String(n.id)===String(_edit.id)); if(i>=0) notes[i]=rec; else notes.push(rec); }
     else notes.push(rec);
