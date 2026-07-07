@@ -6858,7 +6858,7 @@ const Wb = (function(){
     {k:'その他',bg:'#EEF1F4', fg:'#3A4453'},
   ];
   function catOf(k){ return CATS.find(c=>c.k===k)||CATS[4]; }
-  let notes=[], people=[], staff=[], _busy=false, _edit={};
+  let notes=[], people=[], staff=[], _busy=false, _edit={}, _tombN=new Set(), _tombP=new Set();
   let _m=(function(){ const d=new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   function pad(n){ return String(n).padStart(2,'0'); }
@@ -6868,7 +6868,32 @@ const Wb = (function(){
 
   async function apiGet(){ try{ const r=await fetch(API+'?dept=wb&action=read'); return await r.json(); }catch(e){ return null; } }
   function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'wb',...body})}); }catch(e){} }
-  async function loadAll(){ const d=await apiGet(); if(d&&d.success){ notes=d.notes||[]; people=d.people||[]; staff=(d.staff||[]).map(x=>typeof x==='string'?x:(x&&x.name)||'').filter(Boolean); } render(); }
+  function isTmp(id){ return String(id).indexOf('tmp_')===0; }
+  function nkey(n){ return [n.person,n.date_from||'',n.date_to||'',n.category||'',n.text||''].join('|'); }
+  // 楽観更新をreconcileで消さない：サーバ確定を土台に、未反映のtmp追加は残し、削除済みidは隠し、並び順はローカル優先
+  async function loadAll(){
+    const d=await apiGet();
+    if(d&&d.success){
+      const rawN=d.notes||[], rawP=d.people||[];
+      const ord={}; people.forEach((p,i)=>{ ord[p.id]=i; });
+      // 楽観的削除：サーバにまだ残っていても削除済みidは隠す
+      let sN=rawN.filter(n=>!_tombN.has(String(n.id)));
+      let sP=rawP.filter(p=>!_tombP.has(String(p.id)));
+      // 楽観的追加：サーバ未反映のtmp_行はローカルを残す（同内容がサーバに来たら自然に置換）
+      const sk=new Set(sN.map(nkey));
+      sN=sN.concat(notes.filter(n=>isTmp(n.id) && !sk.has(nkey(n))));
+      const spn=new Set(sP.map(p=>p.name));
+      sP=sP.concat(people.filter(p=>isTmp(p.id) && !spn.has(p.name)));
+      // 並び順はローカルの現在順を優先（並べ替えの一瞬の巻き戻りを防ぐ）
+      sP.sort((a,b)=>{ const ai=(a.id in ord)?ord[a.id]:9999+(+a.sort||0), bi=(b.id in ord)?ord[b.id]:9999+(+b.sort||0); return ai-bi; });
+      notes=sN; people=sP;
+      staff=(d.staff||[]).map(x=>typeof x==='string'?x:(x&&x.name)||'').filter(Boolean);
+      // サーバから消えたidは確定＝tombstone解除
+      const nid=new Set(rawN.map(n=>String(n.id))); _tombN.forEach(id=>{ if(!nid.has(id)) _tombN.delete(id); });
+      const pid=new Set(rawP.map(p=>String(p.id))); _tombP.forEach(id=>{ if(!pid.has(id)) _tombP.delete(id); });
+    }
+    render();
+  }
 
   function prevMonth(){ _m=new Date(_m.getFullYear(), _m.getMonth()-1, 1); render(); }
   function nextMonth(){ _m=new Date(_m.getFullYear(), _m.getMonth()+1, 1); render(); }
@@ -6989,6 +7014,7 @@ const Wb = (function(){
     if(!confirm('このメモを削除しますか？'))return;
     if(guard())return;
     fire({ action:'delete_note', id:_edit.id });
+    if(!isTmp(_edit.id)) _tombN.add(String(_edit.id));
     notes=notes.filter(n=>String(n.id)!==String(_edit.id));
     closeModal(); render(); setTimeout(loadAll,3000);
   }
@@ -7020,6 +7046,7 @@ const Wb = (function(){
       if(!confirm(`「${p.name}」の行を削除しますか？\n（この人のメモも表示されなくなります）`))return;
       if(guard())return;
       fire({ action:'del_person', id:p.id });
+      if(!isTmp(p.id)) _tombP.add(String(p.id));
       people=people.filter(x=>x.id!==pid);
       render(); setTimeout(loadAll,3000);
       return;
