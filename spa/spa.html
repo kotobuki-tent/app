@@ -2706,7 +2706,10 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-mbtn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:5px 11px;font-size:15px;cursor:pointer;line-height:1}
 #view-wb .wb-mlabel{font-size:16px;font-weight:800;min-width:158px;text-align:center;color:var(--text);white-space:nowrap}
 #view-wb .wb-today{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--text)}
+#view-wb .wb-topbtns{display:flex;gap:8px}
+#view-wb .wb-addnew{border:none;background:#0C447C;color:#fff;border-radius:8px;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer}
 #view-wb .wb-addp{border:1px solid #0C447C;color:#0C447C;background:#fff;border-radius:8px;padding:7px 14px;font-size:14px;font-weight:700;cursor:pointer}
+#view-wb .wb-pick.sel{background:#0C447C;color:#fff;border-color:#0C447C}
 #view-wb .wb-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
 #view-wb .wb-lg{font-size:12px;font-weight:700;border-radius:5px;padding:2px 9px}
 #view-wb .wb-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface);-webkit-overflow-scrolling:touch}
@@ -2792,7 +2795,6 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="wb-mrow col"><span class="wb-mlab">分類</span><div id="wbmCats" class="wb-cats"></div></div>
     <div class="wb-mrow col"><span class="wb-mlab">見出し（板に表示）</span><input type="text" id="wbmHead" class="wb-head"></div>
     <div class="wb-mrow col"><span class="wb-mlab">メモ（詳細・タップで表示）</span><textarea id="wbmText" class="wb-ta" rows="4"></textarea></div>
-    <div class="wb-mrow" id="wbmMore" style="display:none"><button type="button" class="wb-addmore" onclick="Wb.addSameDay()">＋ この人の同じ日にもう1件</button></div>
     <div class="wb-macts"><button class="wb-del" id="wbmDel" onclick="Wb.delNote()">削除</button><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closeModal()">閉じる</button><button class="wb-save" onclick="Wb.saveNote()">保存</button></div>
   </div>
 </div>
@@ -2801,6 +2803,17 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="wb-mhead"><span>人を追加</span><button class="wb-mx" onclick="Wb.closePick()">×</button></div>
     <div class="wb-mrow col"><span class="wb-mlab">staffから選ぶ（追加後、名前タップで表記を短くできます）</span><div id="wbPickList" class="wb-picklist"></div></div>
     <div class="wb-macts"><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closePick()">閉じる</button></div>
+  </div>
+</div>
+<div id="wbNewModal" class="wb-modal hidden">
+  <div class="wb-mcard">
+    <div class="wb-mhead"><span>新規登録</span><button class="wb-mx" onclick="Wb.closeNew()">×</button></div>
+    <div class="wb-mrow col"><span class="wb-mlab">対象（複数選択可・一覧に無い人は自動で追加）</span><div id="wbnNames" class="wb-picklist"></div></div>
+    <div class="wb-mrow"><span class="wb-mlab">期間</span><input type="date" id="wbnFrom" class="wb-date"><span class="wb-mto">〜</span><input type="date" id="wbnTo" class="wb-date"></div>
+    <div class="wb-mrow col"><span class="wb-mlab">分類</span><div id="wbnCats" class="wb-cats"></div></div>
+    <div class="wb-mrow col"><span class="wb-mlab">見出し（案件・板に表示）</span><input type="text" id="wbnHead" class="wb-head"></div>
+    <div class="wb-mrow col"><span class="wb-mlab">メモ（詳細・タップで表示）</span><textarea id="wbnText" class="wb-ta" rows="3"></textarea></div>
+    <div class="wb-macts"><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closeNew()">閉じる</button><button class="wb-save" onclick="Wb.saveNew()">登録</button></div>
   </div>
 </div>
 </section>
@@ -6877,6 +6890,7 @@ const Wb = (function(){
   ];
   function catOf(k){ return CATS.find(c=>c.k===k)||CATS[2]; }
   let notes=[], people=[], staff=[], _busy=false, _edit={}, _tombN=new Set(), _tombP=new Set(), _tombKey=new Set();
+  let _newSel=new Set(), _newCat='その他';
   // 本日基準のローリング表示：前WB_BACK日＋当日＋先WB_FWD日＝計21日(3週)。送りはWB_STEP日（1週=7）
   const WB_BACK=3, WB_FWD=17, WB_N=WB_BACK+1+WB_FWD, WB_STEP=7;
   function todayStart(){ const d=new Date(); return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
@@ -6996,7 +7010,7 @@ const Wb = (function(){
       +`<span class="wb-mlabel">${rangeLbl}</span>`
       +`<button class="wb-mbtn" onclick="Wb.nextPage()">▶</button>`
       +`<button class="wb-today" onclick="Wb.goToday()">今日</button></div>`
-      +`<button class="wb-addp" onclick="Wb.addPerson()">＋ 人を追加</button>`
+      +`<div class="wb-topbtns"><button class="wb-addnew" onclick="Wb.openNew()">＋ 新規登録</button><button class="wb-addp" onclick="Wb.addPerson()">＋ 人を追加</button></div>`
       +`</div>`;
     h+=`<div class="wb-legend">`+CATS.map(c=>`<span class="wb-lg" style="background:${c.bg};color:${c.fg}">${c.k}</span>`).join('')+`</div>`;
     h+=`<div class="wb-scroll"><div class="wb-grid" style="--wb-n:${N}">`;
@@ -7063,12 +7077,50 @@ const Wb = (function(){
     document.getElementById('wbmHead').value=_edit.head||'';
     document.getElementById('wbmText').value=_edit.memo||'';
     document.getElementById('wbmDel').style.display=_edit.id?'':'none';
-    document.getElementById('wbmMore').style.display=_edit.id?'':'none';   // 編集時のみ「同じ日にもう1件」
     m.classList.remove('hidden');
     setTimeout(()=>{ const t=document.getElementById('wbmHead'); if(t)t.focus(); },50);
   }
   function closeModal(){ const m=document.getElementById('wbModal'); if(m)m.classList.add('hidden'); }
-  function addSameDay(){ const p=people.find(x=>x.name===_edit.person), ds=_edit.date_from; closeModal(); if(p&&ds) openCell(p.id, ds); }
+  // ---- 新規登録（名前を複数選択＋案件＋日程。板に無い人は自動で行追加） ----
+  function openNew(){
+    const m=document.getElementById('wbNewModal'); if(!m)return;
+    _newSel=new Set(); _newCat='その他';
+    const boardNames=people.map(p=>p.name);
+    const cand=boardNames.concat(staff.filter(n=>!boardNames.includes(n)));
+    document.getElementById('wbnNames').innerHTML=cand.length
+      ? cand.map(n=>`<button type="button" class="wb-pick" data-n="${esc(n)}" onclick="Wb.newToggle('${esc(n)}')">${esc(n)}</button>`).join('')
+      : '<div class="wb-pick-empty">候補がありません（staff未取得）</div>';
+    const t=ymd(new Date());
+    document.getElementById('wbnFrom').value=t; document.getElementById('wbnTo').value=t;
+    document.getElementById('wbnCats').innerHTML=CATS.map(c=>`<button type="button" class="wb-mcat${c.k===_newCat?' on':''}" data-k="${c.k}" style="--cbg:${c.bg};--cfg:${c.fg}" onclick="Wb.setNewCat('${c.k}')">${c.k}</button>`).join('');
+    document.getElementById('wbnHead').value=''; document.getElementById('wbnText').value='';
+    m.classList.remove('hidden');
+  }
+  function newToggle(name){
+    if(_newSel.has(name)) _newSel.delete(name); else _newSel.add(name);
+    const box=document.getElementById('wbnNames'); if(box)[...box.children].forEach(b=>{ if(b.getAttribute('data-n')===name) b.classList.toggle('sel', _newSel.has(name)); });
+  }
+  function setNewCat(k){ _newCat=k; const box=document.getElementById('wbnCats'); if(box)[...box.children].forEach(b=>b.classList.toggle('on', b.getAttribute('data-k')===k)); }
+  function closeNew(){ const m=document.getElementById('wbNewModal'); if(m)m.classList.add('hidden'); }
+  function saveNew(){
+    let from=document.getElementById('wbnFrom').value, to=document.getElementById('wbnTo').value||from;
+    const head=document.getElementById('wbnHead').value.trim(), memo=document.getElementById('wbnText').value.trim();
+    const names=[..._newSel];
+    if(!names.length){ alert('対象の名前を選んでください'); return; }
+    if(!from){ alert('開始日を入れてください'); return; }
+    if(to<from){ const t=from; from=to; to=t; }
+    if(guard())return;
+    const stamp=Date.now(); let mx=people.reduce((a,p)=>Math.max(a,p.sort||0),0);
+    names.forEach((name,i)=>{
+      if(!people.some(p=>p.name===name)){        // 板に無い人は自動で行追加
+        fire({action:'add_person', name});
+        people.push({id:'tmpP_'+stamp+'_'+i, name, sort:++mx});
+      }
+      fire({action:'save_note', date_from:from, date_to:to, person:name, text:head, memo, category:_newCat});
+      notes.push({id:'tmp_'+stamp+'_'+i, date_from:from, date_to:to, person:name, text:head, memo, category:_newCat});
+    });
+    closeNew(); render(); setTimeout(loadAll,3000);
+  }
   function saveNote(){
     let from=document.getElementById('wbmFrom').value, to=document.getElementById('wbmTo').value||from;
     const head=document.getElementById('wbmHead').value.trim();
@@ -7165,7 +7217,7 @@ const Wb = (function(){
       body.addEventListener('mouseout', e=>{ const n=e.target.closest('.wb-note'); if(n) hideTip(); });
     }
   }
-  return { loadAll, render, init, prevPage, nextPage, goToday, openCell, openNote, setCat, saveNote, delNote, closeModal, addSameDay, addPerson, closePick, pickPerson, editPerson, movePerson };
+  return { loadAll, render, init, prevPage, nextPage, goToday, openCell, openNote, setCat, saveNote, delNote, closeModal, openNew, newToggle, setNewCat, saveNew, closeNew, addPerson, closePick, pickPerson, editPerson, movePerson };
 })();
 
 /* ========================================================================
