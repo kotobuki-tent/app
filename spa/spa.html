@@ -2728,6 +2728,8 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-dh.sun i{color:#dc2626}
 #view-wb .wb-dh.today b{color:#fff;background:#f59e0b;border-radius:50%;width:19px;height:19px;line-height:19px;margin:0 auto;display:block}
 #view-wb .wb-dh.mstart,#view-wb .wb-cell.mstart{border-left:2px solid #c3cbd6}
+/* 本日の列を丸ごとハイライト（薄い色＋両脇にオレンジの縦線） */
+#view-wb .wb-dh.today,#view-wb .wb-cell.today{background:#FFF4DB;box-shadow:inset 2px 0 #f59e0b,inset -2px 0 #f59e0b}
 #view-wb .wb-prow{display:flex;position:relative;border-bottom:1px solid var(--border)}
 #view-wb .wb-prow .wb-name{border-bottom:none}
 #view-wb .wb-cells{display:flex;flex:1 1 auto;min-width:0}
@@ -2736,7 +2738,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-cell.sun{background:#fdf6f6}
 #view-wb .wb-cell:hover{background:#eef6ff}
 #view-wb .wb-notes{position:absolute;top:0;bottom:0;left:var(--wb-namew);right:0;pointer-events:none}
-#view-wb .wb-note{position:absolute;width:max-content;min-height:20px;border-radius:5px;padding:2px 6px;font-size:12px;line-height:14px;font-weight:600;white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;pointer-events:auto;cursor:pointer;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+#view-wb .wb-note{position:absolute;min-height:20px;border-radius:5px;padding:2px 6px;font-size:12px;line-height:14px;font-weight:600;white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;pointer-events:auto;cursor:pointer;box-sizing:border-box;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 #view-wb .wb-empty{padding:34px;text-align:center;color:var(--text-dim);font-size:14px}
 #view-wb .wb-hint{margin:8px 2px 0;font-size:12px;color:var(--text-dim);line-height:1.6}
 /* モーダル（枠外クリックでは閉じない＝×/閉じるのみ） */
@@ -2775,7 +2777,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="wb-mrow"><span class="wb-mlab">対象</span><span id="wbmPerson" class="wb-mperson"></span></div>
     <div class="wb-mrow"><span class="wb-mlab">期間</span><input type="date" id="wbmFrom" class="wb-date"><span class="wb-mto">〜</span><input type="date" id="wbmTo" class="wb-date"></div>
     <div class="wb-mrow col"><span class="wb-mlab">分類</span><div id="wbmCats" class="wb-cats"></div></div>
-    <div class="wb-mrow col"><span class="wb-mlab">内容</span><textarea id="wbmText" class="wb-ta" rows="4"></textarea></div>
+    <div class="wb-mrow col"><span class="wb-mlab">内容（1行目＝見出し・板に表示／2行目以降＝詳細）</span><textarea id="wbmText" class="wb-ta" rows="4"></textarea></div>
     <div class="wb-macts"><button class="wb-del" id="wbmDel" onclick="Wb.delNote()">削除</button><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closeModal()">閉じる</button><button class="wb-save" onclick="Wb.saveNote()">保存</button></div>
   </div>
 </div>
@@ -6969,17 +6971,17 @@ const Wb = (function(){
       h+=`<div class="wb-cells">`;
       for(let i=0;i<N;i++){
         const dt=addDays(start,i), dow=dt.getDay();
-        const cls = (dow===0?'sun':(dow===6?'sat':''))+(dt.getDate()===1?' mstart':'');
+        const cls = (dow===0?'sun':(dow===6?'sat':''))+(dt.getDate()===1?' mstart':'')+(ymd(dt)===today?' today':'');
         h+=`<div class="wb-cell ${cls}" onclick="Wb.openCell('${esc(p.id)}','${ymd(dt)}')"></div>`;
       }
       h+=`</div>`;
       h+=`<div class="wb-notes">`;
       mine.items.forEach(it=>{
         const c=catOf(it.n.category);
-        const span = it.e - it.s + 1;
-        const avail = Math.max(span, (it.limit==null?N:it.limit) - it.s);   // 右の空きぶんまで伸ばせる
-        const left = it.s*100/N, minW = span*100/N, maxW = avail*100/N;
-        h+=`<div class="wb-note" style="left:${left}%;min-width:calc(${minW}% - 3px);max-width:calc(${maxW}% - 3px);top:${it.lane*32+3}px;background:${c.bg};color:${c.fg}" onclick="event.stopPropagation();Wb.openNote('${esc(it.n.id)}')" title="${esc(it.n.text||it.n.category)}">${esc(it.n.text||it.n.category||'')}</div>`;
+        const wpct = (it.e - it.s + 1)*100/N, left = it.s*100/N;   // メモは自分の日数ぶんだけ（伸ばさない＝単発が複数日に見えない）
+        const full = it.n.text||it.n.category||'';
+        const face = esc(full.split('\n')[0]);                     // 板には1行目（見出し）だけ。詳細はモーダルで
+        h+=`<div class="wb-note" style="left:${left}%;width:calc(${wpct}% - 3px);top:${it.lane*32+3}px;background:${c.bg};color:${c.fg}" onclick="event.stopPropagation();Wb.openNote('${esc(it.n.id)}')" title="${esc(full)}">${face}</div>`;
       });
       h+=`</div></div>`;
     });
