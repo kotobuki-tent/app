@@ -2742,6 +2742,10 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-prow{display:flex;position:relative;border-bottom:1px solid var(--border)}
 #view-wb .wb-prow.alt{background:#fafbfd}
 #view-wb .wb-prow.alt .wb-name{background:#eef2f6}
+/* 最上段の固定行「会社予定」（名前変更・削除・並べ替え不可） */
+#view-wb .wb-prow.fixed{background:#f3f7fd}
+#view-wb .wb-cofix{background:#e4edf9;cursor:default;justify-content:center;font-weight:800;color:#0C447C}
+#view-wb .wb-cofix span{cursor:default;flex:none}
 #view-wb .wb-prow .wb-name{border-bottom:none}
 #view-wb .wb-cells{display:flex;flex:1 1 auto;min-width:0}
 #view-wb .wb-cell{flex:1 1 0;min-width:var(--wb-dayw);box-sizing:border-box;border-right:1px solid #eceff2;cursor:pointer}
@@ -6891,6 +6895,8 @@ const Wb = (function(){
     {k:'その他',bg:'#EEF1F4', fg:'#3A4453'},
   ];
   function catOf(k){ return CATS.find(c=>c.k===k)||CATS[2]; }
+  // 最上段に固定の「会社予定」行（wb_peopleには置かない仮想行。名前変更・削除・並べ替え不可）
+  const WB_COMPANY='会社予定', WB_CO_ID='__co__';
   let notes=[], people=[], staff=[], _busy=false, _edit={}, _tombN=new Set(), _tombP=new Set(), _tombKey=new Set();
   let _newSel=new Set(), _newCat='その他';
   // 本日基準のローリング表示：前WB_BACK日＋当日＋先WB_FWD日＝計21日(3週)。送りはWB_STEP日（1週=7）
@@ -6954,6 +6960,13 @@ const Wb = (function(){
       sN=sN.concat(notes.filter(n=>isTmp(n.id) && !sk.has(nkey(n))));
       const spn=new Set(sP.map(p=>p.name));
       sP=sP.concat(people.filter(p=>isTmp(p.id) && !spn.has(p.name)));
+      // 同名は1行に潰す＋「会社予定」はwb_peopleに置かない（固定行として描画）。サーバの余分な行は自動削除
+      const seenName=new Set();
+      sP=sP.filter(p=>{
+        const dup = p.name===WB_COMPANY || seenName.has(p.name);
+        if(dup){ if(!isTmp(p.id) && !_tombP.has(String(p.id))){ fire({action:'del_person', id:p.id}); _tombP.add(String(p.id)); } return false; }
+        seenName.add(p.name); return true;
+      });
       // 並び順はローカルの現在順を優先（並べ替えの一瞬の巻き戻りを防ぐ）
       sP.sort((a,b)=>{ const ai=(a.id in ord)?ord[a.id]:9999+(+a.sort||0), bi=(b.id in ord)?ord[b.id]:9999+(+b.sort||0); return ai-bi; });
       notes=sN; people=sP;
@@ -7027,12 +7040,15 @@ const Wb = (function(){
       h+=`<div class="wb-dh ${cls}${ymd(dt)===today?' today':''}"${hol?` title="${esc(hol)}"`:''}><b>${dlab}</b><i>${sub}</i></div>`;
     }
     h+=`</div>`;
-    // 人ごとの行
-    people.forEach((p,idx)=>{
+    // 行：先頭に「会社予定」を固定、以降に人
+    const rows=[{id:WB_CO_ID, name:WB_COMPANY, fixed:true}].concat(people);
+    rows.forEach((p,idx)=>{
       const mine=lanesFor(p.name, start, N);
       const rowH = mine.lanes * 32 + 8;
-      h+=`<div class="wb-prow${idx%2?' alt':''}" style="height:${rowH}px">`;
-      h+=`<div class="wb-name"><div class="wb-reord"><button class="wb-rb" title="上へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',-1)">▲</button><button class="wb-rb" title="下へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',1)">▼</button></div><span onclick="Wb.editPerson('${esc(p.id)}')" title="${esc(p.name)}（タップで名前変更・削除）">${esc(p.name)}</span></div>`;
+      h+=`<div class="wb-prow${idx%2?' alt':''}${p.fixed?' fixed':''}" style="height:${rowH}px">`;
+      h+= p.fixed
+        ? `<div class="wb-name wb-cofix"><span>${esc(p.name)}</span></div>`
+        : `<div class="wb-name"><div class="wb-reord"><button class="wb-rb" title="上へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',-1)">▲</button><button class="wb-rb" title="下へ" onclick="event.stopPropagation();Wb.movePerson('${esc(p.id)}',1)">▼</button></div><span onclick="Wb.editPerson('${esc(p.id)}')" title="${esc(p.name)}（タップで名前変更・削除）">${esc(p.name)}</span></div>`;
       h+=`<div class="wb-cells">`;
       for(let i=0;i<N;i++){
         const dt=addDays(start,i), dow=dt.getDay();
@@ -7056,9 +7072,10 @@ const Wb = (function(){
     el.innerHTML=h;
   }
 
+  function personName(pid){ return pid===WB_CO_ID ? WB_COMPANY : ((people.find(x=>x.id===pid)||{}).name||''); }
   function openCell(pid, ds){
-    const p=people.find(x=>x.id===pid); if(!p)return;
-    _edit={ id:'', person:p.name, date_from:ds, date_to:ds, category:'その他', head:'', memo:'' };
+    const nm=personName(pid); if(!nm)return;
+    _edit={ id:'', person:nm, date_from:ds, date_to:ds, category:'その他', head:'', memo:'' };
     showModal();
   }
   function openNote(id){
@@ -7088,7 +7105,7 @@ const Wb = (function(){
     const m=document.getElementById('wbNewModal'); if(!m)return;
     _newSel=new Set(); _newCat='その他';
     const boardNames=people.map(p=>p.name);
-    const cand=boardNames.concat(staff.filter(n=>!boardNames.includes(n)));
+    const cand=[WB_COMPANY].concat(boardNames, staff.filter(n=>!boardNames.includes(n)));   // 先頭は固定行の会社予定
     document.getElementById('wbnNames').innerHTML=cand.length
       ? cand.map(n=>`<button type="button" class="wb-pick" data-n="${esc(n)}" onclick="Wb.newToggle('${esc(n)}')">${esc(n)}</button>`).join('')
       : '<div class="wb-pick-empty">候補がありません（staff未取得）</div>';
@@ -7114,7 +7131,7 @@ const Wb = (function(){
     if(guard())return;
     const stamp=Date.now(); let mx=people.reduce((a,p)=>Math.max(a,p.sort||0),0);
     names.forEach((name,i)=>{
-      if(!people.some(p=>p.name===name)){        // 板に無い人は自動で行追加
+      if(name!==WB_COMPANY && !people.some(p=>p.name===name)){   // 板に無い人は自動で行追加（会社予定は固定行なので追加しない）
         fire({action:'add_person', name});
         people.push({id:'tmpP_'+stamp+'_'+i, name, sort:++mx});
       }
@@ -7206,7 +7223,7 @@ const Wb = (function(){
     const i=people.findIndex(p=>p.id===pid); if(i<0)return;
     const j=i+dir; if(j<0||j>=people.length)return;   // 端は何もしない
     const t=people[i]; people[i]=people[j]; people[j]=t;
-    fire({ action:'reorder', order:people.map(p=>p.id) });
+    fire({ action:'reorder', order:people.filter(p=>!isTmp(p.id)).map(p=>p.id) });   // 実IDのみ（tmpを送るとsortがずれる）
     render(); setTimeout(loadAll,3000);
   }
 
