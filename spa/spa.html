@@ -2773,6 +2773,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-wb .wb-cats{display:flex;gap:6px;flex-wrap:wrap}
 #view-wb .wb-mcat{border:1.5px solid var(--border);background:var(--surface);border-radius:20px;padding:5px 13px;font-size:13px;font-weight:700;cursor:pointer;color:var(--text-dim)}
 #view-wb .wb-mcat.on{background:var(--cbg);color:var(--cfg);border-color:var(--cfg)}
+#view-wb .wb-req{color:#dc2626;margin-left:3px}
 #view-wb .wb-head{border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:15px;font-family:inherit;background:var(--surface);color:var(--text);width:100%;box-sizing:border-box}
 #view-wb .wb-ta{border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:15px;font-family:inherit;background:var(--surface);color:var(--text);resize:vertical;line-height:1.5}
 #view-wb .wb-macts{display:flex;align-items:center;gap:8px;padding:16px}
@@ -2799,7 +2800,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="wb-mrow"><span class="wb-mlab">対象</span><span id="wbmPerson" class="wb-mperson"></span></div>
     <div class="wb-mrow"><span class="wb-mlab">期間</span><input type="date" id="wbmFrom" class="wb-date"><span class="wb-mto">〜</span><input type="date" id="wbmTo" class="wb-date"></div>
     <div class="wb-mrow col"><span class="wb-mlab">分類</span><div id="wbmCats" class="wb-cats"></div></div>
-    <div class="wb-mrow col"><span class="wb-mlab">見出し（板に表示）</span><input type="text" id="wbmHead" class="wb-head"></div>
+    <div class="wb-mrow col"><span class="wb-mlab">見出し（板に表示）<b class="wb-req">*</b></span><input type="text" id="wbmHead" class="wb-head"></div>
     <div class="wb-mrow col"><span class="wb-mlab">メモ（詳細・タップで表示）</span><textarea id="wbmText" class="wb-ta" rows="4"></textarea></div>
     <div class="wb-macts"><button class="wb-del" id="wbmDel" onclick="Wb.delNote()">削除</button><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closeModal()">閉じる</button><button class="wb-save" onclick="Wb.saveNote()">保存</button></div>
   </div>
@@ -2817,7 +2818,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="wb-mrow col"><span class="wb-mlab">対象（複数選択可・一覧に無い人は自動で追加）</span><div id="wbnNames" class="wb-picklist"></div></div>
     <div class="wb-mrow"><span class="wb-mlab">期間</span><input type="date" id="wbnFrom" class="wb-date"><span class="wb-mto">〜</span><input type="date" id="wbnTo" class="wb-date"></div>
     <div class="wb-mrow col"><span class="wb-mlab">分類</span><div id="wbnCats" class="wb-cats"></div></div>
-    <div class="wb-mrow col"><span class="wb-mlab">見出し（案件・板に表示）</span><input type="text" id="wbnHead" class="wb-head"></div>
+    <div class="wb-mrow col"><span class="wb-mlab">見出し（案件・板に表示）<b class="wb-req">*</b></span><input type="text" id="wbnHead" class="wb-head"></div>
     <div class="wb-mrow col"><span class="wb-mlab">メモ（詳細・タップで表示）</span><textarea id="wbnText" class="wb-ta" rows="3"></textarea></div>
     <div class="wb-macts"><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closeNew()">閉じる</button><button class="wb-save" onclick="Wb.saveNew()">登録</button></div>
   </div>
@@ -7082,6 +7083,7 @@ const Wb = (function(){
     const n=notes.find(x=>String(x.id)===String(id)); if(!n)return;
     let head=n.text||'', memo=n.memo||'';
     if(!memo && head.indexOf('\n')>=0){ const pt=head.split('\n'); head=pt[0]; memo=pt.slice(1).join('\n'); }  // 旧：改行区切りを見出し/メモに分割
+    if(!head) head=n.category||'';   // 分類だけで登録された旧メモ（休み等）は見出しに分類名を入れる
     _edit={ id:n.id, person:n.person, date_from:(n.date_from||'').slice(0,10), date_to:(n.date_to||n.date_from||'').slice(0,10), category:n.category||'その他', head, memo };
     showModal();
   }
@@ -7127,6 +7129,7 @@ const Wb = (function(){
     const names=[..._newSel];
     if(!names.length){ alert('対象の名前を選んでください'); return; }
     if(!from){ alert('開始日を入れてください'); return; }
+    if(!head){ alert('見出しを入れてください'); return; }
     if(to<from){ const t=from; from=to; to=t; }
     if(guard())return;
     const stamp=Date.now(); let mx=people.reduce((a,p)=>Math.max(a,p.sort||0),0);
@@ -7145,6 +7148,7 @@ const Wb = (function(){
     const head=document.getElementById('wbmHead').value.trim();
     const memo=document.getElementById('wbmText').value.trim();
     if(!from){ alert('開始日を入れてください'); return; }
+    if(!head){ alert('見出しを入れてください'); return; }
     if(to<from){ const t=from; from=to; to=t; }
     const newRec={ date_from:from, date_to:to, person:_edit.person, text:head, memo, category:_edit.category };
     // 追加直後(tmp)の編集：GASはtmp idでは実体を更新せず新行を作るため、
