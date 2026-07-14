@@ -4392,6 +4392,7 @@ const Proj = (function(){
     _changingStatus=true;
     d.status=newSt;
     fireAndForget({dept:'project',action:'save',id:id,status:newSt});
+    cascadeRentalStatus(d.project,newSt);
     toast(newSt+'に変更しました');
     render();
     setTimeout(()=>{_changingStatus=false},1500);
@@ -4426,7 +4427,7 @@ const Proj = (function(){
     $('projViewContent').innerHTML=h;
     const ptgl=$('projStToggle'),popts=$('projStOpts');
     if(ptgl&&popts)ptgl.onclick=()=>{ptgl.classList.toggle('open');popts.classList.toggle('open')};
-    $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProj(id);render()}});
+    $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});cascadeRentalStatus(d.project,newSt);toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProj(id);render()}});
     $('projViewBg').classList.add('show');
 
     requestAnimationFrame(()=>{$('projViewBg').scrollTop=0;const _mo=$('projViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
@@ -4484,6 +4485,7 @@ const Proj = (function(){
     }
     _savingProj=true;
     fireAndForget(body);
+    cascadeRentalStatus(name,body.status);
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('保存しました');
     closeProjMo();
@@ -4540,9 +4542,9 @@ const Proj = (function(){
       const start=dates[0]?.value||'';
       const end=dates[1]?.value||'';
       if(!cat||!item||!start||!end){toast('カテゴリ・商品・日付を全て入力してください',true);return}
-      const rental={category:cat,item_name:item,qty:qty,date_start:start,date_end:end,status:'予約',client_name:projectName,notes:''};
+      const rental={id:'RNTC-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),category:cat,item_name:item,qty:qty,date_start:start,date_end:end,status:'予約',client_name:projectName,notes:''};
       items.push(rental);
-      rentalsData.push({...rental,id:'tmp_'+Date.now()+'_'+Math.random().toString(36).slice(2,6)});
+      rentalsData.push({...rental});
       fireAndForget({dept:'inventory',action:'save_rental',...rental});
     }
     _busyRental=true;
@@ -4550,6 +4552,15 @@ const Proj = (function(){
     const d=projData.find(x=>x.project===projectName);
     if(d)viewProj(d.id);
     setTimeout(()=>{_busyRental=false},1500);
+  }
+  // 現場ステータス→レンタル品ステータス連動：レンタル中になったら「予約」を「貸出中」へ
+  function cascadeRentalStatus(projectName,newSt){
+    if(newSt!=='レンタル中')return;
+    const targets=rentalsData.filter(r=>r.client_name===projectName&&r.status==='予約');
+    if(!targets.length)return;
+    targets.forEach(r=>{r.status='貸出中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
+    _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
+    toast('レンタル品'+targets.length+'件を貸出中にしました');
   }
   function deleteProjectRental(id){
     if(_busyRental)return;
@@ -4948,10 +4959,10 @@ const Inv = (function(){
       populateCategoryFilters();renderItems();
     }
     if(!cat||!itemName||!start||!end){toast('カテゴリ・商品名・開始日・終了日は必須です',false);return}
-    const existingId=$('xf_r_id').value;const id=existingId||'tmp_'+Date.now();
+    const existingId=$('xf_r_id').value;const id=existingId||('RNTC-'+Date.now()+'-'+Math.random().toString(36).slice(2,6));
     const qtyVal=$('xf_r_qty').value;const status=$('xf_r_status').value;
     const clientName=$('xf_r_client').value.trim();const notes=$('xf_r_notes').value.trim();
-    fireAndForget({action:'save_rental',id:existingId||undefined,category:cat,item_name:itemName,qty:qtyVal,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes});
+    fireAndForget({action:'save_rental',id:id,category:cat,item_name:itemName,qty:qtyVal,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes});
     const local={id,category:cat,item_name:itemName,qty:Number(qtyVal)||1,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes};
     if(existingId){const idx=rentals.findIndex(x=>x.id===existingId);if(idx>=0)rentals[idx]={...rentals[idx],...local};else rentals.push(local)}else{rentals.push(local)}
     _savingRental=true;
