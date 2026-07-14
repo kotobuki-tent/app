@@ -3266,8 +3266,9 @@ function bossTap(){
     f._t=now; f._n=(f._n||0)+1;
     if(f._n>=7){
       f._n=0;
-      if(localStorage.getItem('spa_boss')==='1'){
-        if(confirm('経営者モードを解除しますか？')){ try{localStorage.removeItem('spa_boss');}catch(e){} location.reload(); }
+      if(document.body.classList.contains('boss')){
+        /* 解除＝端末保持を消す＋URLの?boss=も外す（URLに合言葉が残っていると解除してもONに戻るため） */
+        if(confirm('経営者モードを解除しますか？')){ try{localStorage.removeItem('spa_boss');}catch(e){} var u=new URL(location.href); u.searchParams.delete('boss'); location.href=u.toString(); }
       }else{
         var k=prompt('経営者キーを入力');
         if(k===BOSS_KEY){ try{localStorage.setItem('spa_boss','1');}catch(e){} location.reload(); }
