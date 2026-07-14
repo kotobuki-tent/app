@@ -3271,7 +3271,8 @@ function bossTap(){
         if(confirm('経営者モードを解除しますか？')){ try{localStorage.removeItem('spa_boss');}catch(e){} var u=new URL(location.href); u.searchParams.delete('boss'); location.href=u.toString(); }
       }else{
         var k=prompt('経営者キーを入力');
-        if(k===BOSS_KEY){ try{localStorage.setItem('spa_boss','1');}catch(e){} location.reload(); }
+        /* 合言葉が正しければ ?boss= 付きURLで開き直す＝通常ブラウザでも有効。standaloneならbossOn()が保持も保存する */
+        if(k===BOSS_KEY){ var u2=new URL(location.href); u2.searchParams.set('boss',k); location.href=u2.toString(); }
         else if(k!=null){ alert('キーが違います'); }
       }
     }
