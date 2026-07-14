@@ -1744,6 +1744,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navVeh" data-zone="office" onclick="App.nav('veh')">車両</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navWb" data-zone="office" onclick="App.nav('wb')">ボード</button>
+    <button class="nav-link hidden" id="navHrLink" onclick="App.openHr()">人事考課</button>
     <span class="nav-div"></span>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
@@ -8356,6 +8357,13 @@ function reloadAll(){boot();toast('更新しました');}
 const _deepGo=(function(){try{return new URLSearchParams(location.search).get('go')}catch(e){return null}})();
 const App = {
   current:null,
+  /* 人事考課（独立GASアプリ・給与データは持たない）を開く。経営キーは公開リポに置かず初回入力→端末保存 */
+  HR_URL:'https://script.google.com/macros/s/AKfycbxEehTaaBIJrUp5i-15-_frsMcDVSlR5uAba1JRHnjk1w-j5osgS5RWjrmImbXsZZfX/exec',
+  openHr(){
+    let k=''; try{k=localStorage.getItem('hr_master_key')||''}catch(e){}
+    if(!k){ k=(prompt('人事考課の経営キーを入力（初回のみ・この端末に保存）')||'').trim(); if(!k)return; try{localStorage.setItem('hr_master_key',k)}catch(e){} }
+    window.open(App.HR_URL+'?m='+encodeURIComponent(k),'_blank');
+  },
   // アプリ登録：ここに {key, ns(IIFE), sectionId, navId} を足すだけで全機構が回る
   REG:[
     {key:'cases',ns:()=>Cases,section:'view-cases',nav:'navCases',zone:'office'},
@@ -8444,7 +8452,7 @@ window.addEventListener('load', ()=>{
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   initMobileFilters();
   // 経営者モード（?boss=）＝本当のフルモード：全ゾーン表示に強制（localStorageには保存しない＝URLでだけ有効）
-  if(bossOn()){ App.mode='full'; document.body.classList.add('boss'); const bb=$('bossBadge'); if(bb) bb.classList.remove('hidden'); }
+  if(bossOn()){ App.mode='full'; document.body.classList.add('boss'); const bb=$('bossBadge'); if(bb) bb.classList.remove('hidden'); const hn=$('navHrLink'); if(hn) hn.classList.remove('hidden'); }
   App.applyMode();
   App.current=null;
   App.nav((_deepGo && App.reg(_deepGo)) ? _deepGo : 'portal');
