@@ -3662,7 +3662,6 @@ const Prod = (function(){
     el.querySelectorAll('.fv-si').forEach(s=>{s.onclick=()=>{const f=s.dataset.f;prodFilter=prodFilter===f?null:f;render()}});
     el.querySelectorAll('.fv-card').forEach(c=>{c.onclick=()=>viewProd(c.dataset.id)});
   }
-  function factoryFilter(q){q=q.toLowerCase();$('prodFactory').querySelectorAll('.fv-card').forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(q)?'':'none'})}
   function unifiedSearch(q){
     q=(q||'').toLowerCase();
     const view=document.querySelector('#prodFactory:not(.hidden), #prodArchive:not(.hidden), #prodAdmin:not(.hidden)');
@@ -3782,8 +3781,6 @@ const Prod = (function(){
     toast(newSt+'に変更しました');
     render();
   }
-  function archiveFilter(q){q=q.toLowerCase();$('prodArchive').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
-  function prodSearch(q){$('prodAdmin').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'})}
 
   // ===== 案件詳細 =====
   function viewProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;currentViewId=id;const dl=parseD(d.deadline);const diff=dl?diffDays(dl,today):null;const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?' ⚠ '+Math.abs(diff)+'日超過':' あと'+diff+'日'):''}`:'未定';const st=parseD(d.start_date);const stStr=st?`${st.getMonth()+1}/${st.getDate()}（${dow[st.getDay()]}）`:'';let h='';h+=vr('物件名',d.project);if(d.our_person)h+=vr('担当者',d.our_person);if(d.estimate_no)h+=vr('見積番号',d.estimate_no);if(d.order_no)h+=vr('受注番号',d.order_no);h+=vr('得意先',d.client);h+=vr('窓口',d.person);h+=vr('作業場所',d.section);if(d.subcontractor)h+=vr('外注先',d.subcontractor);if(stStr)h+=vr('作業開始',stStr);h+=vr('納期',dlStr);if(d.notes)h+=vr('備考',d.notes);
@@ -4186,7 +4183,6 @@ const Proj = (function(){
     h+='</div>';
     return h;
   }
-  function ganttFilter(q){q=q.toLowerCase();document.querySelectorAll('.gantt-row[data-id]').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'});document.querySelectorAll('.prj-card[data-id]').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
   function unifiedSearch(q){
     q=(q||'').toLowerCase();
     const view=document.querySelector('#projGantt:not(.hidden), #projDoneView:not(.hidden), #projAdminView:not(.hidden)');
@@ -4289,7 +4285,6 @@ const Proj = (function(){
     render();
     setTimeout(()=>{_changingStatus=false},1500);
   }
-  function projDoneFilter(q){q=q.toLowerCase();$('projDoneView').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'})}
 
   // ===== 管理テーブル =====
   function renderProjAdmin(){
@@ -4307,7 +4302,6 @@ const Proj = (function(){
     el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(projSort.col===c)projSort.asc=!projSort.asc;else{projSort.col=c;projSort.asc=true}render()}});
     el.querySelectorAll('[data-st]').forEach(btn=>{btn.onclick=()=>{const v=btn.dataset.st;projAdminFilter=v||null;render()}});
   }
-  function projSearch(q){$('projAdminView').querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'})}
 
   // ===== 現場詳細 =====
   function viewProj(id){const d=projData.find(x=>String(x.id)===String(id));if(!d)return;const fmtDates=s=>{if(!s)return'';return String(s).split(',').map(x=>{const dd=parseD(x.trim());return dd?`${dd.getMonth()+1}/${dd.getDate()}（${dow[dd.getDay()]}）`:''}).filter(Boolean).join('、')};let h='';h+=vr('物件名',d.project);if(d.our_person)h+=vr('担当者',d.our_person);if(d.estimate_no)h+=vr('見積番号',d.estimate_no);if(d.order_no)h+=vr('受注番号',d.order_no);h+=vr('得意先',d.client);h+=vr('窓口',d.person);if(d.venue)h+=vr('会場',d.venue);if(d.address)h+=vr('住所',d.address);h+='<div class="view-section"><h3>日程</h3>';if(d.date_load_in)h+=vr('搬入',fmtDates(d.date_load_in));if(d.date_setup)h+=vr('設営',fmtDates(d.date_setup));if(d.date_event)h+=vr('本番',fmtDates(d.date_event));if(d.date_teardown)h+=vr('撤去',fmtDates(d.date_teardown));if(d.type==='納品'){const dd=deliveryRaw(d);if(dd)h+=vr('納品',fmtDates(dd));}else if(d.date_rental_out)h+=vr('貸出',fmtDates(d.date_rental_out));if(d.date_rental_return)h+=vr('返却',fmtDates(d.date_rental_return));h+='</div>';if(d.people_load_in||d.people_setup||d.people_event||d.people_teardown){h+='<div class="view-section"><h3>人数（予定）</h3>';if(d.people_load_in)h+=vr('搬入',d.people_load_in+'人');if(d.people_setup)h+=vr('設営',d.people_setup+'人');if(d.people_event)h+=vr('本番',d.people_event+'人');if(d.people_teardown)h+=vr('撤去',d.people_teardown+'人');h+='</div>'}const hasVh=d.vehicles_load_in||d.vehicles_setup||d.vehicles_event||d.vehicles_teardown||d.vehicles_rental_out||d.vehicles_rental_return;if(hasVh){h+='<div class="view-section"><h3>車両</h3>';if(d.vehicles_load_in)h+=vr('搬入',d.vehicles_load_in);if(d.vehicles_setup)h+=vr('設営',d.vehicles_setup);if(d.vehicles_event)h+=vr('本番',d.vehicles_event);if(d.vehicles_teardown)h+=vr('撤去',d.vehicles_teardown);if(d.vehicles_rental_out)h+=vr('貸出',d.vehicles_rental_out);if(d.vehicles_rental_return)h+=vr('返却',d.vehicles_rental_return);h+='</div>'}if(d.material)h+='<div class="view-section"><h3>材料・仕入</h3><div class="view-row"><div class="view-val">'+esc(d.material)+'</div></div></div>';if(d.rentals)h+='<div class="view-section"><h3>レンタル品（メモ）</h3><div class="view-row"><div class="view-val">'+esc(d.rentals)+'</div></div></div>';const projRentals=rentalsData.filter(r=>r.client_name===d.project);h+='<div class="rental-add-section"><h3>レンタル品</h3>';if(projRentals.length){projRentals.forEach(r=>{const ds=r.date_start?((new Date(r.date_start+'T00:00:00').getMonth()+1)+'/'+new Date(r.date_start+'T00:00:00').getDate()):'';const de=r.date_end?((new Date(r.date_end+'T00:00:00').getMonth()+1)+'/'+new Date(r.date_end+'T00:00:00').getDate()):'';h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+ds+'〜'+de+'　<span style="font-size:11px;padding:2px 6px;border-radius:4px;background:var(--purple-dim);color:var(--purple)">'+esc(r.status)+'</span></span><button class="re-del" onclick="Proj.deleteProjectRental(\''+r.id+'\')">削除</button></div>'})}else{h+='<div style="font-size:12px;color:var(--text-faint);margin-bottom:6px">まだ登録されていません</div>'}h+='<div id="rentalAddRows"></div><button class="rental-add-btn" onclick="Proj.addRentalRow(\''+esc(d.project)+'\')">＋ レンタル品を追加</button>';h+='<div id="rentalSaveBtnWrap" class="hidden"><button class="rental-save-btn" onclick="Proj.saveProjectRentals(\''+esc(d.project)+'\')">まとめて登録</button></div>';h+='</div>';if(d.notes)h+='<div class="view-section"><h3>備考</h3><div class="view-row"><div class="view-val">'+esc(d.notes)+'</div></div></div>';
@@ -4591,7 +4585,7 @@ const Inv = (function(){
         apiGet({action:'projects'}).catch(()=>[])
       ]);
       items=mergeWithTmp(inv||[],items,r=>String(r.category||'')+'|'+String(r.item_name||''));
-      rentals=mergeWithTmp(rnt||[],rentals,r=>String(r.item_name||'')+'|'+String(r.start_date||'')+'|'+String(r.project_id||''));
+      rentals=mergeWithTmp(rnt||[],rentals,r=>String(r.item_name||'')+'|'+String(r.date_start||'')+'|'+String(r.client_name||''));
       projects=prj||[];
       populateCategoryFilters();
       populateProjectSelect();
@@ -6197,7 +6191,6 @@ const Daily = (function(){
     if(saved&&staffList.some(s=>String(s.employee_no)===saved))sel.value=saved;
   }
   function getWho(){return $('whoSelect').value||''}
-  function getWhoName(){const w=getWho();const s=staffList.find(x=>String(x.employee_no)===String(w));return s?s.name:''}
   function onWhoChange(){
     const w=getWho();
     if(w)localStorage.setItem('daily_who',w);else localStorage.removeItem('daily_who');
@@ -6535,7 +6528,7 @@ const Ot = (function(){
   function todayStr(){return fmtDate(new Date())}
   function oesc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
   async function apiGet(params){try{const qs=new URLSearchParams({dept:DEPT,...params}).toString();const r=await fetch(API+'?'+qs);return r.json()}catch(e){console.error('apiGet失敗(daily):',e);return null}}
-  function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,body:JSON.stringify({dept:DEPT,...body})});return{success:true}}
+  function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:DEPT,...body})});return{success:true}}
 
   function scheduleSyncFromServer(){
     if(syncTimer)clearTimeout(syncTimer);
@@ -6811,7 +6804,6 @@ const Wb = (function(){
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   function pad(n){ return String(n).padStart(2,'0'); }
   function ymd(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-  function daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
   function parseYmd(s){ const m=String(s||'').match(/(\d{4})-(\d{1,2})-(\d{1,2})/); return m? new Date(+m[1],+m[2]-1,+m[3]) : null; }
   // ---- 日本の祝日（春分/秋分は近似式、振替休日・国民の休日も算出。年ごとにキャッシュ） ----
   let _holCache={};
@@ -7206,7 +7198,7 @@ const FInv = (function(){
     return o;
   }
   function qtyLabel(d){return esc(d.qty||'')+esc(d.unit||'')}
-  function fmtD(s){if(!s)return'';const d=parseD(String(s).slice(0,10));return d?((d.getMonth()+1)+'/'+d.getDate()):''}
+  function fmtMD(s){if(!s)return'';const d=parseD(String(s).slice(0,10));return d?((d.getMonth()+1)+'/'+d.getDate()):''}
   function blob(d){return (String(d.item||'')+' '+String(d.supplier||'')+' '+String(d.orderer||'')+' '+String(d.use_note||'')+' '+String(d.receiver||'')).toLowerCase()}
   function search(v){kw=(v||'').trim().toLowerCase();render()}
 
@@ -7229,7 +7221,7 @@ const FInv = (function(){
   }
 
   function pendCard(d,receiveMode){
-    const meta=[d.orderer?('発注:'+esc(d.orderer)):'発注者未記入',esc(d.supplier||''),d.eta?(fmtD(d.eta)+'着予定'):''].filter(Boolean).join(' / ');
+    const meta=[d.orderer?('発注:'+esc(d.orderer)):'発注者未記入',esc(d.supplier||''),d.eta?(fmtMD(d.eta)+'着予定'):''].filter(Boolean).join(' / ');
     const act=receiveMode
       ? '<div style="font-size:11px;color:var(--accent);margin-top:6px">タップで着荷 →</div>'
       : '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button class="act-btn" onclick="event.stopPropagation();FInv.openReceive(\''+d.id+'\')">着荷にする</button><button class="act-btn" onclick="event.stopPropagation();FInv.openOrder(\''+d.id+'\')">編集</button><button class="act-btn del" onclick="event.stopPropagation();FInv.delRow(\''+d.id+'\')">取消</button></div>';
@@ -7258,7 +7250,7 @@ const FInv = (function(){
     let h='<div class="finv-sec">発注者不明（心当たりがあれば「発注者を記入」）</div>';
     if(!unk.length)h+='<div class="empty-msg" style="padding:20px">発注者不明はありません 👍</div>';
     unk.forEach(d=>{
-      const meta=[esc(d.supplier||''),d.arrived_date?(fmtD(d.arrived_date)+'着'):'',d.receiver?('受取:'+esc(d.receiver)):''].filter(Boolean).join(' / ');
+      const meta=[esc(d.supplier||''),d.arrived_date?(fmtMD(d.arrived_date)+'着'):'',d.receiver?('受取:'+esc(d.receiver)):''].filter(Boolean).join(' / ');
       h+='<div class="finv-card"><div class="fc-title">'+esc(d.item||'')+' <span class="fc-qty">'+qtyLabel(d)+'</span></div><div class="fc-meta">'+meta+'</div><div style="margin-top:8px"><button class="act-btn" onclick="FInv.openClaim(\''+d.id+'\')">発注者を記入</button></div></div>';
     });
     el.innerHTML=h;
@@ -7271,7 +7263,7 @@ const FInv = (function(){
     if(!rows.length)h+='<tr><td colspan="7" class="empty-msg">入荷済の記録はありません</td></tr>';
     rows.forEach(d=>{
       const dt=d.arrived_date||d.order_date||d.created_at;
-      h+='<tr data-id="'+d.id+'" onclick="FInv.openRow(\''+d.id+'\')" style="cursor:pointer"><td>'+fmtD(dt)+'</td><td>'+esc(d.item||'')+'</td><td>'+qtyLabel(d)+'</td><td>'+esc(d.supplier||'')+'</td><td>'+esc(d.orderer||'')+'</td><td>'+esc(d.receiver||'')+'</td><td>'+(d.unit_price?('¥'+esc(d.unit_price)):'')+'</td></tr>';
+      h+='<tr data-id="'+d.id+'" onclick="FInv.openRow(\''+d.id+'\')" style="cursor:pointer"><td>'+fmtMD(dt)+'</td><td>'+esc(d.item||'')+'</td><td>'+qtyLabel(d)+'</td><td>'+esc(d.supplier||'')+'</td><td>'+esc(d.orderer||'')+'</td><td>'+esc(d.receiver||'')+'</td><td>'+(d.unit_price?('¥'+esc(d.unit_price)):'')+'</td></tr>';
     });
     h+='</tbody></table></div>';
     el.innerHTML=h;
