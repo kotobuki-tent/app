@@ -1722,28 +1722,28 @@ table.jobs tr:last-child td{border-bottom:none}
 <div class="hdr">
   <div class="hdr-inner">
     <button class="nav-link home-link on" id="navHome" onclick="App.nav('portal')"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</button>
-    <button class="nav-link" id="navDaily" data-zone="field" data-kiosk onclick="App.nav('daily')">日報</button>
-    <button class="nav-link" id="navOt" data-zone="field" onclick="App.nav('ot')">時間外</button>
+    <button class="nav-link" id="navDaily" onclick="App.nav('daily')">日報</button>
+    <button class="nav-link" id="navOt" onclick="App.nav('ot')">時間外</button>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navAlcohol" data-zone="office" data-kiosk onclick="App.nav('alcohol')">点呼</button>
-    <button class="nav-link" id="navForklift" data-zone="office" data-kiosk onclick="App.nav('forklift')">リフト</button>
+    <button class="nav-link" id="navAlcohol" onclick="App.nav('alcohol')">点呼</button>
+    <button class="nav-link" id="navForklift" onclick="App.nav('forklift')">リフト</button>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navCard" data-zone="office" data-kiosk onclick="App.nav('card')">カード</button>
+    <button class="nav-link" id="navCard" onclick="App.nav('card')">カード</button>
     <div class="nav-spacer"></div>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navCases" data-zone="office" onclick="App.nav('cases')">案件</button>
+    <button class="nav-link" id="navCases" onclick="App.nav('cases')">案件</button>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navProd" data-zone="field" onclick="App.nav('prod')">生産</button>
-    <button class="nav-link" id="navProj" data-zone="field" onclick="App.nav('proj')">企画制作</button>
-    <button class="nav-link" id="navSales" data-zone="office" onclick="App.nav('sales')">販売</button>
+    <button class="nav-link" id="navProd" onclick="App.nav('prod')">生産</button>
+    <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
+    <button class="nav-link" id="navSales" onclick="App.nav('sales')">販売</button>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navLabor" data-zone="office" onclick="App.nav('labor')">工数</button>
+    <button class="nav-link" id="navLabor" onclick="App.nav('labor')">工数</button>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navInv" data-zone="office" onclick="App.nav('inv')">在庫</button>
+    <button class="nav-link" id="navInv" onclick="App.nav('inv')">在庫</button>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navVeh" data-zone="office" onclick="App.nav('veh')">車両</button>
+    <button class="nav-link" id="navVeh" onclick="App.nav('veh')">車両</button>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navWb" data-zone="office" onclick="App.nav('wb')">ボード</button>
+    <button class="nav-link" id="navWb" onclick="App.nav('wb')">ボード</button>
     <button class="nav-link hidden" id="navHrLink" onclick="App.openHr()">人事考課</button>
     <span class="nav-div"></span>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
@@ -2641,51 +2641,51 @@ table.jobs tr:last-child td{border-bottom:none}
       <button class="pm-btn" data-m="kiosk" onclick="App.setMode('kiosk')">点検</button>
     </div>
     <div class="portal-grid">
-      <a class="portal-card" data-app="cases" data-zone="office" onclick="App.nav('cases')">
+      <a class="portal-card" data-app="cases" onclick="App.nav('cases')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L13 14l-4 1 1-4z"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">案件管理</div></div>
       </a>
-      <a class="portal-card" data-app="prod" data-zone="field" onclick="App.nav('prod')">
+      <a class="portal-card" data-app="prod" onclick="App.nav('prod')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V11l6 3.5V11l6 3.5V8l6 4.5V21z"/><path d="M2.5 21h19"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">生産部</div></div>
       </a>
-      <a class="portal-card" data-app="proj" data-zone="field" onclick="App.nav('proj')">
+      <a class="portal-card" data-app="proj" onclick="App.nav('proj')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11l10-5 10 5"/><path d="M2 11h20"/><path d="M2.5 11v9M21.5 11v9"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">企画制作部</div></div>
       </a>
-      <a class="portal-card" data-app="sales" data-zone="office" onclick="App.nav('sales')">
+      <a class="portal-card" data-app="sales" onclick="App.nav('sales')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l7-7h7v7l-7 7z"/><circle cx="14.5" cy="9.5" r="1.3"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">販売管理</div></div>
       </a>
-      <a class="portal-card" data-app="daily" data-zone="field" data-kiosk onclick="App.nav('daily')">
+      <a class="portal-card" data-app="daily" onclick="App.nav('daily')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">日報</div></div>
       </a>
-      <a class="portal-card" data-app="ot" data-zone="field" onclick="App.nav('ot')">
+      <a class="portal-card" data-app="ot" onclick="App.nav('ot')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">時間外ボード</div></div>
       </a>
-      <a class="portal-card" data-app="labor" data-zone="office" onclick="App.nav('labor')">
+      <a class="portal-card" data-app="labor" onclick="App.nav('labor')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M10 20V5M16 20V14"/><path d="M2.5 20.5h19"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">工数管理</div></div>
       </a>
-      <a class="portal-card" data-app="inv" data-zone="office" onclick="App.nav('inv')">
+      <a class="portal-card" data-app="inv" onclick="App.nav('inv')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">在庫管理</div></div>
       </a>
-      <a class="portal-card" data-app="veh" data-zone="office" onclick="App.nav('veh')">
+      <a class="portal-card" data-app="veh" onclick="App.nav('veh')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l2-5h12l2 5"/><rect x="2" y="13" width="20" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.5"/><circle cx="17" cy="18.5" r="1.5"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">車両管理</div></div>
       </a>
-      <a class="portal-card" data-app="alcohol" data-zone="office" data-kiosk onclick="App.nav('alcohol')">
+      <a class="portal-card" data-app="alcohol" onclick="App.nav('alcohol')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5 11-12"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">アルコールチェック</div></div>
       </a>
-      <a class="portal-card" data-app="forklift" data-zone="office" data-kiosk onclick="App.nav('forklift')">
+      <a class="portal-card" data-app="forklift" onclick="App.nav('forklift')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V9h6l2 3h2"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="13" cy="18.5" r="1.6"/><path d="M17 17V5"/><path d="M17 17h5M17 12h4"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">フォークリフト点検</div></div>
       </a>
-      <a class="portal-card" data-app="card" data-zone="office" data-kiosk onclick="App.nav('card')">
+      <a class="portal-card" data-app="card" onclick="App.nav('card')">
         <div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10.5h18"/></svg></div>
         <div class="portal-card-body"><div class="portal-card-title">いないカード</div></div>
       </a>
@@ -8531,28 +8531,30 @@ const App = {
     if(!k){ k=(prompt('人事考課の経営キーを入力（初回のみ・この端末に保存）')||'').trim(); if(!k)return; try{localStorage.setItem('hr_master_key',k)}catch(e){} }
     window.open(App.HR_URL+'?m='+encodeURIComponent(k),'_blank');
   },
-  // アプリ登録：ここに {key, ns(IIFE), sectionId, navId} を足すだけで全機構が回る
+  // アプリ登録：ここに {key, ns(IIFE), sectionId, navId, zone, kiosk} を足すだけで全機構が回る（単一情報源）
+  // zone=アクセス判定＋表示。dispZone=表示だけ別ゾーンにしたい時（例:カードはfloorで遷移可・ナビ非表示）。kiosk:true=点検モードに出す
   REG:[
     {key:'cases',ns:()=>Cases,section:'view-cases',nav:'navCases',zone:'office'},
     {key:'prod', ns:()=>Prod, section:'view-prod', nav:'navProd',zone:'field'},
     {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj',zone:'field'},
     {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv',zone:'office'},
     {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh',zone:'office'},
-    {key:'card', ns:()=>Card, section:'view-card', nav:'navCard',zone:'shared'},
+    {key:'card', ns:()=>Card, section:'view-card', nav:'navCard',zone:'shared',dispZone:'office',kiosk:true},
     {key:'wb',   ns:()=>Wb,   section:'view-wb',   nav:'navWb',zone:'office'},
     {key:'finv', ns:()=>FInv, section:'view-finv', nav:'navFinv',zone:'field'},
     {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales',zone:'office'},
     {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor',zone:'office'},
-    {key:'daily',ns:()=>Daily,section:'view-daily',nav:'navDaily',zone:'field'},
+    {key:'daily',ns:()=>Daily,section:'view-daily',nav:'navDaily',zone:'field',kiosk:true},
     {key:'ot',   ns:()=>Ot,   section:'view-ot',   nav:'navOt',zone:'field'},
-    {key:'alcohol',ns:()=>Alc,section:'view-alcohol',nav:'navAlcohol',zone:'office'},
-    {key:'forklift',ns:()=>Fork,section:'view-forklift',nav:'navForklift',zone:'office'},
+    {key:'alcohol',ns:()=>Alc,section:'view-alcohol',nav:'navAlcohol',zone:'office',kiosk:true},
+    {key:'forklift',ns:()=>Fork,section:'view-forklift',nav:'navForklift',zone:'office',kiosk:true},
     {key:'portal',ns:()=>Portal,section:'view-portal',nav:'navHome'},
   ],
+  /* REGのzone/kioskをナビとポータルカードにdata属性として注入（起動時1回）。HTML側の手書き属性を廃止し二重管理をなくす */
+  injectZones(){ this.REG.forEach(r=>{ const z=r.dispZone||r.zone; if(!z)return; [$(r.nav), document.querySelector('.portal-card[data-app="'+r.key+'"]')].forEach(el=>{ if(!el)return; el.setAttribute('data-zone',z); if(r.kiosk)el.setAttribute('data-kiosk',''); }); }); },
   mode:(function(){ try{var m=new URLSearchParams(location.search).get('mode'); if(m==='floor'||m==='full'||m==='kiosk'){localStorage.setItem('spa_mode',m); history.replaceState({},'',location.pathname);} }catch(e){} try{return localStorage.getItem('spa_mode')||'full';}catch(e){return 'full';} })(),
   allowedZones(){ return this.mode==='floor' ? ['field','shared'] : ['field','shared','office']; },
-  KIOSK_KEYS:['daily','alcohol','forklift','card'],
-  _allowed(key){ if(key==='portal')return true; if(this.mode==='kiosk') return this.KIOSK_KEYS.indexOf(key)>=0; const r=this.reg(key); return !r||!r.zone||this.allowedZones().indexOf(r.zone)>=0; },
+  _allowed(key){ if(key==='portal')return true; const r=this.reg(key); if(this.mode==='kiosk') return !!(r&&r.kiosk); return !r||!r.zone||this.allowedZones().indexOf(r.zone)>=0; },
   setMode(m){ this.mode=m; try{localStorage.setItem('spa_mode',m);}catch(e){} this.applyMode(); const c=this.current; if(c&&!this._allowed(c)) this.nav('portal'); if(typeof Portal!=='undefined'&&Portal.render)Portal.render(); },
   applyMode(){ const kiosk=this.mode==='kiosk', allow=this.allowedZones(); document.querySelectorAll('[data-zone]').forEach(b=>{ const show=kiosk?b.hasAttribute('data-kiosk'):allow.indexOf(b.getAttribute('data-zone'))>=0; b.classList.toggle('hidden',!show); }); document.querySelectorAll('.pm-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-m')===this.mode));
     const pg=document.querySelector('.portal-grid'); if(pg) pg.classList.toggle('mode-floor',this.mode==='floor'); // 現場モードだけ現場アイコンを使用頻度順に
@@ -8620,6 +8622,7 @@ window.addEventListener('load', ()=>{
   initMobileFilters();
   // 経営者モード（?boss=）＝本当のフルモード：全ゾーン表示に強制（localStorageには保存しない＝URLでだけ有効）
   if(bossOn()){ App.mode='full'; document.body.classList.add('boss'); const bb=$('bossBadge'); if(bb) bb.classList.remove('hidden'); const hn=$('navHrLink'); if(hn) hn.classList.remove('hidden'); }
+  App.injectZones();
   App.applyMode();
   App.current=null;
   App.nav((_deepGo && App.reg(_deepGo)) ? _deepGo : 'portal');
