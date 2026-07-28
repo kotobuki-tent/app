@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="業務管理">
 <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2314161b'/><text x='16' y='22' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-weight='700' font-size='15' fill='%23f3f5f8'>KT</text></svg>">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
 <meta name="theme-color" content="#ffffff">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
@@ -1435,7 +1435,8 @@ table.jobs tr:last-child td{border-bottom:none}
 
 /* ===== ポータル 固有CSS ===== */
 .portal-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;min-height:calc(100vh - 120px)}
-.portal-logo{font-family:'Kosugi Maru',sans-serif;font-size:32px;font-weight:400;letter-spacing:.1em;margin-bottom:6px;color:var(--text)}
+.portal-logo{font-family:'Kosugi Maru',sans-serif;font-size:32px;font-weight:400;letter-spacing:.1em;margin-bottom:6px;color:var(--text);display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.portal-logo-mark{width:110px;height:auto;margin-bottom:14px;pointer-events:none}
 .portal-sub{font-size:14px;color:var(--text-dim);margin-bottom:40px}
 .portal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px 14px;width:100%;max-width:680px}
 .portal-card{background:transparent;border:none;box-shadow:none;padding:0;text-decoration:none;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:9px;transition:transform .12s}
@@ -2633,7 +2634,7 @@ table.jobs tr:last-child td{border-bottom:none}
 <!-- ===== ポータル section（入口・リンク集） ===== -->
 <section id="view-portal">
   <div class="portal-wrap">
-    <div class="portal-logo" onclick="bossTap()">寿テント</div>
+    <div class="portal-logo" onclick="bossTap()"><img class="portal-logo-mark" src="../icons/logo-mark.png" alt="">寿テント</div>
     <div class="portal-sub">業務管理システム</div>
     <div class="portal-modeswitch">
       <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
