@@ -38,12 +38,12 @@ The **`App` registry** (search `const App = {`) is the orchestrator:
 
 ### Backend: one GAS endpoint, `?dept=` routing
 
-Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every request carries a `dept` param routing to a department handler (`production`/`project`/`sales`/`inventory`/`overtime`/`vehicle`/`daily`/`labor`/`attendance`/`drive`/`factory`/`alcohol`/`forklift`/`cases`/`card`). Each IIFE has its **own** `apiGet`/`apiPost`/`fireAndForget` with its `dept` baked in — they are intentionally duplicated per-namespace, not shared.
+Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every request carries a `dept` param routing to a department handler (`production`/`project`/`sales`/`inventory`/`overtime`/`vehicle`/`daily`/`labor`/`attendance`/`drive`/`alcohol`/`forklift`/`cases`/`card`). Each IIFE has its **own** `apiGet`/`apiPost`/`fireAndForget` with its `dept` baked in — they are intentionally duplicated per-namespace, not shared.
 
 - **Reads**: `fetch(API+'?dept=...&action=...')` → JSON.
 - **Writes**: `no-cors` POST (`fireAndForget`) — response is opaque, so writes use **optimistic update**: mutate the local array immediately, then `setTimeout(loadAll, 3000)` to reconcile with GAS's real ID assignment. `mergeWithTmp(...)` reconciles optimistic temp rows against server data by a composite key.
 - Google Sheets are the DB; sheet/column layout is documented in `README.md`. Google Drive integration (`dept=drive`) links 製作図 files to 生産 orders.
-- **GAS source of truth = `Code.gs`** (kept in iCloud `♿️SEQUENCE LAB/`, NOT in this git repo; ~1500 lines). **To change/deploy it, follow the `gas-update` skill.** `dept=factory` (資材, front-end currently hidden) and the 工数 archive (`dept=labor` POST → `archive`/`unarchive` flips the `labor_archived` column on `orders`, independent of 生産's `archived`) both live here.
+- **GAS source of truth = `Code.gs`** (kept in iCloud `♿️SEQUENCE LAB/`, NOT in this git repo; ~1500 lines). **To change/deploy it, follow the `gas-update` skill.** The 工数 archive (`dept=labor` POST → `archive`/`unarchive` flips the `labor_archived` column on `orders`, independent of 生産's `archived`) lives here. (資材 `dept=factory` was fully removed 2026-07-30.)
 
 ### GAS infrastructure & failure modes
 

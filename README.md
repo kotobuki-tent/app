@@ -46,13 +46,12 @@ SPA本体（`spa/spa.html`）に13画面を統合。1ファイルで全機能完
 | `inventory` | 商品マスタ（カテゴリ・商品名・保有数） |
 | `rentals` | 貸出/予約台帳（ステータス・期間・数量） |
 | `vehicles` | 車両台帳。車種(name)・名称(type)・ナンバー(plate)・寸法(length/width/height＝全長/全幅/全高 mm)・車検/自賠責/任意保険の満了日・備考。GASはヘッダー名で汎用read/write（列追加で自動対応）。旧フォームのusage/status/oil_*/tire_*/current_km列は残存するが現フォーム未使用 |
-| `staff` | スタッフ名簿（employee_no・name・name_kana・dept・position＋各画面の表示フラグ in_overtime / in_attendance / in_daily / in_factory_order / in_factory_receive / in_card） |
+| `staff` | スタッフ名簿（employee_no・name・name_kana・active・dept・position＋各画面の表示フラグ in_overtime / in_attendance / in_daily / in_alcohol / in_forklift / in_case / in_card＋考課アプリ用 in_hr / hr_kind / hr_evaluator1 / hr_token） |
 | `overtime` | 時間外申告データ |
 | `ot_requests` | 休日出勤希望データ |
 | `daily_reports` | 日報データ（date・employee_no・project・work・minutes） |
 | `attendance` | 出勤管理データ |
 | `absence` | 欠勤・休暇データ（日報で使用） |
-| `f_inbound` | 資材（入出荷）データ。※フロントは現在ナビ非表示（保留中）。GAS側 dept=factory は稼働、無害 |
 | `daily_reports_YYYY年度` | 日報の年度アーカイブ（決算後に手動退避。例: `daily_reports_2024年度`） |
 | `alcohol_checks` | アルコールチェック記録（道交法・安全運転管理者制度）。運転者×日×運転前/後。確認者/車両/検知器使用/対面区分/酒気帯び有無/測定値(mg/L)/指示事項。SPAの「点呼」画面から記録、1年保存 |
 | `forklift_checks` | フォークリフト始業前点検（機体×日）。点検者/判定(良/否)/否の項目JSON(ng)/備考。SPAの「リフト」画面から記録。既定すべて良・否のみ記録、機種(エンジン/バッテリー)で項目出し分け |
@@ -178,7 +177,7 @@ GAS（`Code.gs`）に運用系の関数を同梱。**ソースの正本は iClou
 - **画面切替**：ページ遷移なし、初回ロード後は2回目以降ほぼ0秒で切替
 - **PWA**：`spa/manifest.json`＋PWA用メタタグでホーム画面アイコン化、`display:standalone`で全画面表示
 - **キャッシュ戦略**：sw.js の `NO_CACHE_PATTERNS` に `/spa/` を含め、SPAはService Workerのキャッシュ対象外。常にネットワークから最新を取得（CACHE_VERSION管理不要）。純SPA化に伴いプリキャッシュ対象は `register.html`／`manifest.json`／アイコンのみ
-- **Google Apps Script**：API v7、deptパラメータで部門振り分け（production / project / sales / inventory / overtime / vehicle / daily / labor / attendance / drive / factory / alcohol / forklift / cases / card）。GASソースの正本は `Code.gs`（iCloud `♿️SEQUENCE LAB/`）。工数アーカイブは dept=labor の POST（archive/unarchive）で `labor_archived` を切替
+- **Google Apps Script**：API v7、deptパラメータで部門振り分け（production / project / sales / inventory / overtime / vehicle / daily / labor / attendance / drive / alcohol / forklift / cases / card）。GASソースの正本は `Code.gs`（iCloud `♿️SEQUENCE LAB/`）。工数アーカイブは dept=labor の POST（archive/unarchive）で `labor_archived` を切替
 - **Google スプレッドシート**：データベース
 - **Google Drive**：製作図ファイル連携、フォルダID `16iDJrBWXdbIHq-aqJVgHZpA9tRGXMUwc`
 - **GitHub Pages**：ホスティング
