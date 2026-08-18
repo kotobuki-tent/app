@@ -2022,7 +2022,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="xf_our_person" placeholder="自社の担当者"></div></div>
     <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="xf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="xf_order_no"></div></div>
     <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="xf_client" placeholder="例: 鳥取県観光局"></div><div class="mo-field f3"><label>窓口</label><input id="xf_person" placeholder="例: 纐纈"></div></div>
-    <div class="mo-row"><div class="mo-field"><label>会場名</label><input id="xf_venue" placeholder="例: 鳥取砂丘特設会場"></div><div class="mo-field"><label>ステータス</label><select id="xf_status"><option>見積中</option><option>受注</option><option>準備中</option><option>現場中</option><option>レンタル中</option><option>完了</option><option>見送り</option></select></div></div>
+    <div class="mo-row"><div class="mo-field"><label>会場名</label><input id="xf_venue" placeholder="例: 鳥取砂丘特設会場"></div><div class="mo-field"><label>ステータス</label><select id="xf_status"><option>見積中</option><option>受注</option><option>準備中</option><option>現場中</option><option>レンタル中</option><option>メンテ中</option><option>完了</option><option>見送り</option></select></div></div>
     <div class="mo-row full"><div class="mo-field"><label>住所</label><input id="xf_address" placeholder="例: 鳥取県鳥取市福部町"></div></div>
     <div class="phase-hd">日程</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
@@ -3926,7 +3926,7 @@ const Proj = (function(){
   const SLOG_KEY='proj_status_snapshot';
   const SLOG_LIST_KEY='proj_status_log';
   const SLOG_UNREAD_KEY='proj_status_unread';
-  const ACTIVE_PROJ_ST=['見積中','受注','準備中','現場中','レンタル中'];
+  const ACTIVE_PROJ_ST=['見積中','受注','準備中','現場中','レンタル中','メンテ中'];
   const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
   const VH_PHASES=['load_in','setup','event','teardown','rental_out','rental_return'];
   const HOLIDAYS={
@@ -3939,7 +3939,7 @@ const Proj = (function(){
     '2027-07-19':'海の日','2027-08-11':'山の日','2027-09-20':'敬老の日','2027-09-23':'秋分の日','2027-10-11':'スポーツの日','2027-11-03':'文化の日','2027-11-23':'勤労感謝の日'
   };
   function stColorVar(s){
-    return{'見積中':'--text-faint','受注':'--purple','準備中':'--orange','現場中':'--green','レンタル中':'--accent','完了':'--text-dim','見送り':'--red'}[s]||'--text';
+    return{'見積中':'--text-faint','受注':'--purple','準備中':'--orange','現場中':'--green','レンタル中':'--accent','メンテ中':'--red','完了':'--text-dim','見送り':'--red'}[s]||'--text';
   }
 
   // ===== 企画固有ユーティリティ（today/dateStr/dateJP/dow/pad/parseD/esc/vr等は共通土台を使用） =====
@@ -4123,7 +4123,7 @@ const Proj = (function(){
     if(!items.length){h+=`<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px">${emptyMsg}</div>`;h+='</div></div>';}
     else{
     items.forEach(d=>{
-      const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],'レンタル中':['var(--cyan)','var(--cyan-dim)'],完了:['var(--text-dim)','var(--surface3)']};
+      const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],'レンタル中':['var(--cyan)','var(--cyan-dim)'],'メンテ中':['var(--red)','var(--red-dim)'],完了:['var(--text-dim)','var(--surface3)']};
       const sc=stColors[d.status]||['var(--text-faint)','var(--surface3)'];
       const allDates=[].concat(parseDates(d.date_load_in),parseDates(d.date_setup),parseDates(d.date_event),parseDates(d.date_teardown),parseDates(d.date_rental_out),parseDates(d.date_rental_return),parseDates(d.date_delivery)).filter(Boolean).sort((a,b)=>a-b);
       const dateRange=allDates.length?`${allDates[0].getMonth()+1}/${allDates[0].getDate()}〜${allDates[allDates.length-1].getMonth()+1}/${allDates[allDates.length-1].getDate()}`:'日程未定';
@@ -4149,7 +4149,7 @@ const Proj = (function(){
     if(!items.length){h+=`<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px">${emptyMsg}</div>`;}
     else{
       items.forEach(d=>{
-        const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],'レンタル中':['var(--cyan)','var(--cyan-dim)'],完了:['var(--text-dim)','var(--surface3)']};
+        const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],'レンタル中':['var(--cyan)','var(--cyan-dim)'],'メンテ中':['var(--red)','var(--red-dim)'],完了:['var(--text-dim)','var(--surface3)']};
         const sc=stColors[d.status]||['var(--text-faint)','var(--surface3)'];
         const allDates=[].concat(parseDates(d.date_load_in),parseDates(d.date_setup),parseDates(d.date_event),parseDates(d.date_teardown),parseDates(d.date_rental_out),parseDates(d.date_rental_return),parseDates(d.date_delivery)).filter(Boolean).sort((a,b)=>a-b);
         const dateRange=allDates.length?`${allDates[0].getMonth()+1}/${allDates[0].getDate()}〜${allDates[allDates.length-1].getMonth()+1}/${allDates[allDates.length-1].getDate()}`:'日程未定';
@@ -4288,11 +4288,11 @@ const Proj = (function(){
     if(projSort.col)items.sort((a,b)=>{let va=String(a[projSort.col]||'').toLowerCase(),vb=String(b[projSort.col]||'').toLowerCase();return va<vb?(projSort.asc?-1:1):va>vb?(projSort.asc?1:-1):0});
     const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'venue',label:'会場'},{key:'date_load_in',label:'搬入'},{key:'date_event',label:'本番'},{key:'date_teardown',label:'撤去'},{key:'status',label:'ステータス'}];
     const stBtn=(label,val)=>{const on=projAdminFilter===val?' on':'';const cnt=val?stCounts[val]||0:allCount;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`};
-    let h=`<div class="fv-sum">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('準備中','準備中')}${stBtn('現場中','現場中')}${stBtn('レンタル中','レンタル中')}<button class="av-add" style="margin-left:auto" onclick="App.nav('cases');Cases.tab('form')">＋ 案件から登録</button></div>`;
+    let h=`<div class="fv-sum">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('準備中','準備中')}${stBtn('現場中','現場中')}${stBtn('レンタル中','レンタル中')}${stBtn('メンテ中','メンテ中')}<button class="av-add" style="margin-left:auto" onclick="App.nav('cases');Cases.tab('form')">＋ 案件から登録</button></div>`;
     h+='<div class="tbl-wrap"><table><thead><tr>';cols.forEach(c=>{const a=projSort.col===c.key?(projSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
     items.forEach(d=>{h+=`<tr data-id="${d.id}" onclick="Proj.editProj('${d.id}')" style="cursor:pointer">`;
       cols.forEach(c=>{let v=d[c.key]||'';
-      if(c.key==='status'){const opts=['見積中','受注','準備中','現場中','レンタル中','完了','見送り'];
+      if(c.key==='status'){const opts=['見積中','受注','準備中','現場中','レンタル中','メンテ中','完了','見送り'];
       h+=`<td onclick="event.stopPropagation()"><select onchange="Proj.changeProjStatus('${d.id}',this.value)" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer">`;
       opts.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});
       h+='</select></td>'}else{if(c.key.startsWith('date_')&&v){v=String(v).split(',').map(s=>{const dd=parseD(s.trim());
@@ -4355,12 +4355,12 @@ const Proj = (function(){
     h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
     h+=`<button class="st-toggle" id="projStToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
     h+='<div class="st-opts" id="projStOpts">';
-    ['見積中','受注','準備中','現場中','レンタル中','完了'].forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${s}">${s}</button>`});
+    ['見積中','受注','準備中','現場中','レンタル中','メンテ中','完了'].forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${s}">${s}</button>`});
     h+='</div></div>';
     $('projViewContent').innerHTML=h;
     const ptgl=$('projStToggle'),popts=$('projStOpts');
     if(ptgl&&popts)ptgl.onclick=()=>{ptgl.classList.toggle('open');popts.classList.toggle('open')};
-    $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});cascadeRentalStatus(d.project,newSt);toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProj(id);render()}});
+    $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}if(newSt==='完了'&&String(d.invoiced||'').toUpperCase()!=='TRUE'&&!confirm('伝票が済んでいませんが完了にしますか？'))return;_changingStatus=true;d.status=newSt;fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});cascadeRentalStatus(d.project,newSt);toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProj(id);render()}});
     $('projViewBg').classList.add('show');
 
     requestAnimationFrame(()=>{$('projViewBg').scrollTop=0;const _mo=$('projViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
@@ -4552,12 +4552,24 @@ const Proj = (function(){
   }
   // 現場ステータス→レンタル品ステータス連動：レンタル中になったら「予約」を「貸出中」へ
   function cascadeRentalStatus(projectName,newSt){
-    if(newSt!=='レンタル中')return;
-    const targets=rentalsData.filter(r=>r.client_name===projectName&&r.status==='予約');
-    if(!targets.length)return;
-    targets.forEach(r=>{r.status='貸出中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
-    _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
-    toast('レンタル品'+targets.length+'件を貸出中にしました');
+    if(newSt==='レンタル中'){
+      const targets=rentalsData.filter(r=>r.client_name===projectName&&r.status==='予約');
+      if(!targets.length)return;
+      targets.forEach(r=>{r.status='貸出中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
+      _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
+      toast('レンタル品'+targets.length+'件を貸出中にしました');
+      return;
+    }
+    if(newSt==='メンテ中'){
+      const targets=rentalsData.filter(r=>r.client_name===projectName&&(r.status==='貸出中'||r.status==='予約'));
+      if(!targets.length)return;
+      const list=targets.map(r=>r.item_name+'×'+r.qty).join('、');
+      if(!confirm('レンタル品を在庫のメンテ待ちに送りますか？\n'+list))return;
+      targets.forEach(r=>{r.status='メンテ待ち';fireAndForget({dept:'inventory',action:'save_rental',...r})});
+      _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
+      toast('レンタル品'+targets.length+'件をメンテ待ちにしました');
+      return;
+    }
   }
   function deleteProjectRental(id){
     if(_busyRental)return;
@@ -6369,7 +6381,7 @@ const Daily = (function(){
     let h='<option value="">-- 案件を選ぶ --</option><option value="other">その他(自由記述)</option>';
     const w=getWho();const me=staffList.find(s=>String(s.employee_no)===String(w));const myDept=me?me.dept:'';
     const PROD_ST_ORDER={'製作中':0,'完成':1,'受注':2,'見積中':3};
-    const PROJ_ST_ORDER={'現場中':0,'レンタル中':1,'準備中':2,'受注':3,'見積中':4};
+    const PROJ_ST_ORDER={'現場中':0,'レンタル中':1,'メンテ中':1.5,'準備中':2,'受注':3,'見積中':4};
     // 企画は複数の日付候補から「今日以降で最も近い日付」を取得（無ければ最も古いもの）
     const getProjNearestDate=(p)=>{
       const keys=['date_load_in','date_setup','date_event','date_teardown','date_rental_out','date_rental_return','date_delivery'];
@@ -7308,7 +7320,7 @@ const Cases = (function(){
   ];
   const DEPT=Object.fromEntries(DEPTS.map((d,i)=>[d.k,{s:d.s,n:d.n,c:d.c,o:i}]));
   let _cases=[], _tab='list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='';
-  const C_RANK={production:{'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4},project:{'見積中':0,'受注':1,'準備中':2,'現場中':3,'レンタル中':3,'完了':4},sales:{'見積中':0,'受注':1,'発注済':2,'入荷済':3,'納品済':4}};
+  const C_RANK={production:{'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4},project:{'見積中':0,'受注':1,'準備中':2,'現場中':3,'レンタル中':3,'メンテ中':3,'完了':4},sales:{'見積中':0,'受注':1,'発注済':2,'入荷済':3,'納品済':4}};
   function cRank(k){ return (C_RANK[k.dept]&&C_RANK[k.dept][k.status])!=null?C_RANK[k.dept][k.status]:0; }
   // 案件の進捗＝見送り以外の子のうち一番遅れてる子のランク（全子終端なら4、見積中の子が居れば0）。子なしは-1で末尾へ。
   function caseProgress(id){ const ks=(_children[String(id)]||[]).filter(k=>k.status!=='見送り'); if(!ks.length)return -1; return Math.min.apply(null, ks.map(cRank)); }
