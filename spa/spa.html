@@ -4360,7 +4360,7 @@ const Proj = (function(){
     $('projViewContent').innerHTML=h;
     const ptgl=$('projStToggle'),popts=$('projStOpts');
     if(ptgl&&popts)ptgl.onclick=()=>{ptgl.classList.toggle('open');popts.classList.toggle('open')};
-    $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}if(newSt==='完了'&&String(d.invoiced||'').toUpperCase()!=='TRUE'&&!confirm('伝票が済んでいませんが完了にしますか？'))return;if(newSt==='メンテ中'){const mt=rentalsData.filter(r=>r.client_name===d.project&&(r.status==='貸出中'||r.status==='予約'));if(mt.length){maintChoice(d,id,mt);return}}applyProjStatus(d,id,newSt,false)}});
+    $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}if(newSt==='完了'&&String(d.invoiced||'').toUpperCase()!=='TRUE'&&!confirm('伝票が済んでいませんが完了にしますか？'))return;if((newSt==='レンタル中'||newSt==='現場中')&&d.status==='メンテ中'){const mw=rentalsData.filter(r=>r.client_name===d.project&&r.status==='メンテ待ち');if(mw.length){restoreChoice(d,id,newSt,mw);return}}if(newSt==='メンテ中'){const mt=rentalsData.filter(r=>r.client_name===d.project&&(r.status==='貸出中'||r.status==='予約'));if(mt.length){maintChoice(d,id,mt);return}}applyProjStatus(d,id,newSt,false)}});
     $('projViewBg').classList.add('show');
 
     requestAnimationFrame(()=>{$('projViewBg').scrollTop=0;const _mo=$('projViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
@@ -4560,7 +4560,7 @@ const Proj = (function(){
     toast('レンタル品'+targets.length+'件を貸出中にしました');
   }
   // ステータス変更の実行部。sendMaint=trueならレンタル品をメンテ待ちへ送る
-  function applyProjStatus(d,id,newSt,sendMaint){
+  function applyProjStatus(d,id,newSt,sendMaint,restoreMaint){
     _changingStatus=true;
     d.status=newSt;
     fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});
@@ -4570,7 +4570,12 @@ const Proj = (function(){
       targets.forEach(r=>{r.status='メンテ待ち';fireAndForget({dept:'inventory',action:'save_rental',...r})});
       _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     }
-    toast(newSt+'に変更しました'+(sendMaint?'（レンタル品をメンテ待ちへ）':''));
+    if(restoreMaint){
+      const targets=rentalsData.filter(r=>r.client_name===d.project&&r.status==='メンテ待ち');
+      targets.forEach(r=>{r.status='貸出中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
+      _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
+    }
+    toast(newSt+'に変更しました'+(sendMaint?'（レンタル品をメンテ待ちへ）':(restoreMaint?'（メンテ待ちの品を貸出中に戻しました）':'')));
     setTimeout(()=>{_changingStatus=false},1500);
     viewProj(id);render();
   }
@@ -4588,6 +4593,22 @@ const Proj = (function(){
     document.body.appendChild(bg);
     bg.querySelector('#mcSend').onclick=()=>{bg.remove();applyProjStatus(d,id,'メンテ中',true)};
     bg.querySelector('#mcNo').onclick=()=>bg.remove();
+    bg.onclick=e=>{if(e.target===bg)bg.remove()};
+  }
+  // メンテ中から現場中/レンタル中へ戻す時：メンテ待ちに送った品を貸出中へ戻す（誤操作の戻り道）
+  function restoreChoice(d,id,newSt,targets){
+    const list=targets.map(r=>esc(r.item_name)+'×'+r.qty).join('、');
+    const bg=document.createElement('div');
+    bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    bg.innerHTML='<div style="background:var(--surface);border-radius:14px;max-width:480px;width:100%;padding:22px 24px;font-size:14px;line-height:1.7;box-shadow:0 12px 40px rgba(0,0,0,.25)">'
+      +'<div style="font-weight:700;font-size:16px;margin-bottom:8px;color:var(--text)">'+esc(newSt)+'に変更</div>'
+      +'<div style="color:var(--text-dim);font-size:12.5px;margin-bottom:4px">メンテ待ちのレンタル品：'+list+'</div>'
+      +'<div style="color:var(--text-dim);font-size:12.5px;margin-bottom:14px">→ 貸出中に戻します</div>'
+      +'<button id="rcOk" style="display:block;width:100%;margin-bottom:8px;padding:12px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">'+esc(newSt)+'にする</button>'
+      +'<button id="rcNo" style="display:block;width:100%;padding:11px;border:none;border-radius:9px;background:transparent;color:var(--text-faint);font-size:13px;cursor:pointer">やめる</button></div>';
+    document.body.appendChild(bg);
+    bg.querySelector('#rcOk').onclick=()=>{bg.remove();applyProjStatus(d,id,newSt,false,true)};
+    bg.querySelector('#rcNo').onclick=()=>bg.remove();
     bg.onclick=e=>{if(e.target===bg)bg.remove()};
   }
   function deleteProjectRental(id){
