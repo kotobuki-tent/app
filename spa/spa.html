@@ -4564,7 +4564,7 @@ const Proj = (function(){
       const targets=rentalsData.filter(r=>r.client_name===projectName&&(r.status==='貸出中'||r.status==='予約'));
       if(!targets.length)return;
       const list=targets.map(r=>r.item_name+'×'+r.qty).join('、');
-      if(!confirm('レンタル品を在庫のメンテ待ちに送りますか？\n'+list))return;
+      if(!confirm('レンタル品を在庫のメンテ待ちに送りますか？\n'+list+'\n\n※キャンセルしてもステータスはメンテ中になります（レンタル品を在庫に送らないだけ）'))return;
       targets.forEach(r=>{r.status='メンテ待ち';fireAndForget({dept:'inventory',action:'save_rental',...r})});
       _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
       toast('レンタル品'+targets.length+'件をメンテ待ちにしました');
