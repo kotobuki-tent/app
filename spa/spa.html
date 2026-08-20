@@ -3342,10 +3342,13 @@ function moneyFetch(){
     if(!cs||!Array.isArray(cs.data))return null;
     const isT=v=>v===true||v==='true'||v==='TRUE';
     const live=cs.data.filter(c=>!isT(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
-    const by={};let total=0,cnt=0;
-    live.forEach(c=>{const a=Number(c.amount);if(!a||isNaN(a))return;const st=c.status||'不明';(by[st]=by[st]||{sum:0,n:0});by[st].sum+=a;by[st].n++;total+=a;cnt++});
+    // 合計に入れるのは受注のみ。見積中は合計外の参考として別枠で返す
+    const by={};let total=0,cnt=0;const quote={sum:0,n:0};
+    live.forEach(c=>{const a=Number(c.amount);if(!a||isNaN(a))return;const st=c.status||'不明';
+      if(st==='見積中'){quote.sum+=a;quote.n++;return}
+      (by[st]=by[st]||{sum:0,n:0});by[st].sum+=a;by[st].n++;total+=a;cnt++});
     _moneyTotal=total;updateMoneyBadges();
-    return {by,total,cnt,liveCount:live.length};
+    return {by,total,cnt,liveCount:live.length,quote};
   });
 }
 function moneySummary(){
@@ -3366,6 +3369,7 @@ function moneySummary(){
     let h=keys.map(st=>'<div style="display:flex;justify-content:space-between;padding:4px 0;color:var(--text)"><span>'+esc(st)+'（'+r.by[st].n+'件）</span><span style="font-variant-numeric:tabular-nums">¥'+r.by[st].sum.toLocaleString()+'</span></div>').join('');
     if(!keys.length)h='<div style="color:var(--text-faint)">金額が入っている案件がありません</div>';
     h+='<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-weight:700;color:var(--text)"><span>合計（'+r.cnt+'件／'+r.liveCount+'案件中）</span><span style="font-variant-numeric:tabular-nums">¥'+r.total.toLocaleString()+'</span></div>';
+    if(r.quote&&r.quote.n)h+='<div style="display:flex;justify-content:space-between;padding-top:6px;color:var(--text-dim);font-size:13px"><span>見積中（'+r.quote.n+'件・合計外）</span><span style="font-variant-numeric:tabular-nums">¥'+r.quote.sum.toLocaleString()+'</span></div>';
     el.innerHTML=h;
   });
 }
