@@ -4974,6 +4974,7 @@ const Inv = (function(){
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
       <td><div class="tbl-actions">
         <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
+        <a class="del-link" onclick="Inv.discardRental('${r.id}')">廃棄</a>
       </div></td>
     </tr>`).join('');
   }
@@ -5086,6 +5087,31 @@ const Inv = (function(){
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyDel=false},1500);
   }
+  // メンテ不可＝モノごと処分。台帳から行を消し、商品台帳の保有数も減らす
+  let _busyDiscard=false;
+  function discardRental(id){
+    if(_busyDiscard)return;
+    const r=rentals.find(x=>x.id===id);if(!r)return;
+    const n=Number(r.qty)||0;
+    const it=items.find(i=>i.category===r.category&&i.item_name===r.item_name);
+    let msg='「'+r.item_name+'」×'+n+' を廃棄しますか？\n\n・台帳からこの行を消します';
+    if(it){const cur=Number(it.total_qty)||0;const next=Math.max(0,cur-n);msg+='\n・保有数を '+cur+' → '+next+' に減らします';}
+    else{msg+='\n・商品台帳に同名の商品が見つからないため保有数はそのままです';}
+    msg+='\n\n※元に戻せません';
+    if(!confirm(msg))return;
+    _busyDiscard=true;
+    fireAndForget({action:'delete_rental',id});
+    if(it){
+      const next=Math.max(0,(Number(it.total_qty)||0)-n);
+      it.total_qty=next;
+      fireAndForget({action:'save_item',id:it.id,category:it.category,item_name:it.item_name,total_qty:next,notes:it.notes||''});
+    }
+    rentals=rentals.filter(x=>x.id!==id);
+    toast('廃棄しました'+(it?'（保有数を'+n+'減らしました）':''));
+    renderItems();renderRentals();renderMaint();renderAvail();
+    setTimeout(loadAll,3000);
+    setTimeout(()=>{_busyDiscard=false},1500);
+  }
 
   // ===== 在庫確認 =====
   function setAvailCatFilter(v){availCatFilter=v;renderAvail()}
@@ -5179,7 +5205,7 @@ const Inv = (function(){
     switchTab,
     openSlog, closeSlog, clearSlog,
     sortItems, openItemMo, closeItemMo, editItem, saveItem, deleteItem,
-    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental,
+    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental,
     populateItemSelect, onProjectSelect, renderAvail, renderMaint,
     setItemCatFilter, setMaintFilter, setRentalFilter, setAvailCatFilter,
     unifiedSearch
