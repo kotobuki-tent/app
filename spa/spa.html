@@ -2095,6 +2095,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="sub-tab on" data-tab="avail" onclick="Inv.switchTab('avail')">在庫確認</button>
     <button class="sub-tab" data-tab="rentals" onclick="Inv.switchTab('rentals')">貸出/予約</button>
     <button class="sub-tab" data-tab="maint" onclick="Inv.switchTab('maint')">メンテ</button>
+    <button class="sub-tab" data-tab="discard" onclick="Inv.switchTab('discard')">廃棄</button>
     <button class="sub-tab" data-tab="items" onclick="Inv.switchTab('items')">商品台帳</button>
     <button class="slog-btn" id="invSlogBtn" onclick="Inv.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="invPcSearch" placeholder="検索...">
@@ -2135,6 +2136,16 @@ table.jobs tr:last-child td{border-bottom:none}
         <table>
           <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
           <tbody id="maint_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 廃棄リスト -->
+    <div id="v_discard" class="hidden">
+      <div class="cases-hint">廃棄予定に入れた品のリスト。「廃棄を確定」で台帳から消えて保有数が減る（不可逆）。それまでは「戻す」でメンテ待ちに復帰できる。</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
+          <tbody id="discard_tbody"></tbody>
         </table>
       </div>
     </div>
@@ -4863,9 +4874,10 @@ const Inv = (function(){
   // ===== タブ切替（inv独自：v_items/v_rentals/v_maint/v_avail を出し分け） =====
   function switchTab(t){
     document.querySelectorAll('#invTabs .sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
-    ['items','rentals','maint','avail'].forEach(v=>$('v_'+v).classList.toggle('hidden',v!==t));
+    ['items','rentals','maint','avail','discard'].forEach(v=>$('v_'+v).classList.toggle('hidden',v!==t));
     if(t==='avail')renderAvail();
     if(t==='maint')renderMaint();
+    if(t==='discard')renderDiscard();
   }
 
   // ===== 商品台帳 =====
@@ -4949,7 +4961,7 @@ const Inv = (function(){
   // ===== メンテ =====
   function setMaintFilter(v){maintStatusFilter=v;renderMaint()}
   function renderMaint(){
-    const MAINT_ST=['メンテ待ち','メンテ中','廃棄予定'];
+    const MAINT_ST=['メンテ待ち','メンテ中'];
     let f=rentals.filter(r=>MAINT_ST.includes(r.status));
     const chipEl=$('maintChips');
     if(chipEl){
@@ -4975,9 +4987,28 @@ const Inv = (function(){
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
       <td><div class="tbl-actions">
         <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
-        ${r.status==='廃棄予定'
-          ?`<a class="edit-link" onclick="Inv.unDiscard('${r.id}')">戻す</a><a class="del-link" onclick="Inv.discardRental('${r.id}')">廃棄を確定</a>`
-          :`<a class="del-link" onclick="Inv.toDiscardList('${r.id}')">廃棄リストへ</a>`}
+        <a class="del-link" onclick="Inv.toDiscardList('${r.id}')">廃棄リストへ</a>
+      </div></td>
+    </tr>`).join('');
+  }
+
+  // ===== 廃棄リスト =====
+  function renderDiscard(){
+    const f=rentals.filter(r=>r.status==='廃棄予定');
+    const tb=$('discard_tbody');
+    if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">廃棄予定の品はありません（メンテタブの「廃棄リストへ」で入れる）</td></tr>';return}
+    tb.innerHTML=f.map(r=>`<tr>
+      <td><span class="st st-${r.status}">${r.status}</span></td>
+      <td><span class="cat-tag">${esc(r.category)}</span></td>
+      <td><strong>${esc(r.item_name)}</strong></td>
+      <td>${r.qty}</td>
+      <td>${dateJP(r.date_start)}</td>
+      <td>${dateJP(r.date_end)}</td>
+      <td>${esc(r.client_name)}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
+      <td><div class="tbl-actions">
+        <a class="edit-link" onclick="Inv.unDiscard('${r.id}')">戻す</a>
+        <a class="del-link" onclick="Inv.discardRental('${r.id}')">廃棄を確定</a>
       </div></td>
     </tr>`).join('');
   }
@@ -5077,7 +5108,7 @@ const Inv = (function(){
     const local={id,category:cat,item_name:itemName,qty:Number(qtyVal)||1,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes};
     if(existingId){const idx=rentals.findIndex(x=>x.id===existingId);if(idx>=0)rentals[idx]={...rentals[idx],...local};else rentals.push(local)}else{rentals.push(local)}
     _savingRental=true;
-    toast('保存しました');closeRentalMo();renderRentals();renderMaint();renderAvail();
+    toast('保存しました');closeRentalMo();renderRentals();renderMaint();renderAvail();renderDiscard();
     setTimeout(()=>{_savingRental=false},1500);
   }
   function deleteRental(id){
@@ -5086,7 +5117,7 @@ const Inv = (function(){
     _busyDel=true;
     fireAndForget({action:'delete_rental',id});
     rentals=rentals.filter(x=>x.id!==id);
-    toast('削除しました');renderRentals();renderMaint();renderAvail();
+    toast('削除しました');renderRentals();renderMaint();renderAvail();renderDiscard();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyDel=false},1500);
   }
@@ -5099,7 +5130,7 @@ const Inv = (function(){
     r.status='廃棄予定';
     fireAndForget({action:'save_rental',...r});
     toast('廃棄リストに入れました（保有数はまだ減りません）');
-    renderRentals();renderMaint();renderAvail();
+    renderRentals();renderMaint();renderAvail();renderDiscard();
     setTimeout(()=>{_busyToDiscard=false},1500);
   }
   function unDiscard(id){
@@ -5109,7 +5140,7 @@ const Inv = (function(){
     r.status='メンテ待ち';
     fireAndForget({action:'save_rental',...r});
     toast('メンテ待ちに戻しました');
-    renderRentals();renderMaint();renderAvail();
+    renderRentals();renderMaint();renderAvail();renderDiscard();
     setTimeout(()=>{_busyToDiscard=false},1500);
   }
   // メンテ不可＝モノごと処分。台帳から行を消し、商品台帳の保有数も減らす
@@ -5133,7 +5164,7 @@ const Inv = (function(){
     }
     rentals=rentals.filter(x=>x.id!==id);
     toast('廃棄しました'+(it?'（保有数を'+n+'減らしました）':''));
-    renderItems();renderRentals();renderMaint();renderAvail();
+    renderItems();renderRentals();renderMaint();renderAvail();renderDiscard();
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyDiscard=false},1500);
   }
@@ -5230,7 +5261,7 @@ const Inv = (function(){
     switchTab,
     openSlog, closeSlog, clearSlog,
     sortItems, openItemMo, closeItemMo, editItem, saveItem, deleteItem,
-    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental, toDiscardList, unDiscard,
+    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental, toDiscardList, unDiscard, renderDiscard,
     populateItemSelect, onProjectSelect, renderAvail, renderMaint,
     setItemCatFilter, setMaintFilter, setRentalFilter, setAvailCatFilter,
     unifiedSearch
