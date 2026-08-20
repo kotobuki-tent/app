@@ -3331,7 +3331,7 @@ function initMobileFilters(){
 
 function toast(msg,err){ showCenter(msg, err?'err':'ok'); }   // 共通トーストも画面中央に（最下部だと登録成功に気づかず二重登録が起きるため）
 
-/* ===== 金額の積み上げ表示（合言葉ゲート・リロードで再ロック） ===== */
+/* ===== 金額の積み上げ表示（案件ベース・バッジ常時表示） ===== */
 let _moneyTotal=null;   // 今抱えている案件の積み上げ総額（バッジ常時表示用）
 function moneyShort(v){if(v==null)return'¥ 合計';if(!v)return'¥0';if(v>=1e8)return'¥'+((v%1e8)?(v/1e8).toFixed(1):(v/1e8))+'億';if(v>=1e4)return'¥'+Math.round(v/1e4).toLocaleString()+'万';return'¥'+v.toLocaleString()}
 function updateMoneyBadges(){document.querySelectorAll('.mny-btn').forEach(b=>{b.textContent=moneyShort(_moneyTotal)})}
@@ -3359,7 +3359,7 @@ function moneySummary(){
   const bg=document.createElement('div');
   bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
   bg.innerHTML='<div style="background:var(--surface);border-radius:14px;max-width:420px;width:100%;padding:22px 24px;font-size:14px;line-height:1.7;box-shadow:0 12px 40px rgba(0,0,0,.25)">'
-    +'<div style="font-weight:700;font-size:16px;margin-bottom:10px;color:var(--text)">今抱えている案件の積み上げ</div>'
+    +'<div style="font-weight:700;font-size:16px;margin-bottom:10px;color:var(--text)">いまの積み上げ</div>'
     +'<div id="mnyBody" style="color:var(--text-dim)">計算中…</div>'
     +'<button class="mny-close" style="display:block;width:100%;margin-top:14px;padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);cursor:pointer">閉じる</button></div>';
   document.body.appendChild(bg);
