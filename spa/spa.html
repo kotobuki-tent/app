@@ -3802,6 +3802,7 @@ const Prod = (function(){
     const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;
     d.status=newSt;
     fireAndForget({dept:'production',action:'save',id:id,status:newSt});
+    setTimeout(moneyFetch,4000);
     toast(newSt+'に変更しました');
     render();
   }
@@ -3816,7 +3817,7 @@ const Prod = (function(){
     $('prodViewContent').innerHTML=h;
     const tgl=$('stToggle'),opts=$('stOpts');
     if(tgl&&opts)tgl.onclick=()=>{tgl.classList.toggle('open');opts.classList.toggle('open')};
-    $('prodViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){tgl.classList.remove('open');opts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProd(id);render()}});
+    $('prodViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){tgl.classList.remove('open');opts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});setTimeout(moneyFetch,4000);toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProd(id);render()}});
     renderLinkedFiles(d);$('prodViewBg').classList.add('show');
 requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
 
@@ -4327,6 +4328,7 @@ const Proj = (function(){
     _changingStatus=true;
     d.status=newSt;
     fireAndForget({dept:'project',action:'save',id:id,status:newSt});
+    setTimeout(moneyFetch,4000);
     cascadeRentalStatus(d.project,newSt);
     toast(newSt+'に変更しました');
     render();
@@ -4619,6 +4621,7 @@ const Proj = (function(){
     _changingStatus=true;
     d.status=newSt;
     fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});
+    setTimeout(moneyFetch,4000);
     cascadeRentalStatus(d.project,newSt);
     if(sendMaint){
       const targets=rentalsData.filter(r=>r.client_name===d.project&&(r.status==='貸出中'||r.status==='予約'));
@@ -6127,6 +6130,7 @@ const Sales = (function(){
     allEntries[idx]={...allEntries[idx],status:newSt,updated_at:today};
     _setCache('sales',{entries:allEntries});
     apiPost({action:'save',id,status:newSt});
+    setTimeout(moneyFetch,4000);
     render();toast('ステータスを更新しました');
     setTimeout(()=>{_changingStatus=false},1500);
   }
@@ -8509,6 +8513,7 @@ setInterval(()=>{
   _bgBusy=true;
   const app=App.reg(App.current).ns();
   Promise.resolve(app.loadAll()).finally(()=>{_bgBusy=false});
+  moneyFetch();   // ¥バッジも同じ周期で取り直す
 },5*60*1000);
 
 // 初期表示：各アプリの init（イベント配線）→ ポータル（入口）を開く
