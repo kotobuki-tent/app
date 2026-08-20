@@ -3353,10 +3353,27 @@ function moneySummary(deptName,rows){
     +'<div style="font-weight:700;font-size:16px;margin-bottom:10px;color:var(--text)">'+esc(deptName)+'の積み上げ</div>'
     +body
     +'<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-weight:700"><span>合計（'+cnt+'件）</span><span style="font-variant-numeric:tabular-nums">¥'+total.toLocaleString()+'</span></div>'
+    +'<div style="border-top:1px solid var(--border);margin-top:12px;padding-top:10px"><div style="font-weight:700;margin-bottom:2px;color:var(--text)">全部門</div><div id="mnyAll" style="color:var(--text-dim)">計算中…</div></div>'
     +'<button class="mny-close" style="display:block;width:100%;margin-top:14px;padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);cursor:pointer">閉じる</button></div>';
   document.body.appendChild(bg);
   bg.querySelector('.mny-close').onclick=()=>bg.remove();
   bg.onclick=e=>{if(e.target===bg)bg.remove()};
+  // 全部門の総合計（3部門を取り直して集計。オーバーレイが閉じられていたら何もしない）
+  const DEPTS=[['production','生産'],['project','企画制作'],['sales','販売']];
+  Promise.all(DEPTS.map(([d])=>fetch(API+'?dept='+d+'&action=read').then(r=>r.json()).catch(()=>null)))
+    .then(results=>{
+      const el=bg.querySelector('#mnyAll');if(!el)return;
+      let grand=0,linesH='';
+      results.forEach((j,i)=>{
+        const rows=Array.isArray(j)?j:(j&&Array.isArray(j.data)?j.data:null);
+        if(!rows){linesH+='<div style="display:flex;justify-content:space-between;padding:2px 0"><span>'+DEPTS[i][1]+'</span><span>取得失敗</span></div>';return}
+        let sum=0;
+        rows.forEach(r=>{if(r.status==='見送り'||String(r.archived||'').toUpperCase()==='TRUE')return;const a=Number(r.amount);if(a&&!isNaN(a))sum+=a});
+        grand+=sum;
+        linesH+='<div style="display:flex;justify-content:space-between;padding:2px 0"><span>'+DEPTS[i][1]+'</span><span style="font-variant-numeric:tabular-nums">¥'+sum.toLocaleString()+'</span></div>';
+      });
+      el.innerHTML=linesH+'<div style="display:flex;justify-content:space-between;padding-top:6px;margin-top:4px;border-top:1px solid var(--border);font-weight:700;color:var(--text)"><span>総合計</span><span style="font-variant-numeric:tabular-nums">¥'+grand.toLocaleString()+'</span></div>';
+    });
 }
 
 // ===== 効果音（キオスク用・Web Audio／音源ファイル不要・ユーザータップ起点でiOS制約クリア） =====
