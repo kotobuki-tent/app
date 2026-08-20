@@ -7717,7 +7717,7 @@ const Cases = (function(){
     logStatus(c,c.status,upd.status); Object.assign(c,upd); fireAndForget({dept:'cases',action:'save',id:_editId,...upd});
     // ヘッダ（受注/見積番号・得意先・窓口・担当）を子（生産/企画/販売）にも反映
     const kids=_children[String(_editId)]||[];
-    const chdr={order_no:upd.order_no, estimate_no:upd.estimate_no, client:upd.client, person:upd.contact, our_person:upd.our_person};
+    const chdr={order_no:upd.order_no, estimate_no:upd.estimate_no, client:upd.client, person:upd.contact, our_person:upd.our_person, amount:upd.amount};
     kids.forEach((k,i)=>setTimeout(()=>fireAndForget({dept:k.dept,action:'save',id:k.id,...chdr}), i*250));
     _invalidateDepts();
     toast('案件を更新しました'); closeEdit(); render(); }
