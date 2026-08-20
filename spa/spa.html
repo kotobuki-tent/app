@@ -263,6 +263,10 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 .slog-btn+.subtab-search{margin-left:8px}
 .staff-btn:hover{border-color:var(--accent);color:var(--accent)}
 .staff-btn .count{font-weight:700;color:var(--text);margin-left:4px}
+/* ¥合計ボタン（金額の積み上げ）。staff-btnと同外観だがモバイルでも隠さない */
+.mny-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
+.mny-btn:hover{border-color:var(--accent);color:var(--accent)}
+.mny-btn+.staff-btn,.mny-btn+#projSlogBtn,.mny-btn+#salesSlogBtn{margin-left:8px}
 .staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:4px}
 .staff-cell{padding:14px 10px;border:2px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-dim);font:500 14px/1.3 'Noto Sans JP',sans-serif;cursor:pointer;text-align:center;transition:.1s;user-select:none;position:relative}
 .staff-cell:hover{border-color:var(--accent)}
@@ -1918,6 +1922,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="prodPcDate"></span>
     <button class="sub-tab on" data-view="factory">工場ボード</button>
     <button class="sub-tab" data-view="archive">出荷済</button>
+    <button class="mny-btn" onclick="Prod.moneySum()">¥ 合計</button>
     <button class="staff-btn" id="prodStaffBtn" onclick="Prod.openStaff()">STAFF <span class="count">-</span></button>
     <button class="slog-btn" id="prodSlogBtn" onclick="Prod.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="prodPcSearch" placeholder="検索...">
@@ -1938,6 +1943,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="pf_our_person" placeholder="自社の担当者"></div></div>
     <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="pf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="pf_order_no"></div></div>
     <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="pf_client" placeholder="例: 帝都エージェンシー"></div><div class="mo-field f3"><label>窓口</label><input id="pf_person" placeholder="例: 纐纈"></div></div>
+    <div class="mo-row full"><div class="mo-field"><label>金額（円）</label><input type="number" id="pf_amount" min="0" step="1" placeholder="空欄可"></div></div>
     <div class="mo-row">
       <div class="mo-field"><label>作業場所</label><select id="pf_section"><option>未定</option><option>2F工場</option><option>1F工場</option><option>出力関係</option><option>外注</option><option>その他</option></select></div>
       <div class="mo-field"><label>ステータス</label><select id="pf_status"><option>見積中</option><option>受注</option><option>製作中</option><option>完成</option><option>出荷済</option><option>見送り</option></select></div>
@@ -1998,6 +2004,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="projPcDate"></span>
     <button class="sub-tab on" data-view="gantt">スケジュール</button>
     <button class="sub-tab" data-view="projDone">完了</button>
+    <button class="mny-btn" onclick="Proj.moneySum()">¥ 合計</button>
     <button class="slog-btn" id="projSlogBtn" onclick="Proj.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="projPcSearch" placeholder="検索...">
   </div>
@@ -2023,6 +2030,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="xf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="xf_order_no"></div></div>
     <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="xf_client" placeholder="例: 鳥取県観光局"></div><div class="mo-field f3"><label>窓口</label><input id="xf_person" placeholder="例: 纐纈"></div></div>
     <div class="mo-row"><div class="mo-field"><label>会場名</label><input id="xf_venue" placeholder="例: 鳥取砂丘特設会場"></div><div class="mo-field"><label>ステータス</label><select id="xf_status"><option>見積中</option><option>受注</option><option>準備中</option><option>現場中</option><option>レンタル中</option><option>メンテ中</option><option>完了</option><option>見送り</option></select></div></div>
+    <div class="mo-row full"><div class="mo-field"><label>金額（円）</label><input type="number" id="xf_amount" min="0" step="1" placeholder="空欄可"></div></div>
     <div class="mo-row full"><div class="mo-field"><label>住所</label><input id="xf_address" placeholder="例: 鳥取県鳥取市福部町"></div></div>
     <div class="phase-hd">日程</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
@@ -2317,6 +2325,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="salesPcDate"></span>
     <button class="sub-tab on" data-view="board">一覧</button>
     <button class="sub-tab" data-view="archive">納品済</button>
+    <button class="mny-btn" onclick="Sales.moneySum()">¥ 合計</button>
     <button class="slog-btn" id="salesSlogBtn" onclick="Sales.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="salesPcSearch" placeholder="検索..." oninput="Sales.unifiedSearch(this.value)">
   </div>
@@ -3322,6 +3331,34 @@ function initMobileFilters(){
 
 function toast(msg,err){ showCenter(msg, err?'err':'ok'); }   // 共通トーストも画面中央に（最下部だと登録成功に気づかず二重登録が起きるため）
 
+/* ===== 金額の積み上げ表示（合言葉ゲート・リロードで再ロック） ===== */
+const MONEY_KEY='kotobuki-kessan';
+let _moneyOK=false;
+function moneySummary(deptName,rows){
+  if(!_moneyOK){
+    const v=prompt('合言葉を入力');
+    if(v==null)return;
+    if(v!==MONEY_KEY){alert('合言葉が違います');return}
+    _moneyOK=true;
+  }
+  const live=rows.filter(r=>r.status!=='見送り'&&String(r.archived||'').toUpperCase()!=='TRUE');
+  const by={};let total=0,cnt=0;
+  live.forEach(r=>{const a=Number(r.amount);if(!a||isNaN(a))return;const st=r.status||'不明';(by[st]=by[st]||{sum:0,n:0});by[st].sum+=a;by[st].n++;total+=a;cnt++});
+  const keys=Object.keys(by);
+  let body=keys.map(st=>'<div style="display:flex;justify-content:space-between;padding:4px 0"><span>'+esc(st)+'（'+by[st].n+'件）</span><span style="font-variant-numeric:tabular-nums">¥'+by[st].sum.toLocaleString()+'</span></div>').join('');
+  if(!keys.length)body='<div style="color:var(--text-faint)">金額が入っている案件がありません</div>';
+  const bg=document.createElement('div');
+  bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  bg.innerHTML='<div style="background:var(--surface);border-radius:14px;max-width:420px;width:100%;padding:22px 24px;font-size:14px;line-height:1.7;box-shadow:0 12px 40px rgba(0,0,0,.25)">'
+    +'<div style="font-weight:700;font-size:16px;margin-bottom:10px;color:var(--text)">'+esc(deptName)+'の積み上げ</div>'
+    +body
+    +'<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-weight:700"><span>合計（'+cnt+'件）</span><span style="font-variant-numeric:tabular-nums">¥'+total.toLocaleString()+'</span></div>'
+    +'<button class="mny-close" style="display:block;width:100%;margin-top:14px;padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);cursor:pointer">閉じる</button></div>';
+  document.body.appendChild(bg);
+  bg.querySelector('.mny-close').onclick=()=>bg.remove();
+  bg.onclick=e=>{if(e.target===bg)bg.remove()};
+}
+
 // ===== 効果音（キオスク用・Web Audio／音源ファイル不要・ユーザータップ起点でiOS制約クリア） =====
 let _sndCtx=null;
 function _playSeq(notes){
@@ -3385,6 +3422,7 @@ const Prod = (function(){
   let _changingStatus=false;
   let _busyDel=false, _busyInv=false, _busyFile=false, _busyStaff=false;
   const SLOG_KEY='prod_status_snapshot';
+  function moneySum(){moneySummary('生産',prodData)}
   const SLOG_LIST_KEY='prod_status_log';
   const SLOG_UNREAD_KEY='prod_status_unread';
   let staffList=[];
@@ -3645,7 +3683,7 @@ const Prod = (function(){
     });
     const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'section',label:'作業場所'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
     const stBtn=(label,val)=>{const on=adminStatusFilter===val?' on':'';const cnt=val?stCounts[val]||0:allCount;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`};
-    let h=`<div class="fv-sum">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('製作中','製作中')}${stBtn('完成','完成')}<button class="av-add" style="margin-left:auto" onclick="App.nav('cases');Cases.tab('form')">＋ 案件から登録</button></div>`;
+    let h=`<div class="fv-sum">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('製作中','製作中')}${stBtn('完成','完成')}<button class="av-add" style="margin-left:auto" onclick="App.nav('cases');Cases.tab('form')">＋ 案件から登録</button><button class="av-add" onclick="Prod.moneySum()">¥ 合計</button></div>`;
     h+='<div class="tbl-wrap"><table><thead><tr>';cols.forEach(c=>{const a=prodSort.col===c.key?(prodSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
     items.forEach(d=>{h+=`<tr data-id="${d.id}" onclick="Prod.editProd('${d.id}')" style="cursor:pointer">`;
       cols.forEach(c=>{let v=d[c.key]||'';
@@ -3835,7 +3873,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
   }
 
   // ===== モーダル操作 =====
-  function openProdMo(d){$('prodMoTitleText').textContent=d?'案件編集':'案件登録';$('pf_id').value=d?d.id:'';$('pf_project').value=d?d.project:'';$('pf_our_person').value=d?d.our_person||'':'';$('pf_estimate_no').value=d?d.estimate_no||'':'';$('pf_order_no').value=d?d.order_no||'':'';$('pf_client').value=d?d.client||'':'';$('pf_person').value=d?d.person||'':'';$('pf_section').value=d?d.section||'未定':'未定';$('pf_status').value=d?d.status||'受注':'受注';$('pf_subcontractor').value=d?d.subcontractor||'':'';$('pf_start_date').value=d?d.start_date||'':'';$('pf_deadline').value=d?d.deadline||'':'';$('pf_notes').value=d?d.notes||'':'';
+  function openProdMo(d){$('prodMoTitleText').textContent=d?'案件編集':'案件登録';$('pf_id').value=d?d.id:'';$('pf_project').value=d?d.project:'';$('pf_our_person').value=d?d.our_person||'':'';$('pf_estimate_no').value=d?d.estimate_no||'':'';$('pf_order_no').value=d?d.order_no||'':'';$('pf_client').value=d?d.client||'':'';$('pf_person').value=d?d.person||'':'';$('pf_amount').value=d?(d.amount===''||d.amount==null?'':d.amount):'';$('pf_section').value=d?d.section||'未定':'未定';$('pf_status').value=d?d.status||'受注':'受注';$('pf_subcontractor').value=d?d.subcontractor||'':'';$('pf_start_date').value=d?d.start_date||'':'';$('pf_deadline').value=d?d.deadline||'':'';$('pf_notes').value=d?d.notes||'':'';
     const isEdit=!!d, isArch=isEdit&&String(d.archived||'').toUpperCase()==='TRUE';
     $('pfDel').classList.toggle('hidden',!isEdit);
     $('pfArch').classList.toggle('hidden',!isEdit||isArch);
@@ -3856,7 +3894,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
     const name=$('pf_project').value.trim();
     if(!name){toast('物件名を入力してください',true);return}
     const editId=$('pf_id').value;
-    const body={dept:'production',action:'save',id:editId||undefined,project:name,our_person:$('pf_our_person').value.trim(),estimate_no:$('pf_estimate_no').value.trim(),order_no:$('pf_order_no').value.trim(),client:$('pf_client').value.trim(),person:$('pf_person').value.trim(),section:$('pf_section').value,status:$('pf_status').value,subcontractor:$('pf_subcontractor').value.trim(),start_date:$('pf_start_date').value,deadline:$('pf_deadline').value,notes:$('pf_notes').value.trim()};
+    const body={dept:'production',action:'save',id:editId||undefined,project:name,our_person:$('pf_our_person').value.trim(),estimate_no:$('pf_estimate_no').value.trim(),order_no:$('pf_order_no').value.trim(),client:$('pf_client').value.trim(),person:$('pf_person').value.trim(),amount:$('pf_amount').value,section:$('pf_section').value,status:$('pf_status').value,subcontractor:$('pf_subcontractor').value.trim(),start_date:$('pf_start_date').value,deadline:$('pf_deadline').value,notes:$('pf_notes').value.trim()};
     const isNew=!editId;
     if(isNew && _addCaseId){ body.case_id=_addCaseId; _addCaseId=''; }
     if(editId){
@@ -3903,7 +3941,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
     loadAll, render, init,
     openSlog, closeSlog, clearSlog,
     openStaff, closeStaff,
-    openProdMo, closeProdMo, editProd, saveProd, delProd, addToCase,
+    openProdMo, closeProdMo, editProd, saveProd, delProd, addToCase, moneySum,
     changeStatus, toggleInvoiced,
     archiveProd, unarchiveProd,
     viewProd, openFilePicker, closeFilePicker, linkFile, unlinkFile,
@@ -3924,6 +3962,7 @@ const Proj = (function(){
   let _changingStatus=false;
   let _busyDel=false, _busyInv=false, _busyRental=false;
   const SLOG_KEY='proj_status_snapshot';
+  function moneySum(){moneySummary('企画制作',projData)}
   const SLOG_LIST_KEY='proj_status_log';
   const SLOG_UNREAD_KEY='proj_status_unread';
   const ACTIVE_PROJ_ST=['見積中','受注','準備中','現場中','レンタル中','メンテ中'];
@@ -4288,7 +4327,7 @@ const Proj = (function(){
     if(projSort.col)items.sort((a,b)=>{let va=String(a[projSort.col]||'').toLowerCase(),vb=String(b[projSort.col]||'').toLowerCase();return va<vb?(projSort.asc?-1:1):va>vb?(projSort.asc?1:-1):0});
     const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'venue',label:'会場'},{key:'date_load_in',label:'搬入'},{key:'date_event',label:'本番'},{key:'date_teardown',label:'撤去'},{key:'status',label:'ステータス'}];
     const stBtn=(label,val)=>{const on=projAdminFilter===val?' on':'';const cnt=val?stCounts[val]||0:allCount;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`};
-    let h=`<div class="fv-sum">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('準備中','準備中')}${stBtn('現場中','現場中')}${stBtn('レンタル中','レンタル中')}${stBtn('メンテ中','メンテ中')}<button class="av-add" style="margin-left:auto" onclick="App.nav('cases');Cases.tab('form')">＋ 案件から登録</button></div>`;
+    let h=`<div class="fv-sum">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('準備中','準備中')}${stBtn('現場中','現場中')}${stBtn('レンタル中','レンタル中')}${stBtn('メンテ中','メンテ中')}<button class="av-add" style="margin-left:auto" onclick="App.nav('cases');Cases.tab('form')">＋ 案件から登録</button><button class="av-add" onclick="Proj.moneySum()">¥ 合計</button></div>`;
     h+='<div class="tbl-wrap"><table><thead><tr>';cols.forEach(c=>{const a=projSort.col===c.key?(projSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
     items.forEach(d=>{h+=`<tr data-id="${d.id}" onclick="Proj.editProj('${d.id}')" style="cursor:pointer">`;
       cols.forEach(c=>{let v=d[c.key]||'';
@@ -4394,7 +4433,7 @@ const Proj = (function(){
     $('xf_people_teardown').value=d?d.people_teardown||'':'';
     $('xf_material').value=d?d.material||'':'';
     $('xf_rentals').value=d?d.rentals||'':'';
-    $('xf_notes').value=d?d.notes||'':'';
+    $('xf_notes').value=d?d.notes||'':'';$('xf_amount').value=d?(d.amount===''||d.amount==null?'':d.amount):'';
     VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));
     _xfType=(d&&d.type)||'現場';
     $('xf_is_rental').checked=(_xfType==='レンタル');
@@ -4468,6 +4507,7 @@ const Proj = (function(){
       vehicles_teardown:isRental?'':getVehiclesFromPhase('teardown'),
       vehicles_rental_out:getVehiclesFromPhase('rental_out'),
       vehicles_rental_return:getVehiclesFromPhase('rental_return'),
+      amount:$('xf_amount').value,
       material:$('xf_material').value.trim(),
       rentals:$('xf_rentals').value.trim(),
       notes:$('xf_notes').value.trim()};
@@ -4638,7 +4678,7 @@ const Proj = (function(){
     openProjMo, closeProjMo, editProj, saveProj, delProj, toggleProjType, addToCase,
     changeProjStatus, toggleProjInvoiced,
     archiveProj, unarchiveProj,
-    viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput,
+    viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput, moneySum,
     ganttMove, ganttToday, setGanttFilter, setGanttDays,
     unifiedSearch
   };
@@ -5650,6 +5690,7 @@ const Sales = (function(){
   let slogUnread=0;
   let _busyDel=false, _busyInv=false, _changingStatus=false;
   const SLOG_KEY='sales_status_snapshot';
+  function moneySum(){moneySummary('販売',allEntries)}
   const SLOG_LIST_KEY='sales_status_log';
   const SLOG_UNREAD_KEY='sales_status_unread';
   const ACTIVE_ST=['見積中','受注','発注済','入荷済'];
@@ -5661,7 +5702,7 @@ const Sales = (function(){
   function apiPost(body){body.dept=DEPT;fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
   function fmtDate(d){if(!d)return'';const dt=(d instanceof Date)?d:new Date(d);if(isNaN(dt))return String(d).slice(0,10);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')}
   function fmtDateJP(s){if(!s)return'';const dt=new Date(s);if(isNaN(dt))return String(s);return(dt.getMonth()+1)+'/'+dt.getDate()+'（'+dow[dt.getDay()]+'）'}
-  function fmtAmount(v){if(v===''||v==null||isNaN(Number(v)))return'';return'¥'+Number(v).toLocaleString()}
+  function fmtAmount(v){if(v===''||v==null||isNaN(Number(v))||Number(v)<=0)return'';return'¥•••••'}  /* 表示は常時伏字（見せ歩き対策）。実額は編集フォームと合計（合言葉）でのみ */
 
   // ===== ステータスログ（slogBg→salesSlogBg / slogList→salesSlogList） =====
   function detectStatusChanges(){
@@ -6111,7 +6152,7 @@ const Sales = (function(){
     setView, setBoardFilter, openSlog, closeSlog, clearSlog,
     openView, closeView, openMo, closeMo, saveEntry, addToCase,
     changeStatus, toggleInvoiced, delEntry, unifiedSearch,
-    archiveSales, unarchiveSales
+    archiveSales, unarchiveSales, moneySum
   };
 })();
 
