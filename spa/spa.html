@@ -266,7 +266,7 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 /* ¥合計ボタン（金額の積み上げ）。staff-btnと同外観だがモバイルでも隠さない */
 .mny-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
 .mny-btn:hover{border-color:var(--accent);color:var(--accent)}
-.mny-btn+.staff-btn,.mny-btn+#projSlogBtn,.mny-btn+#salesSlogBtn{margin-left:8px}
+.mny-btn+.staff-btn,.mny-btn+#projSlogBtn,.mny-btn+#salesSlogBtn,.mny-btn+#casesSlogBtn{margin-left:8px}
 .staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:4px}
 .staff-cell{padding:14px 10px;border:2px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-dim);font:500 14px/1.3 'Noto Sans JP',sans-serif;cursor:pointer;text-align:center;transition:.1s;user-select:none;position:relative}
 .staff-cell:hover{border-color:var(--accent)}
@@ -3334,46 +3334,45 @@ function toast(msg,err){ showCenter(msg, err?'err':'ok'); }   // 共通トース
 /* ===== 金額の積み上げ表示（合言葉ゲート・リロードで再ロック） ===== */
 const MONEY_KEY='kotobuki-kessan';
 let _moneyOK=false;
-function moneySummary(deptName,rows){
+function moneySummary(){
   if(!_moneyOK){
     const v=prompt('合言葉を入力');
     if(v==null)return;
     if(v!==MONEY_KEY){alert('合言葉が違います');return}
     _moneyOK=true;
   }
-  const live=rows.filter(r=>r.status!=='見送り'&&String(r.archived||'').toUpperCase()!=='TRUE');
-  const by={};let total=0,cnt=0;
-  live.forEach(r=>{const a=Number(r.amount);if(!a||isNaN(a))return;const st=r.status||'不明';(by[st]=by[st]||{sum:0,n:0});by[st].sum+=a;by[st].n++;total+=a;cnt++});
-  const keys=Object.keys(by);
-  let body=keys.map(st=>'<div style="display:flex;justify-content:space-between;padding:4px 0"><span>'+esc(st)+'（'+by[st].n+'件）</span><span style="font-variant-numeric:tabular-nums">¥'+by[st].sum.toLocaleString()+'</span></div>').join('');
-  if(!keys.length)body='<div style="color:var(--text-faint)">金額が入っている案件がありません</div>';
   const bg=document.createElement('div');
   bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
   bg.innerHTML='<div style="background:var(--surface);border-radius:14px;max-width:420px;width:100%;padding:22px 24px;font-size:14px;line-height:1.7;box-shadow:0 12px 40px rgba(0,0,0,.25)">'
-    +'<div style="font-weight:700;font-size:16px;margin-bottom:10px;color:var(--text)">'+esc(deptName)+'の積み上げ</div>'
-    +body
-    +'<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-weight:700"><span>合計（'+cnt+'件）</span><span style="font-variant-numeric:tabular-nums">¥'+total.toLocaleString()+'</span></div>'
-    +'<div style="border-top:1px solid var(--border);margin-top:12px;padding-top:10px"><div style="font-weight:700;margin-bottom:2px;color:var(--text)">全部門</div><div id="mnyAll" style="color:var(--text-dim)">計算中…</div></div>'
+    +'<div style="font-weight:700;font-size:16px;margin-bottom:10px;color:var(--text)">今抱えている案件の積み上げ</div>'
+    +'<div id="mnyBody" style="color:var(--text-dim)">計算中…</div>'
     +'<button class="mny-close" style="display:block;width:100%;margin-top:14px;padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);cursor:pointer">閉じる</button></div>';
   document.body.appendChild(bg);
   bg.querySelector('.mny-close').onclick=()=>bg.remove();
   bg.onclick=e=>{if(e.target===bg)bg.remove()};
-  // 全部門の総合計（3部門を取り直して集計。オーバーレイが閉じられていたら何もしない）
-  const DEPTS=[['production','生産'],['project','企画制作'],['sales','販売']];
-  Promise.all(DEPTS.map(([d])=>fetch(API+'?dept='+d+'&action=read').then(r=>r.json()).catch(()=>null)))
-    .then(results=>{
-      const el=bg.querySelector('#mnyAll');if(!el)return;
-      let grand=0,linesH='';
-      results.forEach((j,i)=>{
-        const rows=Array.isArray(j)?j:(j&&Array.isArray(j.data)?j.data:null);
-        if(!rows){linesH+='<div style="display:flex;justify-content:space-between;padding:2px 0"><span>'+DEPTS[i][1]+'</span><span>取得失敗</span></div>';return}
-        let sum=0;
-        rows.forEach(r=>{if(r.status==='見送り'||String(r.archived||'').toUpperCase()==='TRUE')return;const a=Number(r.amount);if(a&&!isNaN(a))sum+=a});
-        grand+=sum;
-        linesH+='<div style="display:flex;justify-content:space-between;padding:2px 0"><span>'+DEPTS[i][1]+'</span><span style="font-variant-numeric:tabular-nums">¥'+sum.toLocaleString()+'</span></div>';
-      });
-      el.innerHTML=linesH+'<div style="display:flex;justify-content:space-between;padding-top:6px;margin-top:4px;border-top:1px solid var(--border);font-weight:700;color:var(--text)"><span>総合計</span><span style="font-variant-numeric:tabular-nums">¥'+grand.toLocaleString()+'</span></div>';
-    });
+  // 案件>一覧と同条件（アーカイブ・完了・見送りを除外）の案件に紐づく子明細（生産/企画/販売）の金額を合算
+  const grab=d=>fetch(API+'?dept='+d+'&action=read').then(r=>r.json()).catch(()=>null);
+  Promise.all([grab('cases'),grab('production'),grab('project'),grab('sales')]).then(([cs,od,pj,sl])=>{
+    const el=bg.querySelector('#mnyBody');if(!el)return;
+    if(!cs||!Array.isArray(cs.data)){el.textContent='案件データの取得に失敗しました';return}
+    const isT=v=>v===true||v==='true'||v==='TRUE';
+    const live=cs.data.filter(c=>!isT(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
+    const kidAmt={};
+    [od,pj,sl].forEach(j=>{const rows=(j&&j.data)||[];rows.forEach(r=>{
+      const cid=String(r.case_id||'').trim();if(!cid)return;
+      if(r.status==='見送り'||isT(r.archived))return;
+      const a=Number(r.amount);if(!a||isNaN(a))return;
+      kidAmt[cid]=(kidAmt[cid]||0)+a;
+    })});
+    const ORDER=['見積中','受注','準備中','現場中','レンタル中','メンテ中'];
+    const by={};let total=0,cnt=0;
+    live.forEach(c=>{const a=kidAmt[String(c.id)];if(!a)return;const st=c.status||'不明';(by[st]=by[st]||{sum:0,n:0});by[st].sum+=a;by[st].n++;total+=a;cnt++});
+    const keys=Object.keys(by).sort((x,y)=>{const ix=ORDER.indexOf(x),iy=ORDER.indexOf(y);return(ix<0?99:ix)-(iy<0?99:iy)});
+    let h=keys.map(st=>'<div style="display:flex;justify-content:space-between;padding:4px 0;color:var(--text)"><span>'+esc(st)+'（'+by[st].n+'件）</span><span style="font-variant-numeric:tabular-nums">¥'+by[st].sum.toLocaleString()+'</span></div>').join('');
+    if(!keys.length)h='<div style="color:var(--text-faint)">金額が入っている案件がありません</div>';
+    h+='<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-weight:700;color:var(--text)"><span>合計（'+cnt+'件／'+live.length+'案件中）</span><span style="font-variant-numeric:tabular-nums">¥'+total.toLocaleString()+'</span></div>';
+    el.innerHTML=h;
+  });
 }
 
 // ===== 効果音（キオスク用・Web Audio／音源ファイル不要・ユーザータップ起点でiOS制約クリア） =====
@@ -3439,7 +3438,7 @@ const Prod = (function(){
   let _changingStatus=false;
   let _busyDel=false, _busyInv=false, _busyFile=false, _busyStaff=false;
   const SLOG_KEY='prod_status_snapshot';
-  function moneySum(){moneySummary('生産',prodData)}
+  function moneySum(){moneySummary()}
   const SLOG_LIST_KEY='prod_status_log';
   const SLOG_UNREAD_KEY='prod_status_unread';
   let staffList=[];
@@ -3979,7 +3978,7 @@ const Proj = (function(){
   let _changingStatus=false;
   let _busyDel=false, _busyInv=false, _busyRental=false;
   const SLOG_KEY='proj_status_snapshot';
-  function moneySum(){moneySummary('企画制作',projData)}
+  function moneySum(){moneySummary()}
   const SLOG_LIST_KEY='proj_status_log';
   const SLOG_UNREAD_KEY='proj_status_unread';
   const ACTIVE_PROJ_ST=['見積中','受注','準備中','現場中','レンタル中','メンテ中'];
@@ -5707,7 +5706,7 @@ const Sales = (function(){
   let slogUnread=0;
   let _busyDel=false, _busyInv=false, _changingStatus=false;
   const SLOG_KEY='sales_status_snapshot';
-  function moneySum(){moneySummary('販売',allEntries)}
+  function moneySum(){moneySummary()}
   const SLOG_LIST_KEY='sales_status_log';
   const SLOG_UNREAD_KEY='sales_status_unread';
   const ACTIVE_ST=['見積中','受注','発注済','入荷済'];
@@ -7571,6 +7570,7 @@ const Cases = (function(){
       +`<span class="subtab-date">${dateJP(today)}</span>`
       +tabs.map(([k,l])=>`<button class="sub-tab${_tab===k?' on':''}${k==='todo'&&_tc?' has-todo':''}" onclick="Cases.tab('${k}')">${l}</button>`).join('')
       +`<button class="sub-tab cases-new${_tab==='form'?' on':''}" onclick="Cases.tab('form')">＋ 新規登録</button>`
+      +`<button class="mny-btn" onclick="Cases.moneySum()">¥ 合計</button>`
       +`<button class="slog-btn" id="casesSlogBtn" onclick="Cases.openSlog()">ステータスログ</button>`
       +`<input class="subtab-search" id="casesSearch" placeholder="検索..." value="${esc(_q)}" oninput="Cases.search(this.value)">`
       +`</div>`;
@@ -7579,6 +7579,7 @@ const Cases = (function(){
     else renderCaseList(_tab);
   }
   function tab(k){ _tab=k; render(); }
+  function moneySum(){ moneySummary(); }
 
   function renderCaseList(t){
     const pane=$('casesPane');
@@ -7940,7 +7941,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum };
 })();
 
 const Alc=(function(){
