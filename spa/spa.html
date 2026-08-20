@@ -7676,7 +7676,7 @@ const Cases = (function(){
   }
 
   function _invalidateDepts(){ App._loaded.prod=false; App._loaded.proj=false; App._loaded.sales=false; }
-  function setStatus(id,st){ const c=_find(id); if(c){ logStatus(c,c.status,st); c.status=st; } fireAndForget({dept:'cases',action:'status',id,status:st}); _invalidateDepts(); toast('ステータスを'+st+'に変更'); render(); }
+  function setStatus(id,st){ const c=_find(id); if(c){ logStatus(c,c.status,st); c.status=st; } fireAndForget({dept:'cases',action:'status',id,status:st}); _invalidateDepts(); toast('ステータスを'+st+'に変更'); render(); setTimeout(moneyFetch,4000); }
   function logStatus(c,from,to){ if(from===to)return; try{ const k='cases_slog'; const a=JSON.parse(localStorage.getItem(k)||'[]'); a.unshift({name:c.name||c.id,from:from||'',to:to,ts:Date.now()}); localStorage.setItem(k,JSON.stringify(a.slice(0,100))); }catch(e){} }
   function fmtTs(ts){ try{ const d=new Date(ts); return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }catch(e){return ''} }
   function openSlog(){ let a=[]; try{a=JSON.parse(localStorage.getItem('cases_slog')||'[]')}catch(e){}
@@ -7684,7 +7684,7 @@ const Cases = (function(){
     $('caseSlogBg').classList.add('show'); }
   function closeSlog(){ $('caseSlogBg').classList.remove('show'); }
   function toggleInv(id){ const c=_find(id); if(!c)return; const nv=!_inv(c.invoiced); c.invoiced=nv; fireAndForget({dept:'cases',action:'invoiced',id,invoiced:nv}); _invalidateDepts(); }
-  function archive(id){ if(!confirm('この案件をアーカイブへ移しますか？（一覧から見えなくなります）'))return; const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); }
+  function archive(id){ if(!confirm('この案件をアーカイブへ移しますか？（一覧から見えなくなります）'))return; const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); setTimeout(moneyFetch,4000); }
   // 締め待ち（完了・伝票済）を一括アーカイブ。状態変更の代行ではなく、現場が完了済のものの書類整理。
   function archiveSettled(){
     const settled=_cases.filter(c=>!_arch(c.archived)&&c.status==='完了'&&_inv(c.invoiced));
@@ -7694,7 +7694,7 @@ const Cases = (function(){
     toast(settled.length+'件をアーカイブしました'); render();
     setTimeout(loadAll, settled.length*120+2500);
   }
-  function unarchive(id){ if(!confirm('この案件を一覧に戻しますか？'))return; const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); }
+  function unarchive(id){ if(!confirm('この案件を一覧に戻しますか？'))return; const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); setTimeout(moneyFetch,4000); }
   function del(id){ if(!confirm('この案件を削除しますか？（生産/企画制作の明細は残ります）'))return; _cases=_cases.filter(c=>String(c.id)!==String(id)); fireAndForget({dept:'cases',action:'delete',id}); toast('削除しました'); render(); }
   function search(v){ _q=v; const qq=v.trim().toLowerCase(); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||tr.textContent.toLowerCase().includes(qq))?'':'none'; }); }
   function sortBy(col){ if(_sort.col===col)_sort.asc=!_sort.asc; else {_sort.col=col;_sort.asc=true;} render(); }
@@ -7727,7 +7727,7 @@ const Cases = (function(){
     const chdr={order_no:upd.order_no, estimate_no:upd.estimate_no, client:upd.client, person:upd.contact, our_person:upd.our_person, amount:upd.amount};
     kids.forEach((k,i)=>setTimeout(()=>fireAndForget({dept:k.dept,action:'save',id:k.id,...chdr}), i*250));
     _invalidateDepts();
-    toast('案件を更新しました'); closeEdit(); render(); }
+    toast('案件を更新しました'); closeEdit(); render(); setTimeout(moneyFetch,4000); }
 
   const JVH=['load_in','setup','event','teardown','lend','back','deliv']; // 企画制作で使う車両フェーズ
   function dateBlock(id,label){
@@ -7937,7 +7937,7 @@ const Cases = (function(){
     fireAndForget({dept:'cases',action:'save',...parent});
     posts.forEach((b,i)=>setTimeout(()=>fireAndForget(b), i*300));
     _cases.unshift(parent);
-    toast(`案件を登録しました（${posts.length}件／${case_id}）`);
+    toast(`案件を登録しました（${posts.length}件／${case_id}）`); setTimeout(moneyFetch,4000);
     App._loaded['prod']=false; App._loaded['proj']=false; App._loaded['sales']=false;
     _tab='list'; render();
     setTimeout(loadAll,3000);
