@@ -3896,7 +3896,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
   function editProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(d)openProdMo(d)}
   // 既存案件に生産を後付け：case_idと案件ヘッダを引き継いだ新規入力で開く
   let _addCaseId='';
-  function addToCase(c){openProdMo(null);$('pf_project').value=c.name||'';$('pf_our_person').value=c.our_person||'';$('pf_estimate_no').value=c.estimate_no||'';$('pf_order_no').value=c.order_no||'';$('pf_client').value=c.client||'';$('pf_person').value=c.contact||'';$('pf_status').value='受注';_addCaseId=String(c.id||'');$('prodMoTitleText').textContent='生産を追加：'+(c.name||'');}
+  function addToCase(c){openProdMo(null);$('pf_project').value=c.name||'';$('pf_our_person').value=c.our_person||'';$('pf_estimate_no').value=c.estimate_no||'';$('pf_order_no').value=c.order_no||'';$('pf_client').value=c.client||'';$('pf_person').value=c.contact||'';$('pf_amount').value=(c.amount===''||c.amount==null)?'':c.amount;$('pf_status').value='受注';_addCaseId=String(c.id||'');$('prodMoTitleText').textContent='生産を追加：'+(c.name||'');}
 
   // ===== 保存（楽観的更新） =====
   let _savingProd=false;
@@ -4476,7 +4476,7 @@ const Proj = (function(){
   function editProj(id){const d=projData.find(x=>x.id===id);if(d)openProjMo(d)}
   // 既存案件に企画を後付け：case_idと案件ヘッダを引き継いだ新規入力で開く
   let _addCaseId='', _xfType='現場';
-  function addToCase(c){openProjMo(null);$('xf_project').value=c.name||'';$('xf_our_person').value=c.our_person||'';$('xf_estimate_no').value=c.estimate_no||'';$('xf_order_no').value=c.order_no||'';$('xf_client').value=c.client||'';$('xf_person').value=c.contact||'';$('xf_status').value='受注';_addCaseId=String(c.id||'');$('projMoTitleText').textContent='企画を追加：'+(c.name||'');}
+  function addToCase(c){openProjMo(null);$('xf_project').value=c.name||'';$('xf_our_person').value=c.our_person||'';$('xf_estimate_no').value=c.estimate_no||'';$('xf_order_no').value=c.order_no||'';$('xf_client').value=c.client||'';$('xf_person').value=c.contact||'';$('xf_amount').value=(c.amount===''||c.amount==null)?'':c.amount;$('xf_status').value='受注';_addCaseId=String(c.id||'');$('projMoTitleText').textContent='企画を追加：'+(c.name||'');}
 
   // ===== 保存（楽観的更新） =====
   let _savingProj=false;
@@ -6088,7 +6088,7 @@ const Sales = (function(){
   function closeMo(){$('moBg').classList.remove('show');_addCaseId=''}
   // 既存案件に販売を後付け：case_idと案件ヘッダを引き継いだ新規入力で開く
   let _addCaseId='';
-  function addToCase(c){openMo('');$('f_project').value=c.name||'';$('f_our_person').value=c.our_person||'';$('f_estimate_no').value=c.estimate_no||'';$('f_order_no').value=c.order_no||'';$('f_client').value=c.client||'';$('f_person').value=c.contact||'';$('f_status').value='受注';_addCaseId=String(c.id||'');$('moTitleText').textContent='販売を追加：'+(c.name||'');}
+  function addToCase(c){openMo('');$('f_project').value=c.name||'';$('f_our_person').value=c.our_person||'';$('f_estimate_no').value=c.estimate_no||'';$('f_order_no').value=c.order_no||'';$('f_client').value=c.client||'';$('f_person').value=c.contact||'';$('f_amount').value=(c.amount===''||c.amount==null)?'':c.amount;$('f_status').value='受注';_addCaseId=String(c.id||'');$('moTitleText').textContent='販売を追加：'+(c.name||'');}
   let _savingEntry=false;
   function saveEntry(){
     if(_savingEntry) return;
@@ -7893,7 +7893,7 @@ const Cases = (function(){
     const posts=[];
     if(useProd){
       const pnotes=$('cf_pnotes').value.trim();
-      posts.push({dept:'production',action:'save',case_id,...hdr,project:projectName,status,
+      posts.push({dept:'production',action:'save',case_id,...hdr,project:projectName,status,amount:$('cf_case_amount').value,
         section:$('cf_psection').value, subcontractor:$('cf_psub').value.trim(), start_date:$('cf_pstart').value, deadline:$('cf_pdeadline').value,
         delivery:nouhinToProd?shipDelivery:'', material:nouhinToProd?shipMaterial:'',
         notes:nouhinToProd?[pnotes,shipNotes].filter(Boolean).join(' / '):pnotes});
@@ -7901,7 +7901,7 @@ const Cases = (function(){
     if(useProj && !nouhinToProd){
       const t=jType();
       const material=(t==='レンタル')?'':$('cf_material').value.trim();
-      const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,rentals:$('cf_rentals').value.trim(),material,notes,
+      const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,amount:$('cf_case_amount').value,rentals:$('cf_rentals').value.trim(),material,notes,
         venue:t==='レンタル'?'':$('cf_venue').value.trim(), address:t==='レンタル'?'':$('cf_address').value.trim()};
       if(t==='施工'){
         Object.assign(p,{ delivery:'自社車両',
