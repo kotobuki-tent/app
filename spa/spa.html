@@ -1902,6 +1902,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="ce_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="ce_order_no"></div></div>
       <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="ce_client"></div><div class="mo-field f3"><label>窓口</label><input id="ce_contact"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>社内納期（目標・仮）<span class="ce-target-note">客の納期ではない／カレンダーに点線で表示</span></label><input type="date" id="ce_target_date"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>金額（円）　一案件＝一金額</label><input type="number" id="ce_amount" min="0" step="1" placeholder="空欄可"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
       <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div><div id="ce_adddept" class="ce-adddept"></div></div>
       <div class="mo-foot"><button class="cancel" onclick="Cases.closeEdit()">閉じる</button><button class="save" onclick="Cases.saveEdit()">保存</button></div>
@@ -3335,22 +3336,14 @@ function toast(msg,err){ showCenter(msg, err?'err':'ok'); }   // 共通トース
 let _moneyTotal=null;   // 今抱えている案件の積み上げ総額（バッジ常時表示用）
 function moneyShort(v){if(v==null)return'¥ 合計';if(!v)return'¥0';if(v>=1e8)return'¥'+((v%1e8)?(v/1e8).toFixed(1):(v/1e8))+'億';if(v>=1e4)return'¥'+Math.round(v/1e4).toLocaleString()+'万';return'¥'+v.toLocaleString()}
 function updateMoneyBadges(){document.querySelectorAll('.mny-btn').forEach(b=>{b.textContent=moneyShort(_moneyTotal)})}
-// 案件>一覧と同条件（アーカイブ・完了・見送り除外）の案件に紐づく子明細（生産/企画/販売）の金額を合算
+// 案件>一覧と同条件（アーカイブ・完了・見送り除外）の案件の金額（一案件＝一金額）を合算
 function moneyFetch(){
-  const grab=d=>fetch(API+'?dept='+d+'&action=read').then(r=>r.json()).catch(()=>null);
-  return Promise.all([grab('cases'),grab('production'),grab('project'),grab('sales')]).then(([cs,od,pj,sl])=>{
+  return fetch(API+'?dept=cases&action=read').then(r=>r.json()).catch(()=>null).then(cs=>{
     if(!cs||!Array.isArray(cs.data))return null;
     const isT=v=>v===true||v==='true'||v==='TRUE';
     const live=cs.data.filter(c=>!isT(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
-    const kidAmt={};
-    [od,pj,sl].forEach(j=>{const rows=(j&&j.data)||[];rows.forEach(r=>{
-      const cid=String(r.case_id||'').trim();if(!cid)return;
-      if(r.status==='見送り'||isT(r.archived))return;
-      const a=Number(r.amount);if(!a||isNaN(a))return;
-      kidAmt[cid]=(kidAmt[cid]||0)+a;
-    })});
     const by={};let total=0,cnt=0;
-    live.forEach(c=>{const a=kidAmt[String(c.id)];if(!a)return;const st=c.status||'不明';(by[st]=by[st]||{sum:0,n:0});by[st].sum+=a;by[st].n++;total+=a;cnt++});
+    live.forEach(c=>{const a=Number(c.amount);if(!a||isNaN(a))return;const st=c.status||'不明';(by[st]=by[st]||{sum:0,n:0});by[st].sum+=a;by[st].n++;total+=a;cnt++});
     _moneyTotal=total;updateMoneyBadges();
     return {by,total,cnt,liveCount:live.length};
   });
@@ -5720,7 +5713,7 @@ const Sales = (function(){
   function apiPost(body){body.dept=DEPT;fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
   function fmtDate(d){if(!d)return'';const dt=(d instanceof Date)?d:new Date(d);if(isNaN(dt))return String(d).slice(0,10);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')}
   function fmtDateJP(s){if(!s)return'';const dt=new Date(s);if(isNaN(dt))return String(s);return(dt.getMonth()+1)+'/'+dt.getDate()+'（'+dow[dt.getDay()]+'）'}
-  function fmtAmount(v){if(v===''||v==null||isNaN(Number(v))||Number(v)<=0)return'';return'¥•••••'}  /* 表示は常時伏字（見せ歩き対策）。実額は編集フォームと合計（合言葉）でのみ */
+  function fmtAmount(v){if(v===''||v==null||isNaN(Number(v)))return'';return'¥'+Number(v).toLocaleString()}
 
   // ===== ステータスログ（slogBg→salesSlogBg / slogList→salesSlogList） =====
   function detectStatusChanges(){
@@ -7701,7 +7694,7 @@ const Cases = (function(){
   function setStf(v){ _stf=(_stf===v?'':v); render(); }
   function openEdit(id){ const c=_find(id); if(!c)return; _editId=id;
     $('ce_name').value=c.name||''; $('ce_client').value=c.client||''; $('ce_contact').value=c.contact||''; $('ce_our_person').value=c.our_person||'';
-    $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; $('ce_status').value=CASE_ST.indexOf(c.status)>=0?c.status:'受注'; $('ce_note').value=c.note||''; $('ce_target_date').value=String(c.target_date||'').slice(0,10);
+    $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; $('ce_status').value=CASE_ST.indexOf(c.status)>=0?c.status:'受注'; $('ce_note').value=c.note||''; $('ce_target_date').value=String(c.target_date||'').slice(0,10); $('ce_amount').value=(c.amount===''||c.amount==null)?'':c.amount;
     const kids=_children[String(id)]||[];
     $('ce_children').innerHTML = kids.length
       ? kids.map(k=>`<button type="button" class="ce-child" onclick="Cases.jumpChild('${k.dept}','${esc(String(k.id))}')"><span class="ce-cdept ce-${k.dept}">${DEPT[k.dept]?DEPT[k.dept].n:k.dept}</span><span class="ce-cname">${esc(k.project||'(無題)')}</span><span class="ce-cst">${esc(k.status||'')}</span><span class="ce-cgo">開く →</span></button>`).join('')
@@ -7720,7 +7713,7 @@ const Cases = (function(){
   async function jumpChild(dept,id){ closeEdit(); const key={production:'prod',project:'proj',sales:'sales'}[dept]; if(!key)return; try{ await App.nav(key); }catch(e){}
     try{ if(dept==='production')Prod.editProd(id); else if(dept==='project')Proj.editProj(id); else if(dept==='sales')Sales.openMo(id); }catch(e){} }
   function saveEdit(){ if(!_editId)return; const c=_find(_editId); if(!c){closeEdit();return;}
-    const upd={name:$('ce_name').value.trim(),client:$('ce_client').value.trim(),contact:$('ce_contact').value.trim(),our_person:$('ce_our_person').value.trim(),estimate_no:$('ce_estimate_no').value.trim(),order_no:$('ce_order_no').value.trim(),status:$('ce_status').value,note:$('ce_note').value.trim(),target_date:$('ce_target_date').value};
+    const upd={name:$('ce_name').value.trim(),client:$('ce_client').value.trim(),contact:$('ce_contact').value.trim(),our_person:$('ce_our_person').value.trim(),estimate_no:$('ce_estimate_no').value.trim(),order_no:$('ce_order_no').value.trim(),status:$('ce_status').value,note:$('ce_note').value.trim(),target_date:$('ce_target_date').value,amount:$('ce_amount').value};
     logStatus(c,c.status,upd.status); Object.assign(c,upd); fireAndForget({dept:'cases',action:'save',id:_editId,...upd});
     // ヘッダ（受注/見積番号・得意先・窓口・担当）を子（生産/企画/販売）にも反映
     const kids=_children[String(_editId)]||[];
@@ -7744,6 +7737,7 @@ const Cases = (function(){
         <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="cf_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>ステータス</label><select id="cf_status"><option>見積中</option><option selected>受注</option><option>見送り</option></select></div></div>
         <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div></div>
         <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="cf_client"></div><div class="mo-field f3"><label>窓口</label><input id="cf_person"></div></div>
+        <div class="mo-row full"><div class="mo-field"><label>金額（円）　一案件＝一金額</label><input type="number" id="cf_case_amount" min="0" step="1" placeholder="空欄可・あとから編集で入れてもいい"></div></div>
       </div>
       <div class="cases-hint">この案件がどこで動くかを選ぶ（両方でも可）。工場で製作→自社施工なら両方にチェック。生産がベースの案件・企画制作がベースの案件、どちらもここから登録。</div>
 
@@ -7810,7 +7804,7 @@ const Cases = (function(){
           <label class="cf-toggle"><input type="checkbox" id="cf_useSales" onchange="Cases.toggle('sales')"> 販売（仕入れて売る）</label>
         </div>
         <div id="cf_salesWrap" class="cf-hide">
-          <div class="mo-row pair"><div class="mo-field f7"><label>仕入先</label><input id="cf_supplier"></div><div class="mo-field f3"><label>金額（円）</label><input type="number" id="cf_amount" min="0" step="1"></div></div>
+          <div class="mo-row full"><div class="mo-field"><label>仕入先</label><input id="cf_supplier"></div></div>
           <div class="mo-row full"><div class="mo-field"><label>納期</label><input type="date" id="cf_sdeadline"></div></div>
         </div>
       </div>
@@ -7929,10 +7923,10 @@ const Cases = (function(){
     if(useSales){
       const salesStatus=['見積中','受注','見送り'].includes(status)?status:'受注';
       posts.push({dept:'sales',action:'save',case_id,...hdr,project:projectName,
-        supplier:$('cf_supplier').value.trim(), amount:$('cf_amount').value, deadline:$('cf_sdeadline').value,
+        supplier:$('cf_supplier').value.trim(), amount:$('cf_case_amount').value, deadline:$('cf_sdeadline').value,
         status:salesStatus, created_at:new Date().toISOString().slice(0,10), notes});
     }
-    const parent={id:case_id,name:projectName,client:hdr.client,contact:hdr.person,our_person:hdr.our_person,estimate_no:hdr.estimate_no,order_no:hdr.order_no,status,invoiced:false,note:'',archived:false,created_at:new Date().toISOString()};
+    const parent={id:case_id,name:projectName,client:hdr.client,contact:hdr.person,our_person:hdr.our_person,estimate_no:hdr.estimate_no,order_no:hdr.order_no,status,invoiced:false,note:'',amount:$('cf_case_amount').value,archived:false,created_at:new Date().toISOString()};
     fireAndForget({dept:'cases',action:'save',...parent});
     posts.forEach((b,i)=>setTimeout(()=>fireAndForget(b), i*300));
     _cases.unshift(parent);
