@@ -766,6 +766,7 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 .st-検品中{background:#fef9c3;color:#a16207}
 .st-メンテ待ち{background:#ffedd5;color:#c2410c}
 .st-メンテ中{background:#fee2e2;color:#dc2626}
+.st-廃棄予定{background:#e5e7eb;color:#374151}
 .avail-bar{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:baseline;padding:10px 12px;border-bottom:1px solid #f0f1f5;width:100%;box-sizing:border-box}
 .avail-bar.empty{opacity:.45}
 .avail-date-row{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
@@ -2186,7 +2187,7 @@ table.jobs tr:last-child td{border-bottom:none}
       </div>
       <div class="mo-row">
         <div class="mo-field"><label>数量 *</label><input id="xf_r_qty" type="number" min="1" value="1"></div>
-        <div class="mo-field"><label>ステータス</label><select id="xf_r_status"><option>予約</option><option>貸出中</option><option>返却済</option><option>検品中</option><option>メンテ待ち</option><option>メンテ中</option></select></div>
+        <div class="mo-field"><label>ステータス</label><select id="xf_r_status"><option>予約</option><option>貸出中</option><option>返却済</option><option>検品中</option><option>メンテ待ち</option><option>メンテ中</option><option>廃棄予定</option></select></div>
       </div>
       <div class="mo-row">
         <div class="mo-field"><label>開始日 *</label><input id="xf_r_start" type="date"></div>
@@ -4705,8 +4706,8 @@ const Proj = (function(){
 const Inv = (function(){
   // ===== 状態（旧グローバル変数→IIFE内に隔離） =====
   const DEFAULT_CATS=['テント','横幕','テーブル','イス','備品'];
-  const ACTIVE_STATUSES=['予約','貸出中','メンテ待ち','メンテ中'];
-  const RENTAL_ST=['予約','貸出中','返却済','検品中','メンテ待ち','メンテ中'];
+  const ACTIVE_STATUSES=['予約','貸出中','メンテ待ち','メンテ中','廃棄予定'];   // 廃棄予定＝まだ物はある（貸せないだけ）ので在庫計算では引く
+  const RENTAL_ST=['予約','貸出中','返却済','検品中','メンテ待ち','メンテ中','廃棄予定'];
   let items=[], rentals=[], projects=[];
   let itemSort={col:'category',asc:true};
   let itemCatFilter='';
@@ -4948,7 +4949,7 @@ const Inv = (function(){
   // ===== メンテ =====
   function setMaintFilter(v){maintStatusFilter=v;renderMaint()}
   function renderMaint(){
-    const MAINT_ST=['メンテ待ち','メンテ中'];
+    const MAINT_ST=['メンテ待ち','メンテ中','廃棄予定'];
     let f=rentals.filter(r=>MAINT_ST.includes(r.status));
     const chipEl=$('maintChips');
     if(chipEl){
@@ -4974,7 +4975,9 @@ const Inv = (function(){
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
       <td><div class="tbl-actions">
         <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
-        <a class="del-link" onclick="Inv.discardRental('${r.id}')">廃棄</a>
+        ${r.status==='廃棄予定'
+          ?`<a class="edit-link" onclick="Inv.unDiscard('${r.id}')">戻す</a><a class="del-link" onclick="Inv.discardRental('${r.id}')">廃棄を確定</a>`
+          :`<a class="del-link" onclick="Inv.toDiscardList('${r.id}')">廃棄リストへ</a>`}
       </div></td>
     </tr>`).join('');
   }
@@ -5087,6 +5090,28 @@ const Inv = (function(){
     setTimeout(loadAll,3000);
     setTimeout(()=>{_busyDel=false},1500);
   }
+  // 廃棄は二段構え：まず「廃棄予定」に入れる（可逆・保有数そのまま）→ リストで確定して初めて消す
+  let _busyToDiscard=false;
+  function toDiscardList(id){
+    if(_busyToDiscard)return;
+    const r=rentals.find(x=>x.id===id);if(!r)return;
+    _busyToDiscard=true;
+    r.status='廃棄予定';
+    fireAndForget({action:'save_rental',...r});
+    toast('廃棄リストに入れました（保有数はまだ減りません）');
+    renderRentals();renderMaint();renderAvail();
+    setTimeout(()=>{_busyToDiscard=false},1500);
+  }
+  function unDiscard(id){
+    if(_busyToDiscard)return;
+    const r=rentals.find(x=>x.id===id);if(!r)return;
+    _busyToDiscard=true;
+    r.status='メンテ待ち';
+    fireAndForget({action:'save_rental',...r});
+    toast('メンテ待ちに戻しました');
+    renderRentals();renderMaint();renderAvail();
+    setTimeout(()=>{_busyToDiscard=false},1500);
+  }
   // メンテ不可＝モノごと処分。台帳から行を消し、商品台帳の保有数も減らす
   let _busyDiscard=false;
   function discardRental(id){
@@ -5094,7 +5119,7 @@ const Inv = (function(){
     const r=rentals.find(x=>x.id===id);if(!r)return;
     const n=Number(r.qty)||0;
     const it=items.find(i=>i.category===r.category&&i.item_name===r.item_name);
-    let msg='「'+r.item_name+'」×'+n+' を廃棄しますか？\n\n・台帳からこの行を消します';
+    let msg='「'+r.item_name+'」×'+n+' の廃棄を確定しますか？\n\n・台帳からこの行を消します';
     if(it){const cur=Number(it.total_qty)||0;const next=Math.max(0,cur-n);msg+='\n・保有数を '+cur+' → '+next+' に減らします';}
     else{msg+='\n・商品台帳に同名の商品が見つからないため保有数はそのままです';}
     msg+='\n\n※元に戻せません';
@@ -5147,7 +5172,7 @@ const Inv = (function(){
           if((r.category+'|'+r.item_name)!==key)return;
           if(r.date_start<=ds&&r.date_end>=ds){
             const q=Number(r.qty)||0;u+=q;
-            if(r.status==='メンテ待ち'||r.status==='メンテ中')m+=q;else r2+=q;
+            if(r.status==='メンテ待ち'||r.status==='メンテ中'||r.status==='廃棄予定')m+=q;else r2+=q;
           }
         });
         if(u>max){max=u;maxRent=r2;maxMaint=m}
@@ -5205,7 +5230,7 @@ const Inv = (function(){
     switchTab,
     openSlog, closeSlog, clearSlog,
     sortItems, openItemMo, closeItemMo, editItem, saveItem, deleteItem,
-    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental,
+    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental, toDiscardList, unDiscard,
     populateItemSelect, onProjectSelect, renderAvail, renderMaint,
     setItemCatFilter, setMaintFilter, setRentalFilter, setAvailCatFilter,
     unifiedSearch
