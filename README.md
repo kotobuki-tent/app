@@ -40,10 +40,10 @@ SPA本体（`spa/spa.html`）に14画面を統合。1ファイルで全機能完
 
 | シート | 内容 |
 |---|---|
-| `cases` | 案件（親）。案件登録時に発番する `case_id` で生産/企画制作/販売の子行を束ねる。案件の状態を変えると子へ波及（リグレッションガード付き）、伝票チェックも子へ一括 |
-| `orders` | 生産部の案件データ（files・invoiced・archived・labor_archived・case_idカラム含む。labor_archivedは工数アーカイブ専用＝生産のarchivedとは別管理） |
-| `projects` | 企画制作部の現場データ（貸出/返却日程・invoiced・case_idカラム含む） |
-| `sales` | 販売案件データ（仕入先・受注番号・伝票管理・case_id） |
+| `cases` | 案件（親）。案件登録時に発番する `case_id` で生産/企画制作/販売の子行を束ねる。案件の状態を変えると子へ波及（リグレッションガード付き）、伝票チェックも子へ一括。`amount`＝案件の金額（一案件＝一金額の正本。¥合計バッジ＝一覧と同条件の案件のamount合算。登録/編集で子へ参考値としてコピー） |
+| `orders` | 生産部の案件データ（files・invoiced・archived・labor_archived・case_id・amountカラム含む。labor_archivedは工数アーカイブ専用＝生産のarchivedとは別管理。amountは案件金額の写し＝参考値で合計には入らない） |
+| `projects` | 企画制作部の現場データ（貸出/返却日程・invoiced・case_id・amountカラム含む。amountは案件金額の写し＝参考値） |
+| `sales` | 販売案件データ（仕入先・受注番号・伝票管理・case_id・amount。amountは案件金額の写し＝参考値、一覧カードに実額表示） |
 | `inventory` | 商品マスタ（カテゴリ・商品名・保有数） |
 | `rentals` | 貸出/予約台帳（ステータス・期間・数量） |
 | `vehicles` | 車両台帳。車種(name)・名称(type)・ナンバー(plate)・寸法(length/width/height＝全長/全幅/全高 mm)・車検/自賠責/任意保険の満了日・備考。GASはヘッダー名で汎用read/write（列追加で自動対応）。旧フォームのusage/status/oil_*/tire_*/current_km列は残存するが現フォーム未使用 |
