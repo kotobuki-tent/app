@@ -7630,7 +7630,9 @@ const Cases = (function(){
   }
 
   async function loadAll(){
-    if(_tab!=='form') $('casesBody').innerHTML='<div class="cases-loading">読み込み中...</div>';
+    // 「読み込み中」で画面を消すのは初回だけ。2回目以降（5分自動更新・画面往復の取り直し）は
+    // 古い一覧を出したまま裏で取り直す＝リロード感をなくす
+    if(_tab!=='form' && !_cases.length) $('casesBody').innerHTML='<div class="cases-loading">読み込み中...</div>';
     try{
       const grab=d=>fetch(API+'?dept='+d+'&action=read').then(r=>r.json()).catch(()=>({}));
       const [cs,od,pj,sl,st]=await Promise.all([grab('cases'),grab('production'),grab('project'),grab('sales'),fetch(API+'?dept=cases&action=staff').then(r=>r.json()).catch(()=>({}))]);
@@ -7641,7 +7643,9 @@ const Cases = (function(){
       const add=(dept,rows)=>{(rows||[]).forEach(r=>{const cid=String(r.case_id||'').trim(); if(!cid)return; (_children[cid]=_children[cid]||[]).push({dept,id:r.id,project:r.project,status:r.status,invoiced:r.invoiced,deadline:r.deadline,start_date:r.start_date,type:r.type,date_load_in:r.date_load_in,date_setup:r.date_setup,date_event:r.date_event,date_teardown:r.date_teardown,date_rental_out:r.date_rental_out,date_rental_return:r.date_rental_return,date_delivery:r.date_delivery});});};
       add('production',(od&&od.data)); add('project',(pj&&pj.data)); add('sales',(sl&&sl.data));
     }catch(e){}
-    if(_tab!=='form') render();
+    // 検索ボックスに入力中なら描き直さない（フォーカスと入力が飛ぶため。データは更新済みで次の操作から反映）
+    const typing=document.activeElement&&document.activeElement.id==='casesSearch';
+    if(_tab!=='form' && !typing) render();
   }
   const _arch=v=>v===true||v==='true'||v==='TRUE';
   const _inv =v=>v===true||v==='true'||v==='TRUE';
