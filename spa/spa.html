@@ -5126,6 +5126,7 @@ const Inv = (function(){
   function toDiscardList(id){
     if(_busyToDiscard)return;
     const r=rentals.find(x=>x.id===id);if(!r)return;
+    if(!confirm('「'+r.item_name+'」×'+(Number(r.qty)||0)+' を廃棄リストへ入れますか？\n\nまだ廃棄はされません（保有数もそのまま）。\n廃棄タブから「戻す」で戻せます。'))return;
     _busyToDiscard=true;
     r.status='廃棄予定';
     fireAndForget({action:'save_rental',...r});
