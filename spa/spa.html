@@ -275,7 +275,7 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 .staff-cell .floor-badge{position:absolute;top:3px;right:6px;font-size:10px;font-weight:700;opacity:.85}
 .staff-cell .pos{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.75}
 
-/* ===== 生産固有CSS モバイル（#prodAdmin/#prodArchive カード化等） ===== */
+/* ===== 生産固有CSS モバイル（#prodArchive カード化等） ===== */
 @media(max-width:480px),(orientation:portrait){
   html{font-size:14px}
   /* ヘッダー：タイトル縮小、ナビ横スクロール */
@@ -308,36 +308,8 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
   .av-top{flex-direction:column;align-items:stretch;gap:8px}
   .av-search{display:none}
   .av-add{padding:11px 18px;font-size:13px}
-
-  /* === テーブル→カード化（管理ビュー） === */
-  #prodAdmin .tbl-wrap{border:none;background:transparent;overflow:visible}
-  #prodAdmin table,#prodAdmin thead,#prodAdmin tbody,#prodAdmin tr,#prodAdmin td{display:block;width:100%}
-  #prodAdmin thead{display:none}
-  #prodAdmin tr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-  #prodAdmin tr:hover td{background:transparent}
-  #prodAdmin td{padding:5px 0;border:none;white-space:normal;font-size:13px;display:flex;align-items:center;gap:8px}
-  #prodAdmin td::before{font-size:11px;font-weight:600;color:var(--text-dim);min-width:72px;flex-shrink:0}
-  /* 物件名（1列目）は大きく表示、ラベル非表示 */
-  #prodAdmin td:nth-of-type(1){font-size:15px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--surface3);margin-bottom:6px;display:block}
-  #prodAdmin td:nth-of-type(1)::before{display:none}
-  /* 各列のラベル */
-  #prodAdmin td:nth-of-type(2)::before{content:'担当'}
-  #prodAdmin td:nth-of-type(3)::before{content:'見積'}
-  #prodAdmin td:nth-of-type(4)::before{content:'受注'}
-  #prodAdmin td:nth-of-type(5)::before{content:'得意先'}
-  #prodAdmin td:nth-of-type(6)::before{content:'窓口'}
-  #prodAdmin td:nth-of-type(7)::before{content:'作業場所'}
-  #prodAdmin td:nth-of-type(8)::before{content:'納期'}
-  #prodAdmin td:nth-of-type(9)::before{content:'ステータス'}
-  #prodAdmin td:nth-of-type(10)::before{content:'伝票'}
-  #prodAdmin td:nth-of-type(11)::before{content:'操作'}
-  /* 空値セルは非表示（::before のみになる場合） */
-  #prodAdmin td:empty{display:none}
   /* 操作セル内のボタンはタップしやすく */
-  #prodAdmin td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px;margin-right:4px}
-  #prodAdmin td .act-btn.del{color:var(--red)}
   /* ステータスselectを大きく */
-  #prodAdmin td select{flex:1;padding:8px 10px !important;font-size:13px !important;min-height:38px}
 
   /* === テーブル→カード化（出荷済ビュー） === */
   #prodArchive .tbl-wrap{border:none;background:transparent;overflow:visible}
@@ -639,32 +611,6 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
   #projArchivedView td[colspan]{display:block;text-align:center;padding:30px !important}
   #projArchivedView td[colspan]::before{display:none}
 
-  /* === 管理テーブル→カード化（13列） === */
-  #projAdminView .tbl-wrap{border:none;background:transparent;overflow:visible}
-  #projAdminView table,#projAdminView thead,#projAdminView tbody,#projAdminView tr,#projAdminView td{display:block;width:100%}
-  #projAdminView thead{display:none}
-  #projAdminView tr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-  #projAdminView tr:hover td{background:transparent}
-  #projAdminView td{padding:5px 0;border:none;white-space:normal;font-size:13px;display:flex;align-items:center;gap:8px}
-  #projAdminView td::before{font-size:11px;font-weight:600;color:var(--text-dim);min-width:72px;flex-shrink:0}
-  #projAdminView td:nth-of-type(1){font-size:15px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--surface3);margin-bottom:6px;display:block}
-  #projAdminView td:nth-of-type(1)::before{display:none}
-  #projAdminView td:nth-of-type(2)::before{content:'担当'}
-  #projAdminView td:nth-of-type(3)::before{content:'見積'}
-  #projAdminView td:nth-of-type(4)::before{content:'受注'}
-  #projAdminView td:nth-of-type(5)::before{content:'得意先'}
-  #projAdminView td:nth-of-type(6)::before{content:'窓口'}
-  #projAdminView td:nth-of-type(7)::before{content:'会場'}
-  #projAdminView td:nth-of-type(8)::before{content:'搬入'}
-  #projAdminView td:nth-of-type(9)::before{content:'本番'}
-  #projAdminView td:nth-of-type(10)::before{content:'撤去'}
-  #projAdminView td:nth-of-type(11)::before{content:'ステータス'}
-  #projAdminView td:nth-of-type(12)::before{content:'伝票'}
-  #projAdminView td:nth-of-type(13)::before{content:'操作'}
-  #projAdminView td:empty{display:none}
-  #projAdminView td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px;margin-right:4px}
-  #projAdminView td .act-btn.del{color:var(--red)}
-  #projAdminView td select{flex:1;padding:8px 10px !important;font-size:13px !important;min-height:38px}
 
   /* モーダル：入力欄調整（中央モーダルは販売と統一） */
   .mo-row{flex-direction:column;gap:12px;margin-bottom:12px}
@@ -938,7 +884,6 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
   .dash{padding:12px 10px}
   .vlist{padding:12px 10px}
 
-  /* === テーブル→カード化（管理ビュー） === */
   #adminView .tbl-wrap{border:none;background:transparent;overflow:visible}
   #adminView table,#adminView thead,#adminView tbody,#adminView tr,#adminView td{display:block;width:100%}
   #adminView thead{display:none}
@@ -1578,8 +1523,8 @@ table.jobs tr:last-child td{border-bottom:none}
 ========================================================================== */
 @media(max-width:480px),(orientation:portrait){
   /* 対象セレクタ：3アプリ × 3ビュー = 9セレクタ */
-  #prodAdmin tr, #prodArchive tr, #prodArchived tr,
-  #projAdminView tr, #projDoneView tr, #projArchivedView tr,
+  #prodArchive tr, #prodArchived tr,
+  #projDoneView tr, #projArchivedView tr,
   #salesAdminView tr, #archiveView tr, #salesArchivedView tr,
   #view-veh #adminView tr {
     cursor:pointer;
@@ -1589,8 +1534,8 @@ table.jobs tr:last-child td{border-bottom:none}
     align-items:center;
   }
   /* td全体を inline-flex 風に詰める。物件名(1列目)以外はタグ風コンパクト表示 */
-  #prodAdmin td, #prodArchive td, #prodArchived td,
-  #projAdminView td, #projDoneView td, #projArchivedView td,
+  #prodArchive td, #prodArchived td,
+  #projDoneView td, #projArchivedView td,
   #salesAdminView td, #archiveView td, #salesArchivedView td,
   #view-veh #adminView td {
     display:inline-flex !important;
@@ -1607,15 +1552,15 @@ table.jobs tr:last-child td{border-bottom:none}
     color:var(--text-dim);
     gap:0 !important;
   }
-  #prodAdmin td::before, #prodArchive td::before, #prodArchived td::before,
-  #projAdminView td::before, #projDoneView td::before, #projArchivedView td::before,
+  #prodArchive td::before, #prodArchived td::before,
+  #projDoneView td::before, #projArchivedView td::before,
   #salesAdminView td::before, #archiveView td::before, #salesArchivedView td::before,
   #view-veh #adminView td::before {
     display:none !important;
   }
   /* 1列目（物件名）：大きく、ブロック表示、必ず改行 */
-  #prodAdmin td:first-child, #prodArchive td:first-child, #prodArchived td:first-child,
-  #projAdminView td:first-child, #projDoneView td:first-child, #projArchivedView td:first-child,
+  #prodArchive td:first-child, #prodArchived td:first-child,
+  #projDoneView td:first-child, #projArchivedView td:first-child,
   #salesAdminView td:first-child, #archiveView td:first-child, #salesArchivedView td:first-child,
   #view-veh #adminView td:first-child {
     display:block !important;
@@ -1630,15 +1575,15 @@ table.jobs tr:last-child td{border-bottom:none}
     border-radius:0 !important;
   }
   /* 空値tdは隠す */
-  #prodAdmin td:empty, #prodArchive td:empty, #prodArchived td:empty,
-  #projAdminView td:empty, #projDoneView td:empty, #projArchivedView td:empty,
+  #prodArchive td:empty, #prodArchived td:empty,
+  #projDoneView td:empty, #projArchivedView td:empty,
   #salesAdminView td:empty, #archiveView td:empty, #salesArchivedView td:empty,
   #view-veh #adminView td:empty {
     display:none !important;
   }
   /* ステータスselect / 伝票checkbox / 操作ボタンが入ったtdは非表示（モーダル経由で操作） */
-  #prodAdmin td[onclick*="stopPropagation"], #prodArchive td[onclick*="stopPropagation"], #prodArchived td[onclick*="stopPropagation"],
-  #projAdminView td[onclick*="stopPropagation"], #projDoneView td[onclick*="stopPropagation"], #projArchivedView td[onclick*="stopPropagation"],
+  #prodArchive td[onclick*="stopPropagation"], #prodArchived td[onclick*="stopPropagation"],
+  #projDoneView td[onclick*="stopPropagation"], #projArchivedView td[onclick*="stopPropagation"],
   #salesAdminView td[onclick*="stopPropagation"], #archiveView td[onclick*="stopPropagation"], #salesArchivedView td[onclick*="stopPropagation"],
   #view-veh #adminView td[onclick*="stopPropagation"] {
     display:none !important;
@@ -1931,7 +1876,6 @@ table.jobs tr:last-child td{border-bottom:none}
   </div>
   <div class="app">
     <div id="prodFactory" class="factory-view"></div>
-    <div id="prodAdmin" class="admin-view hidden"></div>
     <div id="prodArchive" class="admin-view hidden"></div>
     <div id="prodArchived" class="admin-view hidden"></div>
   </div>
@@ -2014,7 +1958,6 @@ table.jobs tr:last-child td{border-bottom:none}
     <div id="projGantt" class="proj-view"></div>
     <div id="projDoneView" class="proj-admin hidden"></div>
     <div id="projArchivedView" class="proj-admin hidden"></div>
-    <div id="projAdminView" class="proj-admin hidden"></div>
   </div>
 
   <!-- 現場登録/編集モーダル -->
@@ -3460,9 +3403,7 @@ const Prod = (function(){
   // ===== 生産の状態（旧グローバル変数→IIFE内ローカルに隔離） =====
   let prodData=[];
   let curProdView='factory';
-  let prodSort={col:null,asc:true};
   let prodFilter=null;
-  let adminStatusFilter=null;
   let archiveSort={col:'deadline',asc:false};
   let slog=[];
   let slogUnread=0;
@@ -3649,10 +3590,9 @@ const Prod = (function(){
 
   // ===== 描画 =====
   function render(){
-    if(curProdView==='factory'){$('prodFactory').classList.remove('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.add('hidden');$('prodArchived').classList.add('hidden');renderFactory()}
-    else if(curProdView==='admin'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.remove('hidden');$('prodArchive').classList.add('hidden');$('prodArchived').classList.add('hidden');renderProdAdmin()}
-    else if(curProdView==='archive'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.remove('hidden');$('prodArchived').classList.add('hidden');renderArchive()}
-    else if(curProdView==='archived'){$('prodFactory').classList.add('hidden');$('prodAdmin').classList.add('hidden');$('prodArchive').classList.add('hidden');$('prodArchived').classList.remove('hidden');renderArchived()}
+    if(curProdView==='factory'){$('prodFactory').classList.remove('hidden');$('prodArchive').classList.add('hidden');$('prodArchived').classList.add('hidden');renderFactory()}
+    else if(curProdView==='archive'){$('prodFactory').classList.add('hidden');$('prodArchive').classList.remove('hidden');$('prodArchived').classList.add('hidden');renderArchive()}
+    else if(curProdView==='archived'){$('prodFactory').classList.add('hidden');$('prodArchive').classList.add('hidden');$('prodArchived').classList.remove('hidden');renderArchived()}
     updateSlogBtn();updateStaffBtnCount();
   }
 
@@ -3706,45 +3646,13 @@ const Prod = (function(){
   }
   function unifiedSearch(q){
     q=(q||'').toLowerCase();
-    const view=document.querySelector('#prodFactory:not(.hidden), #prodArchive:not(.hidden), #prodAdmin:not(.hidden)');
+    const view=document.querySelector('#prodFactory:not(.hidden), #prodArchive:not(.hidden)');
     if(!view)return;
     view.querySelectorAll('.fv-card, tbody tr').forEach(el=>{
       el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
     });
   }
 
-  // ===== 管理テーブル =====
-  function renderProdAdmin(){
-    const el=$('prodAdmin');let items=prodData.filter(d=>d.status!=='出荷済');
-    const STATUS_ORDER={'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4};
-    const allCount=items.length;
-    const stCounts={};items.forEach(d=>{const s=d.status||'未設定';stCounts[s]=(stCounts[s]||0)+1});
-    if(adminStatusFilter)items=items.filter(d=>d.status===adminStatusFilter);
-    if(prodSort.col)items.sort((a,b)=>{
-      let va=a[prodSort.col],vb=b[prodSort.col];
-      const ea=va==null||va==='',eb=vb==null||vb==='';
-      if(ea&&eb)return 0;if(ea)return 1;if(eb)return-1;
-      if(prodSort.col==='deadline'){const da=parseD(va),db=parseD(vb);if(da&&db)return prodSort.asc?da-db:db-da;if(!da)return 1;if(!db)return-1}
-      if(prodSort.col==='status'){const sa=STATUS_ORDER[va]??99,sb=STATUS_ORDER[vb]??99;return prodSort.asc?sa-sb:sb-sa}
-      va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(prodSort.asc?-1:1):va>vb?(prodSort.asc?1:-1):0
-    });
-    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'section',label:'作業場所'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
-    const stBtn=(label,val)=>{const on=adminStatusFilter===val?' on':'';const cnt=val?stCounts[val]||0:allCount;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`};
-    let h=`<div class="fv-sum">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('製作中','製作中')}${stBtn('完成','完成')}<button class="av-add" style="margin-left:auto" onclick="App.nav('cases');Cases.tab('form')">＋ 案件から登録</button><button class="av-add" onclick="Prod.moneySum()">¥ 合計</button></div>`;
-    h+='<div class="tbl-wrap"><table><thead><tr>';cols.forEach(c=>{const a=prodSort.col===c.key?(prodSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
-    items.forEach(d=>{h+=`<tr data-id="${d.id}" onclick="Prod.editProd('${d.id}')" style="cursor:pointer">`;
-      cols.forEach(c=>{let v=d[c.key]||'';
-      if(c.key==='status'){const opts=['見積中','受注','製作中','完成','出荷済','見送り'];
-      h+=`<td onclick="event.stopPropagation()"><select onchange="Prod.changeStatus('${d.id}',this.value)" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer">`;
-      opts.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});
-      h+='</select></td>'}else{if(c.key==='deadline'&&v){const dd=parseD(v);
-      v=dd?`${dd.getMonth()+1}/${dd.getDate()}（${dow[dd.getDay()]}）`:v}h+=`<td>${esc(v)}${c.key==='project'?staleBadge(d,'production'):''}</td>`}});
-      const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
-      h+=`<td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" ${chk?'checked':''} onchange="Prod.toggleInvoiced('${d.id}',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Prod.editProd('${d.id}')">編集</button></td></tr>`});
-    h+='</tbody></table></div>';el.innerHTML=h;
-    el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(prodSort.col===c)prodSort.asc=!prodSort.asc;else{prodSort.col=c;prodSort.asc=true}render()}});
-    el.querySelectorAll('[data-st]').forEach(btn=>{btn.onclick=()=>{const v=btn.dataset.st;adminStatusFilter=v||null;render()}});
-  }
 
   // ===== 出荷済アーカイブ =====
   function renderArchive(){
@@ -4000,8 +3908,6 @@ const Proj = (function(){
   // ===== 企画の状態（旧グローバル変数→IIFE内ローカルに隔離） =====
   let projData=[],rentalsData=[],inventoryItems=[];
   let curProjView='gantt';
-  let projSort={col:null,asc:true};
-  let projAdminFilter=null;
   let projDoneSort={col:'_endDate',asc:false};
   let ganttStatusFilter='';
   let ganttStart=null,ganttDays=28;
@@ -4132,10 +4038,9 @@ const Proj = (function(){
 
   // ===== 描画 =====
   function render(){
-    if(curProjView==='gantt'){$('projGantt').classList.remove('hidden');$('projDoneView').classList.add('hidden');$('projArchivedView').classList.add('hidden');$('projAdminView').classList.add('hidden');renderGantt()}
-    else if(curProjView==='projDone'){$('projGantt').classList.add('hidden');$('projDoneView').classList.remove('hidden');$('projArchivedView').classList.add('hidden');$('projAdminView').classList.add('hidden');renderProjDone()}
-    else if(curProjView==='projArchived'){$('projGantt').classList.add('hidden');$('projDoneView').classList.add('hidden');$('projArchivedView').classList.remove('hidden');$('projAdminView').classList.add('hidden');renderProjArchived()}
-    else{$('projGantt').classList.add('hidden');$('projDoneView').classList.add('hidden');$('projArchivedView').classList.add('hidden');$('projAdminView').classList.remove('hidden');renderProjAdmin()}
+    if(curProjView==='gantt'){$('projGantt').classList.remove('hidden');$('projDoneView').classList.add('hidden');$('projArchivedView').classList.add('hidden');renderGantt()}
+    else if(curProjView==='projDone'){$('projGantt').classList.add('hidden');$('projDoneView').classList.remove('hidden');$('projArchivedView').classList.add('hidden');renderProjDone()}
+    else if(curProjView==='projArchived'){$('projGantt').classList.add('hidden');$('projDoneView').classList.add('hidden');$('projArchivedView').classList.remove('hidden');renderProjArchived()}
   }
 
   // ===== ガントチャート =====
@@ -4259,7 +4164,7 @@ const Proj = (function(){
   }
   function unifiedSearch(q){
     q=(q||'').toLowerCase();
-    const view=document.querySelector('#projGantt:not(.hidden), #projDoneView:not(.hidden), #projAdminView:not(.hidden)');
+    const view=document.querySelector('#projGantt:not(.hidden), #projDoneView:not(.hidden)');
     if(!view)return;
     view.querySelectorAll('.gantt-row[data-id], .prj-card[data-id], tbody tr').forEach(el=>{
       el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
@@ -4367,30 +4272,6 @@ const Proj = (function(){
     setTimeout(()=>{_changingStatus=false},1500);
   }
 
-  // ===== 管理テーブル =====
-  function renderProjAdmin(){
-    const el=$('projAdminView');let items=projData.filter(d=>d.status!=='終了'&&d.status!=='完了');
-    const allCount=items.length;
-    const stCounts={};items.forEach(d=>{const s=d.status||'未設定';stCounts[s]=(stCounts[s]||0)+1});
-    if(projAdminFilter)items=items.filter(d=>d.status===projAdminFilter);
-    if(projSort.col)items.sort((a,b)=>{let va=String(a[projSort.col]||'').toLowerCase(),vb=String(b[projSort.col]||'').toLowerCase();return va<vb?(projSort.asc?-1:1):va>vb?(projSort.asc?1:-1):0});
-    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'venue',label:'会場'},{key:'date_load_in',label:'搬入'},{key:'date_event',label:'本番'},{key:'date_teardown',label:'撤去'},{key:'status',label:'ステータス'}];
-    const stBtn=(label,val)=>{const on=projAdminFilter===val?' on':'';const cnt=val?stCounts[val]||0:allCount;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`};
-    let h=`<div class="fv-sum">${stBtn('すべて',null)}${stBtn('見積中','見積中')}${stBtn('受注','受注')}${stBtn('準備中','準備中')}${stBtn('現場中','現場中')}${stBtn('レンタル中','レンタル中')}${stBtn('メンテ中','メンテ中')}<button class="av-add" style="margin-left:auto" onclick="App.nav('cases');Cases.tab('form')">＋ 案件から登録</button><button class="av-add" onclick="Proj.moneySum()">¥ 合計</button></div>`;
-    h+='<div class="tbl-wrap"><table><thead><tr>';cols.forEach(c=>{const a=projSort.col===c.key?(projSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});h+='<th>伝票</th><th>操作</th></tr></thead><tbody>';
-    items.forEach(d=>{h+=`<tr data-id="${d.id}" onclick="Proj.editProj('${d.id}')" style="cursor:pointer">`;
-      cols.forEach(c=>{let v=d[c.key]||'';
-      if(c.key==='status'){const opts=['見積中','受注','準備中','現場中','レンタル中','メンテ中','終了','見送り'];
-      h+=`<td onclick="event.stopPropagation()"><select onchange="Proj.changeProjStatus('${d.id}',this.value)" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer">`;
-      opts.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});
-      h+='</select></td>'}else{if(c.key.startsWith('date_')&&v){v=String(v).split(',').map(s=>{const dd=parseD(s.trim());
-      return dd?`${dd.getMonth()+1}/${dd.getDate()}`:s}).join(', ')}h+=`<td>${esc(v)}${c.key==='project'?staleBadge(d,'project'):''}</td>`}});
-      const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
-      h+=`<td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" ${chk?'checked':''} onchange="Proj.toggleProjInvoiced('${d.id}',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Proj.editProj('${d.id}')">編集</button></td></tr>`});
-    h+='</tbody></table></div>';el.innerHTML=h;
-    el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(projSort.col===c)projSort.asc=!projSort.asc;else{projSort.col=c;projSort.asc=true}render()}});
-    el.querySelectorAll('[data-st]').forEach(btn=>{btn.onclick=()=>{const v=btn.dataset.st;projAdminFilter=v||null;render()}});
-  }
 
   // ===== 現場詳細 =====
   function viewProj(id){const d=projData.find(x=>String(x.id)===String(id));
