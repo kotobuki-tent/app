@@ -3373,15 +3373,35 @@ function moneySummary(){
   document.body.appendChild(bg);
   bg.querySelector('.mny-close').onclick=()=>bg.remove();
   bg.onclick=e=>{if(e.target===bg)bg.remove()};
-  moneyFetch().then(r=>{
+  // 内訳は案件の部門構成（単独部門はその部門に、またぎは複合）。一案件＝一金額なので按分はしない＝合計は必ず一致
+  const grab=d=>fetch(API+'?dept='+d+'&action=read').then(r=>r.json()).catch(()=>null);
+  Promise.all([grab('cases'),grab('production'),grab('project'),grab('sales')]).then(([cs,od,pj,sl])=>{
     const el=bg.querySelector('#mnyBody');if(!el)return;
-    if(!r){el.textContent='案件データの取得に失敗しました';return}
-    const ORDER=['見積中','受注','準備中','現場中','レンタル中','メンテ中'];
-    const keys=Object.keys(r.by).sort((x,y)=>{const ix=ORDER.indexOf(x),iy=ORDER.indexOf(y);return(ix<0?99:ix)-(iy<0?99:iy)});
-    let h=keys.map(st=>'<div style="display:flex;justify-content:space-between;padding:4px 0;color:var(--text)"><span>'+esc(st)+'（'+r.by[st].n+'件）</span><span style="font-variant-numeric:tabular-nums">¥'+r.by[st].sum.toLocaleString()+'</span></div>').join('');
-    if(!keys.length)h='<div style="color:var(--text-faint)">金額が入っている案件がありません</div>';
-    h+='<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-weight:700;color:var(--text)"><span>合計（'+r.cnt+'件／'+r.liveCount+'案件中）</span><span style="font-variant-numeric:tabular-nums">¥'+r.total.toLocaleString()+'</span></div>';
-    if(r.quote&&r.quote.n)h+='<div style="display:flex;justify-content:space-between;padding-top:6px;color:var(--text-dim);font-size:13px"><span>見積中（'+r.quote.n+'件・合計外）</span><span style="font-variant-numeric:tabular-nums">¥'+r.quote.sum.toLocaleString()+'</span></div>';
+    if(!cs||!Array.isArray(cs.data)){el.textContent='案件データの取得に失敗しました';return}
+    const isT=v=>v===true||v==='true'||v==='TRUE';
+    const live=cs.data.filter(c=>!isT(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
+    const depts={};
+    [[od,'生'],[pj,'企'],[sl,'販']].forEach(([j,k])=>{const rows=(j&&j.data)||[];rows.forEach(r=>{
+      const cid=String(r.case_id||'').trim();if(!cid)return;
+      if(r.status==='見送り'||isT(r.archived))return;
+      (depts[cid]=depts[cid]||new Set()).add(k);
+    })});
+    const groups={'生':{label:'生産のみ',sum:0,n:0},'企':{label:'企画制作のみ',sum:0,n:0},'販':{label:'販売のみ',sum:0,n:0},'mix':{label:'部門またぎ',sum:0,n:0},'none':{label:'明細なし',sum:0,n:0}};
+    let total=0,cnt=0;const quote={sum:0,n:0};
+    live.forEach(c=>{const a=Number(c.amount);if(!a||isNaN(a))return;
+      if((c.status||'')==='見積中'){quote.sum+=a;quote.n++;return}
+      const ds=depts[String(c.id)];
+      const key=(!ds||!ds.size)?'none':(ds.size>1?'mix':[...ds][0]);
+      groups[key].sum+=a;groups[key].n++;total+=a;cnt++;
+    });
+    _moneyTotal=total;updateMoneyBadges();
+    let h='';
+    ['生','企','販','mix','none'].forEach(k=>{const g=groups[k];if(!g.n)return;
+      h+='<div style="display:flex;justify-content:space-between;padding:4px 0;color:var(--text)"><span>'+g.label+'（'+g.n+'件）</span><span style="font-variant-numeric:tabular-nums">¥'+g.sum.toLocaleString()+'</span></div>';
+    });
+    if(!cnt)h='<div style="color:var(--text-faint)">金額が入っている案件がありません</div>';
+    h+='<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-weight:700;color:var(--text)"><span>合計（'+cnt+'件／'+live.length+'案件中）</span><span style="font-variant-numeric:tabular-nums">¥'+total.toLocaleString()+'</span></div>';
+    if(quote.n)h+='<div style="display:flex;justify-content:space-between;padding-top:6px;color:var(--text-dim);font-size:13px"><span>見積中（'+quote.n+'件・合計外）</span><span style="font-variant-numeric:tabular-nums">¥'+quote.sum.toLocaleString()+'</span></div>';
     el.innerHTML=h;
   });
 }
