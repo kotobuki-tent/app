@@ -3784,7 +3784,7 @@ const Prod = (function(){
     toast('アーカイブに送りました');
     closeProdMo();
     render();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyArch=false},1500);
   }
   function unarchiveProd(id){
@@ -3797,7 +3797,7 @@ const Prod = (function(){
     toast('アーカイブから戻しました');
     closeProdMo();
     render();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyArch=false},1500);
   }
   function toggleInvoiced(id,checked,el){
@@ -3814,7 +3814,7 @@ const Prod = (function(){
     const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;
     d.status=newSt;
     fireAndForget({dept:'production',action:'save',id:id,status:newSt});
-    setTimeout(moneyFetch,4000);
+    setTimeout(moneyFetch,8000);
     toast(newSt+'に変更しました');
     render();
   }
@@ -3829,7 +3829,7 @@ const Prod = (function(){
     $('prodViewContent').innerHTML=h;
     const tgl=$('stToggle'),opts=$('stOpts');
     if(tgl&&opts)tgl.onclick=()=>{tgl.classList.toggle('open');opts.classList.toggle('open')};
-    $('prodViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){tgl.classList.remove('open');opts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});setTimeout(moneyFetch,4000);toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProd(id);render()}});
+    $('prodViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){tgl.classList.remove('open');opts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});setTimeout(moneyFetch,8000);toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProd(id);render()}});
     renderLinkedFiles(d);$('prodViewBg').classList.add('show');
 requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
 
@@ -3938,7 +3938,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
     toast('保存しました');
     closeProdMo();
     render();
-    if(isNew)setTimeout(loadAll,3000);
+    if(isNew)setTimeout(loadAll,8000);
     setTimeout(()=>{_savingProd=false},1500);
   }
 
@@ -3953,7 +3953,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
     toast('削除しました');
     closeProdMo();
     render();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDel=false},1500);
   }
 
@@ -4308,7 +4308,7 @@ const Proj = (function(){
     toast('アーカイブに送りました');
     closeProjMo();
     render();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyArch=false},1500);
   }
   function unarchiveProj(id){
@@ -4321,7 +4321,7 @@ const Proj = (function(){
     toast('アーカイブから戻しました');
     closeProjMo();
     render();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyArch=false},1500);
   }
   function toggleProjInvoiced(id,checked,el){
@@ -4340,7 +4340,7 @@ const Proj = (function(){
     _changingStatus=true;
     d.status=newSt;
     fireAndForget({dept:'project',action:'save',id:id,status:newSt});
-    setTimeout(moneyFetch,4000);
+    setTimeout(moneyFetch,8000);
     cascadeRentalStatus(d.project,newSt);
     toast(newSt+'に変更しました');
     render();
@@ -4556,7 +4556,7 @@ const Proj = (function(){
     toast('保存しました');
     closeProjMo();
     render();
-    if(isNew)setTimeout(loadAll,3000);
+    if(isNew)setTimeout(loadAll,8000);
     setTimeout(()=>{_savingProj=false},1500);
   }
 
@@ -4571,7 +4571,7 @@ const Proj = (function(){
     toast('削除しました');
     closeProjMo();
     render();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDel=false},1500);
   }
 
@@ -4633,7 +4633,7 @@ const Proj = (function(){
     _changingStatus=true;
     d.status=newSt;
     fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});
-    setTimeout(moneyFetch,4000);
+    setTimeout(moneyFetch,8000);
     cascadeRentalStatus(d.project,newSt);
     if(sendMaint){
       const targets=rentalsData.filter(r=>r.client_name===d.project&&(r.status==='貸出中'||r.status==='予約'));
@@ -4689,7 +4689,7 @@ const Proj = (function(){
     fireAndForget({dept:'inventory',action:'delete_rental',id:id});
     toast('削除しました');
     $('projViewBg').classList.remove('show');
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyRental=false},1500);
   }
 
@@ -4954,7 +4954,7 @@ const Inv = (function(){
     fireAndForget({action:'delete_item',id});
     items=items.filter(x=>x.id!==id);
     toast('削除しました');renderItems();renderAvail();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDel=false},1500);
   }
 
@@ -5118,7 +5118,7 @@ const Inv = (function(){
     fireAndForget({action:'delete_rental',id});
     rentals=rentals.filter(x=>x.id!==id);
     toast('削除しました');renderRentals();renderMaint();renderAvail();renderDiscard();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDel=false},1500);
   }
   // 廃棄は二段構え：まず「廃棄予定」に入れる（可逆・保有数そのまま）→ リストで確定して初めて消す
@@ -5166,7 +5166,7 @@ const Inv = (function(){
     rentals=rentals.filter(x=>x.id!==id);
     toast('廃棄しました'+(it?'（保有数を'+n+'減らしました）':''));
     renderItems();renderRentals();renderMaint();renderAvail();renderDiscard();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDiscard=false},1500);
   }
 
@@ -5714,7 +5714,7 @@ const Veh = (function(){
     toast('削除しました');
     closeVMo();
     render();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDel=false},1500);
   }
 
@@ -6098,7 +6098,7 @@ const Sales = (function(){
     toast('アーカイブに送りました');
     closeMo();
     render();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyArch=false},1500);
   }
   function unarchiveSales(id){
@@ -6111,7 +6111,7 @@ const Sales = (function(){
     toast('アーカイブから戻しました');
     closeMo();
     render();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyArch=false},1500);
   }
 
@@ -6213,7 +6213,7 @@ const Sales = (function(){
     allEntries[idx]={...allEntries[idx],status:newSt,updated_at:today};
     _setCache('sales',{entries:allEntries});
     apiPost({action:'save',id,status:newSt});
-    setTimeout(moneyFetch,4000);
+    setTimeout(moneyFetch,8000);
     render();toast('ステータスを更新しました');
     setTimeout(()=>{_changingStatus=false},1500);
   }
@@ -6237,7 +6237,7 @@ const Sales = (function(){
     apiPost({action:'delete',id});
     closeMo();
     render();refreshDatalists();toast('削除しました');
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDel=false},1500);
   }
 
@@ -6415,7 +6415,7 @@ const Labor = (function(){
     _setCache('labor',{jobs:allJobs});
     fireAndForget({dept:'labor',action:on?'archive':'unarchive',id:job.id});
     renderTable();toast(on?'工数アーカイブへ移動しました':'アーカイブ解除しました');
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
   }
   function toggleArchive(){
     const job=allJobs.find(x=>String(x.id)===String(detailId));if(!job)return;
@@ -6693,7 +6693,7 @@ const Daily = (function(){
     fireAndForget({dept:'daily',action:'delete',id:id});
     _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
     toast('削除しました');renderSavedEntries();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDel=false},1500);
   }
 
@@ -7066,7 +7066,7 @@ const Card = (function(){
     loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:''});
     _sel=''; _wk=monday(new Date()); // 記録後は選択解除＋今週を表示
     sndOK();
-    render(); setTimeout(loadAll,3000);
+    render(); setTimeout(loadAll,8000);
   }
   function ret(){
     const open=openLoan(); if(!open){ctoast('持ち出し中の記録がありません');sndError();return;}
@@ -7076,7 +7076,7 @@ const Card = (function(){
     _sel='';                 // 返却後は持ち出す人の選択を解除
     sndOK();
     ctoast('<span class="ct-h">返却しました</span><br>伝票に氏名・用途を明記の上、経理まで速やかに提出してください',true,5000,true);
-    render(); setTimeout(loadAll,3000);
+    render(); setTimeout(loadAll,8000);
   }
   return { loadAll, render, out, ret, sel, clearSel, toggleExtra, prevWeek, nextWeek, thisWeek };
 })();
@@ -7342,7 +7342,7 @@ const Wb = (function(){
       fire({action:'save_note', date_from:from, date_to:to, person:name, text:head, memo, category:_newCat});
       notes.push({id:'tmp_'+stamp+'_'+i, date_from:from, date_to:to, person:name, text:head, memo, category:_newCat});
     });
-    closeNew(); render(); setTimeout(loadAll,3000);
+    closeNew(); render(); setTimeout(loadAll,8000);
   }
   function saveNote(){
     let from=document.getElementById('wbmFrom').value, to=document.getElementById('wbmTo').value||from;
@@ -7362,7 +7362,7 @@ const Wb = (function(){
       notes=notes.filter(n=>String(n.id)!==String(_edit.id));
       notes.push(Object.assign({id:'tmp_'+Date.now()}, newRec));
       fire({ action:'save_note', date_from:from, date_to:to, person:_edit.person, text:head, memo, category:_edit.category });
-      closeModal(); render(); setTimeout(loadAll,3000);
+      closeModal(); render(); setTimeout(loadAll,8000);
       return;
     }
     if(guard())return;
@@ -7370,7 +7370,7 @@ const Wb = (function(){
     fire({ action:'save_note', id:_edit.id||undefined, date_from:from, date_to:to, person:_edit.person, text:head, memo, category:_edit.category });
     if(_edit.id){ const i=notes.findIndex(n=>String(n.id)===String(_edit.id)); if(i>=0) notes[i]=rec; else notes.push(rec); }
     else notes.push(rec);
-    closeModal(); render(); setTimeout(loadAll,3000);
+    closeModal(); render(); setTimeout(loadAll,8000);
   }
   function delNote(){
     if(!_edit.id)return;
@@ -7381,7 +7381,7 @@ const Wb = (function(){
     if(isTmp(_edit.id)){ if(dn) _tombKey.add(nkey(dn)); }   // 追加直後(tmp)＝real id不明→内容キーで墓標。reconcileで実ノートを実IDで削除
     else _tombN.add(String(_edit.id));
     notes=notes.filter(n=>String(n.id)!==String(_edit.id));
-    closeModal(); render(); setTimeout(loadAll,3000);
+    closeModal(); render(); setTimeout(loadAll,8000);
   }
   function addPerson(){
     const m=document.getElementById('wbPickModal'); if(!m)return;
@@ -7400,7 +7400,7 @@ const Wb = (function(){
     const id='tmp_'+Date.now();
     fire({ action:'add_person', name });
     people.push({ id, name, sort:(people.reduce((a,p)=>Math.max(a,p.sort||0),0))+1 });
-    closePick(); render(); setTimeout(loadAll,3000);
+    closePick(); render(); setTimeout(loadAll,8000);
   }
   function editPerson(pid){
     const p=people.find(x=>x.id===pid); if(!p)return;
@@ -7413,7 +7413,7 @@ const Wb = (function(){
       fire({ action:'del_person', id:p.id });
       if(!isTmp(p.id)) _tombP.add(String(p.id));
       people=people.filter(x=>x.id!==pid);
-      render(); setTimeout(loadAll,3000);
+      render(); setTimeout(loadAll,8000);
       return;
     }
     if(name===p.name)return;
@@ -7421,7 +7421,7 @@ const Wb = (function(){
     fire({ action:'rename_person', id:p.id, name });
     notes.forEach(n=>{ if(n.person===p.name) n.person=name; });
     p.name=name;
-    render(); setTimeout(loadAll,3000);
+    render(); setTimeout(loadAll,8000);
   }
 
   function movePerson(pid, dir){
@@ -7429,7 +7429,7 @@ const Wb = (function(){
     const j=i+dir; if(j<0||j>=people.length)return;   // 端は何もしない
     const t=people[i]; people[i]=people[j]; people[j]=t;
     fire({ action:'reorder', order:people.filter(p=>!isTmp(p.id)).map(p=>p.id) });   // 実IDのみ（tmpを送るとsortがずれる）
-    render(); setTimeout(loadAll,3000);
+    render(); setTimeout(loadAll,8000);
   }
 
   // マウスオーバーで見出し＋詳細メモをふわっと表示（PC用。タッチはタップでモーダル）
@@ -7767,7 +7767,7 @@ const Cases = (function(){
   }
 
   function _invalidateDepts(){ App._loaded.prod=false; App._loaded.proj=false; App._loaded.sales=false; }
-  function setStatus(id,st){ const c=_find(id); if(c){ logStatus(c,c.status,st); c.status=st; } fireAndForget({dept:'cases',action:'status',id,status:st}); _invalidateDepts(); toast('ステータスを'+st+'に変更'); render(); setTimeout(moneyFetch,4000); }
+  function setStatus(id,st){ const c=_find(id); if(c){ logStatus(c,c.status,st); c.status=st; } fireAndForget({dept:'cases',action:'status',id,status:st}); _invalidateDepts(); toast('ステータスを'+st+'に変更'); render(); setTimeout(moneyFetch,8000); }
   function logStatus(c,from,to){ if(from===to)return; try{ const k='cases_slog'; const a=JSON.parse(localStorage.getItem(k)||'[]'); a.unshift({name:c.name||c.id,from:from||'',to:to,ts:Date.now()}); localStorage.setItem(k,JSON.stringify(a.slice(0,100))); }catch(e){} }
   function fmtTs(ts){ try{ const d=new Date(ts); return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }catch(e){return ''} }
   function openSlog(){ let a=[]; try{a=JSON.parse(localStorage.getItem('cases_slog')||'[]')}catch(e){}
@@ -7775,7 +7775,7 @@ const Cases = (function(){
     $('caseSlogBg').classList.add('show'); }
   function closeSlog(){ $('caseSlogBg').classList.remove('show'); }
   function toggleInv(id){ const c=_find(id); if(!c)return; const nv=!_inv(c.invoiced); c.invoiced=nv; fireAndForget({dept:'cases',action:'invoiced',id,invoiced:nv}); _invalidateDepts(); }
-  function archive(id){ if(!confirm('この案件をアーカイブへ移しますか？（一覧から見えなくなります）'))return; const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); setTimeout(moneyFetch,4000); }
+  function archive(id){ if(!confirm('この案件をアーカイブへ移しますか？（一覧から見えなくなります）'))return; const c=_find(id); if(c)c.archived=true; fireAndForget({dept:'cases',action:'archive',id}); toast('アーカイブしました'); render(); setTimeout(moneyFetch,8000); }
   // 締め待ち（完了・伝票済）を一括アーカイブ。状態変更の代行ではなく、現場が完了済のものの書類整理。
   function archiveSettled(){
     const settled=_cases.filter(c=>!_arch(c.archived)&&c.status==='完了'&&_inv(c.invoiced));
@@ -7783,9 +7783,9 @@ const Cases = (function(){
     if(!confirm('締め待ち '+settled.length+'件を一括アーカイブします。\n（現場が完了にした・伝票済の案件を書類整理）\n\nよろしいですか？'))return;
     settled.forEach((c,i)=>{ c.archived=true; setTimeout(()=>fireAndForget({dept:'cases',action:'archive',id:c.id}), i*120); });
     toast(settled.length+'件をアーカイブしました'); render();
-    setTimeout(loadAll, settled.length*120+2500);
+    setTimeout(loadAll, settled.length*120+8000);
   }
-  function unarchive(id){ if(!confirm('この案件を一覧に戻しますか？'))return; const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); setTimeout(moneyFetch,4000); }
+  function unarchive(id){ if(!confirm('この案件を一覧に戻しますか？'))return; const c=_find(id); if(c)c.archived=false; fireAndForget({dept:'cases',action:'unarchive',id}); toast('元に戻しました'); render(); setTimeout(moneyFetch,8000); }
   function del(id){ if(!confirm('この案件を削除しますか？（生産/企画制作の明細は残ります）'))return; _cases=_cases.filter(c=>String(c.id)!==String(id)); fireAndForget({dept:'cases',action:'delete',id}); toast('削除しました'); render(); }
   function search(v){ _q=v; const qq=v.trim().toLowerCase(); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||tr.textContent.toLowerCase().includes(qq))?'':'none'; }); }
   function sortBy(col){ if(_sort.col===col)_sort.asc=!_sort.asc; else {_sort.col=col;_sort.asc=true;} render(); }
@@ -7818,7 +7818,7 @@ const Cases = (function(){
     const chdr={order_no:upd.order_no, estimate_no:upd.estimate_no, client:upd.client, person:upd.contact, our_person:upd.our_person, amount:upd.amount};
     kids.forEach((k,i)=>setTimeout(()=>fireAndForget({dept:k.dept,action:'save',id:k.id,...chdr}), i*250));
     _invalidateDepts();
-    toast('案件を更新しました'); closeEdit(); render(); setTimeout(moneyFetch,4000); }
+    toast('案件を更新しました'); closeEdit(); render(); setTimeout(moneyFetch,8000); }
 
   const JVH=['load_in','setup','event','teardown','lend','back','deliv']; // 企画制作で使う車両フェーズ
   function dateBlock(id,label){
@@ -8028,10 +8028,10 @@ const Cases = (function(){
     fireAndForget({dept:'cases',action:'save',...parent});
     posts.forEach((b,i)=>setTimeout(()=>fireAndForget(b), i*300));
     _cases.unshift(parent);
-    toast(`案件を登録しました（${posts.length}件／${case_id}）`); setTimeout(moneyFetch,4000);
+    toast(`案件を登録しました（${posts.length}件／${case_id}）`); setTimeout(moneyFetch,8000);
     App._loaded['prod']=false; App._loaded['proj']=false; App._loaded['sales']=false;
     _tab='list'; render();
-    setTimeout(loadAll,3000);
+    setTimeout(loadAll,8000);
   }
 
   function init(){}
