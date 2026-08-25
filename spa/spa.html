@@ -1714,10 +1714,16 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-qual .qual-hint{font-size:12px;color:var(--text-dim);margin-top:12px}
   #view-qual .qm-dup{width:100%;background:#fff8e6;border:1px solid #e6c96b;border-radius:8px;padding:8px 12px;font-size:12.5px;color:#7a5c00;margin:-4px 0 10px}
   #view-qual .qm-dup b{cursor:pointer;text-decoration:underline}
-  #qualMoBody .qcat{font-size:12px;font-weight:800;color:var(--text-dim);margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:3px}
-  #qualMoBody .qcat:first-child{margin-top:0}
-  #qualMoBody label.qrow{display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:13.5px;cursor:pointer;color:var(--text)}
-  #qualMoBody label.qrow input{width:17px;height:17px;accent-color:var(--accent);flex-shrink:0}
+  #qualMoBody .mrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 4px;border-bottom:1px solid var(--border);font-size:14px;color:var(--text)}
+  #qualMoBody .mrow .cat{font-size:11px;color:var(--text-dim);margin-left:8px}
+  #qualMoBody .mrow .rm{background:none;border:none;color:#c0392b;font-size:15px;cursor:pointer;padding:2px 8px}
+  #qualMoBody .mempty{padding:14px 4px;color:var(--text-dim);font-size:13px}
+  #qualMoBody .madd{margin-top:14px}
+  #qualMoBody .madd select{width:100%;padding:10px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:600 14px/1.3 'Noto Sans JP',sans-serif}
+  #qualMoBody .mnew{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  #qualMoBody .mnew input{flex:1;min-width:150px;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:400 13.5px/1.3 'Noto Sans JP',sans-serif}
+  #qualMoBody .mnew select{padding:9px 8px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:400 13px/1.3 'Noto Sans JP',sans-serif}
+  #qualMoBody .mnew button{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;cursor:pointer;font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text)}
   #qualMoPerson{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:400 14px/1.3 'Noto Sans JP',sans-serif;margin-bottom:6px}
 </style>
   <div class="sub-tabs" id="qualTabs">
@@ -8515,35 +8521,90 @@ const Qual = (function(){
     el.innerHTML=h;
     applySearch();
   }
-  // ===== 保有資格モーダル =====
+  // ===== 保有資格モーダル（選択式: 保有分だけ並べ、追加はプルダウン。表に無い資格はその場でマスタ登録） =====
+  let _moItems=[], _moNewQuals=[];
   function openMo(emp){
-    _moEmp=emp?String(emp):null;
-    const qs=sortedQuals();
-    let h='';
+    _moEmp=emp?String(emp):null; _moNewQuals=[];
+    let head='';
     if(_moEmp){
       const s2=staffList.find(x=>String(x.employee_no)===_moEmp);
       $('qualMoTitle').textContent=(s2?s2.name:'')+'　の保有資格';
+      _moItems=holdingsOf(_moEmp).map(h=>({qual_id:String(h.qual_id),name:qname(h.qual_id)}));
     }else{
       $('qualMoTitle').textContent='人を追加';
+      _moItems=[];
       const carded=cardedPeople().map(x=>String(x.employee_no));
       const cands=staffList.filter(x=>!carded.includes(String(x.employee_no)));
-      h+='<select id="qualMoPerson"><option value="">名前を選択...</option>'
+      head='<select id="qualMoPerson"><option value="">名前を選択...</option>'
         +cands.map(x=>'<option value="'+esc(String(x.employee_no))+'">'+esc(x.name)+'</option>').join('')+'</select>';
     }
-    const owned=_moEmp?holdingsOf(_moEmp).map(x=>String(x.qual_id)):[];
-    _moOrig=owned.slice();
-    CATS.forEach(cat=>{
-      const items=qs.filter(q=>(q.category||'その他')===cat);
-      if(!items.length)return;
-      h+='<div class="qcat">'+cat+'</div>';
-      items.forEach(q=>{
-        const on=owned.includes(String(q.id));
-        h+='<label class="qrow"><input type="checkbox" data-qid="'+esc(String(q.id))+'"'+(on?' checked':'')+'>'+esc(q.name)+'</label>';
-      });
-    });
-    $('qualMoBody').innerHTML=h;
+    _moOrig=_moItems.map(x=>x.qual_id);
+    $('qualMoBody').innerHTML=head+'<div id="qualMoList"></div>';
+    renderMoList();
     $('qualMoBg').classList.add('show');
     requestAnimationFrame(()=>{$('qualMoBg').scrollTop=0;const m=$('qualMoBg').querySelector('.mo');if(m)m.scrollTop=0;});
+  }
+  function renderMoList(){
+    const el=$('qualMoList'); if(!el)return;
+    const held=_moItems.map(x=>x.qual_id);
+    let h='';
+    if(_moItems.length){
+      _moItems.forEach(it=>{
+        const q=quals.find(x=>String(x.id)===it.qual_id);
+        h+='<div class="mrow"><span>'+esc(it.name)
+          +(q&&q.category?'<span class="cat">'+esc(q.category)+'</span>':'<span class="cat">新規</span>')
+          +'</span><button class="rm" onclick="Qual.moRemove(\''+esc(it.qual_id)+'\')">✕</button></div>';
+      });
+    }else h+='<div class="mempty">まだ資格がありません。下から選んで追加してください。</div>';
+    h+='<div class="madd"><select onchange="Qual.moPick(this.value)"><option value="">＋ 資格を追加...</option>';
+    CATS.forEach(cat=>{
+      const items=sortedQuals().filter(q=>(q.category||'その他')===cat&&!held.includes(String(q.id)));
+      if(!items.length)return;
+      h+='<optgroup label="'+cat+'">'+items.map(q=>'<option value="'+esc(String(q.id))+'">'+esc(q.name)+'</option>').join('')+'</optgroup>';
+    });
+    h+='</select></div>';
+    h+='<div class="mnew"><input type="text" id="qualMoNewName" placeholder="一覧に無い資格はここに入力">'
+      +'<select id="qualMoNewCat">'+CATS.map(c=>'<option'+(c==='その他'?' selected':'')+'>'+c+'</option>').join('')+'</select>'
+      +'<button onclick="Qual.moAddNew()">追加</button></div>'
+      +'<div id="qualMoDup" class="qm-dup" style="display:none;margin-top:8px"></div>';
+    el.innerHTML=h;
+    $('qualMoNewName').addEventListener('input',moCheckDup);
+  }
+  function moPick(qid){
+    if(!qid)return; qid=String(qid);
+    if(!_moItems.some(x=>x.qual_id===qid))_moItems.push({qual_id:qid,name:qname(qid)});
+    renderMoList();
+  }
+  function moRemove(qid){
+    qid=String(qid);
+    _moItems=_moItems.filter(x=>x.qual_id!==qid);
+    _moNewQuals=_moNewQuals.filter(x=>String(x.id)!==qid);
+    renderMoList();
+  }
+  function moCheckDup(){
+    const box=$('qualMoDup'); if(!box)return;
+    const v=$('qualMoNewName').value.trim();
+    if(v.length<2){box.style.display='none';return}
+    const ko=x=>String(x).replace(/[^一-鿿]/g,''); const kv=ko(v);
+    const held=_moItems.map(x=>x.qual_id);
+    const hits=quals.filter(q=>{
+      const t=String(q.name)+' '+String(q.notes||'');
+      return t.includes(v)||v.includes(String(q.name))||(kv.length>0&&ko(t).includes(kv));
+    }).slice(0,4);
+    if(!hits.length){box.style.display='none';return}
+    box.innerHTML='もしかして：'+hits.map(q=>held.includes(String(q.id))
+      ?'<span style="color:#999">'+esc(q.name)+'（追加済み）</span>'
+      :'<b onclick="Qual.moPick(\''+esc(String(q.id))+'\')">'+esc(q.name)+'</b>').join('　');
+    box.style.display='';
+  }
+  function moAddNew(){
+    const name=$('qualMoNewName').value.trim(); if(!name)return;
+    const ex=quals.find(q=>String(q.name)===name);
+    if(ex){moPick(ex.id);return}
+    const id='Q'+Math.random().toString(16).slice(2,10);
+    _moNewQuals.push({id:id,name:name,category:$('qualMoNewCat').value});
+    _moItems.push({qual_id:id,name:name});
+    renderMoList();
   }
   function closeMo(){$('qualMoBg').classList.remove('show');_moEmp=null;}
   let _moBusy=false;
@@ -8555,17 +8616,25 @@ const Qual = (function(){
       if(!emp){toast('名前を選択してください',true);return}
     }
     _moBusy=true; setTimeout(()=>{_moBusy=false},1500);
-    const checked=[...document.querySelectorAll('#qualMoBody input[data-qid]:checked')].map(c=>String(c.dataset.qid));
-    const added=checked.filter(q=>!_moOrig.includes(q));
-    const removed=_moOrig.filter(q=>!checked.includes(q));
+    const cur=_moItems.map(x=>x.qual_id);
+    const added=cur.filter(q=>!_moOrig.includes(q));
+    const removed=_moOrig.filter(q=>!cur.includes(q));
+    let t=0;
+    // 新規資格を先にマスタへ（IDはクライアント発番なので保有の参照が切れない）
+    _moNewQuals.forEach(nq=>{
+      if(!cur.includes(String(nq.id)))return;
+      const srt=(quals.length+1)*10;
+      quals.push({id:nq.id,name:nq.name,category:nq.category,notes:'',sort:srt});
+      setTimeout(()=>fireAndForget({action:'save_qual',id:nq.id,name:nq.name,category:nq.category,notes:'',sort:srt}),t); t+=200;
+    });
     added.forEach((qid,i)=>{
       holdings.push({id:'tmp_'+Date.now()+'_'+i,employee_no:String(emp),qual_id:qid});
-      setTimeout(()=>fireAndForget({action:'save_holding',employee_no:emp,qual_id:qid}), i*200);
+      setTimeout(()=>fireAndForget({action:'save_holding',employee_no:emp,qual_id:qid}),t); t+=200;
     });
-    removed.forEach((qid,i)=>{
+    removed.forEach(qid=>{
       const ex=holdings.find(h=>String(h.employee_no)===String(emp)&&String(h.qual_id)===qid);
       if(ex){holdings=holdings.filter(h=>h!==ex);
-        if(String(ex.id).indexOf('tmp_')!==0)setTimeout(()=>fireAndForget({action:'delete_holding',id:ex.id}),(added.length+i)*200);}
+        if(String(ex.id).indexOf('tmp_')!==0){setTimeout(()=>fireAndForget({action:'delete_holding',id:ex.id}),t); t+=200;}}
     });
     if(added.length||removed.length){
       toast('保存しました');
@@ -8652,7 +8721,7 @@ const Qual = (function(){
     $('qualSearch').addEventListener('input',applySearch);
     const d=new Date();const el=$('qualPcDate');if(el)el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+dow[d.getDay()]+'）';
   }
-  return{loadAll:loadAll,render:render,init:init,openMo:openMo,closeMo:closeMo,saveMo:saveMo,saveMaster:saveMaster,delMaster:delMaster,editMaster:editMaster,clearForm:clearForm};
+  return{loadAll:loadAll,render:render,init:init,openMo:openMo,closeMo:closeMo,saveMo:saveMo,moPick:moPick,moRemove:moRemove,moAddNew:moAddNew,saveMaster:saveMaster,delMaster:delMaster,editMaster:editMaster,clearForm:clearForm};
 })();
 
 const App = {
