@@ -1701,12 +1701,24 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-qual .qual-card .nm{font-size:16px;font-weight:800;color:var(--text)}
   #view-qual .qual-card .sub{font-size:11.5px;color:var(--text-dim);margin:2px 0 10px}
   #view-qual .qual-card .chips{display:flex;flex-wrap:wrap;gap:5px}
-  #view-qual .qual-card .qc{font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:2px 9px;color:var(--text)}
-  #view-qual .qual-card .qc.more{background:none;border-style:dashed;color:var(--text-dim)}
+  #view-qual .qual-card .qc{font-size:11px;border:none;border-radius:99px;padding:3px 10px;font-weight:600}
+  #view-qual .qc.c-men{color:#b45309;background:rgba(180,83,9,.1)}
+  #view-qual .qc.c-gino{color:#2563eb;background:rgba(59,130,246,.1)}
+  #view-qual .qc.c-toku{color:#2a9d5a;background:rgba(42,157,90,.12)}
+  #view-qual .qc.c-anei{color:#ea580c;background:rgba(234,88,12,.1)}
+  #view-qual .qc.c-unten{color:#7c3aed;background:rgba(124,58,237,.1)}
+  #view-qual .qc.c-sono{color:#5a6270;background:rgba(90,98,112,.1)}
+  #view-qual .qual-card .qc.more{background:none;border:1px dashed var(--border);color:var(--text-dim);font-weight:400}
+  #view-qual .qual-card .cnt{display:inline-block;min-width:20px;text-align:center;font-size:11.5px;font-weight:800;color:var(--accent);background:var(--accent-dim);border-radius:99px;padding:2px 7px;margin-left:6px}
   #view-qual .qual-card.addp{display:flex;align-items:center;justify-content:center;border-style:dashed;color:var(--text-dim);font-weight:700;min-height:90px}
   #view-qual .qual-hint{font-size:12px;color:var(--text-dim);margin-top:12px}
   #qualMoBody .mrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 4px;border-bottom:1px solid var(--border);font-size:14px;color:var(--text)}
-  #qualMoBody .mrow .cat{font-size:11px;color:var(--text-dim);margin-left:8px}
+  #qualMoBody .mrow .cat{font-size:10.5px;margin-left:8px;border-radius:99px;padding:2px 8px;font-weight:600;background:rgba(90,98,112,.1);color:#5a6270}
+  #qualMoBody .mrow .cat.c-men{color:#b45309;background:rgba(180,83,9,.1)}
+  #qualMoBody .mrow .cat.c-gino{color:#2563eb;background:rgba(59,130,246,.1)}
+  #qualMoBody .mrow .cat.c-toku{color:#2a9d5a;background:rgba(42,157,90,.12)}
+  #qualMoBody .mrow .cat.c-anei{color:#ea580c;background:rgba(234,88,12,.1)}
+  #qualMoBody .mrow .cat.c-unten{color:#7c3aed;background:rgba(124,58,237,.1)}
   #qualMoBody .mrow .rm{background:none;border:none;color:#c0392b;font-size:15px;cursor:pointer;padding:2px 8px}
   #qualMoBody .mempty{padding:14px 4px;color:var(--text-dim);font-size:13px}
   #qualMoBody .madd{margin-top:14px}
@@ -8478,6 +8490,8 @@ const Qual = (function(){
   }
   function holdingsOf(emp){return holdings.filter(h=>String(h.employee_no)===String(emp))}
   function qname(qid){const q=quals.find(x=>String(x.id)===String(qid));return q?q.name:''}
+  const CAT_CLS={'免許':'c-men','技能講習':'c-gino','特別教育':'c-toku','安全衛生教育':'c-anei','運転免許':'c-unten','その他':'c-sono'};
+  function catCls(qid){const q=quals.find(x=>String(x.id)===String(qid));return CAT_CLS[q&&q.category]||'c-sono'}
   function cardedPeople(){
     const emps=[...new Set(holdings.map(h=>String(h.employee_no)))];
     return staffList.filter(s2=>emps.includes(String(s2.employee_no)));
@@ -8490,14 +8504,13 @@ const Qual = (function(){
     const people=cardedPeople();
     let h='<div class="qual-cards">';
     people.forEach(s2=>{
-      const hs=holdingsOf(s2.employee_no);
-      const names=hs.map(x=>qname(x.qual_id)).filter(Boolean);
-      const shown=names.slice(0,4);
+      const hs=holdingsOf(s2.employee_no).filter(x=>qname(x.qual_id));
+      const shown=hs.slice(0,4);
       h+='<div class="qual-card" data-name="'+esc(s2.name)+'" onclick="Qual.openMo(\''+esc(String(s2.employee_no))+'\')">'
-        +'<div class="nm">'+esc(s2.name)+'</div>'
-        +'<div class="sub">'+esc(s2.dept||'')+'　保有 '+names.length+'件</div>'
-        +'<div class="chips">'+shown.map(n=>'<span class="qc">'+esc(n)+'</span>').join('')
-        +(names.length>shown.length?'<span class="qc more">+'+(names.length-shown.length)+'</span>':'')
+        +'<div class="nm">'+esc(s2.name)+'<span class="cnt">'+hs.length+'</span></div>'
+        +'<div class="sub">'+esc(s2.dept||'')+'</div>'
+        +'<div class="chips">'+shown.map(x=>'<span class="qc '+catCls(x.qual_id)+'">'+esc(qname(x.qual_id))+'</span>').join('')
+        +(hs.length>shown.length?'<span class="qc more">+'+(hs.length-shown.length)+'</span>':'')
         +'</div></div>';
     });
     h+='<div class="qual-card addp" onclick="Qual.openMo(null)">＋ 人を追加</div>';
@@ -8537,7 +8550,7 @@ const Qual = (function(){
       _moItems.forEach(it=>{
         const q=quals.find(x=>String(x.id)===it.qual_id);
         h+='<div class="mrow"><span>'+esc(it.name)
-          +(q&&q.category?'<span class="cat">'+esc(q.category)+'</span>':'')
+          +(q&&q.category?'<span class="cat '+catCls(it.qual_id)+'">'+esc(q.category)+'</span>':'')
           +'</span><button class="rm" onclick="Qual.moRemove(\''+esc(it.qual_id)+'\')">✕</button></div>';
       });
     }else h+='<div class="mempty">まだ資格がありません。下から選んで追加してください。</div>';
