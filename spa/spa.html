@@ -1712,6 +1712,8 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-qual .qm-form .add{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 16px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
   #view-qual .tbl-wrap{overflow:auto;max-height:calc(100vh - 210px)}
   #view-qual .qual-hint{font-size:12px;color:var(--text-dim);margin-top:12px}
+  #view-qual .qm-dup{width:100%;background:#fff8e6;border:1px solid #e6c96b;border-radius:8px;padding:8px 12px;font-size:12.5px;color:#7a5c00;margin:-4px 0 10px}
+  #view-qual .qm-dup b{cursor:pointer;text-decoration:underline}
   #qualMoBody .qcat{font-size:12px;font-weight:800;color:var(--text-dim);margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:3px}
   #qualMoBody .qcat:first-child{margin-top:0}
   #qualMoBody label.qrow{display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:13.5px;cursor:pointer;color:var(--text)}
@@ -8577,11 +8579,11 @@ const Qual = (function(){
     let h='<div class="qm-form">'
       +'<input id="qm_name" placeholder="正式名称" style="min-width:260px">'
       +'<select id="qm_cat">'+CATS.map(c=>'<option>'+c+'</option>').join('')+'</select>'
-      +'<input id="qm_notes" placeholder="備考（旧称・通称など）" style="min-width:220px">'
+      +'<input id="qm_notes" placeholder="本人が書いた元の名前をここに" style="min-width:220px">'
       +'<input id="qm_sort" type="number" placeholder="並び順" style="width:90px">'
       +'<button class="add" id="qm_add" onclick="Qual.saveMaster()">追加</button>'
       +'<button class="add" style="background:var(--surface2);color:var(--text);border:1px solid var(--border)" onclick="Qual.clearForm()">クリア</button>'
-      +'</div>';
+      +'</div><div id="qm_dup" style="display:none" class="qm-dup"></div>';
     h+='<div class="tbl-wrap"><table class="qual-master"><thead><tr><th>並び</th><th>正式名称</th><th>区分</th><th>備考</th><th>保有</th><th></th></tr></thead><tbody>';
     qs.forEach(q=>{
       const n=holdings.filter(x=>String(x.qual_id)===String(q.id)).length;
@@ -8593,10 +8595,29 @@ const Qual = (function(){
         +'<td><button class="act-btn" style="color:#c0392b" onclick="Qual.delMaster(\''+esc(String(q.id))+'\')">削除</button></td></tr>';
     });
     h+='</tbody></table></div>';
-    h+='<div class="qual-hint">名称をタップすると上のフォームに読み込んで編集できます。マスタの追加・変更は決まった人だけが行う運用に（表記ゆれ防止）。</div>';
+    h+='<div class="qual-hint">名称をタップすると上のフォームに読み込んで編集できます。追加する前に、同じ資格が別の名前でないか下の表を確認（名前が違うだけなら追加しない）。</div>';
     el.innerHTML=h;
+    $('qm_name').addEventListener('input',checkDup);
     if(_editId){const q=quals.find(x=>String(x.id)===String(_editId)); if(q){$('qm_name').value=q.name;$('qm_cat').value=q.category||'その他';$('qm_notes').value=q.notes||'';$('qm_sort').value=q.sort||'';$('qm_add').textContent='更新';}}
     applySearch();
+  }
+  // 追加時の重複ガード: 名称の入力に合わせ、既存マスタの名称・備考に引っかかる行を警告表示
+  function checkDup(){
+    const box=$('qm_dup'); if(!box)return;
+    const v=$('qm_name').value.trim();
+    if(v.length<2||_editId){box.style.display='none';return}
+    const ko=x=>String(x).replace(/[^一-鿿]/g,'');
+    const kv=ko(v);
+    const hits=quals.filter(q=>{
+      const t=(String(q.name)+' '+String(q.notes||''));
+      if(t.includes(v)||v.includes(String(q.name)))return true;
+      // 漢字だけ抜き出して比較（「玉かけ」→「玉」が「玉掛」に載る等、かな/漢字の揺れを拾う）
+      return kv.length>0&&ko(t).includes(kv);
+    }).slice(0,5);
+    if(!hits.length){box.style.display='none';return}
+    box.innerHTML='⚠️ 似た資格がすでにあります。同じものなら追加せず、その人のカードでチェックを付けてください：<br>'
+      +hits.map(q=>'<b onclick="Qual.editMaster(\''+esc(String(q.id))+'\')">'+esc(q.name)+'</b>'+(q.notes?'（'+esc(q.notes)+'）':'')).join('　');
+    box.style.display='';
   }
   function editMaster(id){_editId=id;render()}
   function clearForm(){_editId='';render()}
