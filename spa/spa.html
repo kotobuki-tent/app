@@ -1695,14 +1695,15 @@ table.jobs tr:last-child td{border-bottom:none}
 <!-- ===== 資格（免許・技能講習の台帳 dept=qual） ===== -->
 <section id="view-qual" class="hidden">
 <style>
-  #view-qual .qual-matrix{border-collapse:collapse;background:var(--surface);font-size:12px}
-  #view-qual .qual-matrix th,#view-qual .qual-matrix td{border:1px solid var(--border);padding:4px 6px;text-align:center}
-  #view-qual .qual-matrix thead th{background:var(--surface2)}
-  #view-qual .qual-matrix th.qv{writing-mode:vertical-rl;text-orientation:mixed;height:160px;min-width:30px;max-width:34px;font-weight:600;font-size:11px;padding:8px 4px;white-space:nowrap}
-  #view-qual .qual-matrix td.nm,#view-qual .qual-matrix th.nm{position:sticky;left:0;background:var(--surface);text-align:left;min-width:110px;font-weight:600;z-index:1;white-space:nowrap}
-  #view-qual .qual-matrix td.c{cursor:pointer;width:32px;height:30px;font-size:14px}
-  #view-qual .qual-matrix td.c.on{background:#e8f5ec;color:#0e7a4a;font-weight:800}
-  #view-qual .qual-matrix td.cnt{font-size:11px;color:var(--text-dim)}
+  #view-qual .qual-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+  #view-qual .qual-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  #view-qual .qual-card:hover{border-color:var(--accent)}
+  #view-qual .qual-card .nm{font-size:16px;font-weight:800;color:var(--text)}
+  #view-qual .qual-card .sub{font-size:11.5px;color:var(--text-dim);margin:2px 0 10px}
+  #view-qual .qual-card .chips{display:flex;flex-wrap:wrap;gap:5px}
+  #view-qual .qual-card .qc{font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:2px 9px;color:var(--text)}
+  #view-qual .qual-card .qc.more{background:none;border-style:dashed;color:var(--text-dim)}
+  #view-qual .qual-card.addp{display:flex;align-items:center;justify-content:center;border-style:dashed;color:var(--text-dim);font-weight:700;min-height:90px}
   #view-qual .qual-master{width:100%;border-collapse:collapse;background:var(--surface);font-size:13px}
   #view-qual .qual-master th,#view-qual .qual-master td{border:1px solid var(--border);padding:7px 10px;text-align:left}
   #view-qual .qual-master th{background:var(--surface2)}
@@ -1710,15 +1711,32 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-qual .qm-form input,#view-qual .qm-form select{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:400 13px/1.3 'Noto Sans JP',sans-serif}
   #view-qual .qm-form .add{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 16px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
   #view-qual .tbl-wrap{overflow:auto;max-height:calc(100vh - 210px)}
-  #view-qual .qual-hint{font-size:12px;color:var(--text-dim);margin-top:8px}
+  #view-qual .qual-hint{font-size:12px;color:var(--text-dim);margin-top:12px}
+  #qualMoBody .qcat{font-size:12px;font-weight:800;color:var(--text-dim);margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:3px}
+  #qualMoBody .qcat:first-child{margin-top:0}
+  #qualMoBody label.qrow{display:flex;align-items:center;gap:9px;padding:6px 2px;font-size:13.5px;cursor:pointer;color:var(--text)}
+  #qualMoBody label.qrow input{width:17px;height:17px;accent-color:var(--accent);flex-shrink:0}
+  #qualMoPerson{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:400 14px/1.3 'Noto Sans JP',sans-serif;margin-bottom:6px}
 </style>
   <div class="sub-tabs" id="qualTabs">
     <span class="subtab-date" id="qualPcDate"></span>
-    <button class="sub-tab on" data-tab="matrix">一覧</button>
+    <button class="sub-tab on" data-tab="cards">一覧</button>
     <button class="sub-tab" data-tab="master">資格マスタ</button>
     <input class="subtab-search" id="qualSearch" placeholder="名前で検索...">
   </div>
   <div id="qualBody"><div style="padding:40px;text-align:center;color:var(--text-dim)">読み込み中...</div></div>
+
+  <!-- 保有資格モーダル -->
+  <div class="mo-bg" id="qualMoBg">
+    <div class="mo" style="max-width:520px">
+      <h2 id="qualMoTitle">保有資格</h2>
+      <div style="max-height:60vh;overflow-y:auto;padding:2px 2px 8px" id="qualMoBody"></div>
+      <div class="mo-foot">
+        <button class="cancel" onclick="Qual.closeMo()">閉じる</button>
+        <button class="save" onclick="Qual.saveMo()">保存</button>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="view-cases" class="hidden">
@@ -8445,10 +8463,11 @@ function reloadAll(){boot();toast('更新しました');}
 const _deepGo=(function(){try{return new URLSearchParams(location.search).get('go')}catch(e){return null}})();
 /* =========================================================
    資格（dept=qual）: 免許・技能講習・特別教育の台帳。
-   マスタ（正式名称の一元管理＝表記ゆれ対策）＋人×資格マトリクス。
+   一覧＝登録済みの人のカード（タップでモーダル編集）。
+   マスタ＝正式名称の一元管理（表記ゆれ対策の核）。
    ========================================================= */
 const Qual = (function(){
-  let quals=[], holdings=[], staffList=[], tab='matrix', _editId='';
+  let quals=[], holdings=[], staffList=[], tab='cards', _editId='', _moEmp=null, _moOrig=[];
   const CATS=['免許','技能講習','特別教育','安全衛生教育','運転免許','その他'];
   function apiGet(params){
     const q=new URLSearchParams(Object.assign({dept:'qual'},params)).toString();
@@ -8464,51 +8483,95 @@ const Qual = (function(){
   function sortedQuals(){
     return quals.slice().sort((a,b)=>((Number(a.sort)||9999)-(Number(b.sort)||9999))||String(a.name).localeCompare(String(b.name),'ja'));
   }
-  function has(emp,qid){return holdings.find(h=>String(h.employee_no)===String(emp)&&String(h.qual_id)===String(qid))}
+  function holdingsOf(emp){return holdings.filter(h=>String(h.employee_no)===String(emp))}
+  function qname(qid){const q=quals.find(x=>String(x.id)===String(qid));return q?q.name:''}
+  function cardedPeople(){
+    const emps=[...new Set(holdings.map(h=>String(h.employee_no)))];
+    return staffList.filter(s2=>emps.includes(String(s2.employee_no)));
+  }
   function render(){
     const el=$('qualBody'); if(!el)return;
-    if(tab==='matrix')renderMatrix(el); else renderMaster(el);
+    if(tab==='cards')renderCards(el); else renderMaster(el);
   }
-  function renderMatrix(el){
-    const qs=sortedQuals();
-    if(!qs.length){el.innerHTML='<div style="padding:40px;text-align:center;color:var(--text-dim)">資格マスタが空です。「資格マスタ」タブから追加してください</div>';return}
-    let h='<div class="tbl-wrap"><table class="qual-matrix"><thead><tr><th class="nm">名前</th>';
-    qs.forEach(q=>{h+='<th class="qv" title="'+esc(q.notes||'')+'">'+esc(q.name)+'</th>'});
-    h+='<th class="qv">保有数</th></tr></thead><tbody>';
-    staffList.forEach(s2=>{
-      let cnt=0;
-      let row='<tr data-name="'+esc(s2.name)+'"><td class="nm">'+esc(s2.name)+'</td>';
-      qs.forEach(q=>{
-        const on=has(s2.employee_no,q.id); if(on)cnt++;
-        row+='<td class="c'+(on?' on':'')+'" onclick="Qual.toggle(\''+esc(String(s2.employee_no))+'\',\''+esc(String(q.id))+'\')">'+(on?'●':'')+'</td>';
-      });
-      row+='<td class="cnt">'+cnt+'</td></tr>';
-      h+=row;
+  function renderCards(el){
+    const people=cardedPeople();
+    let h='<div class="qual-cards">';
+    people.forEach(s2=>{
+      const hs=holdingsOf(s2.employee_no);
+      const names=hs.map(x=>qname(x.qual_id)).filter(Boolean);
+      const shown=names.slice(0,4);
+      h+='<div class="qual-card" data-name="'+esc(s2.name)+'" onclick="Qual.openMo(\''+esc(String(s2.employee_no))+'\')">'
+        +'<div class="nm">'+esc(s2.name)+'</div>'
+        +'<div class="sub">'+esc(s2.dept||'')+'　保有 '+names.length+'件</div>'
+        +'<div class="chips">'+shown.map(n=>'<span class="qc">'+esc(n)+'</span>').join('')
+        +(names.length>shown.length?'<span class="qc more">+'+(names.length-shown.length)+'</span>':'')
+        +'</div></div>';
     });
-    h+='</tbody></table></div>';
-    h+='<div class="qual-hint">セルをタップで付け外し（すぐ保存されます）。資格の名称・並びは「資格マスタ」タブで管理。</div>';
+    h+='<div class="qual-card addp" onclick="Qual.openMo(null)">＋ 人を追加</div>';
+    h+='</div>';
+    if(!people.length)h+='<div class="qual-hint">まだ誰も登録されていません。「＋ 人を追加」から始めてください。</div>';
     el.innerHTML=h;
     applySearch();
   }
-  let _tglBusy=false;
-  function toggle(emp,qid){
-    if(_tglBusy)return;
-    const ex=has(emp,qid);
-    if(ex){
-      if(!confirm('この資格を外しますか？'))return;
-      _tglBusy=true; setTimeout(()=>{_tglBusy=false},600);
-      holdings=holdings.filter(x=>x!==ex);
-      if(String(ex.id).indexOf('tmp_')!==0)fireAndForget({action:'delete_holding',id:ex.id});
-      toast('外しました');
+  // ===== 保有資格モーダル =====
+  function openMo(emp){
+    _moEmp=emp?String(emp):null;
+    const qs=sortedQuals();
+    let h='';
+    if(_moEmp){
+      const s2=staffList.find(x=>String(x.employee_no)===_moEmp);
+      $('qualMoTitle').textContent=(s2?s2.name:'')+'　の保有資格';
     }else{
-      _tglBusy=true; setTimeout(()=>{_tglBusy=false},600);
-      holdings.push({id:'tmp_'+Date.now(),employee_no:String(emp),qual_id:String(qid)});
-      fireAndForget({action:'save_holding',employee_no:emp,qual_id:qid});
-      toast('付けました');
+      $('qualMoTitle').textContent='人を追加';
+      const carded=cardedPeople().map(x=>String(x.employee_no));
+      const cands=staffList.filter(x=>!carded.includes(String(x.employee_no)));
+      h+='<select id="qualMoPerson"><option value="">名前を選択...</option>'
+        +cands.map(x=>'<option value="'+esc(String(x.employee_no))+'">'+esc(x.name)+'</option>').join('')+'</select>';
     }
-    render();
-    clearTimeout(Qual._rt); Qual._rt=setTimeout(loadAll,8000);
+    const owned=_moEmp?holdingsOf(_moEmp).map(x=>String(x.qual_id)):[];
+    _moOrig=owned.slice();
+    CATS.forEach(cat=>{
+      const items=qs.filter(q=>(q.category||'その他')===cat);
+      if(!items.length)return;
+      h+='<div class="qcat">'+cat+'</div>';
+      items.forEach(q=>{
+        const on=owned.includes(String(q.id));
+        h+='<label class="qrow"><input type="checkbox" data-qid="'+esc(String(q.id))+'"'+(on?' checked':'')+'>'+esc(q.name)+'</label>';
+      });
+    });
+    $('qualMoBody').innerHTML=h;
+    $('qualMoBg').classList.add('show');
+    requestAnimationFrame(()=>{$('qualMoBg').scrollTop=0;const m=$('qualMoBg').querySelector('.mo');if(m)m.scrollTop=0;});
   }
+  function closeMo(){$('qualMoBg').classList.remove('show');_moEmp=null;}
+  let _moBusy=false;
+  function saveMo(){
+    if(_moBusy)return;
+    let emp=_moEmp;
+    if(!emp){
+      emp=$('qualMoPerson')?$('qualMoPerson').value:'';
+      if(!emp){toast('名前を選択してください',true);return}
+    }
+    _moBusy=true; setTimeout(()=>{_moBusy=false},1500);
+    const checked=[...document.querySelectorAll('#qualMoBody input[data-qid]:checked')].map(c=>String(c.dataset.qid));
+    const added=checked.filter(q=>!_moOrig.includes(q));
+    const removed=_moOrig.filter(q=>!checked.includes(q));
+    added.forEach((qid,i)=>{
+      holdings.push({id:'tmp_'+Date.now()+'_'+i,employee_no:String(emp),qual_id:qid});
+      setTimeout(()=>fireAndForget({action:'save_holding',employee_no:emp,qual_id:qid}), i*200);
+    });
+    removed.forEach((qid,i)=>{
+      const ex=holdings.find(h=>String(h.employee_no)===String(emp)&&String(h.qual_id)===qid);
+      if(ex){holdings=holdings.filter(h=>h!==ex);
+        if(String(ex.id).indexOf('tmp_')!==0)setTimeout(()=>fireAndForget({action:'delete_holding',id:ex.id}),(added.length+i)*200);}
+    });
+    if(added.length||removed.length){
+      toast('保存しました');
+      clearTimeout(Qual._rt); Qual._rt=setTimeout(loadAll,8000);
+    }
+    closeMo(); render();
+  }
+  // ===== マスタ =====
   function renderMaster(el){
     const qs=sortedQuals();
     let h='<div class="qm-form">'
@@ -8560,7 +8623,7 @@ const Qual = (function(){
   }
   function applySearch(){
     const v=($('qualSearch').value||'').trim().toLowerCase();
-    document.querySelectorAll('#qualBody tr[data-name]').forEach(tr=>{tr.style.display=(!v||tr.dataset.name.toLowerCase().includes(v))?'':'none'});
+    document.querySelectorAll('#qualBody [data-name]').forEach(n=>{n.style.display=(!v||n.dataset.name.toLowerCase().includes(v))?'':'none'});
   }
   function init(){
     $('qualTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.tab)return;
@@ -8568,7 +8631,7 @@ const Qual = (function(){
     $('qualSearch').addEventListener('input',applySearch);
     const d=new Date();const el=$('qualPcDate');if(el)el.textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+dow[d.getDay()]+'）';
   }
-  return{loadAll:loadAll,render:render,init:init,toggle:toggle,saveMaster:saveMaster,delMaster:delMaster,editMaster:editMaster,clearForm:clearForm};
+  return{loadAll:loadAll,render:render,init:init,openMo:openMo,closeMo:closeMo,saveMo:saveMo,saveMaster:saveMaster,delMaster:delMaster,editMaster:editMaster,clearForm:clearForm};
 })();
 
 const App = {
