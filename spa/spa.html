@@ -8518,7 +8518,9 @@ const Qual = (function(){
     let h='<div class="qual-cards">';
     people.forEach(s2=>{
       const hs=holdingsOf(s2.employee_no).filter(x=>qname(x.qual_id));
-      const lic=hs.filter(x=>qcat(x.qual_id)==='運転免許'&&!/二輪|原付/.test(qname(x.qual_id)));
+      const LIC_ORDER=['大型自動車免許','中型自動車免許','準中型自動車免許','普通自動車免許','けん引免許','大型特殊自動車免許'];
+      const lic=hs.filter(x=>qcat(x.qual_id)==='運転免許'&&!/二輪|原付/.test(qname(x.qual_id)))
+        .sort((a,b)=>{const ia=LIC_ORDER.indexOf(qname(a.qual_id)),ib=LIC_ORDER.indexOf(qname(b.qual_id));return (ia<0?99:ia)-(ib<0?99:ib)});
       const rest=hs.filter(x=>qcat(x.qual_id)!=='運転免許');
       h+='<div class="qual-card" data-name="'+esc(s2.name)+'" onclick="Qual.openMo(\''+esc(String(s2.employee_no))+'\')">'
         +'<div class="nm">'+esc(s2.name)+'<span class="cnt">'+hs.length+'</span>'
