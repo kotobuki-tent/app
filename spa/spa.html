@@ -2002,6 +2002,7 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="sub-tabs" id="projTabs">
     <span class="subtab-date" id="projPcDate"></span>
     <button class="sub-tab on" data-view="gantt">スケジュール</button>
+    <button class="sub-tab" data-view="board">ボード</button>
     <button class="sub-tab" data-view="projDone">終了</button>
     <button class="mny-btn" onclick="Proj.moneySum()">¥ 合計</button>
     <button class="slog-btn" id="projSlogBtn" onclick="Proj.openSlog()">ステータスログ<span class="dot"></span></button>
@@ -2009,6 +2010,7 @@ table.jobs tr:last-child td{border-bottom:none}
   </div>
   <div class="app">
     <div id="projGantt" class="proj-view"></div>
+    <div id="projBoard" class="proj-view hidden"></div>
     <div id="projDoneView" class="proj-admin hidden"></div>
     <div id="projArchivedView" class="proj-admin hidden"></div>
   </div>
@@ -3961,6 +3963,7 @@ const Proj = (function(){
   // ===== 企画の状態（旧グローバル変数→IIFE内ローカルに隔離） =====
   let projData=[],rentalsData=[],inventoryItems=[];
   let curProjView='gantt';
+  let projBoardFilter=null;
   let projDoneSort={col:'_endDate',asc:false};
   let ganttStatusFilter='';
   let ganttStart=null,ganttDays=28;
@@ -4091,9 +4094,85 @@ const Proj = (function(){
 
   // ===== 描画 =====
   function render(){
-    if(curProjView==='gantt'){$('projGantt').classList.remove('hidden');$('projDoneView').classList.add('hidden');$('projArchivedView').classList.add('hidden');renderGantt()}
-    else if(curProjView==='projDone'){$('projGantt').classList.add('hidden');$('projDoneView').classList.remove('hidden');$('projArchivedView').classList.add('hidden');renderProjDone()}
-    else if(curProjView==='projArchived'){$('projGantt').classList.add('hidden');$('projDoneView').classList.add('hidden');$('projArchivedView').classList.remove('hidden');renderProjArchived()}
+    const views={gantt:'projGantt',board:'projBoard',projDone:'projDoneView',projArchived:'projArchivedView'};
+    Object.entries(views).forEach(([k,id])=>{const el=$(id);if(el)el.classList.toggle('hidden',curProjView!==k)});
+    if(curProjView==='gantt')renderGantt();
+    else if(curProjView==='board')renderBoard();
+    else if(curProjView==='projDone')renderProjDone();
+    else renderProjArchived();
+  }
+
+  // ===== ボード（案件カード一覧・生産の工場ボードと同作法） =====
+  function renderBoard(){
+    const el=$('projBoard'); if(!el)return;
+    const STC={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],'レンタル中':['var(--cyan)','var(--cyan-dim)'],'メンテ中':['var(--red)','var(--red-dim)']};
+    const FIELDS=[['date_load_in','搬入'],['date_setup','設営'],['date_event','現場'],['date_teardown','撤去'],['date_rental_out','貸出'],['date_delivery','発送'],['date_rental_return','返却']];
+    const day0=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    const dd=dt=>Math.round((new Date(dt.getFullYear(),dt.getMonth(),dt.getDate())-day0)/86400000);
+    let items=projData.filter(d=>!['終了','完了','見送り'].includes(d.status));
+    items.forEach(d=>{
+      const evs=[];
+      FIELDS.forEach(([f,l])=>{parseDates(d[f]).forEach(dt=>evs.push({dt,l}))});
+      evs.sort((a,b)=>a.dt-b.dt);
+      d._evs=evs;
+      const next=evs.find(e=>dd(e.dt)>=0);
+      d._next=next||null;
+      d._nd=next?dd(next.dt):null;
+      d._urgN=!evs.length?999:!next?888:d._nd===0?0:d._nd<=3?1:d._nd<=7?2:3;
+    });
+    let filtered=items;
+    if(projBoardFilter){
+      if(projBoardFilter==='today')filtered=items.filter(d=>d._urgN===0);
+      else if(projBoardFilter==='soon')filtered=items.filter(d=>d._urgN===1);
+      else if(projBoardFilter==='past')filtered=items.filter(d=>d._urgN===888);
+      else filtered=items.filter(d=>d.status===projBoardFilter);
+    }
+    const si=(f,n,l,color)=>{const on=projBoardFilter===f?' on':'';return`<div class="fv-si${on}" data-f="${f}" style="${color?'color:'+color:''}"><div class="n">${n}</div><div class="l">${l}</div></div>`};
+    let h='<div class="fv-sum">';
+    h+=si('all',items.length,'すべて','');
+    h+=si('today',items.filter(d=>d._urgN===0).length,'今日','var(--red)');
+    h+=si('soon',items.filter(d=>d._urgN===1).length,'3日以内','var(--orange)');
+    ['見積中','受注','準備中','現場中','レンタル中','メンテ中'].forEach(st=>{h+=si(st,items.filter(d=>d.status===st).length,st,'')});
+    const pastN=items.filter(d=>d._urgN===888).length;
+    if(pastN)h+=si('past',pastN,'日程超過','var(--red)');
+    h+='</div>';
+    const groups=[
+      {label:'今日',items:filtered.filter(d=>d._urgN===0)},
+      {label:'3日以内',items:filtered.filter(d=>d._urgN===1)},
+      {label:'1週間以内',items:filtered.filter(d=>d._urgN===2)},
+      {label:'それ以降',items:filtered.filter(d=>d._urgN===3)},
+      {label:'日程が過ぎている（未終了）',items:filtered.filter(d=>d._urgN===888)},
+      {label:'日程未定',items:filtered.filter(d=>d._urgN===999)}
+    ];
+    groups.forEach(g=>{if(!g.items.length)return;
+      h+=`<div class="fv-grp"><div class="fv-grp-hd">${g.label}　${g.items.length}件</div><div class="fv-cards">`;
+      g.items.forEach(d=>{
+        const cls=d._urgN===0||d._urgN===888?'urgent':d._urgN===1?'thisweek':'twoweeks';
+        let badge='';
+        if(d._urgN===0)badge='<span class="badge urgent">今日</span>';
+        else if(d._urgN===888)badge='<span class="badge urgent">日程超過</span>';
+        else if(d._urgN===1)badge=`<span class="badge thisweek">あと${d._nd}日</span>`;
+        const tmpBadge=String(d.id||'').startsWith('tmp_')?'<span class="tmp-badge">保存中…</span>':'';
+        const sc=STC[d.status]||['var(--text-faint)','var(--surface3)'];
+        h+=`<div class="fv-card ${cls}" data-id="${d.id}"><div class="top"><span class="pname">${esc(d.project)}${tmpBadge}</span>${badge}${staleBadge(d,'project')}</div>`;
+        if(d.our_person)h+=`<div class="assignee">担当: <span class="tag person">${esc(d.our_person)}</span></div>`;
+        h+=`<div class="meta">${esc(d.client||'')}`;
+        if(d.order_no)h+=` <span class="tag eno">${esc(d.order_no)}</span>`;
+        if(d.venue)h+=` <span class="tag loc">${esc(d.venue)}</span>`;
+        if(d.type==='レンタル')h+=` <span class="tag" style="color:var(--cyan);background:var(--cyan-dim)">レンタル</span>`;
+        h+=` <span class="tag st" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span></div>`;
+        if(d._next){const nd=d._next.dt;h+=`<div class="dl">次: ${d._next.l} ${nd.getMonth()+1}/${nd.getDate()}（${dow[nd.getDay()]}）${d._nd===0?'今日':'あと'+d._nd+'日'}</div>`}
+        else if(d._urgN===888){const last=d._evs[d._evs.length-1].dt;h+=`<div class="dl">全日程終了: ${last.getMonth()+1}/${last.getDate()}（${dow[last.getDay()]}）</div>`}
+        else h+='<div class="dl">日程未定</div>';
+        if(d._evs.length){const f0=d._evs[0].dt,f1=d._evs[d._evs.length-1].dt;h+=`<div style="font-size:11.5px;color:var(--text-dim);margin-top:2px">期間 ${f0.getMonth()+1}/${f0.getDate()}〜${f1.getMonth()+1}/${f1.getDate()}</div>`}
+        h+='</div>';
+      });
+      h+='</div></div>';
+    });
+    el.innerHTML=h;
+    el.querySelectorAll('.fv-si').forEach(t=>{t.onclick=()=>{const f=t.dataset.f;projBoardFilter=(projBoardFilter===f||f==='all')?null:f;render()}});
+    el.querySelectorAll('.fv-card').forEach(c=>{c.onclick=()=>viewProj(c.dataset.id)});
+    unifiedSearch($('projPcSearch').value);
   }
 
   // ===== ガントチャート =====
@@ -4217,9 +4296,9 @@ const Proj = (function(){
   }
   function unifiedSearch(q){
     q=(q||'').toLowerCase();
-    const view=document.querySelector('#projGantt:not(.hidden), #projDoneView:not(.hidden)');
+    const view=document.querySelector('#projGantt:not(.hidden), #projBoard:not(.hidden), #projDoneView:not(.hidden)');
     if(!view)return;
-    view.querySelectorAll('.gantt-row[data-id], .prj-card[data-id], tbody tr').forEach(el=>{
+    view.querySelectorAll('.gantt-row[data-id], .prj-card[data-id], .fv-card[data-id], tbody tr').forEach(el=>{
       el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
     });
   }
