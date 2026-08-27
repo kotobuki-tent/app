@@ -4137,11 +4137,11 @@ const Proj = (function(){
     if(pastN)h+=si('past',pastN,'日程超過','var(--red)');
     h+='</div>';
     const groups=[
+      {label:'日程が過ぎている（未終了）',items:filtered.filter(d=>d._urgN===888)},
       {label:'今日',items:filtered.filter(d=>d._urgN===0)},
       {label:'3日以内',items:filtered.filter(d=>d._urgN===1)},
       {label:'1週間以内',items:filtered.filter(d=>d._urgN===2)},
       {label:'それ以降',items:filtered.filter(d=>d._urgN===3)},
-      {label:'日程が過ぎている（未終了）',items:filtered.filter(d=>d._urgN===888)},
       {label:'日程未定',items:filtered.filter(d=>d._urgN===999)}
     ];
     groups.forEach(g=>{if(!g.items.length)return;
