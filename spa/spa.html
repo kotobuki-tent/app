@@ -179,6 +179,7 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 .fv-card .badge.urgent{color:var(--red);background:var(--red-dim)}
 .fv-card .badge.thisweek{color:var(--orange);background:var(--orange-dim)}
 .fv-card .badge.twoweeks{color:var(--accent);background:var(--accent-dim)}
+.fv-card .badge.dup{color:#fff;background:var(--red)}
 .fv-card .meta{font-size:12px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
 .fv-card .tag{font-size:11px;padding:2px 7px;border-radius:5px;font-weight:600}
 .fv-card .tag.loc{color:var(--cyan);background:var(--cyan-dim)}
@@ -3658,6 +3659,9 @@ const Prod = (function(){
     const statusCnt=s=>items.filter(d=>d.status===s).length;
     const secCnt=s=>items.filter(d=>d.section===s).length;
     items.forEach(d=>{const dl=parseD(d.deadline);if(!dl){d._urgN=999;return}const diff=diffDays(dl,today);d._urgN=diff<0?-1:diff<=3?0:diff<=7?1:diff<=14?2:3});
+    // 重複検知：同一受注番号かつ物件名がスペース除去で一致する行が2件以上＝二重登録の疑い（大口の主膜/妻膜分割は物件名が違うので誤検知しない）
+    const dupKey=d=>{const no=String(d.order_no||'').trim();if(!no)return'';return no+'|'+String(d.project||'').replace(/[\s　]/g,'')};
+    const dupCnt={};items.forEach(d=>{const k=dupKey(d);if(k)dupCnt[k]=(dupCnt[k]||0)+1});
     let filtered=items;
     if(prodFilter){if(['製作中','完成','受注'].includes(prodFilter))filtered=items.filter(d=>d.status===prodFilter);else if(['2F工場','1F工場','出力関係','外注','未定','その他'].includes(prodFilter))filtered=items.filter(d=>d.section===prodFilter);else if(prodFilter==='urgent')filtered=items.filter(d=>d._urgN<=0);else if(prodFilter==='thisweek')filtered=items.filter(d=>d._urgN===1)}
     const si=(f,n,l,color)=>{const on=prodFilter===f?' on':'';return`<div class="fv-si${on}" data-f="${f}" style="${color?'color:'+color:''}"><div class="n">${n}</div><div class="l">${l}</div></div>`};
@@ -3686,7 +3690,8 @@ const Prod = (function(){
       else if(d._urgN===2)badge='<span class="badge twoweeks">2週間以内</span>';
       const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?Math.abs(diff)+'日超過':'あと'+diff+'日'):''}`:'未定';
       const tmpBadge=String(d.id||'').startsWith('tmp_')?'<span class="tmp-badge">保存中…</span>':'';
-      h+=`<div class="fv-card ${cls}" data-id="${d.id}"><div class="top"><span class="pname">${esc(d.project)}${tmpBadge}</span>${badge}${staleBadge(d,'production')}</div>`;
+      const dupBadge=dupCnt[dupKey(d)]>1?'<span class="badge dup">重複?</span>':'';
+      h+=`<div class="fv-card ${cls}" data-id="${d.id}"><div class="top"><span class="pname">${esc(d.project)}${tmpBadge}</span>${dupBadge}${badge}${staleBadge(d,'production')}</div>`;
       if(d.our_person)h+=`<div class="assignee">担当: <span class="tag person">${esc(d.our_person)}</span></div>`;
       h+=`<div class="meta">${esc(d.client||'')}`;
       if(d.order_no)h+=` <span class="tag eno">${esc(d.order_no)}</span>`;
