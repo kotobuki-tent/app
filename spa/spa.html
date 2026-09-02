@@ -3200,6 +3200,34 @@ table.jobs tr:last-child td{border-bottom:none}
    共通ユーティリティ（12個・両アプリで同一確認済みを1セット）
    API dow pad parseD esc vr $ _getCache _setCache fireAndForget toast safeRefresh centerActiveNav
    ======================================================================== */
+// ===== LINE WORKS WOFF連携 =====
+// Developer Consoleで発行されるWOFF ID。空のうちは完全に無効（従来どおりの挙動）。
+// LINE WORKSアプリ内から開かれた時だけ、開いた本人の表示名を取って各画面の「名前を選ぶ」を自動選択する。
+const WOFF_ID='';
+window.__woffUser=null;
+function _woffNameKey(s){return String(s||'').replace(/[\s\u3000]/g,'').normalize('NFKC');}
+// リスト（名前 or {name} 等）からWOFFユーザーと同名の要素を返す。pickで名前の取り出し方を指定
+window.woffMatch=function(list,pick){
+  const u=window.__woffUser; if(!u||!Array.isArray(list))return null;
+  const k=_woffNameKey(u.name); if(!k)return null;
+  for(const x of list){ const n=pick?pick(x):x; if(_woffNameKey(n)===k) return x; }
+  return null;
+};
+async function woffBoot(){
+  if(!WOFF_ID) return;
+  // SDKは必要な時だけ動的に読む（読めなくても最大3秒で諦めて通常起動）
+  await Promise.race([
+    new Promise(res=>{const el=document.createElement('script');el.src='https://static.worksmobile.net/static/wm/woff/edge/3.7.1/sdk.js';el.onload=res;el.onerror=res;document.head.appendChild(el);}),
+    new Promise(res=>setTimeout(res,3000))
+  ]);
+  if(!window.woff) return;
+  try{
+    await woff.init({woffId:WOFF_ID});
+    if(!woff.isInClient()) return;   // PC/外部ブラウザは従来どおり（ログイン導線は使わない）
+    const pf=await woff.getProfile();
+    if(pf&&pf.displayName) window.__woffUser={name:pf.displayName,id:pf.userId||''};
+  }catch(e){}
+}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 秘密の「経営者モード」：?boss=<キー> 一本で 本当のフルモード＝全ゾーン＋日報の記入状況ランキング＋人事考課マスター を解錠。
    URL自体が合言葉（localStorage不使用・端末に痕跡を残さない）。旧 ?stats= / ?hrm= も後方互換で有効。 */
@@ -6535,6 +6563,7 @@ const Daily = (function(){
     sel.innerHTML=h;
     const saved=localStorage.getItem('daily_who');
     if(saved&&staffList.some(s=>String(s.employee_no)===saved))sel.value=saved;
+    if(!sel.value&&window.__woffUser){const m=woffMatch(staffList,s=>s.name);if(m){sel.value=String(m.employee_no);try{localStorage.setItem('daily_who',sel.value)}catch(e){}}}
   }
   function getWho(){return $('whoSelect').value||''}
   function onWhoChange(){
@@ -6919,6 +6948,7 @@ const Ot = (function(){
   }
 
   function renderStaffView(){
+    if(!selectedStaff&&window.__woffUser&&staffList.length){const m=woffMatch(staffList,s=>s.name);if(m)selectedStaff=m.name;}
     const container=$('staffChips');
     let html='<label style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px;width:100%">自分を選択（50音順）：';
     html+='<select id="otStaffSelect" onchange="Ot.onStaffSelectChange()" style="flex:1;min-width:0;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 \'Noto Sans JP\',sans-serif;background:var(--surface)">';
@@ -8174,6 +8204,7 @@ async function loadDay(date,silent){
   if(!silent)$('dayMtx').innerHTML='<div class="empty">読み込み中...</div>';
   try{const r=await apiGet({action:'list',date});records=(r.data||[]);}catch(e){records=[];}
   renderDrivers(); renderToday();
+  if(!selDriver&&window.__woffUser){const m=woffMatch(drivers,d=>d.name);if(m)selectDriver(m.name);}
 }
 
 // 当日の各運転者の達成状況（前/後）を返す
@@ -8420,6 +8451,7 @@ async function boot(){
     const b=await apiGet({action:'bootstrap'});
     inspectors=(b.inspectors||[]).map(x=>typeof x==='string'?{name:x,reg:true}:x);
     renderInspectors();
+    if(!inspector&&window.__woffUser){const m=woffMatch(inspectors,d=>d.name);if(m){inspector=m.name;renderInspectors();}}
     try{localStorage.setItem('fk_boot',JSON.stringify(inspectors));}catch(e){}
   }catch(e){}
   await loadDay($('fk_f_date').value);
@@ -8837,7 +8869,8 @@ setInterval(()=>{
 },5*60*1000);
 
 // 初期表示：各アプリの init（イベント配線）→ ポータル（入口）を開く
-window.addEventListener('load', ()=>{
+window.addEventListener('load', async ()=>{
+  await woffBoot();   // LINE WORKS内なら本人特定（WOFF_ID未設定なら即戻る）
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   initMobileFilters();
   // 経営者モード（?boss=）＝本当のフルモード：全ゾーン表示に強制（localStorageには保存しない＝URLでだけ有効）
