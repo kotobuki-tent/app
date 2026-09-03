@@ -8249,12 +8249,15 @@ async function boot(){
   // キャッシュを即適用（名前が一瞬で出る）→ 裏で最新取得して差し替え
   const cached=localStorage.getItem('alc_boot');
   if(cached){try{applyBoot(JSON.parse(cached));}catch(e){}}
-  try{
+  // bootstrap（名簿）と当日の記録は互いに依存しないので並列で取る（直列だと GAS 2往復分＝倍の待ち時間）
+  const bootP=(async()=>{try{
     const b=await apiGet({action:'bootstrap'});
     applyBoot(b);
     try{localStorage.setItem('alc_boot',JSON.stringify(b));}catch(e){}
-  }catch(e){}
-  await loadDay($('f_date').value);
+  }catch(e){}})();
+  await Promise.all([bootP, loadDay($('f_date').value)]);
+  // 名簿が記録より後に届いた場合に備えて、WOFFの本人自動選択をもう一度
+  if(!selDriver&&window.__woffUser){const m=woffMatch(drivers,d=>d.name);if(m)selectDriver(m.name);}
 }
 
 async function loadDay(date,silent){
