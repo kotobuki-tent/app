@@ -126,6 +126,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 html.in-woff body{padding-top:0}
 html.in-woff .hdr{display:none}
 html.in-woff #view-alcohol .kiosk, html.in-woff #view-forklift .kiosk{height:auto}
+/* WOFF内のポータル（フルメニュー）＝ロゴ・モード切替・フッター無しのアイコン一覧だけ */
+html.in-woff .portal-logo, html.in-woff .portal-sub, html.in-woff .portal-modeswitch, html.in-woff .portal-footer{display:none}
+html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-height:0}
 @media(max-width:480px){.mny-btn{display:none!important}}
 .boss-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:250;pointer-events:none;display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:999px;font:800 12px/1 'Noto Sans JP',sans-serif;color:#7a5300;background:linear-gradient(135deg,#fde68a,#fbbf24);border:1px solid #f0a900;white-space:nowrap;box-shadow:0 2px 8px rgba(217,138,0,.4);letter-spacing:.08em}
 .boss-badge .boss-crown{font-size:14px;line-height:1}
@@ -8934,6 +8937,8 @@ window.addEventListener('load', async ()=>{
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   initMobileFilters();
   // 経営者モード（?boss=）＝本当のフルモード：全ゾーン表示に強制（localStorageには保存しない＝URLでだけ有効）
+  // LINE WORKS（WOFF）内＝スマホ個人利用なので端末モードは常にフル（ポータルのモード切替も出さない）
+  if(document.documentElement.classList.contains('in-woff')) App.mode='full';
   if(bossOn()){ App.mode='full'; document.body.classList.add('boss'); const bb=$('bossBadge'); if(bb) bb.classList.remove('hidden'); const hn=$('navHrLink'); if(hn) hn.classList.remove('hidden'); }
   App.injectZones();
   App.applyMode();
