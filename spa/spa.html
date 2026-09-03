@@ -2923,6 +2923,10 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-alcohol .drvsel select{flex:1;min-width:0;font:700 17px/1.2 'Noto Sans JP';padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text)}
   #view-alcohol .drvsel select.sel{border-color:var(--accent);background:var(--accent-dim)}
   #view-alcohol .ngrid,#view-alcohol .moretoggle,#view-alcohol .selbar{display:none}
+  /* 記録ボタンもスマホでは控えめに（タブレット用の巨大ボタンはそのまま） */
+  html #view-alcohol .commit{gap:10px;margin-top:10px}
+  html #view-alcohol .commit button{height:64px;font-size:19px;border-radius:12px;gap:2px}
+  html #view-alcohol .commit button small{font-size:10px}
 }
 </style>
 <div class="kiosk">
