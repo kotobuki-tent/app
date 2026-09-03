@@ -121,6 +121,11 @@ tr:hover td{background:rgba(59,111,216,.03)}
 /* ===== ヘッダー（アプリ間ナビ・共通） ===== */
 .hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--hdr);border-bottom:1px solid var(--border-light);display:flex;align-items:stretch;height:48px;padding:0;gap:0}
 .hdr-inner{display:flex;align-items:stretch;flex:1;min-width:0;padding:6px 8px 0 8px;gap:2px}
+/* LINE WORKS（WOFF）内で開いた時：ヘッダー無し（Botのメニューが画面の入口）。スマホ幅では¥バッジ（受注総額）も出さない */
+body.in-woff{padding-top:0}
+body.in-woff .hdr{display:none}
+body.in-woff #view-alcohol .kiosk, body.in-woff #view-forklift .kiosk{height:auto}
+@media(max-width:480px){.mny-btn{display:none!important}}
 .boss-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:250;pointer-events:none;display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:999px;font:800 12px/1 'Noto Sans JP',sans-serif;color:#7a5300;background:linear-gradient(135deg,#fde68a,#fbbf24);border:1px solid #f0a900;white-space:nowrap;box-shadow:0 2px 8px rgba(217,138,0,.4);letter-spacing:.08em}
 .boss-badge .boss-crown{font-size:14px;line-height:1}
 body.boss .hdr{border-bottom:2px solid #f0a900}
@@ -1340,6 +1345,12 @@ table.jobs tr:last-child td{border-bottom:none}
 
   /* day-row：縦積み、時間チップ拡大 */
   .day-row{flex-direction:column;align-items:stretch;gap:10px;padding:12px 14px}
+  /* スマホ：今日以外で未申告の日は折りたたみ（日付をタップで開く） */
+  .day-row.fold{gap:0;padding:10px 14px}
+  .day-row.fold .time-chips{display:none}
+  .day-row.foldable .day-label{cursor:pointer}
+  .day-row.foldable .day-label::after{content:'開く';margin-left:auto;font-size:11px;font-weight:600;color:var(--accent)}
+  .day-row.foldable:not(.fold) .day-label::after{content:'閉じる'}
   .day-row.holiday-row{background:#fffbeb}
   .day-label{width:auto;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   .day-label .date{margin-top:0;font-size:12px}
@@ -3256,6 +3267,7 @@ async function woffBoot(){
   try{
     await woff.init({woffId:WOFF_ID});
     if(!woff.isInClient()) return;   // PC/外部ブラウザは従来どおり（ログイン導線は使わない）
+    document.body.classList.add('in-woff');   // LINE WORKS内＝画面の行き来はBotのメニューでやるのでヘッダーを消す（CSS）
     const pf=await woff.getProfile();
     if(pf&&pf.displayName) window.__woffUser={name:pf.displayName,id:pf.userId||''};
   }catch(e){}
@@ -7007,7 +7019,8 @@ const Ot = (function(){
       const selectedTime=entry?entry.until_time:'';
       const slots=isHoliday?HOLIDAY_SLOTS:TIME_SLOTS;
       const chipCls=isHoliday?'holiday-chip':'';
-      dhtml+=`<div class="day-row ${rowCls}"><div class="day-label ${labelCls}">${dayName}曜日<div class="date">${d.getMonth()+1}/${d.getDate()}${isToday?' (今日)':''}</div>${holidayName?`<div class="holiday-name">${holidayName}</div>`:''}</div><div class="time-chips">`;
+      const foldable=!isToday&&!selectedTime;   // スマホでだけCSSが効く（PCでは無視される）
+      dhtml+=`<div class="day-row ${rowCls}${foldable?' foldable fold':''}"><div class="day-label ${labelCls}"${foldable?' onclick="Ot.toggleFold(this)"':''}>${dayName}曜日<div class="date">${d.getMonth()+1}/${d.getDate()}${isToday?' (今日)':''}</div>${holidayName?`<div class="holiday-name">${holidayName}</div>`:''}</div><div class="time-chips">`;
       slots.forEach(t=>{const sel=t===selectedTime?'selected':'';dhtml+=`<button class="time-chip ${chipCls} ${sel}" onclick="Ot.toggleTime('${ds}','${t}')">${t}</button>`});
       dhtml+=`</div>`;
       if(selectedTime)dhtml+=`<button class="day-clear" onclick="Ot.clearDay('${ds}')">取消</button>`;
@@ -7016,6 +7029,7 @@ const Ot = (function(){
     grid.innerHTML=dhtml;
   }
   function selectStaff(name){selectedStaff=name;localStorage.setItem('ot_my_name',name);render()}
+  function toggleFold(el){const row=el.closest('.day-row');if(row)row.classList.toggle('fold')}
   function onStaffSelectChange(){selectStaff($('otStaffSelect').value)}
   function toggleTime(date,time){
     const entry=entries.find(e=>e.name===selectedStaff&&e.date===date);
@@ -7092,7 +7106,7 @@ requestAnimationFrame(()=>{$('reqModalBg').scrollTop=0;const _mo=$('reqModalBg')
   return {
     loadAll, init,
     switchTab, changeWeek, goThisWeek,
-    onStaffSelectChange, toggleTime, clearDay,
+    onStaffSelectChange, toggleTime, clearDay, toggleFold,
     openStaffModal, closeStaffModal, addStaff, removeStaff,
     openRequestModal, closeReqModal, submitRequest, unifiedSearch
   };
