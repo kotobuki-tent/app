@@ -5,7 +5,7 @@
 // HTML/CSS/JS を変更したら必ずこの数字をインクリメントすること。
 // 例: "v1" → "v2" → "v3" ...
 // ============================================================
-const CACHE_VERSION = 'v158';
+const CACHE_VERSION = 'v159';
 const CACHE_NAME = `sequence-lab-${CACHE_VERSION}`;
 
 // プリキャッシュ対象（アプリシェル）
@@ -22,8 +22,10 @@ const NO_CACHE_PATTERNS = [
   /script\.google\.com/,
   /googleusercontent\.com/,
   /drive\.google\.com/,
-  /docs\.google\.com/,
-  /\/spa\//
+  /docs\.google\.com/
+  // 2026-09-03: /spa/ をキャッシュ対象外から外した。spa.html は同一オリジンの stale-while-revalidate
+  // （キャッシュを即返し・裏で最新を取得）になる＝LINE WORKS等から毎回開き直しても本体の読込が一瞬。
+  // 代わりにアプリ更新は「次の次」に開いた時に反映。GAS(API)は引き続き絶対にキャッシュしない
 ];
 
 // ===== install: プリキャッシュ =====

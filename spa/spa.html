@@ -8945,6 +8945,9 @@ window.addEventListener('load', async ()=>{
   App.current=null;
   App.nav((_deepGo && App.reg(_deepGo)) ? _deepGo : 'portal');
   setTimeout(()=>{moneyFetch()},2500);   // ¥バッジ（案件積み上げ総額）の初期値
+  // Service Worker登録（同一オリジンの静的ファイル＝spa.html本体をキャッシュから即表示し、裏で最新を取得）。
+  // 従来はregister.htmlだけが登録していたので、LINE WORKSやスマホで開く端末には無かった。失敗しても何もしない
+  try{ if('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js').catch(()=>{}); }catch(e){}
 });
 </script>
 </body>
