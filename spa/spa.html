@@ -8620,6 +8620,8 @@ function reloadAll(){boot();toast('更新しました');}
 // キオスク用ディープリンク：?go=画面 を mode-strip 前に捕捉（事務所前=alcohol/倉庫=forklift のアイコン用）
 // ?go=daily 直指定に加え、LINE WORKS WOFFがパス（…/woff/<ID>/daily）を ?woff.state=/daily に変換して渡してくる形も受ける
 const _deepGo=(function(){try{const q=new URLSearchParams(location.search);const g=q.get('go');if(g)return g;const st=q.get('woff.state');if(st){const m=String(st).match(/^\/?([a-z]+)/);if(m)return m[1];}return null}catch(e){return null}})();
+// 画面直指定で開いた時は、WOFFの本人特定（最大数秒）を待つ間にポータル（フルメニュー）が一瞬見えないよう先に隠す
+if(_deepGo && _deepGo!=='portal'){const _vp=document.getElementById('view-portal'); if(_vp) _vp.classList.add('hidden');}
 /* =========================================================
    資格（dept=qual）: 免許・技能講習・特別教育の台帳。
    一覧＝登録済みの人のカード（タップでモーダル編集）。
