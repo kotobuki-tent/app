@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>業務管理</title>
 <link rel="manifest" href="manifest.json">
+<script>/* LINE WORKS（WOFF）内で開いてる時はヘッダーを最初から出さない：前回WOFF内と判定した印（このWebView専用のlocalStorage）か、WOFFのパス引数（woff.state）があれば描画前にin-woffを付ける。本判定はwoffBootで行い、違っていれば外す */try{if(localStorage.getItem('in_woff')==='1'||/[?&]woff\.state=/.test(location.search))document.documentElement.classList.add('in-woff');}catch(e){}</script>
 <script>/* 経営者モード(?boss=)で開いた時はmanifestを外す＝ホーム画面に追加した起動URLに ?boss= を残す（start_urlで上書きされないように） */try{if(new URLSearchParams(location.search).get('boss')){var _m=document.querySelector('link[rel="manifest"]');if(_m)_m.remove();}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -122,9 +123,9 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--hdr);border-bottom:1px solid var(--border-light);display:flex;align-items:stretch;height:48px;padding:0;gap:0}
 .hdr-inner{display:flex;align-items:stretch;flex:1;min-width:0;padding:6px 8px 0 8px;gap:2px}
 /* LINE WORKS（WOFF）内で開いた時：ヘッダー無し（Botのメニューが画面の入口）。スマホ幅では¥バッジ（受注総額）も出さない */
-body.in-woff{padding-top:0}
-body.in-woff .hdr{display:none}
-body.in-woff #view-alcohol .kiosk, body.in-woff #view-forklift .kiosk{height:auto}
+html.in-woff body{padding-top:0}
+html.in-woff .hdr{display:none}
+html.in-woff #view-alcohol .kiosk, html.in-woff #view-forklift .kiosk{height:auto}
 @media(max-width:480px){.mny-btn{display:none!important}}
 .boss-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:250;pointer-events:none;display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:999px;font:800 12px/1 'Noto Sans JP',sans-serif;color:#7a5300;background:linear-gradient(135deg,#fde68a,#fbbf24);border:1px solid #f0a900;white-space:nowrap;box-shadow:0 2px 8px rgba(217,138,0,.4);letter-spacing:.08em}
 .boss-badge .boss-crown{font-size:14px;line-height:1}
@@ -3266,8 +3267,8 @@ async function woffBoot(){
   try{ const q=new URLSearchParams(location.search); if(q.has('woff.state')){ q.delete('woff.state'); if(_deepGo&&!q.has('go'))q.set('go',_deepGo); const qs=q.toString(); history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+location.hash); } }catch(e){}
   try{
     await woff.init({woffId:WOFF_ID});
-    if(!woff.isInClient()) return;   // PC/外部ブラウザは従来どおり（ログイン導線は使わない）
-    document.body.classList.add('in-woff');   // LINE WORKS内＝画面の行き来はBotのメニューでやるのでヘッダーを消す（CSS）
+    if(!woff.isInClient()){ document.documentElement.classList.remove('in-woff'); try{localStorage.removeItem('in_woff')}catch(e){} return; }   // PC/外部ブラウザは従来どおり
+    document.documentElement.classList.add('in-woff'); try{localStorage.setItem('in_woff','1')}catch(e){}   // LINE WORKS内＝ヘッダー無し（次回からは描画前に消える）
     const pf=await woff.getProfile();
     if(pf&&pf.displayName) window.__woffUser={name:pf.displayName,id:pf.userId||''};
   }catch(e){}
