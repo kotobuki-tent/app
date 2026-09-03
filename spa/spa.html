@@ -3227,6 +3227,13 @@ async function woffBoot(){
     const pf=await woff.getProfile();
     if(pf&&pf.displayName) window.__woffUser={name:pf.displayName,id:pf.userId||''};
   }catch(e){}
+  // 認識できた時だけ一言出す（名簿に無い人でも「WOFFが効いた」ことが分かるように）
+  if(window.__woffUser){
+    const el=document.createElement('div');
+    el.textContent='LINE WORKS：'+window.__woffUser.name+' として認識';
+    el.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111;color:#fff;padding:8px 14px;border-radius:20px;font-size:13px;z-index:99999;opacity:.92;pointer-events:none';
+    document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
+  }
 }
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 秘密の「経営者モード」：?boss=<キー> 一本で 本当のフルモード＝全ゾーン＋日報の記入状況ランキング＋人事考課マスター を解錠。
