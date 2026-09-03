@@ -15,7 +15,7 @@ There is no build or test tooling. To work here:
 - **Edit** the relevant `.html` / `.js` file directly.
 - **Preview** by opening the file in a browser (or serve the dir, e.g. `python3 -m http.server`). Note: a Service Worker is active — see caching rules below.
 - **Deploy** = commit + `git push origin main` (GitHub Pages serves `main` directly). Details/conventions in `.claude/rules/working-with-iller.md`.
-- **Caching**: `spa/spa.html` is in `NO_CACHE_PATTERNS` (always fresh). `register.html`/`manifest.json`/icons are in `PRECACHE_URLS` — changing any of them needs a `CACHE_VERSION` bump in `sw.js`. Claude may edit `sw.js` (unlocked 2026-07-28) — with care, see `.claude/rules/guardrails.md`.
+- **Caching**: since 2026-09-03 `spa/spa.html` is served **stale-while-revalidate** by the SW (spa.html registers `../sw.js` itself): cached copy shows instantly, the fresh copy is fetched in the background and used on the *next* open — so a deploy lands one reload late. GAS/API requests are never cached. `register.html`/`manifest.json`/icons are in `PRECACHE_URLS` — changing any of them needs a `CACHE_VERSION` bump in `sw.js`. Claude may edit `sw.js` (unlocked 2026-07-28) — with care, see `.claude/rules/guardrails.md`.
 - **Change the GAS backend** (`Code.gs`): follow the `gas-update` skill.
 
 ## Architecture

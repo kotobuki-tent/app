@@ -14,7 +14,7 @@ description: iller との仕事の進め方（口調・判断・デプロイ作�
 - **デプロイ = commit + `git push origin main`**（GitHub Pages が main を直配信）。リモートは SSH `git@github.com:kotobuki-tent/app.git`。
 - 編集は **diff で**。ファイル丸ごとの消して貼り直しはしない。
 - コミットメッセージ末尾は必ず: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`
-- **実機反映は最大10分**（GitHub Pages CDN cache）。`/spa/` は SW の `NO_CACHE_PATTERNS` なので強制リロード(⌘⇧R)/「更新」ボタンで即。
+- **実機反映は最大10分**（GitHub Pages CDN cache）＋ SW が spa.html を stale-while-revalidate でキャッシュしている（2026-09-03〜）ので**開き直し1回分遅れて反映**（1回目の開き直しで裏取得→2回目で新版）。「更新」ボタンはデータ再取得のみ。
 
 ## 検証・見せ方
 - 変更後は preview（`python3 -m http.server`、`.claude/launch.json` の "spa" 設定）で検証 → コンソールエラー無しを確認 → push。
