@@ -8249,13 +8249,27 @@ async function boot(){
   // キャッシュを即適用（名前が一瞬で出る）→ 裏で最新取得して差し替え
   const cached=localStorage.getItem('alc_boot');
   if(cached){try{applyBoot(JSON.parse(cached));}catch(e){}}
-  // bootstrap（名簿）と当日の記録は互いに依存しないので並列で取る（直列だと GAS 2往復分＝倍の待ち時間）
-  const bootP=(async()=>{try{
-    const b=await apiGet({action:'bootstrap'});
-    applyBoot(b);
-    try{localStorage.setItem('alc_boot',JSON.stringify(b));}catch(e){}
-  }catch(e){}})();
-  await Promise.all([bootP, loadDay($('f_date').value)]);
+  // 速さ優先の読み方（実測：list 2.5〜3.7s／bootstrap 約3s／boot(両方) 4〜5s）
+  //  - 名簿がキャッシュにある（2回目以降）：当日の記録(list)だけ待つ。名簿の最新化は裏で取ってそっと差し替え
+  //  - 名簿が無い（初回）：boot（名簿＋当日分を1往復）。GASが旧版なら従来の並列2往復にフォールバック
+  const date=$('f_date').value;
+  if(cached){
+    (async()=>{try{const b=await apiGet({action:'bootstrap'});if(b&&Array.isArray(b.drivers)){applyBoot(b);try{localStorage.setItem('alc_boot',JSON.stringify(b));}catch(e){}renderDrivers();}}catch(e){}})();
+    await loadDay(date);
+  }else{
+    let done=false;
+    try{
+      const b=await apiGet({action:'boot',date});
+      if(b&&b.success&&Array.isArray(b.data)&&Array.isArray(b.drivers)){   // 旧GASは未知のactionを当日listとして返す（driversが無い）ので、それは採用しない
+        applyBoot(b); try{localStorage.setItem('alc_boot',JSON.stringify({success:true,drivers:b.drivers,vehicles:b.vehicles,checker:b.checker}));}catch(e){}
+        records=b.data; renderDrivers(); renderToday(); done=true;
+      }
+    }catch(e){}
+    if(!done){
+      const bootP=(async()=>{try{const b=await apiGet({action:'bootstrap'});applyBoot(b);try{localStorage.setItem('alc_boot',JSON.stringify(b));}catch(e){}}catch(e){}})();
+      await Promise.all([bootP, loadDay(date)]);
+    }
+  }
   // 名簿が記録より後に届いた場合に備えて、WOFFの本人自動選択をもう一度
   if(!selDriver&&window.__woffUser){const m=woffMatch(drivers,d=>d.name);if(m)selectDriver(m.name);}
 }
