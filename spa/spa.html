@@ -2915,6 +2915,15 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-alcohol .toast.ok{background:var(--accent);color:#fff}
 #view-alcohol .toast.err{background:var(--red);color:#fff}
 @media(max-width:840px),(orientation:portrait){#view-alcohol .kiosk{grid-template-columns:1fr}}
+/* スマホ（幅480px以下）だけ：運転者のボタン一覧を日報と同じセレクト式にしてコンパクトに。PC・事務所前タブレット（縦置き27インチ＝幅は480pxより広い）は従来のボタン一覧のまま */
+#view-alcohol .drvsel{display:none}
+@media(max-width:480px){
+  #view-alcohol .drvsel{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+  #view-alcohol .drvsel label{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+  #view-alcohol .drvsel select{flex:1;min-width:0;font:700 17px/1.2 'Noto Sans JP';padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text)}
+  #view-alcohol .drvsel select.sel{border-color:var(--accent);background:var(--accent-dim)}
+  #view-alcohol .ngrid,#view-alcohol .moretoggle,#view-alcohol .selbar{display:none}
+}
 </style>
 <div class="kiosk">
 
@@ -8235,7 +8244,9 @@ function renderDrivers(){
   };
   const reg=drivers.filter(d=>d.reg!==false);    // 普段表示（運転する人）
   const extra=drivers.filter(d=>d.reg===false);  // 普段運転しない人（控え）
-  let html='';
+  // スマホ用のセレクト（CSSで幅480px以下の時だけ表示。同じ状態＝selDriverを共有）
+  const opt=d=>{const st=statusOf(d.name);const mk=st==='full'?' ✓':(st==='half'?' •':'');return `<option value="${esc(d.name)}"${selDriver===d.name?' selected':''}>${esc(d.name)}${mk}</option>`;};
+  let html=`<div class="drvsel"><label>運転者</label><select class="${selDriver?'sel':''}" onchange="Alc.onDriverSel(this.value)"><option value="">-- 名前を選んでください --</option>${reg.map(opt).join('')}${extra.length?`<optgroup label="普段運転しない人">${extra.map(opt).join('')}</optgroup>`:''}</select></div>`;
   if(reg.length){html+=`<div class="ngrid">${reg.map(btn).join('')}</div>`;}
   if(extra.length){
     html+=`<div><span class="moretoggle" onclick="Alc.toggleExtra()">${showExtra?'− 控えを隠す':'＋ その他の人（普段運転しない人）'}</span></div>`;
@@ -8244,6 +8255,7 @@ function renderDrivers(){
   el.innerHTML=html;
 }
 function toggleExtra(){showExtra=!showExtra;renderDrivers();}
+function onDriverSel(v){ if(!v){clearSel();return;} if(v===selDriver)return; selectDriver(v); }
 
 function selectDriver(name){
   if(selDriver===name){ clearSel(); return; }  // 同じ氏名を再タップで選択解除
@@ -8391,7 +8403,7 @@ async function exportCsv(){
 function reloadAll(){boot();toast('更新しました');}
   function loadAll(){ return boot(); }
   function init(){}
-  return { loadAll, init, clearSel, segPick, onAlcoholChange, addInstr, toggleDetail, onFaceChange, record, shiftDay, goToday, exportCsv, closeEdit, delRecord, saveEdit, selectDriver, toggleExtra, openEdit, delById, loadDay, reloadAll };
+  return { loadAll, init, clearSel, segPick, onAlcoholChange, addInstr, toggleDetail, onFaceChange, record, shiftDay, goToday, exportCsv, closeEdit, delRecord, saveEdit, selectDriver, toggleExtra, onDriverSel, openEdit, delById, loadDay, reloadAll };
 })();
 const Fork=(function(){
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
