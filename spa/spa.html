@@ -2938,6 +2938,8 @@ table.jobs tr:last-child td{border-bottom:none}
   html #view-alcohol .rc-st{display:none}
   html #view-alcohol .rc-slot.ng .rc-st{display:inline;color:var(--red)}
   html #view-alcohol .rc-del{display:none}
+  /* 月次CSV出力はスマホでは不要（PC/タブレットのみ） */
+  html #view-alcohol .csvsec{display:none}
 }
 </style>
 <div class="kiosk">
@@ -3013,6 +3015,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <input type="hidden" id="f_date">
     <div id="dayMtx"><div class="empty">読み込み中...</div></div>
 
+    <div class="csvsec">
     <div class="divider"></div>
     <h2>📤 月次CSV出力（保存用）</h2>
     <div class="csvbar">
@@ -3020,6 +3023,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <button class="btn" onclick="Alc.exportCsv()">CSV出力</button>
     </div>
     <p class="note">法定記録事項（確認者・運転者・車両・日時・確認方法・酒気帯びの有無・指示事項）を含みます。1年間保存してください。</p>
+    </div>
   </div>
 
 </div>
