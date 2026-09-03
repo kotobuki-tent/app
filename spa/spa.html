@@ -2927,6 +2927,17 @@ table.jobs tr:last-child td{border-bottom:none}
   html #view-alcohol .commit{gap:10px;margin-top:10px}
   html #view-alcohol .commit button{height:64px;font-size:19px;border-radius:12px;gap:2px}
   html #view-alcohol .commit button small{font-size:10px}
+  /* 本日の点呼状況：スマホでは1人1行（名前｜運転前 時刻｜運転後 時刻）。取消はタップ→編集画面から */
+  html #view-alcohol .rec-grid{display:block}
+  html #view-alcohol .rec-card{display:flex;align-items:center;gap:8px;padding:7px 10px 7px 12px;border-radius:10px;margin-bottom:6px}
+  html #view-alcohol .rc-name{flex:1;min-width:0;font-size:15px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  html #view-alcohol .rc-slots{display:flex;gap:6px;flex:none}
+  html #view-alcohol .rc-slot{min-height:0;flex-direction:row;gap:5px;padding:6px 8px;border-radius:8px;min-width:92px;justify-content:center}
+  html #view-alcohol .rc-k{font-size:10px}
+  html #view-alcohol .rc-v{font-size:14px}
+  html #view-alcohol .rc-st{display:none}
+  html #view-alcohol .rc-slot.ng .rc-st{display:inline;color:var(--red)}
+  html #view-alcohol .rc-del{display:none}
 }
 </style>
 <div class="kiosk">
