@@ -7631,8 +7631,8 @@ const Cases = (function(){
   const DEPT=Object.fromEntries(DEPTS.map((d,i)=>[d.k,{s:d.s,n:d.n,c:d.c,o:i}]));
   let _cases=[], _tab='list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='';
   // 完了タブの得意先トグル（大口客を隠して残りを見やすく）。非表示中のキーをlocalStorageに保持
-  // 'tsp'＝TSP太陽㈱のみ（TSP東日本・西日本・東北・プラスは含めない：illerの指示 09-08）
-  const CL_GROUPS=[['tsp','TSP太陽',v=>/TSP\s*太陽/i.test(v)],['taiyo','太陽工業',v=>v.includes('太陽工業')],['ceres','セレスポ',v=>v.includes('セレスポ')]];
+  // 'tsp'＝TSP太陽㈱のみ（TSP東日本・西日本・東北・プラスは含めない）。TSP太陽の商品センターは対象外＝トグルで消さない（illerの指示 09-08）
+  const CL_GROUPS=[['tsp','TSP太陽',v=>/TSP\s*太陽/i.test(v)&&!v.includes('商品センター')],['taiyo','太陽工業',v=>v.includes('太陽工業')],['ceres','セレスポ',v=>v.includes('セレスポ')]];
   let _hideCl=new Set(); try{ _hideCl=new Set(JSON.parse(localStorage.getItem('cases_hideCl')||'[]')); }catch(e){}
   const clKey=c=>{ const v=String(c.client||'')+' '+String(c.name||''); const g=CL_GROUPS.find(g=>g[2](v)); return g?g[0]:''; };
   function clientChips(base){
