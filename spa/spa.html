@@ -1919,7 +1919,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="ce_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="ce_order_no"></div></div>
       <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="ce_client"></div><div class="mo-field f3"><label>窓口</label><input id="ce_contact"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>社内納期（目標・仮）<span class="ce-target-note">客の納期ではない／カレンダーに点線で表示</span></label><input type="date" id="ce_target_date"></div></div>
-      <div class="mo-row full"><div class="mo-field"><label>金額（円）　一案件＝一金額</label><input type="number" id="ce_amount" min="0" step="1" placeholder="空欄可"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　一案件＝一金額</label><input type="number" id="ce_amount" min="0" step="1"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
       <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div><div id="ce_adddept" class="ce-adddept"></div></div>
       <div class="mo-foot"><button class="cancel" onclick="Cases.closeEdit()">閉じる</button><button class="save" onclick="Cases.saveEdit()">保存</button></div>
@@ -7990,7 +7990,7 @@ const Cases = (function(){
         <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="cf_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>ステータス</label><select id="cf_status"><option>見積中</option><option selected>受注</option><option>見送り</option></select></div></div>
         <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div></div>
         <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="cf_client"></div><div class="mo-field f3"><label>窓口</label><input id="cf_person"></div></div>
-        <div class="mo-row full"><div class="mo-field"><label>金額（円）　一案件＝一金額</label><input type="number" id="cf_case_amount" min="0" step="1" placeholder="空欄可・あとから編集で入れてもいい"></div></div>
+        <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　一案件＝一金額</label><input type="number" id="cf_case_amount" min="0" step="1"></div></div>
       </div>
       <div class="cases-hint">この案件がどこで動くかを選ぶ（両方でも可）。工場で製作→自社施工なら両方にチェック。生産がベースの案件・企画制作がベースの案件、どちらもここから登録。</div>
 
