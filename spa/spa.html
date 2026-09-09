@@ -4725,6 +4725,9 @@ const Proj = (function(){
     const rows=$('rentalAddRows').querySelectorAll('.rental-add-row');
     if(!rows.length){toast('追加する行がありません',true);return}
     const items=[];
+    // 案件が既にメンテ中なら後入れの品は最初からメンテ待ち、レンタル中なら貸出中（後入れでも連動が抜けないように）
+    const pj=projData.find(x=>x.project===projectName);
+    const initSt=pj&&pj.status==='メンテ中'?'メンテ待ち':(pj&&pj.status==='レンタル中'?'貸出中':'予約');
     for(const row of rows){
       const cat=row.querySelector('.ra-cat').value;
       const item=row.querySelector('.ra-item').value;
@@ -4733,13 +4736,13 @@ const Proj = (function(){
       const start=dates[0]?.value||'';
       const end=dates[1]?.value||'';
       if(!cat||!item||!start||!end){toast('カテゴリ・商品・日付を全て入力してください',true);return}
-      const rental={id:'RNTC-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),category:cat,item_name:item,qty:qty,date_start:start,date_end:end,status:'予約',client_name:projectName,notes:''};
+      const rental={id:'RNTC-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),category:cat,item_name:item,qty:qty,date_start:start,date_end:end,status:initSt,client_name:projectName,notes:''};
       items.push(rental);
       rentalsData.push({...rental});
       fireAndForget({dept:'inventory',action:'save_rental',...rental});
     }
     _busyRental=true;
-    toast(items.length+'件登録しました');
+    toast(items.length+'件登録しました'+(initSt!=='予約'?'（'+initSt+'）':''));
     const d=projData.find(x=>x.project===projectName);
     if(d)viewProj(d.id);
     setTimeout(()=>{_busyRental=false},1500);
