@@ -4665,9 +4665,10 @@ const Proj = (function(){
       notes:$('xf_notes').value.trim()};
     const isNew=!editId;
     if(isNew && _addCaseId){ body.case_id=_addCaseId; _addCaseId=''; }
+    let prevSt='';
     if(editId){
       const idx=projData.findIndex(x=>String(x.id)===String(editId));
-      if(idx!==-1)projData[idx]={...projData[idx],...body};
+      if(idx!==-1){prevSt=projData[idx].status||'';projData[idx]={...projData[idx],...body};}
     }else{
       body.id='tmp_'+Date.now();
       projData.unshift(body);
@@ -4675,6 +4676,7 @@ const Proj = (function(){
     _savingProj=true;
     fireAndForget(body);
     cascadeRentalStatus(name,body.status);
+    cascadeMaint(name,prevSt,body.status);   // 編集フォームからの変更でも在庫のメンテ連動を必ず走らせる（詳細画面のボタンと同じ結果）
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('保存しました');
     closeProjMo();
@@ -4750,6 +4752,21 @@ const Proj = (function(){
     targets.forEach(r=>{r.status='貸出中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('レンタル品'+targets.length+'件を貸出中にしました');
+  }
+  // 編集フォーム経由の連動：メンテ中にしたら 予約/貸出中 のレンタル品をメンテ待ちへ、メンテ中から現場中/レンタル中へ戻したらメンテ待ちを貸出中へ
+  function cascadeMaint(projectName,prevSt,newSt){
+    if(prevSt===newSt)return;
+    if(newSt==='メンテ中'){
+      const t=rentalsData.filter(r=>r.client_name===projectName&&(r.status==='貸出中'||r.status==='予約'));
+      if(!t.length)return;
+      t.forEach(r=>{r.status='メンテ待ち';fireAndForget({dept:'inventory',action:'save_rental',...r})});
+      toast('レンタル品'+t.length+'件をメンテ待ちへ');
+    }else if(prevSt==='メンテ中'&&(newSt==='現場中'||newSt==='レンタル中')){
+      const t=rentalsData.filter(r=>r.client_name===projectName&&r.status==='メンテ待ち');
+      if(!t.length)return;
+      t.forEach(r=>{r.status='貸出中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
+      toast('メンテ待ちの品'+t.length+'件を貸出中に戻しました');
+    }
   }
   // ステータス変更の実行部。sendMaint=trueならレンタル品をメンテ待ちへ送る
   function applyProjStatus(d,id,newSt,sendMaint,restoreMaint){
