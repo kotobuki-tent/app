@@ -1921,7 +1921,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-row full"><div class="mo-field"><label>社内納期（目標・仮）<span class="ce-target-note">客の納期ではない／カレンダーに点線で表示</span></label><input type="date" id="ce_target_date"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　一案件＝一金額</label><input type="number" id="ce_amount" min="0" step="1"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
-      <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div><div id="ce_adddept" class="ce-adddept"></div></div>
+      <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div><div id="ce_adddept" class="ce-adddept"></div><div id="ce_rentals"></div></div>
       <div class="mo-foot"><button class="cancel" onclick="Cases.closeEdit()">閉じる</button><button class="save" onclick="Cases.saveEdit()">保存</button></div>
     </div>
   </div>
@@ -2066,8 +2066,8 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-field"><label>本番</label><input type="number" id="xf_people_event" min="0" placeholder="0"></div>
       <div class="mo-field"><label>撤去</label><input type="number" id="xf_people_teardown" min="0" placeholder="0"></div>
     </div>
-    <div class="phase-hd">車両</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+    <div class="phase-hd hidden">車両</div><!-- 車両の調整は使わないので非表示（09-14 iller） -->
+    <div class="hidden" style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
     <div class="date-phase-block setup-only"><label class="date-phase-label">搬入</label><div class="chk-list" id="xf_vh_load_in"></div></div>
     <div class="date-phase-block setup-only"><label class="date-phase-label">設営</label><div class="chk-list" id="xf_vh_setup"></div></div>
     <div class="date-phase-block setup-only"><label class="date-phase-label">本番</label><div class="chk-list" id="xf_vh_event"></div></div>
@@ -4703,8 +4703,9 @@ const Proj = (function(){
   // ===== レンタル品（在庫連携） =====
   function getInvCategories(){const cats=new Set();inventoryItems.forEach(i=>{if(i.category)cats.add(i.category)});return[...cats].sort()}
   function getInvItemsByCat(cat){return inventoryItems.filter(i=>i.category===cat)}
-  function addRentalRow(projectName){
-    const wrap=$('rentalAddRows');
+  function addRentalRow(projectName,pfx){
+    pfx=pfx||'';
+    const wrap=$('rentalAddRows'+pfx);
     const cats=getInvCategories();
     const row=document.createElement('div');row.className='rental-add-row';
     const catSel=document.createElement('select');catSel.className='ra-cat';
@@ -4715,14 +4716,15 @@ const Proj = (function(){
     const qtyInp=document.createElement('input');qtyInp.className='ra-qty';qtyInp.type='number';qtyInp.min='1';qtyInp.value='1';qtyInp.placeholder='数量';
     const startInp=document.createElement('input');startInp.className='ra-date';startInp.type='date';
     const endInp=document.createElement('input');endInp.className='ra-date';endInp.type='date';
-    const rmBtn=document.createElement('button');rmBtn.className='ra-rm';rmBtn.textContent='×';rmBtn.onclick=()=>{row.remove();if(!wrap.children.length)$('rentalSaveBtnWrap').classList.add('hidden')};
+    const rmBtn=document.createElement('button');rmBtn.className='ra-rm';rmBtn.textContent='×';rmBtn.onclick=()=>{row.remove();if(!wrap.children.length)$('rentalSaveBtnWrap'+pfx).classList.add('hidden')};
     row.appendChild(catSel);row.appendChild(itemSel);row.appendChild(qtyInp);row.appendChild(startInp);row.appendChild(endInp);row.appendChild(rmBtn);
     wrap.appendChild(row);
-    $('rentalSaveBtnWrap').classList.remove('hidden');
+    $('rentalSaveBtnWrap'+pfx).classList.remove('hidden');
   }
-  function saveProjectRentals(projectName){
+  function saveProjectRentals(projectName,pfx){
     if(_busyRental)return;
-    const rows=$('rentalAddRows').querySelectorAll('.rental-add-row');
+    pfx=pfx||'';
+    const rows=$('rentalAddRows'+pfx).querySelectorAll('.rental-add-row');
     if(!rows.length){toast('追加する行がありません',true);return}
     const items=[];
     // 案件が既にメンテ中なら後入れの品は最初からメンテ待ち、レンタル中なら貸出中（後入れでも連動が抜けないように）
@@ -4743,9 +4745,30 @@ const Proj = (function(){
     }
     _busyRental=true;
     toast(items.length+'件登録しました'+(initSt!=='予約'?'（'+initSt+'）':''));
-    const d=projData.find(x=>x.project===projectName);
-    if(d)viewProj(d.id);
+    if(pfx){_setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});try{Cases.refreshRentals()}catch(e){}}
+    else{const d=projData.find(x=>x.project===projectName);
+    if(d)viewProj(d.id);}
     setTimeout(()=>{_busyRental=false},1500);
+  }
+  // 案件（親）の編集画面から使うレンタル品の欄。企画制作の詳細画面と同じ追加・登録・削除を pfx 付きIDで使う
+  async function ensureRentalData(){
+    if(projData.length&&inventoryItems.length)return;
+    const cached=_getCache('project');
+    if(cached){if(cached.proj&&!projData.length)projData=cached.proj;if(cached.rent&&!rentalsData.length)rentalsData=cached.rent;if(cached.inv&&!inventoryItems.length)inventoryItems=cached.inv;}
+    if(projData.length&&inventoryItems.length)return;
+    await Promise.all([loadProj(),loadRentals(),loadInventoryItems()]);
+    _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
+  }
+  function rentalPanelHtml(projectName,pfx){
+    const q=String(projectName).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const list=rentalsData.filter(r=>r.client_name===projectName);
+    const md=v=>{if(!v)return'';const t=new Date(v+'T00:00:00');return (t.getMonth()+1)+'/'+t.getDate()};
+    let h='';
+    if(list.length){list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span style="font-size:11px;padding:2px 6px;border-radius:4px;background:var(--purple-dim);color:var(--purple)">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'})}
+    else h+='<div style="font-size:12px;color:var(--text-faint);margin-bottom:6px">まだ登録されていません</div>';
+    h+='<div id="rentalAddRows'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="Proj.addRentalRow(\''+esc(q)+'\',\''+pfx+'\')">＋ レンタル品を追加</button>';
+    h+='<div id="rentalSaveBtnWrap'+pfx+'" class="hidden"><button type="button" class="rental-save-btn" onclick="Proj.saveProjectRentals(\''+esc(q)+'\',\''+pfx+'\')">まとめて登録</button></div>';
+    return h;
   }
   // 現場ステータス→レンタル品ステータス連動：レンタル中になったら「予約」を「貸出中」へ
   function cascadeRentalStatus(projectName,newSt){
@@ -4824,14 +4847,15 @@ const Proj = (function(){
     bg.querySelector('#rcNo').onclick=()=>bg.remove();
     bg.onclick=e=>{if(e.target===bg)bg.remove()};
   }
-  function deleteProjectRental(id){
+  function deleteProjectRental(id,pfx){
     if(_busyRental)return;
     if(!confirm('このレンタル品を削除しますか？'))return;
     _busyRental=true;
     rentalsData=rentalsData.filter(x=>x.id!==id);
     fireAndForget({dept:'inventory',action:'delete_rental',id:id});
     toast('削除しました');
-    $('projViewBg').classList.remove('show');
+    if(pfx){_setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});try{Cases.refreshRentals()}catch(e){}}
+    else $('projViewBg').classList.remove('show');
     setTimeout(loadAll,8000);
     setTimeout(()=>{_busyRental=false},1500);
   }
@@ -4852,6 +4876,7 @@ const Proj = (function(){
     changeProjStatus, toggleProjInvoiced,
     archiveProj, unarchiveProj,
     viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput, moneySum,
+    ensureRentalData, rentalPanelHtml,
     ganttMove, ganttToday, setGanttFilter, setGanttDays,
     unifiedSearch
   };
@@ -7977,8 +8002,17 @@ const Cases = (function(){
     $('ce_adddept').innerHTML = addable.length
       ? '<span class="ce-add-lbl">部門を後から追加：</span>'+addable.map(d=>`<button type="button" class="ce-add-btn ce-add-${d.k}" onclick="Cases.addDept('${d.k}')">＋ ${d.n}</button>`).join('')
       : '';
+    refreshRentals();
     $('caseEditBg').classList.add('show'); }
-  function closeEdit(){ $('caseEditBg').classList.remove('show'); _editId=''; }
+  // 企画制作の明細ごとにレンタル品の欄（追加・登録・削除は Proj の仕組みをそのまま使う）
+  async function refreshRentals(){ const box=$('ce_rentals'); if(!box)return; const id=_editId;
+    const pj=(_children[String(id)]||[]).filter(k=>k.dept==='project'&&k.project);
+    if(!pj.length){ box.innerHTML=''; return; }
+    if(!box.innerHTML) box.innerHTML='<div class="rental-add-section"><h3>レンタル品</h3><div style="font-size:12px;color:var(--text-faint)">読み込み中...</div></div>';
+    try{ await Proj.ensureRentalData(); }catch(e){}
+    if(_editId!==id)return;
+    box.innerHTML=pj.map((k,i)=>'<div class="rental-add-section"><h3>レンタル品'+(pj.length>1?'（'+esc(k.project)+'）':'')+'</h3>'+Proj.rentalPanelHtml(k.project,'_ce'+i)+'</div>').join(''); }
+  function closeEdit(){ $('caseEditBg').classList.remove('show'); _editId=''; const rb=$('ce_rentals'); if(rb)rb.innerHTML=''; }
   function addDept(dept){ const c=_find(_editId); if(!c)return; closeEdit(); const key={production:'prod',project:'proj',sales:'sales'}[dept]; if(!key)return;
     App._loaded.cases=false; // 戻った時に案件を取り直して新しい子を反映
     App.nav(key); // セクション切替は同期・データ取得は裏。モーダルはネット待ちせず即開く
@@ -8046,8 +8080,8 @@ const Cases = (function(){
               <div class="mo-field"><label>本番</label><input type="number" id="cf_p_event" min="0" placeholder="0"></div>
               <div class="mo-field"><label>撤去</label><input type="number" id="cf_p_teardown" min="0" placeholder="0"></div>
             </div>
-            <div class="phase-hd">車両</div>
-            <div class="cf-grid2">${vhBlock('load_in','搬入')}${vhBlock('setup','設営')}${vhBlock('event','本番')}${vhBlock('teardown','撤去')}</div>
+            <div class="phase-hd hidden">車両</div><!-- 車両の調整は使わないので非表示（09-14 iller） -->
+            <div class="cf-grid2 hidden">${vhBlock('load_in','搬入')}${vhBlock('setup','設営')}${vhBlock('event','本番')}${vhBlock('teardown','撤去')}</div>
           </div>
           <div id="cf_jt_rental" class="cf-hide">
             <div class="phase-hd">レンタル期間</div>
@@ -8055,7 +8089,7 @@ const Cases = (function(){
             <div class="phase-hd">配送方法</div>
             <select id="cf_rdeliv" class="cf-delsel" onchange="Cases.setRdeliv()"><option>引き取り</option><option>自社配送</option><option>運送便</option></select>
             <div id="cf_rcarrier" class="cf-hide" style="margin-top:10px"><div class="mo-field"><label>運送業者</label><input id="cf_rcarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
-            <div id="cf_rveh" class="cf-hide" style="margin-top:10px"><div class="cf-grid2">${vhBlock('lend','貸出')}${vhBlock('back','返却')}</div></div>
+            <div id="cf_rveh" class="cf-hide hidden" style="margin-top:10px"><div class="cf-grid2">${vhBlock('lend','貸出')}${vhBlock('back','返却')}</div></div>
           </div>
           <div id="cf_jt_nouhin" class="cf-hide">
             <div class="phase-hd">納品日</div>
@@ -8064,7 +8098,7 @@ const Cases = (function(){
             <select id="cf_ndeliv" class="cf-delsel" onchange="Cases.setNdeliv()"><option>運送便</option><option>自社配送</option><option>引き取り</option></select>
             <div id="cf_nhint" class="cases-hint" style="margin:8px 0 0">製作品の出荷なら〈生産〉にもチェック（配送方法・材料は製作物に記録）。保管品などを送るだけなら企画制作のみでOK。</div>
             <div id="cf_ncarrier" style="margin-top:10px"><div class="mo-field"><label>運送業者</label><input id="cf_ncarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
-            <div id="cf_nveh" class="cf-hide" style="margin-top:10px"><div class="cf-grid2">${vhBlock('deliv','納品')}</div></div>
+            <div id="cf_nveh" class="cf-hide hidden" style="margin-top:10px"><div class="cf-grid2">${vhBlock('deliv','納品')}</div></div>
           </div>
           <div id="cf_jt_material"><div class="phase-hd">材料・仕入</div><div class="mo-row full"><div class="mo-field"><label>材料・仕入メモ</label><textarea id="cf_material"></textarea></div></div></div>
           <div class="phase-hd">レンタル品</div>
@@ -8210,7 +8244,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, refreshRentals, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum };
 })();
 
 const Alc=(function(){
