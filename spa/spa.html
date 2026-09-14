@@ -4538,8 +4538,8 @@ const Proj = (function(){
     if(d.vehicles_rental_out)h+=vr('貸出',d.vehicles_rental_out);
     if(d.vehicles_rental_return)h+=vr('返却',d.vehicles_rental_return);
     h+='</div>'}if(d.material)h+='<div class="view-section"><h3>材料・仕入</h3><div class="view-row"><div class="view-val">'+esc(d.material)+'</div></div></div>';
-    if(d.rentals){const sp=splitExtras(d.rentals);
-      if(sp.items.length)h+='<div class="view-section"><h3>台帳にない物</h3>'+sp.items.map(it=>'<div class="rental-existing"><span class="re-info">'+esc(it.name)+(it.qty?' × '+esc(it.qty):'')+'</span></div>').join('')+'</div>';
+    {const sp=splitExtras(d.rentals);
+      h+='<div class="view-section"><h3>台帳にない物（1行に1品）</h3><div id="pv_extras"></div><button type="button" class="rental-add-btn" onclick="Proj.addExtraRow(\'pv_extras\')">＋ 台帳にない物を追加</button> <button type="button" class="rental-save-btn" onclick="Proj.saveViewExtras(\''+esc(String(d.id))+'\')">台帳にない物を保存</button></div>';
       if(sp.legacy)h+='<div class="view-section"><h3>以前のメモ</h3><div class="view-row"><div class="view-val" style="white-space:pre-wrap">'+esc(sp.legacy)+'</div></div></div>';}
     const projRentals=rentalsData.filter(r=>r.client_name===d.project);
     h+='<div class="rental-add-section"><h3>レンタル品</h3>';
@@ -4555,6 +4555,7 @@ const Proj = (function(){
     ['見積中','受注','準備中','現場中','レンタル中','メンテ中','終了'].forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${s}">${s}</button>`});
     h+='</div></div>';
     $('projViewContent').innerHTML=h;
+    splitExtras(d.rentals).items.forEach(it=>addExtraRow('pv_extras',it.name,it.qty));
     const ptgl=$('projStToggle'),popts=$('projStOpts');
     if(ptgl&&popts)ptgl.onclick=()=>{ptgl.classList.toggle('open');popts.classList.toggle('open')};
     $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}if(newSt==='終了'&&String(d.invoiced||'').toUpperCase()!=='TRUE'&&!confirm('伝票が済んでいませんが終了にしますか？'))return;if((newSt==='レンタル中'||newSt==='現場中')&&d.status==='メンテ中'){const mw=rentalsData.filter(r=>r.client_name===d.project&&r.status==='メンテ待ち');if(mw.length){restoreChoice(d,id,newSt,mw);return}}if(newSt==='メンテ中'){const mt=rentalsData.filter(r=>r.client_name===d.project&&(r.status==='貸出中'||r.status==='予約'));if(mt.length){maintChoice(d,id,mt);return}}applyProjStatus(d,id,newSt,false)}});
@@ -4805,6 +4806,17 @@ const Proj = (function(){
     const html='<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>台帳に載せるリスト '+ds+'</title><style>body{font-family:"Noto Sans JP","Hiragino Sans",sans-serif;margin:24px;color:#222}h1{font-size:18px;margin:0 0 4px}.meta{font-size:12px;color:#666;margin-bottom:12px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #999;padding:6px 8px;vertical-align:top}th{background:#eee}.c{width:28px;text-align:center}.n{width:48px;text-align:right}.s{font-size:11px;color:#444;width:38%}th:last-child{width:90px}.bar{margin-bottom:12px}@media print{.bar{display:none}body{margin:10mm}}</style></head><body><div class="bar"><button onclick="window.print()" style="font-size:14px;padding:8px 18px">印刷</button></div><h1>台帳に載せるリスト</h1><div class="meta">'+ds+' 作成　'+rows.length+'品　（現場の「台帳にない物」から集計。台帳と同じ名前の'+skipped+'件は除外）</div><table><thead><tr><th class="c">済</th><th>品名</th><th class="n">回数</th><th>使った現場（数量）</th><th>保有数</th></tr></thead><tbody>'+body+'</tbody></table></body></html>';
     w.document.open();w.document.write(html);w.document.close();
   }
+  let _busyExtras=false;
+  function saveViewExtras(id){
+    if(_busyExtras)return;
+    const d=projData.find(x=>String(x.id)===String(id));if(!d)return;
+    const txt=composeExtras('pv_extras',splitExtras(d.rentals).legacy);
+    if(txt===String(d.rentals||'')){toast('変更はありません');return}
+    _busyExtras=true;setTimeout(()=>{_busyExtras=false},1500);
+    d.rentals=txt;fireAndForget({dept:'project',action:'save',id:d.id,rentals:txt});
+    _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
+    toast('台帳にない物を保存しました');viewProj(d.id);
+  }
   function projRentalsText(id){const d=projData.find(x=>String(x.id)===String(id));return d?String(d.rentals||''):null}
   function setProjRentalsText(id,text){const d=projData.find(x=>String(x.id)===String(id));if(d)d.rentals=text;_setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems})}
   // どの画面から登録・削除しても、開いている欄を描き直す（データは rentalsData 1本）
@@ -4965,7 +4977,7 @@ const Proj = (function(){
     changeProjStatus, toggleProjInvoiced,
     archiveProj, unarchiveProj,
     viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput, moneySum,
-    ensureRentalData, hasRentalData, rentalPanelHtml, addExtraRow, composeExtras, splitExtras, fillExtras, projRentalsText, setProjRentalsText, printLedgerCandidates, addRentalRowXfNew, pendingRentalRows, rentalRowsIncomplete,
+    ensureRentalData, hasRentalData, rentalPanelHtml, addExtraRow, composeExtras, splitExtras, fillExtras, projRentalsText, setProjRentalsText, printLedgerCandidates, saveViewExtras, addRentalRowXfNew, pendingRentalRows, rentalRowsIncomplete,
     ganttMove, ganttToday, setGanttFilter, setGanttDays,
     unifiedSearch
   };
