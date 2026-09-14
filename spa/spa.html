@@ -4787,6 +4787,8 @@ const Proj = (function(){
     const lg=String(legacyText||'').trim();
     return lines.concat(lg?[lg]:[]).join('\n');
   }
+  function projRentalsText(id){const d=projData.find(x=>String(x.id)===String(id));return d?String(d.rentals||''):null}
+  function setProjRentalsText(id,text){const d=projData.find(x=>String(x.id)===String(id));if(d)d.rentals=text;_setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems})}
   // どの画面から登録・削除しても、開いている欄を描き直す（データは rentalsData 1本）
   function refreshRentalPanels(pfx){
     if(pfx==='_xf'){const d=projData.find(x=>String(x.id)===String($('xf_id').value));const b=$('xf_rentalPanel');if(d&&b)b.innerHTML=rentalPanelHtml(d.project,'_xf');}
@@ -4945,7 +4947,7 @@ const Proj = (function(){
     changeProjStatus, toggleProjInvoiced,
     archiveProj, unarchiveProj,
     viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput, moneySum,
-    ensureRentalData, hasRentalData, rentalPanelHtml, addExtraRow, composeExtras, splitExtras, addRentalRowXfNew, pendingRentalRows, rentalRowsIncomplete,
+    ensureRentalData, hasRentalData, rentalPanelHtml, addExtraRow, composeExtras, splitExtras, fillExtras, projRentalsText, setProjRentalsText, addRentalRowXfNew, pendingRentalRows, rentalRowsIncomplete,
     ganttMove, ganttToday, setGanttFilter, setGanttDays,
     unifiedSearch
   };
@@ -8077,14 +8079,16 @@ const Cases = (function(){
   async function refreshRentals(){ const box=$('ce_rentals'); if(!box)return; const id=_editId;
     const pj=(_children[String(id)]||[]).filter(k=>k.dept==='project'&&k.project);
     if(!pj.length){ box.innerHTML=''; return; }
-    const draw=()=>{ box.innerHTML=pj.map((k,i)=>'<div class="rental-add-section"><h3>レンタル品'+(pj.length>1?'（'+esc(k.project)+'）':'')+'</h3>'+Proj.rentalPanelHtml(k.project,'_ce'+i)+'</div>').join(''); };
-    const pending=()=>pj.some((k,i)=>Proj.pendingRentalRows('_ce'+i).length);
+    const extrasHtml=i=>'<div class="ce-extras" oninput="this.dataset.dirty=1" onclick="if(event.target.tagName===\'BUTTON\')this.dataset.dirty=1" style="margin-top:12px"><h3>台帳にない物（1行に1品）</h3><div id="ce_extras_'+i+'"></div><button type="button" class="rental-add-btn" onclick="Proj.addExtraRow(\'ce_extras_'+i+'\')">＋ 台帳にない物を追加</button><div class="mo-row full hidden" id="ce_rentals_'+i+'Wrap" style="margin-top:8px"><div class="mo-field"><label>以前のメモ（台帳にない物は上の行に移していく）</label><textarea id="ce_rentals_'+i+'"></textarea></div></div></div>';
+    const draw=()=>{ box.innerHTML=pj.map((k,i)=>'<div class="rental-add-section"><h3>レンタル品'+(pj.length>1?'（'+esc(k.project)+'）':'')+'</h3>'+Proj.rentalPanelHtml(k.project,'_ce'+i)+extrasHtml(i)+'</div>').join('');
+      pj.forEach((k,i)=>{ const t=Proj.projRentalsText(k.id); Proj.fillExtras('ce_extras_'+i,'ce_rentals_'+i,t||''); const ex=$('ce_extras_'+i); if(ex&&ex.parentElement)ex.parentElement.dataset.orig=(t==null?'__none__':t); }); };
+    const pending=()=>pj.some((k,i)=>Proj.pendingRentalRows('_ce'+i).length)||!!box.querySelector('.ce-extras[data-dirty]');
     if(pending()) return;
     if(Proj.hasRentalData()) draw(); else if(!box.innerHTML) box.innerHTML='<div class="rental-add-section"><h3>レンタル品</h3><div style="font-size:12px;color:var(--text-faint)">読み込み中...</div></div>';
     try{ await Proj.ensureRentalData(); }catch(e){}
     if(_editId!==id)return;
     if(pending())return;
-    box.innerHTML=pj.map((k,i)=>'<div class="rental-add-section"><h3>レンタル品'+(pj.length>1?'（'+esc(k.project)+'）':'')+'</h3>'+Proj.rentalPanelHtml(k.project,'_ce'+i)+'</div>').join(''); }
+    draw(); }
   function closeEdit(){ $('caseEditBg').classList.remove('show'); _editId=''; const rb=$('ce_rentals'); if(rb)rb.innerHTML=''; }
   function addDept(dept){ const c=_find(_editId); if(!c)return; closeEdit(); const key={production:'prod',project:'proj',sales:'sales'}[dept]; if(!key)return;
     App._loaded.cases=false; // 戻った時に案件を取り直して新しい子を反映
@@ -8097,6 +8101,9 @@ const Cases = (function(){
     const _pend=_pj.map((k,i)=>({k,pfx:'_ce'+i,rows:Proj.pendingRentalRows('_ce'+i)})).filter(x=>x.rows.length);
     if(_pend.some(x=>Proj.rentalRowsIncomplete(x.rows))){ toast('レンタル品の行はカテゴリ・商品・日付を全て入力してください',true); return; }
     _pend.forEach(x=>Proj.saveProjectRentals(x.k.project,x.pfx,true));
+    _pj.forEach((k,i)=>{ const ex=$('ce_extras_'+i); if(!ex||!ex.parentElement)return; const orig=ex.parentElement.dataset.orig; if(orig==null||orig==='__none__')return;
+      const txt=Proj.composeExtras('ce_extras_'+i, ($('ce_rentals_'+i)||{}).value||'');
+      if(txt!==orig){ Proj.setProjRentalsText(k.id,txt); fireAndForget({dept:'project',action:'save',id:k.id,rentals:txt}); } });
     const upd={name:$('ce_name').value.trim(),client:$('ce_client').value.trim(),contact:$('ce_contact').value.trim(),our_person:$('ce_our_person').value.trim(),estimate_no:$('ce_estimate_no').value.trim(),order_no:$('ce_order_no').value.trim(),status:$('ce_status').value,note:$('ce_note').value.trim(),target_date:$('ce_target_date').value,amount:$('ce_amount').value};
     logStatus(c,c.status,upd.status); Object.assign(c,upd); fireAndForget({dept:'cases',action:'save',id:_editId,...upd});
     // ヘッダ（受注/見積番号・得意先・窓口・担当）を子（生産/企画/販売）にも反映
