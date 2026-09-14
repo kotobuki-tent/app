@@ -2079,7 +2079,8 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="mo-row full"><div class="mo-field"><label>材料・仕入メモ</label><textarea id="xf_material" placeholder="材料・仕入の内訳など"></textarea></div></div>
     <div class="phase-hd">レンタル品・備考</div>
     <div class="mo-row full"><div class="mo-field"><label>レンタル品（台帳）</label><div id="xf_rentalPanel" class="rental-add-section" style="margin-top:0;padding-top:0;border-top:none"></div></div></div>
-    <div class="mo-row full"><div class="mo-field"><label>台帳にない物（メモ）</label><textarea id="xf_rentals" placeholder="台帳にない物だけ書く（例: 長机10台、発電機1台）"></textarea></div></div>
+    <div class="mo-row full"><div class="mo-field"><label>台帳にない物（1行に1品）</label><div id="xf_extras"></div><button type="button" class="rental-add-btn" onclick="Proj.addExtraRow('xf_extras')">＋ 台帳にない物を追加</button></div></div>
+    <div class="mo-row full hidden" id="xf_rentalsWrap"><div class="mo-field"><label>以前のメモ（台帳にない物は上の行に移していく）</label><textarea id="xf_rentals"></textarea></div></div>
     <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="xf_notes" placeholder="補足事項があれば"></textarea></div></div>
     <div class="mo-foot"><button class="cancel" onclick="Proj.closeProjMo()">閉じる</button><button class="arch-btn hidden" id="xfArch" onclick="Proj.archiveProj($('xf_id').value)">アーカイブへ</button><button class="arch-btn hidden" id="xfUnarch" onclick="Proj.unarchiveProj($('xf_id').value)">アーカイブ解除</button><button class="save" onclick="Proj.saveProj()">保存</button></div>
   </div>
@@ -4536,7 +4537,9 @@ const Proj = (function(){
     if(d.vehicles_rental_out)h+=vr('貸出',d.vehicles_rental_out);
     if(d.vehicles_rental_return)h+=vr('返却',d.vehicles_rental_return);
     h+='</div>'}if(d.material)h+='<div class="view-section"><h3>材料・仕入</h3><div class="view-row"><div class="view-val">'+esc(d.material)+'</div></div></div>';
-    if(d.rentals)h+='<div class="view-section"><h3>台帳にない物（メモ）</h3><div class="view-row"><div class="view-val">'+esc(d.rentals)+'</div></div></div>';
+    if(d.rentals){const sp=splitExtras(d.rentals);
+      if(sp.items.length)h+='<div class="view-section"><h3>台帳にない物</h3>'+sp.items.map(it=>'<div class="rental-existing"><span class="re-info">'+esc(it.name)+(it.qty?' × '+esc(it.qty):'')+'</span></div>').join('')+'</div>';
+      if(sp.legacy)h+='<div class="view-section"><h3>以前のメモ</h3><div class="view-row"><div class="view-val" style="white-space:pre-wrap">'+esc(sp.legacy)+'</div></div></div>';}
     const projRentals=rentalsData.filter(r=>r.client_name===d.project);
     h+='<div class="rental-add-section"><h3>レンタル品</h3>';
     if(projRentals.length){projRentals.forEach(r=>{const ds=r.date_start?((new Date(r.date_start+'T00:00:00').getMonth()+1)+'/'+new Date(r.date_start+'T00:00:00').getDate()):'';
@@ -4586,7 +4589,7 @@ const Proj = (function(){
     $('xf_people_event').value=d?d.people_event||'':'';
     $('xf_people_teardown').value=d?d.people_teardown||'':'';
     $('xf_material').value=d?d.material||'':'';
-    $('xf_rentals').value=d?d.rentals||'':'';
+    fillExtras('xf_extras','xf_rentals',d?d.rentals||'':'');
     $('xf_notes').value=d?d.notes||'':'';$('xf_amount').value=d?(d.amount===''||d.amount==null?'':d.amount):'';
     VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));
     _xfType=(d&&d.type)||'現場';
@@ -4666,7 +4669,7 @@ const Proj = (function(){
       vehicles_rental_return:getVehiclesFromPhase('rental_return'),
       amount:$('xf_amount').value,
       material:$('xf_material').value.trim(),
-      rentals:$('xf_rentals').value.trim(),
+      rentals:composeExtras('xf_extras',$('xf_rentals').value),
       notes:$('xf_notes').value.trim()};
     const isNew=!editId;
     if(isNew && _addCaseId){ body.case_id=_addCaseId; _addCaseId=''; }
@@ -4755,6 +4758,34 @@ const Proj = (function(){
     else{const d=projData.find(x=>x.project===projectName);
     if(d)viewProj(d.id);}
     setTimeout(()=>{_busyRental=false},1500);
+  }
+  // 台帳にない物：1行1品。保存は rentals 列に「・品名｜数量」を改行区切り（形式が揃うので後で台帳候補を抜き出せる）
+  // 形式に合わない既存テキストは「以前のメモ」として別に残す（捨てない）
+  function splitExtras(text){
+    const items=[],legacy=[];
+    String(text||'').split(/\r?\n/).forEach(line=>{const m=line.match(/^・(.*?)｜(.*)$/);if(m&&m[1].trim())items.push({name:m[1].trim(),qty:m[2].trim()});else if(line.trim())legacy.push(line)});
+    return {items,legacy:legacy.join('\n')};
+  }
+  function addExtraRow(containerId,name,qty){
+    const wrap=$(containerId);if(!wrap)return;
+    const row=document.createElement('div');row.className='rental-add-row extra-row';
+    const n=document.createElement('input');n.className='ex-name';n.placeholder='品名（例: 長机）';n.value=name||'';n.style.flex='1 1 180px';
+    const q=document.createElement('input');q.className='ex-qty';q.placeholder='数量（例: 10台）';q.value=qty||'';q.style.width='110px';
+    const rm=document.createElement('button');rm.type='button';rm.className='ra-rm';rm.textContent='×';rm.onclick=()=>row.remove();
+    row.appendChild(n);row.appendChild(q);row.appendChild(rm);wrap.appendChild(row);
+    if(!name)n.focus();
+  }
+  function fillExtras(containerId,legacyId,text){
+    const wrap=$(containerId);if(!wrap)return;wrap.innerHTML='';
+    const sp=splitExtras(text);sp.items.forEach(it=>addExtraRow(containerId,it.name,it.qty));
+    const lg=$(legacyId);if(lg)lg.value=sp.legacy;
+    const lw=$(legacyId+'Wrap');if(lw)lw.classList.toggle('hidden',!sp.legacy);
+  }
+  function composeExtras(containerId,legacyText){
+    const wrap=$(containerId);
+    const lines=wrap?[...wrap.querySelectorAll('.extra-row')].map(r=>{const n=r.querySelector('.ex-name').value.replace(/[｜\r\n]/g,' ').trim();const q=r.querySelector('.ex-qty').value.replace(/[｜\r\n]/g,' ').trim();return n?'・'+n+'｜'+q:''}).filter(Boolean):[];
+    const lg=String(legacyText||'').trim();
+    return lines.concat(lg?[lg]:[]).join('\n');
   }
   // どの画面から登録・削除しても、開いている欄を描き直す（データは rentalsData 1本）
   function refreshRentalPanels(pfx){
@@ -4914,7 +4945,7 @@ const Proj = (function(){
     changeProjStatus, toggleProjInvoiced,
     archiveProj, unarchiveProj,
     viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput, moneySum,
-    ensureRentalData, hasRentalData, rentalPanelHtml, addRentalRowXfNew, pendingRentalRows, rentalRowsIncomplete,
+    ensureRentalData, hasRentalData, rentalPanelHtml, addExtraRow, composeExtras, splitExtras, addRentalRowXfNew, pendingRentalRows, rentalRowsIncomplete,
     ganttMove, ganttToday, setGanttFilter, setGanttDays,
     unifiedSearch
   };
@@ -8149,7 +8180,8 @@ const Cases = (function(){
           <div id="cf_jt_material"><div class="phase-hd">材料・仕入</div><div class="mo-row full"><div class="mo-field"><label>材料・仕入メモ</label><textarea id="cf_material"></textarea></div></div></div>
           <div class="phase-hd">レンタル品</div>
           <div class="rental-add-section" style="margin-top:0;padding-top:0;border-top:none"><div id="rentalAddRows_cf"></div><button type="button" class="rental-add-btn" onclick="Cases.addRentalRow()">＋ 台帳からレンタル品を追加</button><div id="rentalSaveBtnWrap_cf" class="hidden"></div></div>
-          <div class="mo-row full"><div class="mo-field"><label>台帳にない物（メモ）</label><textarea id="cf_rentals"></textarea></div></div>
+          <div class="mo-row full"><div class="mo-field"><label>台帳にない物（1行に1品）</label><div id="cf_extras"></div><button type="button" class="rental-add-btn" onclick="Proj.addExtraRow('cf_extras')">＋ 台帳にない物を追加</button></div></div>
+          <textarea id="cf_rentals" class="hidden"></textarea>
         </div>
       </div>
 
@@ -8271,7 +8303,7 @@ const Cases = (function(){
     if(useProj && !nouhinToProd){
       const t=jType();
       const material=(t==='レンタル')?'':$('cf_material').value.trim();
-      const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,amount:$('cf_case_amount').value,rentals:$('cf_rentals').value.trim(),material,notes,
+      const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,amount:$('cf_case_amount').value,rentals:Proj.composeExtras('cf_extras',$('cf_rentals').value),material,notes,
         venue:t==='レンタル'?'':$('cf_venue').value.trim(), address:t==='レンタル'?'':$('cf_address').value.trim()};
       if(t==='施工'){
         Object.assign(p,{ delivery:'自社車両',
