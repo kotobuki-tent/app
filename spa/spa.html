@@ -4538,9 +4538,9 @@ const Proj = (function(){
     if(d.vehicles_rental_out)h+=vr('貸出',d.vehicles_rental_out);
     if(d.vehicles_rental_return)h+=vr('返却',d.vehicles_rental_return);
     h+='</div>'}if(d.material)h+='<div class="view-section"><h3>材料・仕入</h3><div class="view-row"><div class="view-val">'+esc(d.material)+'</div></div></div>';
-    {const sp=splitExtras(d.rentals);
-      h+='<div class="view-section"><h3>台帳にない物（1行に1品）</h3><div id="pv_extras"></div><button type="button" class="rental-add-btn" onclick="Proj.addExtraRow(\'pv_extras\')">＋ 台帳にない物を追加</button> <button type="button" class="rental-save-btn" onclick="Proj.saveViewExtras(\''+esc(String(d.id))+'\')">台帳にない物を保存</button></div>';
-      if(sp.legacy)h+='<div class="view-section"><h3>以前のメモ</h3><div class="view-row"><div class="view-val" style="white-space:pre-wrap">'+esc(sp.legacy)+'</div></div></div>';}
+    let _exH='';{const sp=splitExtras(d.rentals);
+      _exH+='<div class="view-section"><h3>台帳にない物（1行に1品）</h3><div id="pv_extras"></div><button type="button" class="rental-add-btn" onclick="Proj.addExtraRow(\'pv_extras\')">＋ 台帳にない物を追加</button> <button type="button" class="rental-save-btn" onclick="Proj.saveViewExtras(\''+esc(String(d.id))+'\')">台帳にない物を保存</button></div>';
+      if(sp.legacy)_exH+='<div class="view-section"><h3>以前のメモ</h3><div class="view-row"><div class="view-val" style="white-space:pre-wrap">'+esc(sp.legacy)+'</div></div></div>';}
     const projRentals=rentalsData.filter(r=>r.client_name===d.project);
     h+='<div class="rental-add-section"><h3>レンタル品</h3>';
     if(projRentals.length){projRentals.forEach(r=>{const ds=r.date_start?((new Date(r.date_start+'T00:00:00').getMonth()+1)+'/'+new Date(r.date_start+'T00:00:00').getDate()):'';
@@ -4548,6 +4548,7 @@ const Proj = (function(){
     h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+ds+'〜'+de+'　<span style="font-size:11px;padding:2px 6px;border-radius:4px;background:var(--purple-dim);color:var(--purple)">'+esc(r.status)+'</span></span><button class="re-del" onclick="Proj.deleteProjectRental(\''+r.id+'\')">削除</button></div>'})}else{h+='<div style="font-size:12px;color:var(--text-faint);margin-bottom:6px">まだ登録されていません</div>'}h+='<div id="rentalAddRows"></div><button class="rental-add-btn" onclick="Proj.addRentalRow(\''+esc(d.project)+'\')">＋ レンタル品を追加</button>';
     h+='<div id="rentalSaveBtnWrap" class="hidden"><button class="rental-save-btn" onclick="Proj.saveProjectRentals(\''+esc(d.project)+'\')">まとめて登録</button></div>';
     h+='</div>';
+    h+=_exH;
     if(d.notes)h+='<div class="view-section"><h3>備考</h3><div class="view-row"><div class="view-val">'+esc(d.notes)+'</div></div></div>';
     h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
     h+=`<button class="st-toggle" id="projStToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
