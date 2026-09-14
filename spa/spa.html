@@ -2115,6 +2115,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="sub-tab" data-tab="maint" onclick="Inv.switchTab('maint')">メンテ</button>
     <button class="sub-tab" data-tab="discard" onclick="Inv.switchTab('discard')">廃棄</button>
     <button class="sub-tab" data-tab="items" onclick="Inv.switchTab('items')">商品台帳</button>
+    <button class="slog-btn" onclick="Proj.printLedgerCandidates()">台帳に載せるリスト</button>
     <button class="slog-btn" id="invSlogBtn" onclick="Inv.openSlog()">ステータスログ<span class="dot"></span></button>
     <input class="subtab-search" id="invPcSearch" placeholder="検索...">
   </div>
@@ -4787,6 +4788,23 @@ const Proj = (function(){
     const lg=String(legacyText||'').trim();
     return lines.concat(lg?[lg]:[]).join('\n');
   }
+  // 台帳に載せるリスト：各現場の「台帳にない物」を品名ごとに集計し、印刷用ページを別ウィンドウで開く（台帳と同名の品は除く）
+  async function printLedgerCandidates(){
+    const w=window.open('','_blank');
+    if(!w){toast('ポップアップがブロックされました。許可してもう一度押してください',true);return}
+    w.document.write('<p style="font-family:sans-serif;padding:20px">読み込み中...</p>');
+    try{await ensureRentalData()}catch(e){}
+    const norm=v=>String(v||'').normalize('NFKC').replace(/\s+/g,' ').trim();
+    const inLedger=new Set(inventoryItems.map(i=>norm(i.item_name)));
+    const map=new Map();let skipped=0;
+    projData.forEach(d=>{splitExtras(d.rentals).items.forEach(it=>{const k=norm(it.name);if(!k)return;if(inLedger.has(k)){skipped++;return}
+      const e=map.get(k)||{name:it.name,count:0,sites:[]};e.count++;if(e.sites.length<3)e.sites.push(String(d.project||'')+(it.qty?'（'+it.qty+'）':''));map.set(k,e)})});
+    const rows=[...map.values()].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name,'ja'));
+    const t=new Date(),ds=t.getFullYear()+'/'+(t.getMonth()+1)+'/'+t.getDate();
+    const body=rows.length?rows.map((r,i)=>'<tr><td class="c">□</td><td>'+esc(r.name)+'</td><td class="n">'+r.count+'</td><td class="s">'+r.sites.map(esc).join('<br>')+(r.count>r.sites.length?'<br>ほか'+(r.count-r.sites.length)+'件':'')+'</td><td></td></tr>').join(''):'<tr><td colspan="5" style="text-align:center;padding:24px;color:#888">まだありません（現場の「台帳にない物（1行に1品）」に入れた品がここに出ます）</td></tr>';
+    const html='<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>台帳に載せるリスト '+ds+'</title><style>body{font-family:"Noto Sans JP","Hiragino Sans",sans-serif;margin:24px;color:#222}h1{font-size:18px;margin:0 0 4px}.meta{font-size:12px;color:#666;margin-bottom:12px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #999;padding:6px 8px;vertical-align:top}th{background:#eee}.c{width:28px;text-align:center}.n{width:48px;text-align:right}.s{font-size:11px;color:#444;width:38%}th:last-child{width:90px}.bar{margin-bottom:12px}@media print{.bar{display:none}body{margin:10mm}}</style></head><body><div class="bar"><button onclick="window.print()" style="font-size:14px;padding:8px 18px">印刷</button></div><h1>台帳に載せるリスト</h1><div class="meta">'+ds+' 作成　'+rows.length+'品　（現場の「台帳にない物」から集計。台帳と同じ名前の'+skipped+'件は除外）</div><table><thead><tr><th class="c">済</th><th>品名</th><th class="n">回数</th><th>使った現場（数量）</th><th>保有数</th></tr></thead><tbody>'+body+'</tbody></table></body></html>';
+    w.document.open();w.document.write(html);w.document.close();
+  }
   function projRentalsText(id){const d=projData.find(x=>String(x.id)===String(id));return d?String(d.rentals||''):null}
   function setProjRentalsText(id,text){const d=projData.find(x=>String(x.id)===String(id));if(d)d.rentals=text;_setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems})}
   // どの画面から登録・削除しても、開いている欄を描き直す（データは rentalsData 1本）
@@ -4947,7 +4965,7 @@ const Proj = (function(){
     changeProjStatus, toggleProjInvoiced,
     archiveProj, unarchiveProj,
     viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput, moneySum,
-    ensureRentalData, hasRentalData, rentalPanelHtml, addExtraRow, composeExtras, splitExtras, fillExtras, projRentalsText, setProjRentalsText, addRentalRowXfNew, pendingRentalRows, rentalRowsIncomplete,
+    ensureRentalData, hasRentalData, rentalPanelHtml, addExtraRow, composeExtras, splitExtras, fillExtras, projRentalsText, setProjRentalsText, printLedgerCandidates, addRentalRowXfNew, pendingRentalRows, rentalRowsIncomplete,
     ganttMove, ganttToday, setGanttFilter, setGanttDays,
     unifiedSearch
   };
