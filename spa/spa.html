@@ -2059,8 +2059,8 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="date-phase-block"><label class="date-phase-label">貸出日</label><div class="date-list" id="xf_dates_rental_out"></div><button type="button" class="date-add-btn" onclick="Proj.addDateInput('xf_dates_rental_out')">＋ 日付追加</button></div>
     <div class="date-phase-block"><label class="date-phase-label">返却日</label><div class="date-list" id="xf_dates_rental_return"></div><button type="button" class="date-add-btn" onclick="Proj.addDateInput('xf_dates_rental_return')">＋ 日付追加</button></div>
     </div>
-    <div class="phase-hd setup-only-hd">人数（予定）</div>
-    <div class="phase-grid setup-only">
+    <div class="phase-hd setup-only-hd hidden">人数（予定）</div><!-- 人数は使わないので非表示（09-14 iller） -->
+    <div class="phase-grid setup-only hidden">
       <div class="mo-field"><label>搬入</label><input type="number" id="xf_people_load_in" min="0" placeholder="0"></div>
       <div class="mo-field"><label>設営</label><input type="number" id="xf_people_setup" min="0" placeholder="0"></div>
       <div class="mo-field"><label>本番</label><input type="number" id="xf_people_event" min="0" placeholder="0"></div>
@@ -8073,8 +8073,8 @@ const Cases = (function(){
           <div id="cf_jt_sekou">
             <div class="phase-hd">日程</div>
             <div class="cf-grid2">${dateBlock('load_in','搬入日')}${dateBlock('setup','設営日')}${dateBlock('event','本番')}${dateBlock('teardown','撤去日')}</div>
-            <div class="phase-hd">人数（予定）</div>
-            <div class="phase-grid">
+            <div class="phase-hd hidden">人数（予定）</div><!-- 人数は使わないので非表示（09-14 iller） -->
+            <div class="phase-grid hidden">
               <div class="mo-field"><label>搬入</label><input type="number" id="cf_p_load_in" min="0" placeholder="0"></div>
               <div class="mo-field"><label>設営</label><input type="number" id="cf_p_setup" min="0" placeholder="0"></div>
               <div class="mo-field"><label>本番</label><input type="number" id="cf_p_event" min="0" placeholder="0"></div>
