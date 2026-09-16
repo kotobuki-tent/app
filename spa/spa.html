@@ -2062,6 +2062,8 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="date-phase-block"><label class="date-phase-label">貸出日</label><div class="date-list" id="xf_dates_rental_out"></div><button type="button" class="date-add-btn" onclick="Proj.addDateInput('xf_dates_rental_out')">＋ 日付追加</button></div>
     <div class="date-phase-block"><label class="date-phase-label">返却日</label><div class="date-list" id="xf_dates_rental_return"></div><button type="button" class="date-add-btn" onclick="Proj.addDateInput('xf_dates_rental_return')">＋ 日付追加</button></div>
     </div>
+    <div class="phase-hd">レンタル品が倉庫にない期間 <span style="font-weight:400;font-size:11px;color:var(--text-faint)">空欄なら搬入日〜撤去日（レンタルは貸出日〜返却日）。積み込みや戻り検品で前後に伸びる時に入れる</span></div>
+    <div class="mo-row pair"><div class="mo-field"><label>出庫日</label><input type="date" id="xf_date_out"></div><div class="mo-field"><label>入庫日</label><input type="date" id="xf_date_in"></div></div>
     <div class="phase-hd setup-only-hd hidden">人数（予定）</div><!-- 人数は使わないので非表示（09-14 iller） -->
     <div class="phase-grid setup-only hidden">
       <div class="mo-field"><label>搬入</label><input type="number" id="xf_people_load_in" min="0" placeholder="0"></div>
@@ -4539,6 +4541,7 @@ const Proj = (function(){
     if(dd)h+=vr('納品',fmtDates(dd));
     }else if(d.date_rental_out)h+=vr('貸出',fmtDates(d.date_rental_out));
     if(d.date_rental_return)h+=vr('返却',fmtDates(d.date_rental_return));
+    if(d.date_out||d.date_in){const oi=defaultDatesFromProj(d);h+=vr('倉庫にない期間',(oi[0]?fmtDates(oi[0]):'')+'〜'+(oi[1]?fmtDates(oi[1]):''))}
     h+='</div>';
     if(d.people_load_in||d.people_setup||d.people_event||d.people_teardown){h+='<div class="view-section"><h3>人数（予定）</h3>';
     if(d.people_load_in)h+=vr('搬入',d.people_load_in+'人');
@@ -4598,6 +4601,7 @@ const Proj = (function(){
     $('xf_people_event').value=d?d.people_event||'':'';
     $('xf_people_teardown').value=d?d.people_teardown||'':'';
     $('xf_material').value=d?d.material||'':'';
+    $('xf_date_out').value=d?String(d.date_out||'').slice(0,10):'';$('xf_date_in').value=d?String(d.date_in||'').slice(0,10):'';
     $('xf_notes').value=d?d.notes||'':'';$('xf_amount').value=d?(d.amount===''||d.amount==null?'':d.amount):'';
     VH_PHASES.forEach(p=>setVehiclesForPhase(p,d?d['vehicles_'+p]||'':''));
     _xfType=(d&&d.type)||'現場';
@@ -4642,7 +4646,8 @@ const Proj = (function(){
     const editId=$('xf_id').value;
     const _rPfx=editId?'_xf':'_xfn', _rRows=pendingRentalRows(_rPfx);
     // 日程の前後逆（返却日が貸出日より前・撤去日が搬入日より前）は保存させない＝レンタル品にそのまま写るので
-    {const _dd=blockDates(_rPfx);if(_dd[0]&&_dd[1]&&_dd[1]<_dd[0]){toast(($('xf_is_rental').checked?'返却日が貸出日':'撤去日が搬入日')+'より前になっています（'+_dd[0].replace(/-/g,'/')+'〜'+_dd[1].replace(/-/g,'/')+'）',true);return}}
+    {const _o=$('xf_date_out').value,_i=$('xf_date_in').value;if(_o&&_i&&_i<_o){toast('入庫日が出庫日より前になっています（'+_o.replace(/-/g,'/')+'〜'+_i.replace(/-/g,'/')+'）',true);return}
+     const _dd=blockDates(_rPfx);if(_dd[0]&&_dd[1]&&_dd[1]<_dd[0]){toast(($('xf_is_rental').checked?'返却日が貸出日':'撤去日が搬入日')+'より前になっています（'+_dd[0].replace(/-/g,'/')+'〜'+_dd[1].replace(/-/g,'/')+'）',true);return}}
     if(rentalRowsIncomplete(_rRows)){toast('レンタル品の行はカテゴリ・商品を選んでください',true);return}
     if(_rRows.length&&!fillBlockDates(_rPfx))return;
     const isRental=$('xf_is_rental').checked;
@@ -4668,6 +4673,7 @@ const Proj = (function(){
       date_rental_out:isNouhin?'':getDatesFromList('xf_dates_rental_out'),
       date_rental_return:getDatesFromList('xf_dates_rental_return'),
       date_delivery:isNouhin?getDatesFromList('xf_dates_rental_out'):'',
+      date_out:$('xf_date_out').value,date_in:$('xf_date_in').value,
       people_load_in:isRental?'':$('xf_people_load_in').value,
       people_setup:isRental?'':$('xf_people_setup').value,
       people_event:isRental?'':$('xf_people_event').value,
@@ -4848,12 +4854,17 @@ const Proj = (function(){
   function blockDirty(pfx){const b=$('rblock'+pfx);return !!(b&&(b.dataset.dirty||pendingRentalRows(pfx).length))}
   function blockAddExtra(pfx){addExtraRow('rbExtras'+pfx);blockTouched(pfx)}
   function blockExtrasText(pfx){return composeExtras('rbExtras'+pfx,($('rbLegacy'+pfx)||{}).value||'')}
+  // レンタル品の日付＝その現場の「倉庫にない期間」。出庫日・入庫日があればそれを優先、無ければ 搬入日〜撤去日（レンタルは貸出日〜返却日）
   function defaultDatesFromProj(d){
     if(!d)return['',''];
     const f=(k,last)=>{const v=String(d[k]||'').split(',').map(x=>x.trim().slice(0,10)).filter(Boolean).sort();return v.length?(last?v[v.length-1]:v[0]):''};
-    if(d.type==='レンタル')return[f('date_rental_out'),f('date_rental_return',true)];
-    if(d.type==='納品'){const x=f('date_delivery')||f('date_rental_out');return[x,x]}
-    const st=f('date_load_in')||f('date_setup')||f('date_event');return[st,f('date_teardown',true)||f('date_event',true)||st];
+    let r;
+    if(d.type==='レンタル')r=[f('date_rental_out'),f('date_rental_return',true)];
+    else if(d.type==='納品'){const x=f('date_delivery')||f('date_rental_out');r=[x,x]}
+    else{const st=f('date_load_in')||f('date_setup')||f('date_event');r=[st,f('date_teardown',true)||f('date_event',true)||st]}
+    const o=String(d.date_out||'').slice(0,10),i=String(d.date_in||'').slice(0,10);
+    if(o)r[0]=o;if(i)r[1]=i;
+    return r;
   }
   function fillLastRowDates(pfx,dates){const rows=pendingRentalRows(pfx);const row=rows[rows.length-1];if(!row)return;const ds=row.querySelectorAll('.ra-date');if(ds[0]&&!ds[0].value)ds[0].value=dates[0]||'';if(ds[1]&&!ds[1].value)ds[1].value=dates[1]||''}
   async function blockAddLedger(pfx){
@@ -4922,8 +4933,8 @@ const Proj = (function(){
     if(pfx==='_xf'||pfx==='_xfn'){
       const pick=(ph,last)=>{const v=getDatesFromList('xf_dates_'+ph).split(',').map(x=>x.trim()).filter(Boolean).sort();return v.length?(last?v[v.length-1]:v[0]):''};
       const rental=$('xf_is_rental').checked;
-      const st=rental?pick('rental_out'):(pick('load_in')||pick('setup')||pick('event')||pick('rental_out'));
-      const en=rental?pick('rental_return',true):(pick('teardown',true)||pick('event',true)||pick('rental_return',true)||st);
+      const st=$('xf_date_out').value||(rental?pick('rental_out'):(pick('load_in')||pick('setup')||pick('event')||pick('rental_out')));
+      const en=$('xf_date_in').value||(rental?pick('rental_return',true):(pick('teardown',true)||pick('event',true)||pick('rental_return',true)||st));
       return[st,en];
     }
     const b=$('rblock'+pfx);const d=b&&b.dataset.pid?projById(b.dataset.pid):null;return defaultDatesFromProj(d);
@@ -8308,6 +8319,8 @@ const Cases = (function(){
             <div id="cf_ncarrier" style="margin-top:10px"><div class="mo-field"><label>運送業者</label><input id="cf_ncarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
             <div id="cf_nveh" class="cf-hide hidden" style="margin-top:10px"><div class="cf-grid2">${vhBlock('deliv','納品')}</div></div>
           </div>
+          <div class="phase-hd">レンタル品が倉庫にない期間 <span style="font-weight:400;font-size:11px;color:var(--text-faint)">空欄なら搬入日〜撤去日（レンタルは貸出日〜返却日）。積み込みや戻り検品で前後に伸びる時に入れる</span></div>
+          <div class="mo-row pair"><div class="mo-field"><label>出庫日</label><input type="date" id="cf_date_out"></div><div class="mo-field"><label>入庫日</label><input type="date" id="cf_date_in"></div></div>
           <div id="cf_jt_material"><div class="phase-hd">材料・仕入</div><div class="mo-row full"><div class="mo-field"><label>材料・仕入メモ</label><textarea id="cf_material"></textarea></div></div></div>
           <div class="phase-hd">レンタル品</div>
           <div id="cfBlockHost"></div>
@@ -8379,10 +8392,13 @@ const Cases = (function(){
     if(ds[0]&&!ds[0].value)ds[0].value=d[0]; if(ds[1]&&!ds[1].value)ds[1].value=d[1]; }
   function defaultRentalDates(){ const t=jType();
     const pick=(id,last)=>{ const v=getDates(id).split(',').map(x=>x.trim()).filter(Boolean).sort(); return v.length?(last?v[v.length-1]:v[0]):''; };
-    if(t==='レンタル') return [pick('cf_d_lend'), pick('cf_d_back',true)];
-    if(t==='施工') return [pick('cf_d_load_in')||pick('cf_d_setup')||pick('cf_d_event'), pick('cf_d_teardown',true)||pick('cf_d_event',true)];
-    if(t==='納品'){ const x=pick('cf_d_deliv'); return [x,x]; }
-    return ['','']; }
+    let r=['',''];
+    if(t==='レンタル') r=[pick('cf_d_lend'), pick('cf_d_back',true)];
+    else if(t==='施工') r=[pick('cf_d_load_in')||pick('cf_d_setup')||pick('cf_d_event'), pick('cf_d_teardown',true)||pick('cf_d_event',true)];
+    else if(t==='納品'){ const x=pick('cf_d_deliv'); r=[x,x]; }
+    const o=$('cf_date_out')?$('cf_date_out').value:'', i=$('cf_date_in')?$('cf_date_in').value:'';   // 出庫日・入庫日があれば優先
+    if(o)r[0]=o; if(i)r[1]=i;
+    return r; }
   function newCaseId(){
     const u=(self.crypto&&crypto.randomUUID)?crypto.randomUUID().replace(/-/g,''):(Date.now().toString(36)+Math.random().toString(36).slice(2));
     return 'C'+u.slice(0,8);
@@ -8412,7 +8428,8 @@ const Cases = (function(){
     if(rRows.some(r=>!r.querySelector('.ra-cat').value||!r.querySelector('.ra-item').value)){ toast('レンタル品の行はカテゴリ・商品を選んでください',true); return; }
     if(rRows.length){ const dd=defaultRentalDates(); if(!dd[0]||!dd[1]){ toast('レンタル品を入れるなら、先に日程（貸出日・返却日、施工なら搬入日・撤去日）を入れてください',true); return; } }
     // 日程の前後逆は登録させない（返却日が貸出日より前・撤去日が搬入日より前）
-    if(useProj && !nouhinToProd){ const dd=defaultRentalDates(); if(dd[0]&&dd[1]&&dd[1]<dd[0]){ toast((jType()==='レンタル'?'返却日が貸出日':'撤去日が搬入日')+'より前になっています（'+dd[0].replace(/-/g,'/')+'〜'+dd[1].replace(/-/g,'/')+'）',true); return; } }
+    if(useProj && !nouhinToProd){ const o=$('cf_date_out').value,i=$('cf_date_in').value; if(o&&i&&i<o){ toast('入庫日が出庫日より前になっています（'+o.replace(/-/g,'/')+'〜'+i.replace(/-/g,'/')+'）',true); return; }
+      const dd=defaultRentalDates(); if(dd[0]&&dd[1]&&dd[1]<dd[0]){ toast((jType()==='レンタル'?'返却日が貸出日':'撤去日が搬入日')+'より前になっています（'+dd[0].replace(/-/g,'/')+'〜'+dd[1].replace(/-/g,'/')+'）',true); return; } }
 
     // 登録先の確認（チェックの付け間違いで生産と企画制作の両方に入るのを防ぐ）
     const _dests=[];
@@ -8436,7 +8453,7 @@ const Cases = (function(){
     if(useProj && !nouhinToProd){
       const t=jType();
       const material=(t==='レンタル')?'':$('cf_material').value.trim();
-      const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,amount:$('cf_case_amount').value,rentals:Proj.blockExtrasText('_cf'),material,notes,
+      const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,amount:$('cf_case_amount').value,rentals:Proj.blockExtrasText('_cf'),material,notes,date_out:$('cf_date_out').value,date_in:$('cf_date_in').value,
         venue:t==='レンタル'?'':$('cf_venue').value.trim(), address:t==='レンタル'?'':$('cf_address').value.trim()};
       if(t==='施工'){
         Object.assign(p,{ delivery:'自社車両',
