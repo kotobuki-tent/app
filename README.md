@@ -7,11 +7,11 @@
 
 https://kotobuki-tent.github.io/app/spa/spa.html
 
-ブラウザのお気に入りに登録するか、ホーム画面に追加してアプリのように開く。13画面（ポータル＋12アプリ）をヘッダーのタブで切り替える。
+ブラウザのお気に入りに登録するか、ホーム画面に追加してアプリのように開く。15画面（ポータル＋14アプリ）をヘッダーのタブで切り替える。
 
 ## 画面構成
 
-SPA本体（`spa/spa.html`）に14画面を統合。1ファイルで全機能完結、画面間の切り替えはページ遷移なし。
+SPA本体（`spa/spa.html`）に15画面を統合。1ファイルで全機能完結、画面間の切り替えはページ遷移なし。
 
 | 画面 | 役割 |
 |---|---|
@@ -28,13 +28,14 @@ SPA本体（`spa/spa.html`）に14画面を統合。1ファイルで全機能完
 | 工数 | 案件ごとの延べ作業時間・人別内訳 |
 | 在庫 | 商品台帳・貸出/予約・メンテ・在庫確認 |
 | 車両 | 車両台帳・寸法・期限アラート |
+| 資格 | 免許・技能講習・特別教育の保有台帳（人×資格、マスタ選択式で表記ゆれ防止） |
 | ボード | 予定ボード（物理ホワイトボードのデジタル版、人×日グリッド） |
 
 旧来の単独HTML（各画面のMPA版・ACFL単独アプリ等12ファイル）は廃止し、純粋にSPAへ一本化済み。残る単独ページは `register.html`（スマホ特化の商品追加専用ツール）のみ。アルコールチェック（点呼）・フォークリフト点検（リフト）・いないカード（カード）はSPAに内包され、据え置きタブレットへは `?go=alcohol` / `?go=forklift` / `?go=card` のディープリンク＋`?mode=kiosk`（または `full`）で配布する。
 
-ヘッダー：`HOME｜日報｜時間外 │ 点呼 リフト │ カード  [spacer]  案件 │ 生産 企画制作 販売 │ 工数 │ 在庫 │ 車両 │ ボード  [↻更新]`
+ヘッダー：`HOME｜日報｜時間外 │ 点呼 リフト │ カード  [spacer]  案件 │ 生産 企画制作 販売 │ 工数 │ 在庫 │ 車両 │ 資格 │ ボード  [↻更新]`
 
-端末モード：`現場`（field）/`フル`（full）/`点検`（kiosk）を localStorage または URL `?mode=floor|full|kiosk` で切替。現場モードは事務所向け画面（点呼/リフト/カード/案件/販売/工数/在庫/車両/ボード）を隠し現場系（日報/時間外/生産/企画制作）だけを出す。点検モードは事務所前タブレット（27インチMegPad・縦置き運用）向けで、日報/点呼/リフト/カードのみ表示する。各画面の zone（field/shared/office）でモードごとの表示可否を制御。
+端末モード：`現場`（field）/`フル`（full）/`点検`（kiosk）を localStorage または URL `?mode=floor|full|kiosk` で切替。現場モードは事務所向け画面（点呼/リフト/カード/案件/販売/工数/在庫/車両/資格/ボード）を隠し現場系（日報/時間外/生産/企画制作）だけを出す。点検モードは事務所前タブレット（27インチMegPad・縦置き運用）向けで、日報/点呼/リフト/カードのみ表示する。各画面の zone（field/shared/office）でモードごとの表示可否を制御。
 
 ## スプレッドシート構成
 
@@ -182,11 +183,11 @@ GAS（`Code.gs`）に運用系の関数を同梱。**ソースの正本は iClou
 
 ## 技術
 
-- **SPA構成**：HTML / CSS / JavaScript（フレームワークなし）、`spa/spa.html` 1ファイルに13画面のIIFE名前空間を統合、Appレジストリ（key/ns/section/nav/zone）で画面切替・遅延ロード・自動更新・端末モードを管理
+- **SPA構成**：HTML / CSS / JavaScript（フレームワークなし）、`spa/spa.html` 1ファイルに15画面のIIFE名前空間を統合、Appレジストリ（key/ns/section/nav/zone）で画面切替・遅延ロード・自動更新・端末モードを管理
 - **画面切替**：ページ遷移なし、初回ロード後は2回目以降ほぼ0秒で切替
 - **PWA**：`spa/manifest.json`＋PWA用メタタグでホーム画面アイコン化、`display:standalone`で全画面表示
-- **キャッシュ戦略**：sw.js の `NO_CACHE_PATTERNS` に `/spa/` を含め、SPAはService Workerのキャッシュ対象外。常にネットワークから最新を取得（CACHE_VERSION管理不要）。純SPA化に伴いプリキャッシュ対象は `register.html`／`manifest.json`／アイコンのみ
-- **Google Apps Script**：API v7、deptパラメータで部門振り分け（production / project / sales / inventory / overtime / vehicle / daily / labor / attendance / drive / alcohol / forklift / cases / card）。GASソースの正本は `Code.gs`（iCloud `♿️SEQUENCE LAB/`）。工数アーカイブは dept=labor の POST（archive/unarchive）で `labor_archived` を切替
+- **キャッシュ戦略**：`spa.html` は同一オリジンの static として Service Worker が **stale-while-revalidate** で配信（2026-09-03〜。キャッシュを即返し、裏で最新を取得して次回に反映＝デプロイは開き直し1回分遅れて届く）。GAS/Drive 等の API は `NO_CACHE_PATTERNS` で絶対にキャッシュしない。プリキャッシュ対象は `register.html`／`manifest.json`／アイコンのみで、これらを変えた時だけ `CACHE_VERSION` をバンプ
+- **Google Apps Script**：API v7、deptパラメータで部門振り分け（production / project / sales / inventory / overtime / vehicle / daily / labor / attendance / drive / alcohol / forklift / cases / card / wb / qual / hr）。GASソースの正本は `Code.gs`（iCloud `♿️SEQUENCE LAB/`）。工数アーカイブは dept=labor の POST（archive/unarchive）で `labor_archived` を切替
 - **Google スプレッドシート**：データベース
 - **Google Drive**：製作図ファイル連携、フォルダID `16iDJrBWXdbIHq-aqJVgHZpA9tRGXMUwc`
 - **GitHub Pages**：ホスティング
