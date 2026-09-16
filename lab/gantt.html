@@ -47,16 +47,19 @@ footer{position:sticky;bottom:0;background:var(--surface);border-top:1px solid v
 /* 残数：帯の下に1行だけ（出ている数はマウスオーバーで） */
 .free{position:absolute;left:0;right:0;bottom:0;height:15px;display:grid}.free>div{font-size:10px;text-align:center;line-height:15px;color:var(--text-faint);font-variant-numeric:tabular-nums}.free>div.low{color:var(--red);font-weight:700}.free>div.zero{color:var(--red);font-weight:700}
 .empty{color:var(--text-faint);padding:24px;text-align:center;font-size:13px}
+.sites{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}.sites button{font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text-dim);cursor:pointer;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}.sites button b{font-weight:700;color:var(--text);margin-left:4px}.sites button.on{background:#fef3c7;border-color:#f59e0b;color:#92400e}.sites button.on b{color:#92400e}
+.bar.dim{opacity:.3}
 </style></head><body>
 <header><h1>在庫ガント（試作）</h1>
 <label>開始 <input type="date" id="d0"></label><label>日数 <select id="dn"><option>14</option><option selected>31</option><option>62</option><option>92</option></select></label>
 <span class="nav"><button onclick="go(-7)">← 1週</button><button onclick="today()">今日</button><button onclick="go(7)">1週 →</button></span>
 <span class="cat" id="cats"></span><span id="st"></span><span class="nav"><button id="reload" onclick="load()">↻ 更新</button></span></header>
-<main><div id="out" class="empty">読み込み中…</div></main>
+<main><div id="sites" class="sites"></div><div id="out" class="empty">読み込み中…</div></main>
 <footer><div class="legend"><span><i style="background:#dbeafe;border:1px dashed #60a5fa"></i>仮押さえ</span><span><i style="background:#dbeafe;border:1px solid #60a5fa"></i>予約</span><span><i style="background:#dcfce7;border:1px solid #4ade80"></i>貸出中</span><span><i style="background:#ffedd5;border:1px solid #fb923c"></i>メンテ中</span><span><i style="background:#e5e7eb;border:1px solid #9ca3af"></i>廃棄予定</span></div></footer>
 <script>
 var API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
-var ITEMS=[],RENT=[],PROJ={},CAT='',SEL='';   // SEL=クリックで選んだ日（その列の残を全品に出す）
+var ITEMS=[],RENT=[],PROJ={},CAT='',SEL='',SITE='';   // SITE=選んだ現場名（その現場が使う品だけに絞る）
+function pickSite(n){SITE=(SITE===n?'':n);render()}   // SEL=クリックで選んだ日（その列の残を全品に出す）
 function pick(ds){SEL=(SEL===ds?'':ds);render()}
 var ACTIVE=['予約','貸出中','メンテ待ち','メンテ中','廃棄予定'];   // 在庫画面と同じ（廃棄予定＝物はあるが貸せない＝残から引く）
 var OUT=['貸出中','メンテ待ち','メンテ中','廃棄予定'];   // 「まだ倉庫にない」＝返却日を過ぎてもステータスが変わるまで出っぱなし扱い（予約は予定なので日付どおり）
@@ -81,6 +84,9 @@ function render(){
   var cats=[],cnt={},moving=0;
   ITEMS.forEach(function(i){if(i.category&&cats.indexOf(i.category)<0)cats.push(i.category);if(rowsOf(i,dstr,N).length){cnt[i.category]=(cnt[i.category]||0)+1;moving++}});
   $('cats').innerHTML='<button class="'+(CAT?'':'on')+'" onclick="CAT=\'\';render()">すべて <b>'+moving+'</b></button>'+cats.map(function(c){return '<button class="'+(CAT===c?'on':'')+'" onclick="CAT=\''+c.replace(/'/g,"\\'")+'\';render()">'+esc(c)+' <b>'+(cnt[c]||0)+'</b></button>'}).join('');
+  var siteCnt={};ITEMS.forEach(function(i){rowsOf(i,dstr,N).forEach(function(r){var n=String(r.client_name||'').trim();if(!n)return;(siteCnt[n]=siteCnt[n]||{});siteCnt[n][i.item_name]=1})});
+  var siteNames=Object.keys(siteCnt).sort(function(a,b){return Object.keys(siteCnt[b]).length-Object.keys(siteCnt[a]).length||a.localeCompare(b,'ja')});
+  $('sites').innerHTML=siteNames.map(function(n){return '<button class="'+(SITE===n?'on':'')+'" title="'+esc(n)+'" onclick="pickSite(\''+esc(n).replace(/'/g,'&#39;')+'\')">'+esc(n)+'<b>'+Object.keys(siteCnt[n]).length+'</b></button>'}).join('');
   var grid='repeat('+N+',1fr)';
   var h='<div class="g"><div class="hd name"><b>品目</b><span class="tot">保有</span></div><div class="hd tl"><div class="days" style="grid-template-columns:'+grid+'">'+days.map(function(d){var s=ymd(d);return '<div class="'+dcls(d,t)+'" title="'+(HOL[s]||'')+' クリックでこの日の残を全品に表示" onclick="pick(\''+s+'\')"><span class="dw">'+(HOL[s]||'日月火水木金土'[d.getDay()])+'</span><span class="dm">'+(d.getMonth()+1)+'/'+d.getDate()+'</span></div>'}).join('')+'</div></div>';
   var last='';var shown=0;
@@ -88,6 +94,7 @@ function render(){
     var rows=rowsOf(it,dstr,N);
     var tot=Number(it.total_qty)||0;
     if(!rows.length&&CAT==='')return;   // 全部表示の時は動きのある品だけ
+    if(SITE&&!rows.some(function(r){return String(r.client_name||'').trim()===SITE}))return;   // 現場で絞り込み中はその現場が使う品だけ
     shown++;
     if(it.category!==last){last=it.category;h+='<div class="cat">'+esc(it.category)+'</div>'}
     // レーン割り当て（重なる帯は下の段へ）
@@ -101,7 +108,7 @@ function render(){
     h+='<div class="name"><div class="nm"><b title="'+esc(it.item_name)+'">'+esc(it.item_name)+'</b>'+(odTxt?'<span class="od" title="返却日を過ぎてステータスがそのままの数。戻っていれば在庫の貸出/予約で状態を直す">未返却 '+esc(odTxt)+'</span>':'')+'</div><span class="tot">'+(tot||'未')+'</span></div><div class="tl" style="height:'+H+'px"><div class="bg" style="grid-template-columns:'+grid+'">'+days.map(function(d){return '<div class="'+dcls(d,t)+'" onclick="pick(\''+ymd(d)+'\')"></div>'}).join('')+'</div>';
     bars.forEach(function(r){var s=Math.max(0,dstr.indexOf(r.date_start.slice(0,10))<0?(r.date_start<dstr[0]?0:N):dstr.indexOf(r.date_start.slice(0,10)));var bad=r.date_end.slice(0,10)<r.date_start.slice(0,10);var e=bad?s:dstr.indexOf(r.date_end.slice(0,10));if(e<0)e=r.date_end>dstr[N-1]?N-1:0;if(e<s)e=s;
 
-      var l=s/N*100,w=(e-s+1)/N*100;h+='<div class="bar '+cls(r)+(bad?' bad':'')+'" style="left:'+l+'%;width:'+w+'%;top:'+(3+r._lane*22)+'px" title="'+esc((r.client_name||'')+' '+r.qty+' '+r.date_start.slice(0,10)+'〜'+r.date_end.slice(0,10)+' '+r.status+(bad?'　※返却日が貸出日より前':''))+'">'+r.qty+' '+esc(r.client_name||'')+'</div>'});
+      var l=s/N*100,w=(e-s+1)/N*100;h+='<div class="bar '+cls(r)+(bad?' bad':'')+(SITE&&String(r.client_name||'').trim()!==SITE?' dim':'')+'" style="left:'+l+'%;width:'+w+'%;top:'+(3+r._lane*22)+'px" title="'+esc((r.client_name||'')+' '+r.qty+' '+r.date_start.slice(0,10)+'〜'+r.date_end.slice(0,10)+' '+r.status+(bad?'　※返却日が貸出日より前':''))+'">'+r.qty+' '+esc(r.client_name||'')+'</div>'});
     // 日ごとの残（出ている数はtitleで）
     var use=dstr.map(function(ds){var u=0;rows.forEach(function(r){var st=r.date_start.slice(0,10),e=r.date_end.slice(0,10);if((st<=ds&&e>=ds)||(overdue(r)&&ds>e))u+=Number(r.qty)||0});return u});
     // 残は「変わり目」だけ出す（出ている数が前日と違う日・翌日と違う日・今日）。同じ数が続く間は空けて帯を主役に

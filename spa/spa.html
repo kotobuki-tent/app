@@ -733,6 +733,12 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 #v_gantt .gt-nav button{font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 12px;border:none;border-radius:999px;background:var(--surface3);color:var(--text-dim);cursor:pointer;white-space:nowrap}
 #v_gantt .gt-nav button:hover{background:#e2e5f0;color:var(--text)}
 #v_gantt .gt-wrap{overflow-x:auto}
+#v_gantt .gt-sites{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+#v_gantt .gt-sites button{font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text-dim);cursor:pointer;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+#v_gantt .gt-sites button b{font-weight:700;color:var(--text);margin-left:4px}
+#v_gantt .gt-sites button.on{background:#fef3c7;border-color:#f59e0b;color:#92400e}
+#v_gantt .gt-sites button.on b{color:#92400e}
+#v_gantt .bar.dim{opacity:.3}
 #v_gantt .gt{display:grid;grid-template-columns:220px 1fr;min-width:800px;border:1px solid var(--border);background:var(--surface);border-radius:10px;overflow:clip;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 #v_gantt .gt .hd{position:sticky;top:0;z-index:2;background:var(--surface2);border-bottom:1px solid var(--border)}
 #v_gantt .gt .hd.name{padding:8px 12px;font-size:12px;font-weight:700}
@@ -2208,6 +2214,7 @@ table.jobs tr:last-child td{border-bottom:none}
         <label>日数 <select id="gt_dn" onchange="Inv.renderGantt()"><option>14</option><option selected>31</option><option>62</option><option>92</option></select></label>
         <span class="gt-nav"><button type="button" onclick="Inv.ganttMove(-7)">← 1週</button><button type="button" onclick="Inv.ganttToday()">今日</button><button type="button" onclick="Inv.ganttMove(7)">1週 →</button></span>
       </div>
+      <div id="ganttSites" class="gt-sites"></div>
       <div id="ganttOut" class="gt-wrap"></div>
       <div class="gt-legend"><span><i style="background:#dbeafe;border:1px dashed #60a5fa"></i>仮押さえ</span><span><i style="background:#dbeafe;border:1px solid #60a5fa"></i>予約</span><span><i style="background:#dcfce7;border:1px solid #4ade80"></i>貸出中</span><span><i style="background:#ffedd5;border:1px solid #fb923c"></i>メンテ中</span><span><i style="background:#e5e7eb;border:1px solid #9ca3af"></i>廃棄予定</span></div>
     </div>
@@ -5125,7 +5132,7 @@ const Inv = (function(){
   let itemCatFilter='';
   let maintStatusFilter='';
   let rentalStatusFilter='';
-  let ganttStart=null, ganttDays=31, ganttCat='', ganttSel='';   // 在庫ガント（ganttSel=クリックで選んだ日＝その列の残を全品に出す）
+  let ganttStart=null, ganttDays=31, ganttCat='', ganttSel='', ganttSite='';   // ganttSite=選んだ現場名（その現場が使う品だけに絞る）   // 在庫ガント（ganttSel=クリックで選んだ日＝その列の残を全品に出す）
   let projStatus={};   // 現場名→ステータス（見積中の予約＝仮押さえ）
   // slog（inv独自：i付き変数・ILOG_KEY）
   const ILOG_KEY='inv_status_snapshot';
@@ -5585,6 +5592,7 @@ const Inv = (function(){
   function gtYmd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
   function gtCls(d,t){const s=gtYmd(d),w=d.getDay();return (s===t?'today':GT_HOL[s]?'hol':w===6?'sat':w===0?'sun':'')+(s===ganttSel?' sel':'')}
   function ganttPick(ds){ganttSel=(ganttSel===ds?'':ds);renderGantt()}
+  function ganttSiteSel(n){ganttSite=(ganttSite===n?'':n);renderGantt()}
   function gtOverdue(r){return GT_OUT.indexOf(r.status)>=0&&String(r.date_end||'').slice(0,10)<todayStr()}
   function gtBarCls(r){const st=r.status||'';if(st==='貸出中')return'out';if(st==='メンテ待ち'||st==='メンテ中')return'mnt';if(st==='廃棄予定')return'dsp';if(st==='予約')return projStatus[r.client_name]==='見積中'?'est':'res';return'oth'}
   function gtRowsOf(it,dstr,N){return rentals.filter(r=>{if(r.category!==it.category||r.item_name!==it.item_name||ACTIVE_STATUSES.indexOf(r.status)<0)return false;if(gtOverdue(r))return true;const e=String(r.date_end||'').slice(0,10),st=String(r.date_start||'').slice(0,10);return (e<st?st:e)>=dstr[0]&&st<=dstr[N-1]})}
@@ -5604,6 +5612,10 @@ const Inv = (function(){
     if(chipEl){let ch=`<div class="fv-si${ganttCat===''?' on':''}" data-f="" onclick="Inv.setGanttCat('')"><div class="n">${moving}</div><div class="l">すべて</div></div>`;
       cats.forEach(c=>{ch+=`<div class="fv-si${ganttCat===c?' on':''}" data-f="${esc(c)}" onclick="Inv.setGanttCat('${esc(c)}')"><div class="n">${cnt[c]||0}</div><div class="l">${esc(c)}</div></div>`});
       chipEl.innerHTML=ch}
+    // 現場チップ：期間内の行から現場名を集めて（使う品数つき）出す
+    const siteCnt={};items.forEach(i=>{gtRowsOf(i,dstr,N).forEach(r=>{const n=String(r.client_name||'').trim();if(!n)return;(siteCnt[n]=siteCnt[n]||{})[i.item_name]=1})});
+    const siteNames=Object.keys(siteCnt).sort((a,b)=>Object.keys(siteCnt[b]).length-Object.keys(siteCnt[a]).length||a.localeCompare(b,'ja'));
+    const se=$('ganttSites');if(se)se.innerHTML=siteNames.map(n=>`<button type="button" class="${ganttSite===n?'on':''}" title="${esc(n)}" onclick="Inv.ganttSiteSel('${esc(n).replace(/'/g,'&#39;')}')">${esc(n)}<b>${Object.keys(siteCnt[n]).length}</b></button>`).join('');
     const grid='repeat('+N+',1fr)';
     let h=`<div class="gt"><div class="hd name"><b>品目</b><span class="tot">保有</span></div><div class="hd tl"><div class="days" style="grid-template-columns:${grid}">`+days.map(d=>{const s=gtYmd(d);return `<div class="${gtCls(d,t)}" title="${GT_HOL[s]||''} クリックでこの日の残を全品に表示" onclick="Inv.ganttPick('${s}')"><span class="dw">${GT_HOL[s]||dow[d.getDay()]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`}).join('')+'</div></div>';
     let last='',shown=0;
@@ -5611,6 +5623,7 @@ const Inv = (function(){
     sorted.filter(i=>!ganttCat||i.category===ganttCat).forEach(it=>{
       const rows=gtRowsOf(it,dstr,N);const tot=Number(it.total_qty)||0;
       if(!rows.length&&ganttCat==='')return;   // 全部表示の時は動きのある品だけ
+      if(ganttSite&&!rows.some(r=>String(r.client_name||'').trim()===ganttSite))return;   // 現場で絞り込み中はその現場が使う品だけ
       shown++;
       if(it.category!==last){last=it.category;h+=`<div class="cat">${esc(it.category)}</div>`}
       rows.sort((a,b)=>a.date_start<b.date_start?-1:1);const lanes=[];
@@ -5624,7 +5637,7 @@ const Inv = (function(){
         const s=Math.max(0,dstr.indexOf(st)<0?(st<dstr[0]?0:N):dstr.indexOf(st));
         const bad=en<st;let e=bad?s:dstr.indexOf(en);if(e<0)e=en>dstr[N-1]?N-1:0;if(e<s)e=s;
         const l=s/N*100,w=(e-s+1)/N*100;
-        h+=`<div class="bar ${gtBarCls(r)}${bad?' bad':''}" style="left:${l}%;width:${w}%;top:${3+r._lane*22}px" title="${esc((r.client_name||'')+' '+r.qty+' '+st+'〜'+en+' '+r.status+(bad?'　※返却日が貸出日より前':''))}" onclick="Inv.editRental('${esc(String(r.id))}')">${r.qty} ${esc(r.client_name||'')}</div>`});
+        h+=`<div class="bar ${gtBarCls(r)}${bad?' bad':''}${ganttSite&&String(r.client_name||'').trim()!==ganttSite?' dim':''}" style="left:${l}%;width:${w}%;top:${3+r._lane*22}px" title="${esc((r.client_name||'')+' '+r.qty+' '+st+'〜'+en+' '+r.status+(bad?'　※返却日が貸出日より前':''))}" onclick="Inv.editRental('${esc(String(r.id))}')">${r.qty} ${esc(r.client_name||'')}</div>`});
       const use=dstr.map(ds=>{let u=0;rows.forEach(r=>{const st=String(r.date_start||'').slice(0,10),en=String(r.date_end||'').slice(0,10);if((st<=ds&&en>=ds)||(gtOverdue(r)&&ds>en))u+=Number(r.qty)||0});return u});
       // 残は「変わり目」だけ出す（出ている数が前日と違う日・翌日と違う日・今日）。同じ数が続く間は空けて帯を主役に
       h+=`<div class="free" style="grid-template-columns:${grid}">`+use.map((u,i)=>{const f=tot-u;if(!tot||u===0)return'<div></div>';const show=(i===0||use[i-1]!==u)||(i===N-1||use[i+1]!==u)||dstr[i]===t||dstr[i]===ganttSel;return `<div class="${f<=0?'zero':f<=Math.ceil(tot*0.3)?'low':''}${dstr[i]===ganttSel?' sel':''}" title="出 ${u} ／ 保有 ${tot} ／ 残 ${f}">${show?f:''}</div>`}).join('')+'</div></div>';
@@ -5650,7 +5663,7 @@ const Inv = (function(){
     openSlog, closeSlog, clearSlog,
     sortItems, openItemMo, closeItemMo, editItem, saveItem, deleteItem,
     renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental, toDiscardList, unDiscard, renderDiscard,
-    populateItemSelect, onProjectSelect, renderGantt, ganttMove, ganttToday, setGanttCat, ganttPick, renderMaint,
+    populateItemSelect, onProjectSelect, renderGantt, ganttMove, ganttToday, setGanttCat, ganttPick, ganttSiteSel, renderMaint,
     setItemCatFilter, setMaintFilter, setRentalFilter,
     unifiedSearch
   };
