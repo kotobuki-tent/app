@@ -101,7 +101,8 @@ function render(){
       var l=s/N*100,w=(e-s+1)/N*100;h+='<div class="bar '+cls(r)+(bad?' bad':'')+'" style="left:'+l+'%;width:'+w+'%;top:'+(3+r._lane*22)+'px" title="'+esc((r.client_name||'')+' '+r.qty+' '+r.date_start.slice(0,10)+'〜'+r.date_end.slice(0,10)+' '+r.status+(bad?'　※返却日が貸出日より前':''))+'">'+r.qty+' '+esc(r.client_name||'')+'</div>'});
     // 日ごとの残（出ている数はtitleで）
     var use=dstr.map(function(ds){var u=0;rows.forEach(function(r){var st=r.date_start.slice(0,10),e=r.date_end.slice(0,10);if((st<=ds&&e>=ds)||(overdue(r)&&ds>e))u+=Number(r.qty)||0});return u});
-    h+='<div class="free" style="grid-template-columns:'+grid+'">'+use.map(function(u){var f=tot-u;if(!tot||u===0)return '<div></div>';return '<div class="'+(f<=0?'zero':f<=Math.ceil(tot*0.3)?'low':'')+'" title="出 '+u+' ／ 保有 '+tot+' ／ 残 '+f+'">'+f+'</div>'}).join('')+'</div></div>';
+    // 残は「変わり目」だけ出す（出ている数が前日と違う日・翌日と違う日・今日）。同じ数が続く間は空けて帯を主役に
+    h+='<div class="free" style="grid-template-columns:'+grid+'">'+use.map(function(u,i){var f=tot-u;if(!tot||u===0)return '<div></div>';var show=(i===0||use[i-1]!==u)||(i===N-1||use[i+1]!==u)||dstr[i]===t;return '<div class="'+(f<=0?'zero':f<=Math.ceil(tot*0.3)?'low':'')+'" title="出 '+u+' ／ 保有 '+tot+' ／ 残 '+f+'">'+(show?f:'')+'</div>'}).join('')+'</div></div>';
   });
   h+='</div>';
   $('out').className='';$('out').innerHTML=shown?h:'<p class="empty">この期間に動きのある品はありません</p>';
