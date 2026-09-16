@@ -4108,8 +4108,23 @@ const Proj = (function(){
     }
     await Promise.all([loadProj(),loadRentals(),loadInventoryItems()]);
     _rentalFreshAt=Date.now();
+    alignRentalDates();
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     render();
+  }
+  // 読み込み時にレンタル品の日付を現場の日程に揃える（日付は現場に1つ＝品ごとに打たない）。
+  // 現場を保存し直さなくても、古い行や在庫画面で日付だけ触った行が次に開いた時点で戻る＝打ち間違いが残らない
+  function alignRentalDates(){
+    const byName={};projData.forEach(d=>{if(d.project&&!byName[d.project])byName[d.project]=d});
+    let n=0;
+    rentalsData.forEach(r=>{
+      const d=byName[r.client_name];if(!d)return;
+      const nd=defaultDatesFromProj(d);if(!nd[0]||!nd[1])return;
+      if(r.date_start===nd[0]&&r.date_end===nd[1])return;
+      r.date_start=nd[0];r.date_end=nd[1];n++;
+      fireAndForget({dept:'inventory',action:'save_rental',...r});
+    });
+    if(n)toast('レンタル品'+n+'件の日付を現場の日程に揃えました');
   }
 
   // ===== ステータス変更検知 =====
@@ -4626,6 +4641,8 @@ const Proj = (function(){
     if(!name){toast('物件名を入力してください',true);return}
     const editId=$('xf_id').value;
     const _rPfx=editId?'_xf':'_xfn', _rRows=pendingRentalRows(_rPfx);
+    // 日程の前後逆（返却日が貸出日より前・撤去日が搬入日より前）は保存させない＝レンタル品にそのまま写るので
+    {const _dd=blockDates(_rPfx);if(_dd[0]&&_dd[1]&&_dd[1]<_dd[0]){toast(($('xf_is_rental').checked?'返却日が貸出日':'撤去日が搬入日')+'より前になっています（'+_dd[0].replace(/-/g,'/')+'〜'+_dd[1].replace(/-/g,'/')+'）',true);return}}
     if(rentalRowsIncomplete(_rRows)){toast('レンタル品の行はカテゴリ・商品を選んでください',true);return}
     if(_rRows.length&&!fillBlockDates(_rPfx))return;
     const isRental=$('xf_is_rental').checked;
@@ -4928,6 +4945,7 @@ const Proj = (function(){
     if(Date.now()-_rentalFreshAt<60000&&projData.length&&inventoryItems.length)return;
     await Promise.all([loadProj(),loadRentals(),loadInventoryItems()]);
     _rentalFreshAt=Date.now();
+    alignRentalDates();
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
   }
   function rentalPanelHtml(projectName,pfx){
@@ -8393,6 +8411,8 @@ const Cases = (function(){
     const rRows=(useProj && !nouhinToProd && $('rentalAddRows_cf'))?[...$('rentalAddRows_cf').querySelectorAll('.rental-add-row')]:[];
     if(rRows.some(r=>!r.querySelector('.ra-cat').value||!r.querySelector('.ra-item').value)){ toast('レンタル品の行はカテゴリ・商品を選んでください',true); return; }
     if(rRows.length){ const dd=defaultRentalDates(); if(!dd[0]||!dd[1]){ toast('レンタル品を入れるなら、先に日程（貸出日・返却日、施工なら搬入日・撤去日）を入れてください',true); return; } }
+    // 日程の前後逆は登録させない（返却日が貸出日より前・撤去日が搬入日より前）
+    if(useProj && !nouhinToProd){ const dd=defaultRentalDates(); if(dd[0]&&dd[1]&&dd[1]<dd[0]){ toast((jType()==='レンタル'?'返却日が貸出日':'撤去日が搬入日')+'より前になっています（'+dd[0].replace(/-/g,'/')+'〜'+dd[1].replace(/-/g,'/')+'）',true); return; } }
 
     // 登録先の確認（チェックの付け間違いで生産と企画制作の両方に入るのを防ぐ）
     const _dests=[];
