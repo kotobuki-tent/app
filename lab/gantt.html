@@ -46,7 +46,7 @@ main{padding:12px 16px 40px}
 <label>開始 <input type="date" id="d0"></label><label>日数 <select id="dn"><option>14</option><option selected>31</option><option>62</option><option>92</option></select></label>
 <span class="nav"><button onclick="go(-7)">← 1週</button><button onclick="today()">今日</button><button onclick="go(7)">1週 →</button></span>
 <span class="cat" id="cats"></span><span id="st"></span></header>
-<main><div id="out" class="empty">読み込み中…</div><div class="legend"><span><i style="background:#ede9fe;border:1px dashed #a78bfa"></i>仮押さえ</span><span><i style="background:#8b5cf6"></i>予約</span><span><i style="background:#3b82f6"></i>貸出中</span><span><i style="background:#f59e0b"></i>メンテ待ち・中</span><span><i style="background:#6b7280"></i>廃棄予定</span><span class="note">帯の下の数字＝その日の <b>残</b>。赤＝残り3割以下、赤地＝0以下。数字にマウスを載せると出ている数</span></div></main>
+<main><div id="out" class="empty">読み込み中…</div><div class="legend"><span><i style="background:#ede9fe;border:1px dashed #a78bfa"></i>仮押さえ</span><span><i style="background:#8b5cf6"></i>予約</span><span><i style="background:#3b82f6"></i>貸出中</span><span><i style="background:#f59e0b"></i>メンテ中</span><span><i style="background:#6b7280"></i>廃棄予定</span><span class="note">帯の下の数字＝その日の <b>残</b>。赤＝残り3割以下、赤地＝0以下。数字にマウスを載せると出ている数</span></div></main>
 <script>
 var API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 var ITEMS=[],RENT=[],PROJ={},CAT='';
