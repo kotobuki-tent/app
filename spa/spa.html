@@ -418,8 +418,7 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 .type-toggle input{width:18px;height:18px;cursor:pointer}
 .type-toggle label{font-size:13px;font-weight:600;color:var(--text);margin:0;cursor:default}
 .type-toggle .hint{font-size:11px;color:var(--text-dim);margin-left:8px}
-.rental-disabled{opacity:.4;pointer-events:none}
-.rental-disabled input,.rental-disabled select,.rental-disabled textarea,.rental-disabled button{background:var(--surface3)!important;cursor:not-allowed!important}
+.rental-disabled{display:none!important}   /* レンタル/納品で使わない施工系の欄は畳む（保存側はもともと空で送る） */
 .gantt-section-hd{font-size:13px;font-weight:700;color:var(--text-dim);padding:14px 4px 8px;margin-top:8px;border-top:1px solid var(--border)}
 .gantt-section-hd:first-of-type{border-top:none;margin-top:0;padding-top:4px}
 .gantt-section-hd .count{font-weight:500;color:var(--text-faint);margin-left:6px}
