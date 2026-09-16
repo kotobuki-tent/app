@@ -19,8 +19,9 @@ header .nav button:hover{background:#e2e5f0;color:var(--text)}
 .cat button b{font-weight:800;font-size:12px;color:var(--text)}
 .cat button.on{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}.cat button.on b{color:var(--accent)}
 #st{margin-left:auto;color:var(--text-faint);font-size:12px;white-space:nowrap}
-main{padding:12px 16px 40px}
-.legend{display:flex;gap:16px;font-size:12px;color:var(--text-dim);margin:10px 2px 0;flex-wrap:wrap;align-items:center}.legend i{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:middle;margin-right:5px;box-sizing:border-box}
+main{padding:12px 16px 16px}
+footer{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 16px;z-index:3}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--text-dim);flex-wrap:wrap;align-items:center}.legend i{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:middle;margin-right:5px;box-sizing:border-box}
 .legend .note{color:var(--text-faint)}
 .g{display:grid;grid-template-columns:220px 1fr;border:1px solid var(--border);background:var(--surface);border-radius:10px;overflow:clip;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .g .hd{position:sticky;top:var(--hh,46px);z-index:2;background:var(--surface2);border-bottom:1px solid var(--border)}
@@ -46,7 +47,8 @@ main{padding:12px 16px 40px}
 <label>開始 <input type="date" id="d0"></label><label>日数 <select id="dn"><option>14</option><option selected>31</option><option>62</option><option>92</option></select></label>
 <span class="nav"><button onclick="go(-7)">← 1週</button><button onclick="today()">今日</button><button onclick="go(7)">1週 →</button></span>
 <span class="cat" id="cats"></span><span id="st"></span></header>
-<main><div id="out" class="empty">読み込み中…</div><div class="legend"><span><i style="background:#dbeafe;border:1px dashed #60a5fa"></i>仮押さえ</span><span><i style="background:#dbeafe;border:1px solid #60a5fa"></i>予約</span><span><i style="background:#dcfce7;border:1px solid #4ade80"></i>貸出中</span><span><i style="background:#ffedd5;border:1px solid #fb923c"></i>メンテ中</span><span><i style="background:#e5e7eb;border:1px solid #9ca3af"></i>廃棄予定</span></div></main>
+<main><div id="out" class="empty">読み込み中…</div></main>
+<footer><div class="legend"><span><i style="background:#dbeafe;border:1px dashed #60a5fa"></i>仮押さえ</span><span><i style="background:#dbeafe;border:1px solid #60a5fa"></i>予約</span><span><i style="background:#dcfce7;border:1px solid #4ade80"></i>貸出中</span><span><i style="background:#ffedd5;border:1px solid #fb923c"></i>メンテ中</span><span><i style="background:#e5e7eb;border:1px solid #9ca3af"></i>廃棄予定</span></div></footer>
 <script>
 var API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 var ITEMS=[],RENT=[],PROJ={},CAT='';
