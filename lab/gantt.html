@@ -37,7 +37,7 @@ main{padding:12px 16px 40px}
 .bg{position:absolute;inset:0;display:grid}.bg>div{border-right:1px solid var(--surface3)}.bg>div.sat{background:rgba(59,111,216,.03)}.bg>div.sun,.bg>div.hol{background:rgba(217,64,64,.04)}.bg>div.today{background:rgba(59,111,216,.06)}
 /* 帯＝在庫画面のステータス色（予約=紫・貸出中=青・メンテ=橙・廃棄予定=灰・仮押さえ=薄紫の点線） */
 .bar{position:absolute;height:18px;border-radius:4px;font-size:11px;font-weight:600;line-height:18px;padding:0 6px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default;z-index:1}
-.bar.est{background:#ede9fe;color:#7c3aed;border:1px dashed #a78bfa;line-height:16px}.bar.res{background:var(--purple)}.bar.out{background:var(--accent)}.bar.mnt{background:var(--orange)}.bar.dsp{background:#6b7280}.bar.oth{background:#9aa2b1}
+.bar.est{background:#ede9fe;color:#7c3aed;border:1px dashed #a78bfa;line-height:16px}.bar.res{background:var(--purple)}.bar.out{background:var(--accent)}.bar.mnt{background:var(--orange)}.bar.dsp{background:#6b7280}.bar.oth{background:#9aa2b1}.bar.bad{outline:2px dashed var(--red);outline-offset:-2px}
 /* 残数：帯の下に1行だけ（出ている数はマウスオーバーで） */
 .free{position:absolute;left:0;right:0;bottom:0;height:15px;display:grid}.free>div{font-size:10px;text-align:center;line-height:15px;color:var(--text-faint);font-variant-numeric:tabular-nums}.free>div.low{color:var(--red);font-weight:700}.free>div.zero{color:var(--red);font-weight:700}
 .empty{color:var(--text-faint);padding:24px;text-align:center;font-size:13px}
@@ -62,7 +62,7 @@ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'
 function today(){$('d0').value=ymd(new Date(Date.now()-3*86400000));render()}
 function go(n){var d=new Date($('d0').value+'T00:00:00');d.setDate(d.getDate()+n);$('d0').value=ymd(d);render()}
 function cls(r){var st=r.status||'';if(st==='貸出中')return'out';if(st==='メンテ待ち'||st==='メンテ中')return'mnt';if(st==='廃棄予定')return'dsp';if(st==='予約'){var p=PROJ[r.client_name];return (p==='見積中')?'est':'res'}return'oth'}
-function rowsOf(it,dstr,N){return RENT.filter(function(r){return r.category===it.category&&r.item_name===it.item_name&&ACTIVE.indexOf(r.status)>=0&&r.date_end>=dstr[0]&&r.date_start<=dstr[N-1]})}
+function rowsOf(it,dstr,N){return RENT.filter(function(r){return r.category===it.category&&r.item_name===it.item_name&&ACTIVE.indexOf(r.status)>=0&&(r.date_end<r.date_start?r.date_start:r.date_end)>=dstr[0]&&r.date_start<=dstr[N-1]})}
 function render(){
   var d0=new Date($('d0').value+'T00:00:00'),N=Number($('dn').value);var days=[];for(var i=0;i<N;i++){var d=new Date(d0);d.setDate(d.getDate()+i);days.push(d)}
   var t=ymd(new Date());var dstr=days.map(ymd);
@@ -84,8 +84,8 @@ function render(){
     rows.forEach(function(r){var L=0;while(lanes[L]&&lanes[L]>=r.date_start)L++;lanes[L]=r.date_end;r._lane=L});
     var H=4+Math.max(1,lanes.length)*22+15;
     h+='<div class="name"><b title="'+esc(it.item_name)+'">'+esc(it.item_name)+'</b><span class="tot">'+(tot||'未')+'</span></div><div class="tl" style="height:'+H+'px"><div class="bg" style="grid-template-columns:'+grid+'">'+days.map(function(d){return '<div class="'+dcls(d,t)+'"></div>'}).join('')+'</div>';
-    rows.forEach(function(r){var s=Math.max(0,dstr.indexOf(r.date_start.slice(0,10))<0?(r.date_start<dstr[0]?0:N):dstr.indexOf(r.date_start.slice(0,10)));var e=dstr.indexOf(r.date_end.slice(0,10));if(e<0)e=r.date_end>dstr[N-1]?N-1:0;
-      var l=s/N*100,w=(e-s+1)/N*100;h+='<div class="bar '+cls(r)+'" style="left:'+l+'%;width:'+w+'%;top:'+(3+r._lane*22)+'px" title="'+esc((r.client_name||'')+' '+r.qty+' '+r.date_start.slice(0,10)+'〜'+r.date_end.slice(0,10)+' '+r.status)+'">'+r.qty+' '+esc(r.client_name||'')+'</div>'});
+    rows.forEach(function(r){var s=Math.max(0,dstr.indexOf(r.date_start.slice(0,10))<0?(r.date_start<dstr[0]?0:N):dstr.indexOf(r.date_start.slice(0,10)));var bad=r.date_end.slice(0,10)<r.date_start.slice(0,10);var e=bad?s:dstr.indexOf(r.date_end.slice(0,10));if(e<0)e=r.date_end>dstr[N-1]?N-1:0;if(e<s)e=s;
+      var l=s/N*100,w=(e-s+1)/N*100;h+='<div class="bar '+cls(r)+(bad?' bad':'')+'" style="left:'+l+'%;width:'+w+'%;top:'+(3+r._lane*22)+'px" title="'+esc((r.client_name||'')+' '+r.qty+' '+r.date_start.slice(0,10)+'〜'+r.date_end.slice(0,10)+' '+r.status+(bad?'　※返却日が貸出日より前':''))+'">'+r.qty+' '+esc(r.client_name||'')+'</div>'});
     // 日ごとの残（出ている数はtitleで）
     var use=dstr.map(function(ds){var u=0;rows.forEach(function(r){if(r.date_start.slice(0,10)<=ds&&r.date_end.slice(0,10)>=ds)u+=Number(r.qty)||0});return u});
     h+='<div class="free" style="grid-template-columns:'+grid+'">'+use.map(function(u){var f=tot-u;if(!tot||u===0)return '<div></div>';return '<div class="'+(f<=0?'zero':f<=Math.ceil(tot*0.3)?'low':'')+'" title="出 '+u+' ／ 保有 '+tot+' ／ 残 '+f+'">'+f+'</div>'}).join('')+'</div></div>';
