@@ -194,7 +194,7 @@ GAS（`Code.gs`）に運用系の関数を同梱。**ソースの正本は iClou
 - **Google Drive**：製作図ファイル連携、フォルダID `16iDJrBWXdbIHq-aqJVgHZpA9tRGXMUwc`
 - **GitHub Pages**：ホスティング
 - **楽観的更新**：no-cors POST + ローカル配列即時反映、保存後にloadAll自動実行（GASの実ID採番を待つ）
-- **自動更新**：5分間隔、`document.visibilityState` ガード、`_bgBusy` 同時実行ガード、表示中アプリのみ再取得
+- **自動更新**（2026-09-17〜）：「表示中の画面のデータが90秒以上古ければ裏で取り直す」の一本（`App.softRefresh`）。30秒ごとの見回り・画面に戻った時・端末が表示に戻った時（スリープ明け/タブ切替）に発火。入力中とモーダル表示中は見送り。`document.visibilityState` ガード、`_bgBusy` 同時実行ガード、表示中アプリのみ再取得。¥バッジは従来どおり5分
 - **連打防止**：書き込み系（保存・削除・伝票チェック・ステータス変更等）32箇所に1.5秒の連打防止フラグを実装。同じボタンの2連打で日報が2件登録される等の事故を防ぐ
 - **エラーハンドリング**：apiGet（読み取り）にtry/catchを実装、GAS瞬断やJSONパース失敗時もUIが止まらずnullを返して処理続行
 - **並行実行競合対策**：attendanceはLockServiceでシリアライズ、cleanupはclearContent + setValues一括書き込みで高速化

@@ -9322,21 +9322,40 @@ const App = {
       $('loader').classList.remove('hidden');
       try{
         await app.loadAll();
-        this._loaded[name]=true;
+        this._loaded[name]=true; this._loadedAt[name]=Date.now();
       }catch(e){
         toast('データ取得エラー',true);
       }finally{
         this._loading[name]=false;
         if(!this._loading[this.current]) $('loader').classList.add('hidden');
       }
+    }else{
+      this.softRefresh();   // 2回目以降に戻ってきた時：古ければ裏で取り直す（2026-09-17）
     }
+  },
+  /* 裏の取り直し（2026-09-17）：表示中の画面のデータが STALE_MS より古ければ、ローダーを出さずに loadAll。
+     呼び元＝画面に戻った時（nav）／端末が表示に戻った時（visibilitychange・focus・pageshow）／30秒ごとの見回り。
+     入力中（その画面の input/textarea/select にフォーカス）やモーダル表示中は再描画で手元が飛ぶので見送る。
+     従来は「表示中の画面を5分ごと」だけで、他の端末の変更が最大5分＋画面を切り替えても届かなかった。 */
+  STALE_MS:90*1000,
+  _loadedAt:{},
+  softRefresh(){
+    const name=this.current; if(!name||name==='portal')return;
+    if(!this._loaded[name]||this._loading[name]||_bgBusy)return;
+    if(document.visibilityState!=='visible')return;
+    if(Date.now()-(this._loadedAt[name]||0)<this.STALE_MS)return;
+    const ae=document.activeElement; if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&ae.type!=='button')return;
+    if(document.querySelector('.mo-bg.show'))return;
+    _bgBusy=true;
+    const app=this.reg(name).ns();
+    Promise.resolve(app.loadAll()).then(()=>{this._loadedAt[name]=Date.now();}).catch(()=>{}).finally(()=>{_bgBusy=false});
   },
   // 更新：今表示中のアプリだけ再取得（裏アプリのGASは叩かない＝SEQ-011全停止対策）
   async refreshCurrent(){
     const name=this.current;
     const app=this.reg(name).ns();
     this._loading[name]=true;
-    try{ await app.loadAll(); this._loaded[name]=true; }
+    try{ await app.loadAll(); this._loaded[name]=true; this._loadedAt[name]=Date.now(); }
     finally{ this._loading[name]=false; }
   }
 };
@@ -9346,15 +9365,13 @@ $('refreshBtn').addEventListener('click', function(){
   safeRefresh(this, ()=>App.refreshCurrent());
 });
 let _bgBusy=false;
-setInterval(()=>{
-  if(document.visibilityState!=='visible')return;
-  if(_bgBusy)return;
-  if(!App.current)return;
-  _bgBusy=true;
-  const app=App.reg(App.current).ns();
-  Promise.resolve(app.loadAll()).finally(()=>{_bgBusy=false});
-  moneyFetch();   // ¥バッジも同じ周期で取り直す
-},5*60*1000);
+// 見回り（2026-09-17）：30秒ごとに「表示中の画面が90秒以上古ければ取り直す」。従来は5分固定。
+setInterval(()=>{ App.softRefresh(); },30*1000);
+// 端末が表示に戻った時（タブレットのスリープ明け・タブ切替・アプリ復帰）も同じルールで取り直す
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') App.softRefresh(); });
+window.addEventListener('focus',()=>App.softRefresh());
+window.addEventListener('pageshow',()=>App.softRefresh());
+setInterval(()=>{ if(document.visibilityState==='visible') moneyFetch(); },5*60*1000);   // ¥バッジは従来どおり5分
 
 // 初期表示：各アプリの init（イベント配線）→ ポータル（入口）を開く
 window.addEventListener('load', async ()=>{
