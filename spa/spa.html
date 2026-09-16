@@ -2271,6 +2271,24 @@ table.jobs tr:last-child td{border-bottom:none}
     </div>
   </div>
 
+  <!-- 分けるモーダル：1行のうち N 個だけ別の状態にする（検品で 20 返却・2 メンテ・1 廃棄、のように割る） -->
+  <div class="mo-bg" id="splitMoBg">
+    <div class="mo" style="max-width:480px">
+      <h3>分ける</h3>
+      <input type="hidden" id="xf_sp_id">
+      <div id="xf_sp_info" style="font-size:13px;color:var(--text-dim);margin-bottom:12px;line-height:1.6"></div>
+      <div class="mo-row">
+        <div class="mo-field"><label>うち何個</label><input id="xf_sp_qty" type="number" min="1" value="1"></div>
+        <div class="mo-field"><label>どうする</label><select id="xf_sp_status"><option>メンテ中</option><option>返却済</option><option>メンテ待ち</option><option>廃棄予定</option><option>検品中</option><option>貸出中</option><option>予約</option></select></div>
+      </div>
+      <div style="font-size:12px;color:var(--text-faint);margin-top:-4px">残りは今の状態のまま。全部なら数量そのままで「どうする」だけ選べば行ごと変わります。</div>
+      <div class="mo-foot">
+        <button class="cancel" onclick="Inv.closeSplitMo()">キャンセル</button>
+        <button class="save" onclick="Inv.doSplit()">分ける</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ステータスログモーダル（slogBg→invSlogBg / slogList→invSlogList） -->
   <div class="mo-bg" id="invSlogBg">
   <div class="mo" style="max-width:560px">
@@ -5399,6 +5417,7 @@ const Inv = (function(){
       <td>${esc(r.client_name)}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
       <td><div class="tbl-actions">
+        <a class="edit-link" onclick="Inv.openSplit('${r.id}')">分ける</a>
         <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
         <a class="del-link" onclick="Inv.toDiscardList('${r.id}')">廃棄リストへ</a>
       </div></td>
@@ -5461,6 +5480,7 @@ const Inv = (function(){
       <td>${esc(r.client_name)}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
       <td><div class="tbl-actions">
+        <a class="edit-link" onclick="Inv.openSplit('${r.id}')">分ける</a>
         <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
         <a class="del-link" onclick="Inv.deleteRental('${r.id}')">削除</a>
       </div></td>
@@ -5523,6 +5543,45 @@ const Inv = (function(){
     _savingRental=true;
     toast('保存しました');closeRentalMo();renderRentals();renderMaint();renderGantt();renderDiscard();
     setTimeout(()=>{_savingRental=false},1500);
+  }
+  // ===== 分ける：1行のうち N 個だけ別の状態にする =====
+  // 現場のスタッフがメンテ画面から「23 のうち 1 をメンテ中へ」「今日 3 張メンテ終わった→返却済へ」とやれるように。
+  // N < 数量 なら元の行を (数量−N) に減らして、同じ現場・同じ日付で N 個の新しい行を作る。N ≥ 数量 なら行ごと状態を変える。
+  let _busySplit=false;
+  function openSplit(id){
+    const r=rentals.find(x=>x.id===id);if(!r)return;
+    if(String(id).startsWith('tmp_')){toast('保存中の行です。数秒後にもう一度',false);return}
+    $('xf_sp_id').value=id;
+    $('xf_sp_info').innerHTML=`<b>${esc(r.item_name)}</b> × ${r.qty}　<span class="st st-${esc(r.status)}">${esc(r.status)}</span><br>${esc(r.client_name||'')}　${dateJP(r.date_start)}〜${dateJP(r.date_end)}`;
+    $('xf_sp_qty').value=1;$('xf_sp_qty').max=Number(r.qty)||1;
+    $('xf_sp_status').value=r.status==='メンテ待ち'?'メンテ中':(r.status==='メンテ中'||r.status==='貸出中'||r.status==='検品中')?'返却済':'メンテ中';
+    $('splitMoBg').classList.add('show');
+    setTimeout(()=>{$('xf_sp_qty').focus();$('xf_sp_qty').select()},50);
+  }
+  function closeSplitMo(){$('splitMoBg').classList.remove('show')}
+  function doSplit(){
+    if(_busySplit)return;
+    const id=$('xf_sp_id').value;const r=rentals.find(x=>x.id===id);if(!r){closeSplitMo();return}
+    const total=Number(r.qty)||0;let n=parseInt($('xf_sp_qty').value,10);const st=$('xf_sp_status').value;
+    if(!n||n<1){toast('個数を入れてください',false);return}
+    if(n>total)n=total;
+    if(st===r.status){toast('今と同じ状態です',false);return}
+    _busySplit=true;setTimeout(()=>{_busySplit=false},1500);
+    if(n>=total){
+      r.status=st;
+      fireAndForget({action:'save_rental',...r});
+      toast(`${r.item_name} ×${total} を${st}にしました`);
+    }else{
+      r.qty=total-n;
+      fireAndForget({action:'save_rental',...r});
+      const nr={...r,id:'RNTC-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),qty:n,status:st};
+      rentals.push(nr);
+      fireAndForget({action:'save_rental',...nr});
+      toast(`${r.item_name}：${n} を${st}へ、${total-n} は${r.status}のまま`);
+    }
+    _setCache('inventory',{items:items,rentals:rentals,projects:projects,projStatus:projStatus});
+    closeSplitMo();renderRentals();renderMaint();renderGantt();renderDiscard();
+    setTimeout(loadAll,8000);
   }
   function deleteRental(id){
     if(_busyDel)return;
@@ -5662,7 +5721,7 @@ const Inv = (function(){
     switchTab,
     openSlog, closeSlog, clearSlog,
     sortItems, openItemMo, closeItemMo, editItem, saveItem, deleteItem,
-    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental, toDiscardList, unDiscard, renderDiscard,
+    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental, toDiscardList, unDiscard, renderDiscard, openSplit, closeSplitMo, doSplit,
     populateItemSelect, onProjectSelect, renderGantt, ganttMove, ganttToday, setGanttCat, ganttPick, ganttSiteSel, renderMaint,
     setItemCatFilter, setMaintFilter, setRentalFilter,
     unifiedSearch
