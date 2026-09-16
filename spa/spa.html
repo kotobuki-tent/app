@@ -5171,7 +5171,31 @@ const Inv = (function(){
       const r=await fetch(url);return r.json();
     }catch(e){console.error('apiGet失敗(inventory):',e);return null;}
   }
-  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})})}
+  function _send(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})}).catch(()=>{})}catch(e){}}
+  /* 送った変更の控え（2026-09-17）：貸出/予約・メンテの行は既存 ID（RNTC-）のまま状態を変えるので、
+     8秒後や自動更新の取り直しで GAS がまだ書き終えていない（or POST が落ちた）とサーバーの古い値で上書きされ、
+     「メンテで変えたのにガントに出ない」「分けた行が消えた」に見えていた。控えは applyPending で取り直し結果に当てる：
+     サーバーに反映済み→控えを消す／15秒経っても未反映→1回だけ再送／60秒で諦めて警告。 */
+  const _pend={};
+  function fireAndForget(body){
+    if(body&&(body.action==='save_rental'||body.action==='delete_rental')&&body.id&&String(body.id).indexOf('tmp_')!==0){_pend[String(body.id)]={body:{...body},ts:Date.now(),retried:false};}
+    _send(body);
+  }
+  const _d10=v=>String(v||'').slice(0,10), _s=v=>String(v==null?'':v).trim();
+  function _sameAsPending(row,b){return _s(row.status)===_s(b.status)&&(Number(row.qty)||0)===(Number(b.qty)||0)&&_d10(row.date_start)===_d10(b.date_start)&&_d10(row.date_end)===_d10(b.date_end)&&_s(row.client_name)===_s(b.client_name)}
+  function applyPending(srv){
+    const now=Date.now(),out=srv.slice();
+    Object.keys(_pend).forEach(id=>{
+      const p=_pend[id],age=now-p.ts,i=out.findIndex(r=>String(r.id)===id);
+      const done=p.body.action==='delete_rental'?(i<0):(i>=0&&_sameAsPending(out[i],p.body));
+      if(done){delete _pend[id];return}
+      if(age>60000){delete _pend[id];toast('保存が確認できません：'+(p.body.item_name||id)+'（もう一度やり直してください）',true);return}
+      if(age>15000&&!p.retried){p.retried=true;_send(p.body);}
+      if(p.body.action==='delete_rental'){if(i>=0)out.splice(i,1)}
+      else{const local={...(i>=0?out[i]:{}),...p.body};delete local.action;delete local.dept;if(i>=0)out[i]=local;else out.push(local)}
+    });
+    return out;
+  }
 
   // ===== ステータスログ =====
   function detectInvChanges(){
@@ -5248,7 +5272,7 @@ const Inv = (function(){
         fetch(API+'?dept=project&action=read').then(r=>r.json()).catch(()=>null)   // 現場のステータス（ガントの仮押さえ判定用）
       ]);
       items=mergeWithTmp(inv||[],items,r=>String(r.category||'')+'|'+String(r.item_name||''));
-      rentals=mergeWithTmp(rnt||[],rentals,r=>String(r.item_name||'')+'|'+String(r.date_start||'')+'|'+String(r.client_name||''));
+      rentals=applyPending(mergeWithTmp(rnt||[],rentals,r=>String(r.item_name||'')+'|'+String(r.date_start||'')+'|'+String(r.client_name||'')));
       projects=prj||[];
       if(pst&&Array.isArray(pst.data)){projStatus={};pst.data.forEach(p=>{if(p.project)projStatus[p.project]=p.status})}
       populateCategoryFilters();
