@@ -8649,6 +8649,8 @@ async function boot(){
   // キャッシュを即適用（名前が一瞬で出る）→ 裏で最新取得して差し替え
   const cached=localStorage.getItem('alc_boot');
   if(cached){try{applyBoot(JSON.parse(cached));}catch(e){}}
+  // 名簿が出た瞬間に本人を選ぶ（当日分の list を待たない。実測で list は 3〜4秒かかる）
+  if(!selDriver&&window.__woffUser&&drivers.length){const m0=woffMatch(drivers,d=>d.name);if(m0)selectDriver(m0.name);}
   // 速さ優先の読み方（実測：list 2.5〜3.7s／bootstrap 約3s／boot(両方) 4〜5s）
   //  - 名簿がキャッシュにある（2回目以降）：当日の記録(list)だけ待つ。名簿の最新化は裏で取ってそっと差し替え
   //  - 名簿が無い（初回）：boot（名簿＋当日分を1往復）。GASが旧版なら従来の並列2往復にフォールバック
@@ -8676,7 +8678,12 @@ async function boot(){
 
 async function loadDay(date,silent){
   if(!silent)$('dayMtx').innerHTML='<div class="empty">読み込み中...</div>';
-  try{const r=await apiGet({action:'list',date});records=(r.data||[]);}catch(e){records=[];}
+  try{const r=await apiGet({action:'list',date});const srv=(r.data||[]);
+    // 直前に登録した楽観行は、GAS がまだ書き終えていない（POST 2〜3秒＋ぶれ）と list に無い。
+    // 消してしまうと「登録したのに消えた」に見えるので、同じ日・人・前後の行が来るまで残す（20秒まで）
+    const keep=records.filter(x=>x._optimistic&&x.date===date&&(Date.now()-(+String(x.id).slice(4)||0))<20000&&!srv.some(y=>y.driver===x.driver&&y.phase===x.phase));
+    records=srv.concat(keep);
+  }catch(e){records=[];}
   renderDrivers(); renderToday();
   if(!selDriver&&window.__woffUser){const m=woffMatch(drivers,d=>d.name);if(m)selectDriver(m.name);}
 }
@@ -8778,6 +8785,7 @@ function record(phase){
   clearSel();              // 次の人へ
   renderToday();
   setTimeout(()=>loadDay($('f_date').value,true),3000);
+  setTimeout(()=>{if(records.some(x=>x._optimistic))loadDay($('f_date').value,true);},9000);   // 3秒で追いつかなかった時だけもう1回
 }
 
 /* ===== 編集 ===== */
