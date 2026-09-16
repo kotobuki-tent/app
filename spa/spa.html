@@ -725,28 +725,54 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 .st-メンテ待ち{background:#ffedd5;color:#c2410c}
 .st-メンテ中{background:#fee2e2;color:#dc2626}
 .st-廃棄予定{background:#e5e7eb;color:#374151}
-.avail-bar{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:baseline;padding:10px 12px;border-bottom:1px solid #f0f1f5;width:100%;box-sizing:border-box}
-.avail-bar.empty{opacity:.45}
-.avail-date-row{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
-.avail-item-name{font-size:14px;font-weight:600;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.avail-remain{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;min-width:60px;text-align:right;letter-spacing:-0.02em}
-.avail-remain.ok{color:#059669}
-.avail-remain.warn{color:#d97706}
-.avail-remain.danger{color:#dc2626}
-.avail-remain.none{color:#9ca3af}
-.avail-remain .lbl{font-size:11px;font-weight:500;color:#9ca3af;margin-right:4px}
-.avail-usage{font-size:12px;color:#9ca3af;min-width:140px;text-align:right;font-variant-numeric:tabular-nums}
-.avail-cat-hd{margin-top:18px;margin-bottom:4px;font-size:13px;font-weight:700;color:var(--text-dim);padding:0 12px 6px;border-bottom:2px solid var(--border)}
-@media(max-width:480px),(orientation:portrait){
-  .avail-bar{grid-template-columns:1fr auto;grid-template-areas:"name remain" "usage usage";gap:4px 12px;padding:10px}
-  .avail-item-name{grid-area:name;font-size:13px}
-  .avail-remain{grid-area:remain;font-size:17px}
-  .avail-usage{grid-area:usage;text-align:left;min-width:0;font-size:11px}
-}
+/* ===== 在庫ガント（試作 lab/gantt.html を移植。帯＝予定、品名の下＝未返却、数字＝残） ===== */
+#v_gantt .gt-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-8px 0 12px}
+#v_gantt .gt-controls label{font-size:12px;color:var(--text-dim);display:inline-flex;align-items:center;gap:6px}
+#v_gantt .gt-controls input,#v_gantt .gt-controls select{font:500 13px/1 'Noto Sans JP',sans-serif;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text)}
+#v_gantt .gt-nav{display:inline-flex;gap:4px;margin-left:4px}
+#v_gantt .gt-nav button{font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 12px;border:none;border-radius:999px;background:var(--surface3);color:var(--text-dim);cursor:pointer;white-space:nowrap}
+#v_gantt .gt-nav button:hover{background:#e2e5f0;color:var(--text)}
+#v_gantt .gt-wrap{overflow-x:auto}
+#v_gantt .gt{display:grid;grid-template-columns:220px 1fr;min-width:800px;border:1px solid var(--border);background:var(--surface);border-radius:10px;overflow:clip;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+#v_gantt .gt .hd{position:sticky;top:0;z-index:2;background:var(--surface2);border-bottom:1px solid var(--border)}
+#v_gantt .gt .hd.name{padding:8px 12px;font-size:12px;font-weight:700}
+#v_gantt .gt .name{padding:6px 12px;border-bottom:1px solid var(--surface3);border-right:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:6px;overflow:hidden;cursor:default}
+#v_gantt .gt .name .nm{min-width:0;display:flex;flex-direction:column;gap:1px}
+#v_gantt .gt .name b{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#v_gantt .gt .name .tot{color:var(--text-faint);font-size:11px;white-space:nowrap}
+#v_gantt .gt .name .od{font-size:10px;color:#c2410c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#v_gantt .gt .cat{grid-column:1/3;background:var(--surface3);padding:5px 12px;font-weight:700;font-size:11px;color:var(--text-dim);border-bottom:1px solid var(--border)}
+#v_gantt .tl{position:relative;border-bottom:1px solid var(--surface3);min-height:30px}
+#v_gantt .days{display:grid;height:100%}
+#v_gantt .days>div{border-right:1px solid var(--surface3);text-align:center;padding:4px 1px 3px;color:var(--text-dim);white-space:nowrap;overflow:hidden;line-height:1.15}
+#v_gantt .days .dw{display:block;font-size:9px;overflow:hidden;text-overflow:ellipsis}
+#v_gantt .days .dm{display:block;font-size:12px;font-weight:700}
+#v_gantt .days>div.sat{color:var(--accent)}
+#v_gantt .days>div.sun,#v_gantt .days>div.hol{color:var(--red)}
+#v_gantt .days>div.hol{background:rgba(217,64,64,.05)}
+#v_gantt .days>div.today{background:var(--accent-dim);color:var(--accent)}
+#v_gantt .bg{position:absolute;inset:0;display:grid}
+#v_gantt .bg>div{border-right:1px solid var(--surface3)}
+#v_gantt .bg>div.sat{background:rgba(59,111,216,.03)}
+#v_gantt .bg>div.sun,#v_gantt .bg>div.hol{background:rgba(217,64,64,.04)}
+#v_gantt .bg>div.today{background:rgba(59,111,216,.06)}
+#v_gantt .bar{position:absolute;height:18px;border-radius:4px;font-size:11px;font-weight:600;line-height:16px;padding:0 6px;border:1px solid;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;z-index:1;box-sizing:border-box}
+#v_gantt .bar.est{background:#dbeafe;color:#1d4ed8;border-color:#60a5fa;border-style:dashed}
+#v_gantt .bar.res{background:#dbeafe;color:#1d4ed8;border-color:#60a5fa}
+#v_gantt .bar.out{background:#dcfce7;color:#15803d;border-color:#4ade80}
+#v_gantt .bar.mnt{background:#ffedd5;color:#c2410c;border-color:#fb923c}
+#v_gantt .bar.dsp{background:#e5e7eb;color:#374151;border-color:#9ca3af}
+#v_gantt .bar.oth{background:#f3f4f6;color:#6b7280;border-color:#d1d5db}
+#v_gantt .bar.bad{outline:2px dashed var(--red);outline-offset:-2px}
+#v_gantt .free{position:absolute;left:0;right:0;bottom:0;height:15px;display:grid}
+#v_gantt .free>div{font-size:10px;text-align:center;line-height:15px;color:var(--text-faint);font-variant-numeric:tabular-nums}
+#v_gantt .free>div.low{color:var(--red);font-weight:700}
+#v_gantt .free>div.zero{color:var(--red);font-weight:700}
+#v_gantt .gt-empty{color:var(--text-faint);padding:24px;text-align:center;font-size:13px}
+#v_gantt .gt-legend{position:sticky;bottom:0;display:flex;gap:16px;font-size:12px;color:var(--text-dim);flex-wrap:wrap;align-items:center;background:var(--surface);border-top:1px solid var(--border);padding:8px 12px;margin:12px -14px -32px}
+#v_gantt .gt-legend i{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:middle;margin-right:5px;box-sizing:border-box}
 .filter-bar select,.filter-bar input{padding:7px 12px;background:#fff;border1px solid var(--border);border-radius:6px;color:var(--text);font:400 13px/1 'Noto Sans JP',sans-serif;outline:none}
 .filter-bar select:focus,.filter-bar input:focus{border-color:#6366f1}
-.avail-date-row label{font-size:12px;font-weight:600;color:#888}
-.avail-date-row input,.avail-date-row select{padding:7px 12px;background:#fff;border1px solid var(--border);border-radius:6px;color:var(--text);font:400 13px/1 'Noto Sans JP',sans-serif;outline:none}
 .section{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
 .section h2{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
 .section p.desc{font-size:12px;color:#999;margin-bottom:16px}
@@ -769,7 +795,6 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
   .mo{padding:20px 16px;width:98%;overflow-x:hidden}
   .mo-row{flex-direction:column}
   .phase-grid{grid-template-columns:1fr}
-  .avail-item-name{min-width:100px;font-size:12px}
   .toolbar{flex-direction:column;align-items:flex-start}
   .av-top{flex-direction:column;align-items:stretch;gap:8px}
   .av-search{display:none}
@@ -2112,7 +2137,7 @@ table.jobs tr:last-child td{border-bottom:none}
 <section id="view-inv" class="hidden">
   <div class="sub-tabs" id="invTabs">
     <span class="subtab-date" id="invPcDate"></span>
-    <button class="sub-tab on" data-tab="avail" onclick="Inv.switchTab('avail')">在庫確認</button>
+    <button class="sub-tab on" data-tab="gantt" onclick="Inv.switchTab('gantt')">ガント</button>
     <button class="sub-tab" data-tab="rentals" onclick="Inv.switchTab('rentals')">貸出/予約</button>
     <button class="sub-tab" data-tab="maint" onclick="Inv.switchTab('maint')">メンテ</button>
     <button class="sub-tab" data-tab="discard" onclick="Inv.switchTab('discard')">廃棄</button>
@@ -2170,22 +2195,16 @@ table.jobs tr:last-child td{border-bottom:none}
         </table>
       </div>
     </div>
-    <!-- 在庫確認 -->
-    <div id="v_avail">
-      <div class="fv-sum" id="availChips"></div>
-      <div class="av-top">
-        <div class="avail-date-row">
-          <label>開始日</label>
-          <input type="date" id="avail_start" onchange="Inv.renderAvail()">
-          <label>終了日</label>
-          <input type="date" id="avail_end" onchange="Inv.renderAvail()">
-        </div>
+    <!-- ガント（在庫の日程表：帯＝予定、品名の下＝未返却、数字＝残） -->
+    <div id="v_gantt">
+      <div class="fv-sum" id="ganttChips"></div>
+      <div class="gt-controls">
+        <label>開始 <input type="date" id="gt_d0" onchange="Inv.renderGantt()"></label>
+        <label>日数 <select id="gt_dn" onchange="Inv.renderGantt()"><option>14</option><option selected>31</option><option>62</option><option>92</option></select></label>
+        <span class="gt-nav"><button type="button" onclick="Inv.ganttMove(-7)">← 1週</button><button type="button" onclick="Inv.ganttToday()">今日</button><button type="button" onclick="Inv.ganttMove(7)">1週 →</button></span>
       </div>
-      <div class="section">
-        <h2>在庫バッティング確認</h2>
-        <p class="desc">指定期間中に「予約」「貸出中」の数量を合計し、保有数に対する使用率を表示します。</p>
-        <div id="avail_body"></div>
-      </div>
+      <div id="ganttOut" class="gt-wrap"></div>
+      <div class="gt-legend"><span><i style="background:#dbeafe;border:1px dashed #60a5fa"></i>仮押さえ</span><span><i style="background:#dbeafe;border:1px solid #60a5fa"></i>予約</span><span><i style="background:#dcfce7;border:1px solid #4ade80"></i>貸出中</span><span><i style="background:#ffedd5;border:1px solid #fb923c"></i>メンテ中</span><span><i style="background:#e5e7eb;border:1px solid #9ca3af"></i>廃棄予定</span></div>
     </div>
   </div>
 
@@ -5101,7 +5120,8 @@ const Inv = (function(){
   let itemCatFilter='';
   let maintStatusFilter='';
   let rentalStatusFilter='';
-  let availCatFilter='';
+  let ganttStart=null, ganttDays=31, ganttCat='';   // 在庫ガント
+  let projStatus={};   // 現場名→ステータス（見積中の予約＝仮押さえ）
   // slog（inv独自：i付き変数・ILOG_KEY）
   const ILOG_KEY='inv_status_snapshot';
   const ILOG_LIST_KEY='inv_status_log';
@@ -5182,26 +5202,28 @@ const Inv = (function(){
   async function loadAll(){
     const cached=_getCache('inventory');
     if(cached){
-      items=cached.items||[];rentals=cached.rentals||[];projects=cached.projects||[];
+      items=cached.items||[];rentals=cached.rentals||[];projects=cached.projects||[];projStatus=cached.projStatus||{};
       populateCategoryFilters();
       populateProjectSelect();
-      renderItems();renderRentals();renderMaint();renderAvail();
+      renderItems();renderRentals();renderMaint();renderGantt();
       detectInvChanges();updateSlogBtn();
     }
     try{
-      const [inv,rnt,prj]=await Promise.all([
+      const [inv,rnt,prj,pst]=await Promise.all([
         apiGet({action:'list'}).catch(()=>[]),
         apiGet({action:'rentals'}).catch(()=>[]),
-        apiGet({action:'projects'}).catch(()=>[])
+        apiGet({action:'projects'}).catch(()=>[]),
+        fetch(API+'?dept=project&action=read').then(r=>r.json()).catch(()=>null)   // 現場のステータス（ガントの仮押さえ判定用）
       ]);
       items=mergeWithTmp(inv||[],items,r=>String(r.category||'')+'|'+String(r.item_name||''));
       rentals=mergeWithTmp(rnt||[],rentals,r=>String(r.item_name||'')+'|'+String(r.date_start||'')+'|'+String(r.client_name||''));
       projects=prj||[];
+      if(pst&&Array.isArray(pst.data)){projStatus={};pst.data.forEach(p=>{if(p.project)projStatus[p.project]=p.status})}
       populateCategoryFilters();
       populateProjectSelect();
-      renderItems();renderRentals();renderMaint();renderAvail();
+      renderItems();renderRentals();renderMaint();renderGantt();
       detectInvChanges();updateSlogBtn();
-      _setCache('inventory',{items:items,rentals:rentals,projects:projects});
+      _setCache('inventory',{items:items,rentals:rentals,projects:projects,projStatus:projStatus});
     }catch(e){
       toast('データ取得に失敗: '+e.message,false);
     }
@@ -5241,18 +5263,20 @@ const Inv = (function(){
 
   function unifiedSearch(q){
     q=(q||'').toLowerCase();
-    const view=document.querySelector('#v_items:not(.hidden), #v_rentals:not(.hidden), #v_maint:not(.hidden), #v_avail:not(.hidden)');
+    const view=document.querySelector('#v_items:not(.hidden), #v_rentals:not(.hidden), #v_maint:not(.hidden), #v_gantt:not(.hidden)');
     if(!view)return;
-    view.querySelectorAll('tbody tr, .avail-bar').forEach(el=>{
+    view.querySelectorAll('tbody tr').forEach(el=>{
       el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
     });
+    // ガント：品名セルとその右の帯（隣の要素）をセットで隠す。品名・現場名・状態で検索
+    view.querySelectorAll('.gt .name[data-k]').forEach(el=>{const tl=el.nextElementSibling;const hit=(el.textContent+' '+(tl?tl.textContent:'')).toLowerCase().includes(q);el.style.display=hit?'':'none';if(tl)tl.style.display=hit?'':'none';});
   }
 
-  // ===== タブ切替（inv独自：v_items/v_rentals/v_maint/v_avail を出し分け） =====
+  // ===== タブ切替（inv独自：v_items/v_rentals/v_maint/v_gantt/v_discard を出し分け） =====
   function switchTab(t){
     document.querySelectorAll('#invTabs .sub-tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
-    ['items','rentals','maint','avail','discard'].forEach(v=>$('v_'+v).classList.toggle('hidden',v!==t));
-    if(t==='avail')renderAvail();
+    ['items','rentals','maint','gantt','discard'].forEach(v=>$('v_'+v).classList.toggle('hidden',v!==t));
+    if(t==='gantt')renderGantt();
     if(t==='maint')renderMaint();
     if(t==='discard')renderDiscard();
   }
@@ -5321,7 +5345,7 @@ const Inv = (function(){
     const local={id,category:cat,item_name:name,total_qty:Number(qty)||0,notes};
     if(existingId){const idx=items.findIndex(x=>x.id===existingId);if(idx>=0)items[idx]={...items[idx],...local};else items.push(local)}else{items.push(local)}
     _savingItem=true;
-    toast('保存しました');closeItemMo();populateCategoryFilters();renderItems();renderAvail();
+    toast('保存しました');closeItemMo();populateCategoryFilters();renderItems();renderGantt();
     setTimeout(()=>{_savingItem=false},1500);
   }
   function deleteItem(id,name){
@@ -5330,7 +5354,7 @@ const Inv = (function(){
     _busyDel=true;
     fireAndForget({action:'delete_item',id});
     items=items.filter(x=>x.id!==id);
-    toast('削除しました');renderItems();renderAvail();
+    toast('削除しました');renderItems();renderGantt();
     setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDel=false},1500);
   }
@@ -5485,7 +5509,7 @@ const Inv = (function(){
     const local={id,category:cat,item_name:itemName,qty:Number(qtyVal)||1,date_start:start,date_end:end,status,client_name:clientName,project_id:'',notes};
     if(existingId){const idx=rentals.findIndex(x=>x.id===existingId);if(idx>=0)rentals[idx]={...rentals[idx],...local};else rentals.push(local)}else{rentals.push(local)}
     _savingRental=true;
-    toast('保存しました');closeRentalMo();renderRentals();renderMaint();renderAvail();renderDiscard();
+    toast('保存しました');closeRentalMo();renderRentals();renderMaint();renderGantt();renderDiscard();
     setTimeout(()=>{_savingRental=false},1500);
   }
   function deleteRental(id){
@@ -5494,7 +5518,7 @@ const Inv = (function(){
     _busyDel=true;
     fireAndForget({action:'delete_rental',id});
     rentals=rentals.filter(x=>x.id!==id);
-    toast('削除しました');renderRentals();renderMaint();renderAvail();renderDiscard();
+    toast('削除しました');renderRentals();renderMaint();renderGantt();renderDiscard();
     setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDel=false},1500);
   }
@@ -5508,7 +5532,7 @@ const Inv = (function(){
     r.status='廃棄予定';
     fireAndForget({action:'save_rental',...r});
     toast('廃棄リストに入れました（保有数はまだ減りません）');
-    renderRentals();renderMaint();renderAvail();renderDiscard();
+    renderRentals();renderMaint();renderGantt();renderDiscard();
     setTimeout(()=>{_busyToDiscard=false},1500);
   }
   function unDiscard(id){
@@ -5518,7 +5542,7 @@ const Inv = (function(){
     r.status='メンテ待ち';
     fireAndForget({action:'save_rental',...r});
     toast('メンテ待ちに戻しました');
-    renderRentals();renderMaint();renderAvail();renderDiscard();
+    renderRentals();renderMaint();renderGantt();renderDiscard();
     setTimeout(()=>{_busyToDiscard=false},1500);
   }
   // メンテ不可＝モノごと処分。台帳から行を消し、商品台帳の保有数も減らす
@@ -5542,93 +5566,72 @@ const Inv = (function(){
     }
     rentals=rentals.filter(x=>x.id!==id);
     toast('廃棄しました'+(it?'（保有数を'+n+'減らしました）':''));
-    renderItems();renderRentals();renderMaint();renderAvail();renderDiscard();
+    renderItems();renderRentals();renderMaint();renderGantt();renderDiscard();
     setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDiscard=false},1500);
   }
 
   // ===== 在庫確認 =====
-  function setAvailCatFilter(v){availCatFilter=v;renderAvail()}
-  function renderAvail(){
-    const startStr=$('avail_start').value;const endStr=$('avail_end').value;
-    const cat=availCatFilter;const body=$('avail_body');
-    const chipEl=$('availChips');
-    if(chipEl){
-      const cats=getAllCategories();
-      const cnt={};cats.forEach(c=>cnt[c]=0);
-      items.forEach(i=>{if(cnt[i.category]!==undefined)cnt[i.category]++});
-      let ch=`<div class="fv-si${availCatFilter===''?' on':''}" onclick="Inv.setAvailCatFilter('')"><div class="n">${items.length}</div><div class="l">すべて</div></div>`;
-      cats.forEach(c=>{
-        ch+=`<div class="fv-si${availCatFilter===c?' on':''}" onclick="Inv.setAvailCatFilter('${esc(c)}')"><div class="n">${cnt[c]||0}</div><div class="l">${esc(c)}</div></div>`;
-      });
-      chipEl.innerHTML=ch;
-    }
-    if(!startStr||!endStr){body.innerHTML='<p style="color:#aaa;font-size:13px">開始日と終了日を指定してください。</p>';return}
-    const start=new Date(startStr+'T00:00:00');const end=new Date(endStr+'T00:00:00');
-    const usage={};
-    items.forEach(i=>{
-      if(cat&&i.category!==cat)return;
-      usage[i.category+'|'+i.item_name]={category:i.category,item_name:i.item_name,total:Number(i.total_qty)||0,used:0,rent:0,maint:0};
+  // ===== ガント（試作 lab/gantt.html を移植） =====
+  // 帯＝予定どおりの期間。返却日を過ぎてステータスが「貸出中/メンテ待ち/メンテ中/廃棄予定」のままの分は
+  // 「未返却」として品名の下に出し、残からは引き続ける（予約は予定なので日付どおり）。帯クリック＝その行の編集。
+  const GT_OUT=['貸出中','メンテ待ち','メンテ中','廃棄予定'];
+  const GT_HOL={'2025-01-01':'元日','2025-01-13':'成人の日','2025-02-11':'建国記念の日','2025-02-23':'天皇誕生日','2025-02-24':'振替休日','2025-03-20':'春分の日','2025-04-29':'昭和の日','2025-05-03':'憲法記念日','2025-05-04':'みどりの日','2025-05-05':'こどもの日','2025-05-06':'振替休日','2025-07-21':'海の日','2025-08-11':'山の日','2025-09-15':'敬老の日','2025-09-23':'秋分の日','2025-10-13':'スポーツの日','2025-11-03':'文化の日','2025-11-23':'勤労感謝の日','2025-11-24':'振替休日','2026-01-01':'元日','2026-01-12':'成人の日','2026-02-11':'建国記念の日','2026-02-23':'天皇誕生日','2026-03-20':'春分の日','2026-04-29':'昭和の日','2026-05-03':'憲法記念日','2026-05-04':'みどりの日','2026-05-05':'こどもの日','2026-05-06':'振替休日','2026-07-20':'海の日','2026-08-11':'山の日','2026-09-21':'敬老の日','2026-09-22':'国民の休日','2026-09-23':'秋分の日','2026-10-12':'スポーツの日','2026-11-03':'文化の日','2026-11-23':'勤労感謝の日','2027-01-01':'元日','2027-01-11':'成人の日','2027-02-11':'建国記念の日','2027-02-23':'天皇誕生日','2027-03-21':'春分の日','2027-03-22':'振替休日','2027-04-29':'昭和の日','2027-05-03':'憲法記念日','2027-05-04':'みどりの日','2027-05-05':'こどもの日','2027-07-19':'海の日','2027-08-11':'山の日','2027-09-20':'敬老の日','2027-09-23':'秋分の日','2027-10-11':'スポーツの日','2027-11-03':'文化の日','2027-11-23':'勤労感謝の日'};
+  function gtYmd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+  function gtCls(d,t){const s=gtYmd(d),w=d.getDay();return s===t?'today':GT_HOL[s]?'hol':w===6?'sat':w===0?'sun':''}
+  function gtOverdue(r){return GT_OUT.indexOf(r.status)>=0&&String(r.date_end||'').slice(0,10)<todayStr()}
+  function gtBarCls(r){const st=r.status||'';if(st==='貸出中')return'out';if(st==='メンテ待ち'||st==='メンテ中')return'mnt';if(st==='廃棄予定')return'dsp';if(st==='予約')return projStatus[r.client_name]==='見積中'?'est':'res';return'oth'}
+  function gtRowsOf(it,dstr,N){return rentals.filter(r=>{if(r.category!==it.category||r.item_name!==it.item_name||ACTIVE_STATUSES.indexOf(r.status)<0)return false;if(gtOverdue(r))return true;const e=String(r.date_end||'').slice(0,10),st=String(r.date_start||'').slice(0,10);return (e<st?st:e)>=dstr[0]&&st<=dstr[N-1]})}
+  function ganttToday(){const d=new Date();d.setDate(d.getDate()-3);$('gt_d0').value=gtYmd(d);renderGantt()}
+  function ganttMove(n){const d=new Date(($('gt_d0').value||todayStr())+'T00:00:00');d.setDate(d.getDate()+n);$('gt_d0').value=gtYmd(d);renderGantt()}
+  function setGanttCat(v){ganttCat=(ganttCat===v?'':v);renderGantt()}
+  function renderGantt(){
+    const out=$('ganttOut');if(!out)return;
+    if(!$('gt_d0').value){const d=new Date();d.setDate(d.getDate()-3);$('gt_d0').value=gtYmd(d)}
+    const d0=new Date($('gt_d0').value+'T00:00:00'),N=Number($('gt_dn').value)||31;
+    const days=[];for(let i=0;i<N;i++){const d=new Date(d0);d.setDate(d.getDate()+i);days.push(d)}
+    const t=todayStr(),dstr=days.map(gtYmd);
+    // カテゴリチップ：件数＝この期間に動きのある品の数
+    const cats=getAllCategories(),cnt={};let moving=0;
+    items.forEach(i=>{if(gtRowsOf(i,dstr,N).length){cnt[i.category]=(cnt[i.category]||0)+1;moving++}});
+    const chipEl=$('ganttChips');
+    if(chipEl){let ch=`<div class="fv-si${ganttCat===''?' on':''}" data-f="" onclick="Inv.setGanttCat('')"><div class="n">${moving}</div><div class="l">すべて</div></div>`;
+      cats.forEach(c=>{ch+=`<div class="fv-si${ganttCat===c?' on':''}" data-f="${esc(c)}" onclick="Inv.setGanttCat('${esc(c)}')"><div class="n">${cnt[c]||0}</div><div class="l">${esc(c)}</div></div>`});
+      chipEl.innerHTML=ch}
+    const grid='repeat('+N+',1fr)';
+    let h=`<div class="gt"><div class="hd name"><b>品目</b><span class="tot">保有</span></div><div class="hd tl"><div class="days" style="grid-template-columns:${grid}">`+days.map(d=>{const s=gtYmd(d);return `<div class="${gtCls(d,t)}" title="${GT_HOL[s]||''}"><span class="dw">${GT_HOL[s]||dow[d.getDay()]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`}).join('')+'</div></div>';
+    let last='',shown=0;
+    const sorted=items.slice().sort((a,b)=>{const ia=CAT_PRIORITY.indexOf(a.category),ib=CAT_PRIORITY.indexOf(b.category);const ra=ia<0?CAT_PRIORITY.length:ia,rb=ib<0?CAT_PRIORITY.length:ib;if(ra!==rb)return ra-rb;const c=String(a.category).localeCompare(String(b.category),'ja');if(c)return c;return String(a.item_name).localeCompare(String(b.item_name),'ja')});
+    sorted.filter(i=>!ganttCat||i.category===ganttCat).forEach(it=>{
+      const rows=gtRowsOf(it,dstr,N);const tot=Number(it.total_qty)||0;
+      if(!rows.length&&ganttCat==='')return;   // 全部表示の時は動きのある品だけ
+      shown++;
+      if(it.category!==last){last=it.category;h+=`<div class="cat">${esc(it.category)}</div>`}
+      rows.sort((a,b)=>a.date_start<b.date_start?-1:1);const lanes=[];
+      const bars=rows.filter(r=>{const e=String(r.date_end||'').slice(0,10),st=String(r.date_start||'').slice(0,10);return (e<st?st:e)>=dstr[0]&&st<=dstr[N-1]});
+      bars.forEach(r=>{let L=0;while(lanes[L]&&lanes[L]>=r.date_start)L++;lanes[L]=String(r.date_end||'').slice(0,10);r._lane=L});
+      const od={};rows.forEach(r=>{if(gtOverdue(r))od[r.status]=(od[r.status]||0)+(Number(r.qty)||0)});
+      const odTxt=Object.keys(od).map(k=>k+' '+od[k]).join('・');
+      const H=4+Math.max(1,lanes.length)*22+15;
+      h+=`<div class="name" data-k="1"><div class="nm"><b title="${esc(it.item_name)}">${esc(it.item_name)}</b>${odTxt?`<span class="od" title="返却日を過ぎてステータスがそのままの数。戻っていれば貸出/予約で状態を直す">未返却 ${esc(odTxt)}</span>`:''}</div><span class="tot">${tot||'未'}</span></div><div class="tl" style="height:${H}px"><div class="bg" style="grid-template-columns:${grid}">`+days.map(d=>`<div class="${gtCls(d,t)}"></div>`).join('')+'</div>';
+      bars.forEach(r=>{const st=String(r.date_start||'').slice(0,10),en=String(r.date_end||'').slice(0,10);
+        const s=Math.max(0,dstr.indexOf(st)<0?(st<dstr[0]?0:N):dstr.indexOf(st));
+        const bad=en<st;let e=bad?s:dstr.indexOf(en);if(e<0)e=en>dstr[N-1]?N-1:0;if(e<s)e=s;
+        const l=s/N*100,w=(e-s+1)/N*100;
+        h+=`<div class="bar ${gtBarCls(r)}${bad?' bad':''}" style="left:${l}%;width:${w}%;top:${3+r._lane*22}px" title="${esc((r.client_name||'')+' '+r.qty+' '+st+'〜'+en+' '+r.status+(bad?'　※返却日が貸出日より前':''))}" onclick="Inv.editRental('${esc(String(r.id))}')">${r.qty} ${esc(r.client_name||'')}</div>`});
+      const use=dstr.map(ds=>{let u=0;rows.forEach(r=>{const st=String(r.date_start||'').slice(0,10),en=String(r.date_end||'').slice(0,10);if((st<=ds&&en>=ds)||(gtOverdue(r)&&ds>en))u+=Number(r.qty)||0});return u});
+      h+=`<div class="free" style="grid-template-columns:${grid}">`+use.map(u=>{const f=tot-u;if(!tot||u===0)return'<div></div>';return `<div class="${f<=0?'zero':f<=Math.ceil(tot*0.3)?'low':''}" title="出 ${u} ／ 保有 ${tot} ／ 残 ${f}">${f}</div>`}).join('')+'</div></div>';
     });
-    const dayMs=86400000;const days=[];
-    for(let d=new Date(start);d<=end;d=new Date(d.getTime()+dayMs))days.push(new Date(d));
-    Object.keys(usage).forEach(key=>{
-      let max=0,maxRent=0,maxMaint=0;
-      days.forEach(day=>{
-        const ds=day.toISOString().slice(0,10);let u=0,r2=0,m=0;
-        rentals.forEach(r=>{
-          if(!ACTIVE_STATUSES.includes(r.status))return;
-          if((r.category+'|'+r.item_name)!==key)return;
-          if(r.date_start<=ds&&r.date_end>=ds){
-            const q=Number(r.qty)||0;u+=q;
-            if(r.status==='メンテ待ち'||r.status==='メンテ中'||r.status==='廃棄予定')m+=q;else r2+=q;
-          }
-        });
-        if(u>max){max=u;maxRent=r2;maxMaint=m}
-      });
-      usage[key].used=max;usage[key].rent=maxRent;usage[key].maint=maxMaint;
-    });
-    const entries=Object.values(usage).sort((a,b)=>{
-      const ia=CAT_PRIORITY.indexOf(a.category), ib=CAT_PRIORITY.indexOf(b.category);
-      const ra=ia<0?CAT_PRIORITY.length:ia, rb=ib<0?CAT_PRIORITY.length:ib;
-      if(ra!==rb) return ra-rb;
-      const c=String(a.category).localeCompare(String(b.category));
-      if(c!==0) return c;
-      return String(a.item_name).localeCompare(String(b.item_name));
-    });
-    if(!entries.length){body.innerHTML='<p class="empty-msg">商品が登録されていません。</p>';return}
-    let html='';let lastCat='';
-    entries.forEach(e=>{
-      if(e.category!==lastCat){lastCat=e.category;html+=`<div class="avail-cat-hd">${esc(e.category)}</div>`}
-      const avail=e.total-e.used;
-      const isEmpty=(e.total<=0);
-      let remainCls='ok';
-      let remainTxt;
-      if(isEmpty){remainCls='none';remainTxt='-';}
-      else if(avail<=0){remainCls='danger';remainTxt=avail;}
-      else if(avail<=Math.ceil(e.total*0.3)){remainCls='warn';remainTxt=avail;}
-      else{remainTxt=avail;}
-      let detail='';
-      if(e.rent>0&&e.maint>0)detail='貸出'+e.rent+' + メンテ'+e.maint;
-      else if(e.rent>0)detail='貸出'+e.rent;
-      else if(e.maint>0)detail='メンテ'+e.maint;
-      const usageTxt=isEmpty?'未登録':(detail?(detail+' / '+e.total):(e.used+' / '+e.total));
-      html+=`<div class="avail-bar${isEmpty?' empty':''}">
-        <span class="avail-item-name">${esc(e.item_name)}</span>
-        <span class="avail-remain ${remainCls}"><span class="lbl">残</span>${remainTxt}</span>
-        <span class="avail-usage">${usageTxt}</span>
-      </div>`;
-    });
-    body.innerHTML=html;
+    h+='</div>';
+    out.innerHTML=shown?h:'<div class="gt-empty">この期間に動きのある品はありません</div>';
+    if($('invPcSearch')&&$('invPcSearch').value)unifiedSearch($('invPcSearch').value);
   }
 
   // ===== init（タブ初期状態・日付初期値・イベント配線） =====
   function init(){
-    // 在庫確認の日付初期値（今日〜14日後）
+    // ガントの開始日＝今日の3日前
     const d=new Date();
-    if($('avail_start'))$('avail_start').value=todayStr();
-    const tw=new Date(d.getTime()+14*86400000);
-    if($('avail_end'))$('avail_end').value=tw.getFullYear()+'-'+String(tw.getMonth()+1).padStart(2,'0')+'-'+String(tw.getDate()).padStart(2,'0');
+    if($('gt_d0')){const g=new Date(d);g.setDate(g.getDate()-3);$('gt_d0').value=gtYmd(g)}
     const pc=$('invPcDate');if(pc)pc.textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
     if($('invPcSearch'))$('invPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
   }
@@ -5640,8 +5643,8 @@ const Inv = (function(){
     openSlog, closeSlog, clearSlog,
     sortItems, openItemMo, closeItemMo, editItem, saveItem, deleteItem,
     renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental, toDiscardList, unDiscard, renderDiscard,
-    populateItemSelect, onProjectSelect, renderAvail, renderMaint,
-    setItemCatFilter, setMaintFilter, setRentalFilter, setAvailCatFilter,
+    populateItemSelect, onProjectSelect, renderGantt, ganttMove, ganttToday, setGanttCat, renderMaint,
+    setItemCatFilter, setMaintFilter, setRentalFilter,
     unifiedSearch
   };
 })();
