@@ -35,9 +35,9 @@ main{padding:12px 16px 40px}
 .days>div.sat{color:var(--accent)}.days>div.sun,.days>div.hol{color:var(--red)}.days>div.hol{background:rgba(217,64,64,.05)}
 .days>div.today{background:var(--accent-dim);color:var(--accent)}
 .bg{position:absolute;inset:0;display:grid}.bg>div{border-right:1px solid var(--surface3)}.bg>div.sat{background:rgba(59,111,216,.03)}.bg>div.sun,.bg>div.hol{background:rgba(217,64,64,.04)}.bg>div.today{background:rgba(59,111,216,.06)}
-/* 帯＝在庫画面のステータス色（予約=紫・貸出中=青・メンテ=橙・廃棄予定=灰・仮押さえ=薄紫の点線） */
+/* 帯の色：仮押さえ=薄青の点線・予約=青・貸出中=緑・メンテ=橙・廃棄予定=灰（青と紫は見分けにくいので在庫画面の配色は使わない） */
 .bar{position:absolute;height:18px;border-radius:4px;font-size:11px;font-weight:600;line-height:18px;padding:0 6px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default;z-index:1}
-.bar.est{background:#ede9fe;color:#7c3aed;border:1px dashed #a78bfa;line-height:16px}.bar.res{background:var(--purple)}.bar.out{background:var(--accent)}.bar.mnt{background:var(--orange)}.bar.dsp{background:#6b7280}.bar.oth{background:#9aa2b1}.bar.bad{outline:2px dashed var(--red);outline-offset:-2px}
+.bar.est{background:#dbeafe;color:#1d4ed8;border:1px dashed #60a5fa;line-height:16px}.bar.res{background:var(--accent)}.bar.out{background:var(--green)}.bar.mnt{background:var(--orange)}.bar.dsp{background:#6b7280}.bar.oth{background:#9aa2b1}.bar.bad{outline:2px dashed var(--red);outline-offset:-2px}
 /* 残数：帯の下に1行だけ（出ている数はマウスオーバーで） */
 .free{position:absolute;left:0;right:0;bottom:0;height:15px;display:grid}.free>div{font-size:10px;text-align:center;line-height:15px;color:var(--text-faint);font-variant-numeric:tabular-nums}.free>div.low{color:var(--red);font-weight:700}.free>div.zero{color:var(--red);font-weight:700}
 .empty{color:var(--text-faint);padding:24px;text-align:center;font-size:13px}
@@ -46,7 +46,7 @@ main{padding:12px 16px 40px}
 <label>開始 <input type="date" id="d0"></label><label>日数 <select id="dn"><option>14</option><option selected>31</option><option>62</option><option>92</option></select></label>
 <span class="nav"><button onclick="go(-7)">← 1週</button><button onclick="today()">今日</button><button onclick="go(7)">1週 →</button></span>
 <span class="cat" id="cats"></span><span id="st"></span></header>
-<main><div id="out" class="empty">読み込み中…</div><div class="legend"><span><i style="background:#ede9fe;border:1px dashed #a78bfa"></i>仮押さえ</span><span><i style="background:#8b5cf6"></i>予約</span><span><i style="background:#3b82f6"></i>貸出中</span><span><i style="background:#f59e0b"></i>メンテ中</span><span><i style="background:#6b7280"></i>廃棄予定</span><span class="note">帯の下の数字＝その日の <b>残</b>。赤＝残り3割以下。数字にマウスを載せると出ている数</span></div></main>
+<main><div id="out" class="empty">読み込み中…</div><div class="legend"><span><i style="background:#dbeafe;border:1px dashed #60a5fa"></i>仮押さえ</span><span><i style="background:#3b82f6"></i>予約</span><span><i style="background:#2a9d5a"></i>貸出中</span><span><i style="background:#f59e0b"></i>メンテ中</span><span><i style="background:#6b7280"></i>廃棄予定</span></div></main>
 <script>
 var API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 var ITEMS=[],RENT=[],PROJ={},CAT='';
