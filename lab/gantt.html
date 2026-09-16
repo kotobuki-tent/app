@@ -1,36 +1,56 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>在庫ガント（試作）</title>
 <style>
-body{margin:0;font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:14px;color:#222;background:#f6f7f8}
-header{position:sticky;top:0;background:#fff;border-bottom:1px solid #ddd;padding:8px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;z-index:3}
-header h1{font-size:17px;margin:0 10px 0 0}
-header input,header select,header button{font:inherit;padding:4px 8px;border:1px solid #bbb;border-radius:4px;background:#fff}
-header .cat button{border-radius:999px;padding:3px 10px;cursor:pointer}header .cat button.on{background:#222;color:#fff;border-color:#222}
-main{padding:10px 14px 40px}
-.legend{display:flex;gap:14px;font-size:12px;color:#555;margin:6px 0 10px;flex-wrap:wrap}.legend i{display:inline-block;width:14px;height:10px;border-radius:2px;vertical-align:middle;margin-right:4px}
-.g{display:grid;grid-template-columns:220px 1fr;border:1px solid #ddd;background:#fff;border-radius:6px;overflow:clip}
-.g .hd{position:sticky;top:var(--hh,46px);z-index:2;background:#fafafa;border-bottom:1px solid #ddd}
-.g .name{padding:6px 10px;border-bottom:1px solid #eee;border-right:1px solid #ddd;display:flex;justify-content:space-between;align-items:center;gap:6px}
-.g .name b{font-weight:600}.g .name .tot{color:#888;font-size:12px;white-space:nowrap}
-.g .cat{grid-column:1/3;background:#eef1f5;padding:4px 10px;font-weight:700;font-size:12px;color:#555;border-bottom:1px solid #ddd}
-.tl{position:relative;border-bottom:1px solid #eee;min-height:30px}
-.days{display:grid;height:100%}.days>div{border-right:1px solid #f0f0f0;font-size:11px;text-align:center;color:#777;padding:3px 0 2px;white-space:nowrap;overflow:hidden;line-height:1.25}.days .dw{display:block;font-size:9px;color:#999;overflow:hidden;text-overflow:ellipsis}.days>div.sat .dw{color:#3b6fd8}.days>div.sun .dw,.days>div.hol .dw{color:#d33}.days>div.today .dw{color:#c60}
-.days>div.sat{background:#f2f6ff}.days>div.sun,.days>div.hol{background:#fff1f1}.days>div.today{background:#fffbe0;font-weight:700;color:#c60}
-.bg{position:absolute;inset:0;display:grid}.bg>div{border-right:1px solid #f0f0f0}.bg>div.sat{background:#f6f9ff}.bg>div.sun,.bg>div.hol{background:#fff6f6}.bg>div.today{background:#fffbe0}
-.bar{position:absolute;height:20px;border-radius:4px;font-size:11px;line-height:20px;padding:0 6px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box;cursor:default}
-.bar.est{background:#cfd8e3;color:#345;border:1px dashed #8aa}.bar.res{background:#5b8def}.bar.out{background:#2e9e5b}.bar.mnt{background:#e0862c}.bar.dsp{background:#8d6e63}.bar.oth{background:#999}
-.free{position:absolute;left:0;right:0;bottom:0;height:14px;display:grid}.free>div{font-size:10px;text-align:center;line-height:14px;color:#aaa}.free>div.low{color:#d33;font-weight:700}.free>div.zero{color:#fff;background:#d33;font-weight:700}
-.used{position:absolute;left:0;right:0;bottom:14px;height:14px;display:grid}.used>div{font-size:10px;text-align:center;line-height:14px;color:#667}
-.lbl{position:absolute;left:2px;font-size:9px;color:#bbb;line-height:14px}
-.empty{color:#999;padding:20px}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap');
+/* SPA（spa.html）と同じ配色トークン */
+:root{--bg:#f5f6fa;--surface:#fff;--surface2:#fafbfc;--surface3:#f0f1f5;--border:#d8dbe3;--text:#1a1d27;--text-dim:#5a6270;--text-faint:#8a92a0;--accent:#3b82f6;--accent-dim:rgba(59,111,216,.1);--red:#dc2626;--orange:#f59e0b;--green:#2a9d5a;--purple:#8b5cf6}
+*{box-sizing:border-box}
+html{font-size:15px;scrollbar-gutter:stable}
+body{margin:0;font-family:'Noto Sans JP',sans-serif;font-size:14px;color:var(--text);background:var(--bg)}
+header{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:3}
+header h1{font-size:16px;font-weight:800;margin:0 12px 0 0;white-space:nowrap}
+header label{font-size:12px;color:var(--text-dim);display:inline-flex;align-items:center;gap:6px}
+header input,header select{font:500 13px/1 'Noto Sans JP',sans-serif;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text)}
+header .nav{display:inline-flex;gap:4px;margin-left:4px}
+header .nav button{font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 12px;border:none;border-radius:999px;background:var(--surface3);color:var(--text-dim);cursor:pointer;white-space:nowrap}
+header .nav button:hover{background:#e2e5f0;color:var(--text)}
+/* カテゴリ絞り込み＝SPAの件数つきチップ（.fv-si のコンパクト版） */
+.cat{display:flex;gap:6px;flex-wrap:wrap;margin-left:8px}
+.cat button{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 'Noto Sans JP',sans-serif;padding:7px 12px;border:1px solid transparent;border-radius:999px;background:var(--surface3);color:var(--text-dim);cursor:pointer;white-space:nowrap}
+.cat button b{font-weight:800;font-size:12px;color:var(--text)}
+.cat button.on{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}.cat button.on b{color:var(--accent)}
+#st{margin-left:auto;color:var(--text-faint);font-size:12px;white-space:nowrap}
+main{padding:12px 16px 40px}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--text-dim);margin:0 2px 10px;flex-wrap:wrap;align-items:center}.legend i{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:middle;margin-right:5px}
+.legend .note{color:var(--text-faint)}
+.g{display:grid;grid-template-columns:220px 1fr;border:1px solid var(--border);background:var(--surface);border-radius:10px;overflow:clip;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.g .hd{position:sticky;top:var(--hh,46px);z-index:2;background:var(--surface2);border-bottom:1px solid var(--border)}
+.g .hd.name{padding:8px 12px;font-size:12px;font-weight:700}
+.g .name{padding:6px 12px;border-bottom:1px solid var(--surface3);border-right:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:6px;overflow:hidden}
+.g .name b{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.g .name .tot{color:var(--text-faint);font-size:11px;white-space:nowrap}
+.g .cat{grid-column:1/3;background:var(--surface3);padding:5px 12px;font-weight:700;font-size:11px;color:var(--text-dim);border-bottom:1px solid var(--border);margin:0}
+.tl{position:relative;border-bottom:1px solid var(--surface3);min-height:30px}
+/* 日付ヘッダー＝SPAの .gantt-date-cell と同じ作法（上：曜日/祝日名、下：日付） */
+.days{display:grid;height:100%}.days>div{border-right:1px solid var(--surface3);text-align:center;padding:4px 1px 3px;color:var(--text-dim);white-space:nowrap;overflow:hidden;line-height:1.15}
+.days .dw{display:block;font-size:9px;overflow:hidden;text-overflow:ellipsis}.days .dm{display:block;font-size:12px;font-weight:700}
+.days>div.sat{color:var(--accent)}.days>div.sun,.days>div.hol{color:var(--red)}.days>div.hol{background:rgba(217,64,64,.05)}
+.days>div.today{background:var(--accent-dim);color:var(--accent)}
+.bg{position:absolute;inset:0;display:grid}.bg>div{border-right:1px solid var(--surface3)}.bg>div.sat{background:rgba(59,111,216,.03)}.bg>div.sun,.bg>div.hol{background:rgba(217,64,64,.04)}.bg>div.today{background:rgba(59,111,216,.06)}
+/* 帯＝在庫画面のステータス色（予約=紫・貸出中=青・メンテ=橙・廃棄予定=灰・仮押さえ=薄紫の点線） */
+.bar{position:absolute;height:18px;border-radius:4px;font-size:11px;font-weight:600;line-height:18px;padding:0 6px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default;z-index:1}
+.bar.est{background:#ede9fe;color:#7c3aed;border:1px dashed #a78bfa;line-height:16px}.bar.res{background:var(--purple)}.bar.out{background:var(--accent)}.bar.mnt{background:var(--orange)}.bar.dsp{background:#6b7280}.bar.oth{background:#9aa2b1}
+/* 残数：帯の下に1行だけ（出ている数はマウスオーバーで） */
+.free{position:absolute;left:0;right:0;bottom:0;height:15px;display:grid}.free>div{font-size:10px;text-align:center;line-height:15px;color:var(--text-faint);font-variant-numeric:tabular-nums}.free>div.low{color:var(--red);font-weight:700}.free>div.zero{color:#fff;background:var(--red);font-weight:700}
+.empty{color:var(--text-faint);padding:24px;text-align:center;font-size:13px}
 </style></head><body>
 <header><h1>在庫ガント（試作）</h1>
 <label>開始 <input type="date" id="d0"></label><label>日数 <select id="dn"><option>14</option><option selected>31</option><option>62</option><option>92</option></select></label>
-<button onclick="go(-7)">←1週</button><button onclick="today()">今日</button><button onclick="go(7)">1週→</button>
-<span class="cat" id="cats"></span><span id="st" style="margin-left:auto;color:#777;font-size:12px"></span></header>
-<main><div class="legend"><span><i style="background:#cfd8e3;border:1px dashed #8aa"></i>仮押さえ（見積中）</span><span><i style="background:#5b8def"></i>予約</span><span><i style="background:#2e9e5b"></i>貸出中</span><span><i style="background:#e0862c"></i>メンテ待ち・中</span><span><i style="background:#8d6e63"></i>廃棄予定（物はあるが貸せない）</span><span>帯の下の数字＝上段 <b>出</b>（その日に出ている数）・下段 <b>残</b>（空き、減った日だけ）</span></div><div id="out" class="empty">読み込み中…</div></main>
+<span class="nav"><button onclick="go(-7)">← 1週</button><button onclick="today()">今日</button><button onclick="go(7)">1週 →</button></span>
+<span class="cat" id="cats"></span><span id="st"></span></header>
+<main><div class="legend"><span><i style="background:#ede9fe;border:1px dashed #a78bfa"></i>仮押さえ（見積中）</span><span><i style="background:#8b5cf6"></i>予約</span><span><i style="background:#3b82f6"></i>貸出中</span><span><i style="background:#f59e0b"></i>メンテ待ち・中</span><span><i style="background:#6b7280"></i>廃棄予定（物はあるが貸せない）</span><span class="note">帯の下の数字＝その日の <b>残</b>（空き）。赤＝残り3割以下、赤地＝0以下。数字にマウスを載せると出ている数</span></div><div id="out" class="empty">読み込み中…</div></main>
 <script>
 var API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 var ITEMS=[],RENT=[],PROJ={},CAT='';
+var ACTIVE=['予約','貸出中','メンテ待ち','メンテ中','廃棄予定'];   // 在庫画面と同じ（廃棄予定＝物はあるが貸せない＝残から引く）
 var $=function(i){return document.getElementById(i)};
 // 日本の祝日（SPAのHOLIDAYSと同じ表）
 var HOL={'2025-01-01':'元日','2025-01-13':'成人の日','2025-02-11':'建国記念の日','2025-02-23':'天皇誕生日','2025-02-24':'振替休日','2025-03-20':'春分の日','2025-04-29':'昭和の日','2025-05-03':'憲法記念日','2025-05-04':'みどりの日','2025-05-05':'こどもの日','2025-05-06':'振替休日','2025-07-21':'海の日','2025-08-11':'山の日','2025-09-15':'敬老の日','2025-09-23':'秋分の日','2025-10-13':'スポーツの日','2025-11-03':'文化の日','2025-11-23':'勤労感謝の日','2025-11-24':'振替休日','2026-01-01':'元日','2026-01-12':'成人の日','2026-02-11':'建国記念の日','2026-02-23':'天皇誕生日','2026-03-20':'春分の日','2026-04-29':'昭和の日','2026-05-03':'憲法記念日','2026-05-04':'みどりの日','2026-05-05':'こどもの日','2026-05-06':'振替休日','2026-07-20':'海の日','2026-08-11':'山の日','2026-09-21':'敬老の日','2026-09-22':'国民の休日','2026-09-23':'秋分の日','2026-10-12':'スポーツの日','2026-11-03':'文化の日','2026-11-23':'勤労感謝の日','2027-01-01':'元日','2027-01-11':'成人の日','2027-02-11':'建国記念の日','2027-02-23':'天皇誕生日','2027-03-21':'春分の日','2027-03-22':'振替休日','2027-04-29':'昭和の日','2027-05-03':'憲法記念日','2027-05-04':'みどりの日','2027-05-05':'こどもの日','2027-07-19':'海の日','2027-08-11':'山の日','2027-09-20':'敬老の日','2027-09-23':'秋分の日','2027-10-11':'スポーツの日','2027-11-03':'文化の日','2027-11-23':'勤労感謝の日'};
@@ -38,34 +58,37 @@ function dcls(d,t){var s=ymd(d),w=d.getDay();return s===t?'today':HOL[s]?'hol':w
 function fixHd(){var hd=document.querySelector('header');if(hd)document.documentElement.style.setProperty('--hh',hd.offsetHeight+'px')}
 window.addEventListener('resize',fixHd);
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function today(){$('d0').value=ymd(new Date(Date.now()-3*86400000));render()}
 function go(n){var d=new Date($('d0').value+'T00:00:00');d.setDate(d.getDate()+n);$('d0').value=ymd(d);render()}
 function cls(r){var st=r.status||'';if(st==='貸出中')return'out';if(st==='メンテ待ち'||st==='メンテ中')return'mnt';if(st==='廃棄予定')return'dsp';if(st==='予約'){var p=PROJ[r.client_name];return (p==='見積中')?'est':'res'}return'oth'}
+function rowsOf(it,dstr,N){return RENT.filter(function(r){return r.category===it.category&&r.item_name===it.item_name&&ACTIVE.indexOf(r.status)>=0&&r.date_end>=dstr[0]&&r.date_start<=dstr[N-1]})}
 function render(){
   var d0=new Date($('d0').value+'T00:00:00'),N=Number($('dn').value);var days=[];for(var i=0;i<N;i++){var d=new Date(d0);d.setDate(d.getDate()+i);days.push(d)}
   var t=ymd(new Date());var dstr=days.map(ymd);
-  var cats=[];ITEMS.forEach(function(i){if(i.category&&cats.indexOf(i.category)<0)cats.push(i.category)});
-  $('cats').innerHTML='<button class="'+(CAT?'':'on')+'" onclick="CAT=\'\';render()">すべて</button>'+cats.map(function(c){return '<button class="'+(CAT===c?'on':'')+'" onclick="CAT=\''+c.replace(/'/g,"\\'")+'\';render()">'+c+'</button>'}).join('');
+  // カテゴリチップ：件数＝この期間に動きのある品の数
+  var cats=[],cnt={},moving=0;
+  ITEMS.forEach(function(i){if(i.category&&cats.indexOf(i.category)<0)cats.push(i.category);if(rowsOf(i,dstr,N).length){cnt[i.category]=(cnt[i.category]||0)+1;moving++}});
+  $('cats').innerHTML='<button class="'+(CAT?'':'on')+'" onclick="CAT=\'\';render()">すべて <b>'+moving+'</b></button>'+cats.map(function(c){return '<button class="'+(CAT===c?'on':'')+'" onclick="CAT=\''+c.replace(/'/g,"\\'")+'\';render()">'+esc(c)+' <b>'+(cnt[c]||0)+'</b></button>'}).join('');
   var grid='repeat('+N+',1fr)';
-  var h='<div class="g"><div class="hd name"><b>品目</b><span class="tot">保有</span></div><div class="hd tl"><div class="days" style="grid-template-columns:'+grid+'">'+days.map(function(d){var w=d.getDay();var s=ymd(d);return '<div class="'+dcls(d,t)+'" title="'+(HOL[s]||'')+'"><span class="dw">'+(HOL[s]||'日月火水木金土'[d.getDay()])+'</span>'+(d.getMonth()+1)+'/'+d.getDate()+'</div>'}).join('')+'</div></div>';
+  var h='<div class="g"><div class="hd name"><b>品目</b><span class="tot">保有</span></div><div class="hd tl"><div class="days" style="grid-template-columns:'+grid+'">'+days.map(function(d){var s=ymd(d);return '<div class="'+dcls(d,t)+'" title="'+(HOL[s]||'')+'"><span class="dw">'+(HOL[s]||'日月火水木金土'[d.getDay()])+'</span><span class="dm">'+(d.getMonth()+1)+'/'+d.getDate()+'</span></div>'}).join('')+'</div></div>';
   var last='';var shown=0;
   ITEMS.filter(function(i){return !CAT||i.category===CAT}).forEach(function(it){
-    var rows=RENT.filter(function(r){return r.category===it.category&&r.item_name===it.item_name&&['予約','貸出中','メンテ待ち','メンテ中','廃棄予定'].indexOf(r.status)>=0&&r.date_end>=dstr[0]&&r.date_start<=dstr[N-1]});
+    var rows=rowsOf(it,dstr,N);
     var tot=Number(it.total_qty)||0;
     if(!rows.length&&CAT==='')return;   // 全部表示の時は動きのある品だけ
     shown++;
-    if(it.category!==last){last=it.category;h+='<div class="cat">'+it.category+'</div>'}
+    if(it.category!==last){last=it.category;h+='<div class="cat">'+esc(it.category)+'</div>'}
     // レーン割り当て（重なる帯は下の段へ）
     rows.sort(function(a,b){return a.date_start<b.date_start?-1:1});var lanes=[];
     rows.forEach(function(r){var L=0;while(lanes[L]&&lanes[L]>=r.date_start)L++;lanes[L]=r.date_end;r._lane=L});
-    var H=6+Math.max(1,lanes.length)*24+28;
-    h+='<div class="name"><b>'+it.item_name+'</b><span class="tot">'+(tot||'未')+'</span></div><div class="tl" style="height:'+H+'px"><div class="bg" style="grid-template-columns:'+grid+'">'+days.map(function(d){var w=d.getDay();return '<div class="'+dcls(d,t)+'"></div>'}).join('')+'</div>';
+    var H=4+Math.max(1,lanes.length)*22+15;
+    h+='<div class="name"><b title="'+esc(it.item_name)+'">'+esc(it.item_name)+'</b><span class="tot">'+(tot||'未')+'</span></div><div class="tl" style="height:'+H+'px"><div class="bg" style="grid-template-columns:'+grid+'">'+days.map(function(d){return '<div class="'+dcls(d,t)+'"></div>'}).join('')+'</div>';
     rows.forEach(function(r){var s=Math.max(0,dstr.indexOf(r.date_start.slice(0,10))<0?(r.date_start<dstr[0]?0:N):dstr.indexOf(r.date_start.slice(0,10)));var e=dstr.indexOf(r.date_end.slice(0,10));if(e<0)e=r.date_end>dstr[N-1]?N-1:0;
-      var l=s/N*100,w=(e-s+1)/N*100;h+='<div class="bar '+cls(r)+'" style="left:'+l+'%;width:'+w+'%;top:'+(4+r._lane*24)+'px" title="'+(r.client_name||'')+' '+r.qty+' '+r.date_start.slice(0,10)+'〜'+r.date_end.slice(0,10)+' '+r.status+'">'+r.qty+' '+(r.client_name||'')+'</div>'});
-    // 日ごとの空き
+      var l=s/N*100,w=(e-s+1)/N*100;h+='<div class="bar '+cls(r)+'" style="left:'+l+'%;width:'+w+'%;top:'+(3+r._lane*22)+'px" title="'+esc((r.client_name||'')+' '+r.qty+' '+r.date_start.slice(0,10)+'〜'+r.date_end.slice(0,10)+' '+r.status)+'">'+r.qty+' '+esc(r.client_name||'')+'</div>'});
+    // 日ごとの残（出ている数はtitleで）
     var use=dstr.map(function(ds){var u=0;rows.forEach(function(r){if(r.date_start.slice(0,10)<=ds&&r.date_end.slice(0,10)>=ds)u+=Number(r.qty)||0});return u});
-    h+='<div class="used" style="grid-template-columns:'+grid+'">'+use.map(function(u){return '<div>'+(u?u:'')+'</div>'}).join('')+'</div>';
-    h+='<div class="free" style="grid-template-columns:'+grid+'">'+use.map(function(u){var f=tot-u;if(!tot||u===0)return '<div></div>';return '<div class="'+(f<=0?'zero':f<=Math.ceil(tot*0.3)?'low':'')+'">'+f+'</div>'}).join('')+'</div></div>';
+    h+='<div class="free" style="grid-template-columns:'+grid+'">'+use.map(function(u){var f=tot-u;if(!tot||u===0)return '<div></div>';return '<div class="'+(f<=0?'zero':f<=Math.ceil(tot*0.3)?'low':'')+'" title="出 '+u+' ／ 保有 '+tot+' ／ 残 '+f+'">'+f+'</div>'}).join('')+'</div></div>';
   });
   h+='</div>';
   $('out').className='';$('out').innerHTML=shown?h:'<p class="empty">この期間に動きのある品はありません</p>';
