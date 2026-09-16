@@ -732,6 +732,7 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 #v_gantt .gt-nav{display:inline-flex;gap:4px;margin-left:4px}
 #v_gantt .gt-nav button{font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 12px;border:none;border-radius:999px;background:var(--surface3);color:var(--text-dim);cursor:pointer;white-space:nowrap}
 #v_gantt .gt-nav button:hover{background:#e2e5f0;color:var(--text)}
+#view-inv th.rs-th{cursor:pointer;white-space:nowrap}
 #v_gantt .gt-wrap{overflow-x:auto}
 #v_gantt .gt-sites{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
 #v_gantt .gt-sites button{font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text-dim);cursor:pointer;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
@@ -2148,7 +2149,7 @@ table.jobs tr:last-child td{border-bottom:none}
 <section id="view-inv" class="hidden">
   <div class="sub-tabs" id="invTabs">
     <span class="subtab-date" id="invPcDate"></span>
-    <button class="sub-tab on" data-tab="gantt" onclick="Inv.switchTab('gantt')">ガント</button>
+    <button class="sub-tab on" data-tab="gantt" onclick="Inv.switchTab('gantt')">在庫</button>
     <button class="sub-tab" data-tab="rentals" onclick="Inv.switchTab('rentals')">貸出/予約</button>
     <button class="sub-tab" data-tab="maint" onclick="Inv.switchTab('maint')">メンテ</button>
     <button class="sub-tab" data-tab="discard" onclick="Inv.switchTab('discard')">廃棄</button>
@@ -2181,7 +2182,7 @@ table.jobs tr:last-child td{border-bottom:none}
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
+          <thead><tr><th class="rs-th" data-col="status" onclick="Inv.sortRentals('status')">ステータス <span class="arrow rs-arrow" data-col="status"></span></th><th class="rs-th" data-col="category" onclick="Inv.sortRentals('category')">カテゴリ <span class="arrow rs-arrow" data-col="category"></span></th><th class="rs-th" data-col="item_name" onclick="Inv.sortRentals('item_name')">商品名 <span class="arrow rs-arrow" data-col="item_name"></span></th><th class="rs-th" data-col="qty" onclick="Inv.sortRentals('qty')">数量 <span class="arrow rs-arrow" data-col="qty"></span></th><th class="rs-th" data-col="date_start" onclick="Inv.sortRentals('date_start')">開始日 <span class="arrow rs-arrow" data-col="date_start"></span></th><th class="rs-th" data-col="date_end" onclick="Inv.sortRentals('date_end')">終了日 <span class="arrow rs-arrow" data-col="date_end"></span></th><th class="rs-th" data-col="client_name" onclick="Inv.sortRentals('client_name')">案件/顧客 <span class="arrow rs-arrow" data-col="client_name"></span></th><th>備考</th><th>操作</th></tr></thead>
           <tbody id="rentals_tbody"></tbody>
         </table>
       </div>
@@ -2191,7 +2192,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="fv-sum" id="maintChips"></div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
+          <thead><tr><th class="rs-th" data-col="status" onclick="Inv.sortRentals('status')">ステータス <span class="arrow rs-arrow" data-col="status"></span></th><th class="rs-th" data-col="category" onclick="Inv.sortRentals('category')">カテゴリ <span class="arrow rs-arrow" data-col="category"></span></th><th class="rs-th" data-col="item_name" onclick="Inv.sortRentals('item_name')">商品名 <span class="arrow rs-arrow" data-col="item_name"></span></th><th class="rs-th" data-col="qty" onclick="Inv.sortRentals('qty')">数量 <span class="arrow rs-arrow" data-col="qty"></span></th><th class="rs-th" data-col="date_start" onclick="Inv.sortRentals('date_start')">開始日 <span class="arrow rs-arrow" data-col="date_start"></span></th><th class="rs-th" data-col="date_end" onclick="Inv.sortRentals('date_end')">終了日 <span class="arrow rs-arrow" data-col="date_end"></span></th><th class="rs-th" data-col="client_name" onclick="Inv.sortRentals('client_name')">案件/顧客 <span class="arrow rs-arrow" data-col="client_name"></span></th><th>備考</th><th>操作</th></tr></thead>
           <tbody id="maint_tbody"></tbody>
         </table>
       </div>
@@ -2201,7 +2202,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="cases-hint">廃棄予定に入れた品のリスト。「廃棄を確定」で台帳から消えて保有数が減る（不可逆）。それまでは「戻す」でメンテ待ちに復帰できる。</div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>ステータス</th><th>カテゴリ</th><th>商品名</th><th>数量</th><th>開始日</th><th>終了日</th><th>案件/顧客</th><th>備考</th><th>操作</th></tr></thead>
+          <thead><tr><th class="rs-th" data-col="status" onclick="Inv.sortRentals('status')">ステータス <span class="arrow rs-arrow" data-col="status"></span></th><th class="rs-th" data-col="category" onclick="Inv.sortRentals('category')">カテゴリ <span class="arrow rs-arrow" data-col="category"></span></th><th class="rs-th" data-col="item_name" onclick="Inv.sortRentals('item_name')">商品名 <span class="arrow rs-arrow" data-col="item_name"></span></th><th class="rs-th" data-col="qty" onclick="Inv.sortRentals('qty')">数量 <span class="arrow rs-arrow" data-col="qty"></span></th><th class="rs-th" data-col="date_start" onclick="Inv.sortRentals('date_start')">開始日 <span class="arrow rs-arrow" data-col="date_start"></span></th><th class="rs-th" data-col="date_end" onclick="Inv.sortRentals('date_end')">終了日 <span class="arrow rs-arrow" data-col="date_end"></span></th><th class="rs-th" data-col="client_name" onclick="Inv.sortRentals('client_name')">案件/顧客 <span class="arrow rs-arrow" data-col="client_name"></span></th><th>備考</th><th>操作</th></tr></thead>
           <tbody id="discard_tbody"></tbody>
         </table>
       </div>
@@ -5150,6 +5151,7 @@ const Inv = (function(){
   let itemCatFilter='';
   let maintStatusFilter='';
   let rentalStatusFilter='';
+  let rentalSort={col:null,asc:true};   // 貸出/予約・メンテ・廃棄の3表で共通のソート（見出しクリック）
   let ganttStart=null, ganttDays=31, ganttCat='', ganttSel='', ganttSite='';   // ganttSite=選んだ現場名（その現場が使う品だけに絞る）   // 在庫ガント（ganttSel=クリックで選んだ日＝その列の残を全品に出す）
   let projStatus={};   // 現場名→ステータス（見積中の予約＝仮押さえ）
   // slog（inv独自：i付き変数・ILOG_KEY）
@@ -5389,6 +5391,21 @@ const Inv = (function(){
     setTimeout(()=>{_busyDel=false},1500);
   }
 
+  // ===== 貸出/予約・メンテ・廃棄の並び替え（見出しクリック。3表で共通） =====
+  function sortRentals(col){if(rentalSort.col===col)rentalSort.asc=!rentalSort.asc;else{rentalSort.col=col;rentalSort.asc=true}renderRentals();renderMaint();renderDiscard()}
+  function applyRentalSort(arr){
+    const c=rentalSort.col;if(!c)return arr;
+    const ST_ORDER={'予約':0,'貸出中':1,'返却済':2,'検品中':3,'メンテ待ち':4,'メンテ中':5,'廃棄予定':6};
+    return arr.slice().sort((a,b)=>{
+      let va=a[c],vb=b[c],r;
+      if(c==='qty')r=(Number(va)||0)-(Number(vb)||0);
+      else if(c==='status')r=(ST_ORDER[va]??99)-(ST_ORDER[vb]??99);
+      else r=String(va||'').localeCompare(String(vb||''),'ja',{numeric:true});
+      if(r===0)r=String(a.item_name||'').localeCompare(String(b.item_name||''),'ja',{numeric:true});
+      return rentalSort.asc?r:-r});
+  }
+  function updateRentalSortArrows(){document.querySelectorAll('#view-inv .rs-arrow').forEach(el=>{el.textContent=rentalSort.col===el.dataset.col?(rentalSort.asc?'▲':'▼'):''})}
+
   // ===== メンテ =====
   function setMaintFilter(v){maintStatusFilter=v;renderMaint()}
   function renderMaint(){
@@ -5405,6 +5422,7 @@ const Inv = (function(){
       chipEl.innerHTML=ch;
     }
     if(maintStatusFilter)f=f.filter(r=>r.status===maintStatusFilter);
+    f=applyRentalSort(f);updateRentalSortArrows();
     const tb=$('maint_tbody');
     if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">メンテ待ち・メンテ中の商品はありません</td></tr>';return}
     tb.innerHTML=f.map(r=>`<tr>
@@ -5426,7 +5444,7 @@ const Inv = (function(){
 
   // ===== 廃棄リスト =====
   function renderDiscard(){
-    const f=rentals.filter(r=>r.status==='廃棄予定');
+    const f=applyRentalSort(rentals.filter(r=>r.status==='廃棄予定'));updateRentalSortArrows();
     const tb=$('discard_tbody');
     if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">廃棄予定の品はありません（メンテタブの「廃棄リストへ」で入れる）</td></tr>';return}
     tb.innerHTML=f.map(r=>`<tr>
@@ -5460,11 +5478,11 @@ const Inv = (function(){
       });
       chipEl.innerHTML=ch;
     }
-    const f=rentals.filter(r=>{
+    const f=applyRentalSort(rentals.filter(r=>{
       if(rentalStatusFilter&&r.status!==rentalStatusFilter)return false;
       if(cat&&r.category!==cat)return false;
       return true;
-    });
+    }));updateRentalSortArrows();
     const tb=$('rentals_tbody');
     if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">貸出/予約データがありません</td></tr>';return}
     const now=todayStr();
@@ -5723,7 +5741,7 @@ const Inv = (function(){
     sortItems, openItemMo, closeItemMo, editItem, saveItem, deleteItem,
     renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental, toDiscardList, unDiscard, renderDiscard, openSplit, closeSplitMo, doSplit,
     populateItemSelect, onProjectSelect, renderGantt, ganttMove, ganttToday, setGanttCat, ganttPick, ganttSiteSel, renderMaint,
-    setItemCatFilter, setMaintFilter, setRentalFilter,
+    setItemCatFilter, setMaintFilter, setRentalFilter, sortRentals,
     unifiedSearch
   };
 })();
