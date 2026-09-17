@@ -3327,6 +3327,7 @@ async function woffBoot(){
     document.documentElement.classList.add('in-woff'); try{localStorage.setItem('in_woff','1')}catch(e){}   // LINE WORKS内＝ヘッダー無し（次回からは描画前に消える）
     const pf=await woff.getProfile();
     if(pf&&pf.displayName) window.__woffUser={name:pf.displayName,id:pf.userId||''};
+    try{ window.__woffToken=woff.getAccessToken()||''; }catch(e){}   // GAS への身分証（2026-09-17）：以後の API 呼び出しに tok= で添える
   }catch(e){}
   // 認識できた時だけ一言出す（名簿に無い人でも「WOFFが効いた」ことが分かるように）
   if(window.__woffUser){
@@ -3337,6 +3338,28 @@ async function woffBoot(){
   }
 }
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+/* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
+   tok = LINE WORKS（WOFF）のアクセストークン（woffBoot で取得）／key = 端末に1回入れる合言葉（?k=… で開くと localStorage に保存）／cid = 端末の印。
+   GET はクエリに、POST は JSON 本文に入れる。GAS 側は当面「記録だけ」、拒否はスクリプトプロパティで切替。 */
+(function(){
+  try{ const q=new URLSearchParams(location.search); const k=q.get('k'); if(k){ localStorage.setItem('api_key',k); q.delete('k'); const qs=q.toString(); history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+location.hash); } }catch(e){}
+  const cid=(function(){ try{ let c=localStorage.getItem('cid'); if(!c){ c=Math.random().toString(36).slice(2,8); localStorage.setItem('cid',c); } return c; }catch(e){ return ''; } })();
+  const _f=window.fetch;
+  window.fetch=function(u,o){
+    try{
+      if(typeof u==='string'&&u.indexOf(API)===0){
+        const tok=window.__woffToken||''; let key=''; try{ key=localStorage.getItem('api_key')||''; }catch(e){}
+        const mode=(typeof App!=='undefined'&&App.mode)||''; const c=cid+'-'+mode;
+        if(o&&String(o.method||'').toUpperCase()==='POST'&&typeof o.body==='string'){
+          try{ const b=JSON.parse(o.body); if(tok)b.tok=tok; if(key)b.key=key; b.cid=c; o=Object.assign({},o,{body:JSON.stringify(b)}); }catch(e){}
+        }else{
+          u+=(u.indexOf('?')<0?'?':'&')+(tok?'tok='+encodeURIComponent(tok)+'&':'')+(key?'key='+encodeURIComponent(key)+'&':'')+'cid='+encodeURIComponent(c);
+        }
+      }
+    }catch(e){}
+    return _f.call(this,u,o);
+  };
+})();
 /* 秘密の「経営者モード」：?boss=<キー> 一本で 本当のフルモード＝全ゾーン＋日報の記入状況ランキング＋人事考課マスター を解錠。
    URL自体が合言葉（localStorage不使用・端末に痕跡を残さない）。旧 ?stats= / ?hrm= も後方互換で有効。 */
 const BOSS_KEY='kotobuki-keiei';
