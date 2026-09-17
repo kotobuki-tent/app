@@ -140,6 +140,7 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 .nav-link.on::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2.5px;border-radius:2px;background:var(--accent)}
 .home-link{font-weight:700;display:inline-flex;align-items:center}
 .nav-div{flex:0 0 auto;align-self:center;width:1px;height:18px;background:var(--border);margin:0 6px}
+#appVer{position:fixed;right:6px;bottom:4px;z-index:150;font:500 10px/1 'Noto Sans JP',sans-serif;color:var(--text-faint);opacity:.7;pointer-events:none;user-select:none}   /* 版の表示（2026-09-17 iller「最新版かどこかで分かれば」） */
 .hdr-btn{background:var(--surface2);border:1px solid var(--border-light);color:var(--text-dim);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
 .hdr-btn:hover{color:var(--text);border-color:var(--border)}
 .hdr-btn:hover{color:#4a0e1f;border-color:rgba(255,255,255,.5)}
@@ -1744,6 +1745,7 @@ table.jobs tr:last-child td{border-bottom:none}
   </div>
   <div class="boss-badge hidden" id="bossBadge" title="BOSS MODE（?boss=）で開いています"><span class="boss-crown">♛</span>BOSS MODE<span class="boss-crown">♛</span></div>
 </div>
+<div id="appVer" title="この端末が読み込んでいる版（コミット日時）。新しい版は開き直し2回目で届く"></div>
 
 <!-- ===== 案件登録 section ===== -->
 <!-- ===== 資格（免許・技能講習の台帳 dept=qual） ===== -->
@@ -3337,6 +3339,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
+const APP_VER='2026-09-17 11:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
    tok = LINE WORKS（WOFF）のアクセストークン（woffBoot で取得）／key = 端末に1回入れる合言葉（?k=… で開くと localStorage に保存）／cid = 端末の印。
