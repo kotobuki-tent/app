@@ -3320,7 +3320,7 @@ async function woffBoot(){
   // WOFFがパス指定（…/woff/<ID>/daily）を ?woff.state=/daily に変えて渡してくると、SDKのinitが
   // 「エンドポイント＋そのパス」へ飛ばそうとして spa.html/daily（404）になる。画面キーは_deepGoで
   // 既に読んであるので、initの前にURLから woff.state を消して飛ばさせない（?go= に置き換える）
-  try{ const q=new URLSearchParams(location.search); if(q.has('woff.state')){ q.delete('woff.state'); if(_deepGo&&!q.has('go'))q.set('go',_deepGo); const qs=q.toString(); history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+location.hash); } }catch(e){}
+  try{ const q=new URLSearchParams(location.search); if(q.has('woff.state')){ q.delete('woff.state'); if(_deepGo&&!q.has('go'))q.set('go',_deepGo); if(_deepDate&&!q.has('d'))q.set('d',_deepDate); const qs=q.toString(); history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+location.hash); } }catch(e){}
   try{
     await woff.init({woffId:WOFF_ID});
     if(!woff.isInClient()){ document.documentElement.classList.remove('in-woff'); try{localStorage.removeItem('in_woff')}catch(e){} return; }   // PC/外部ブラウザは従来どおり
@@ -7305,6 +7305,8 @@ const Daily = (function(){
 
   // ===== init =====
   function init(){
+    // 直リンクの日付（…/daily/2026-09-16）があれば、その日で「自分で書く」を開く（今日より後は無視）
+    try{ if(typeof _deepDate==='string'&&_deepDate){ const d=new Date(_deepDate+'T00:00:00'); if(!isNaN(d)&&d<=today){ writeDate=d; writeDate.setHours(0,0,0,0); } } }catch(e){}
     $('dailyTabs').addEventListener('click',e=>{const t=e.target.closest('.sub-tab');if(!t||!t.dataset.view)return;$('dailyTabs').querySelectorAll('.sub-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');curView=t.dataset.view;render()});
     const pc=$('dailyPcDate');if(pc)pc.textContent=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）`;
     if($('dailyPcSearch'))$('dailyPcSearch').addEventListener('input',e=>unifiedSearch(e.target.value));
@@ -9128,6 +9130,8 @@ function reloadAll(){boot();toast('更新しました');}
 // キオスク用ディープリンク：?go=画面 を mode-strip 前に捕捉（事務所前=alcohol/倉庫=forklift のアイコン用）
 // ?go=daily 直指定に加え、LINE WORKS WOFFがパス（…/woff/<ID>/daily）を ?woff.state=/daily に変換して渡してくる形も受ける
 const _deepGo=(function(){try{const q=new URLSearchParams(location.search);const g=q.get('go');if(g)return g;const st=q.get('woff.state');if(st){const m=String(st).match(/^\/?([a-z]+)/);if(m)return m[1];}return null}catch(e){return null}})();
+// 画面の後ろの日付（…/woff/<ID>/daily/2026-09-16 → ?woff.state=/daily/2026-09-16、または ?go=daily&d=2026-09-16）：日報を「その日」で開く（2026-09-17、未記入通知の朝の分＝昨日を書かせる用）
+const _deepDate=(function(){try{const q=new URLSearchParams(location.search);const d=q.get('d');if(d&&/^\d{4}-\d{2}-\d{2}$/.test(d))return d;const st=q.get('woff.state');if(st){const m=String(st).match(/^\/?[a-z]+\/(\d{4}-\d{2}-\d{2})/);if(m)return m[1];}return null}catch(e){return null}})();
 // 画面直指定で開いた時は、WOFFの本人特定（最大数秒）を待つ間にポータル（フルメニュー）が一瞬見えないよう先に隠す
 if(_deepGo && _deepGo!=='portal'){const _vp=document.getElementById('view-portal'); if(_vp) _vp.classList.add('hidden');}
 /* =========================================================
