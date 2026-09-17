@@ -140,6 +140,11 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 .nav-link.on::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2.5px;border-radius:2px;background:var(--accent)}
 .home-link{font-weight:700;display:inline-flex;align-items:center}
 .nav-div{flex:0 0 auto;align-self:center;width:1px;height:18px;background:var(--border);margin:0 6px}
+#authGate{position:fixed;inset:0;z-index:1000;background:rgba(20,22,30,.96);display:flex;align-items:center;justify-content:center;padding:24px}
+#authGate .ag-box{max-width:520px;width:100%;background:#fff;border-radius:16px;padding:28px 26px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+#authGate .ag-ttl{font:800 20px/1.4 'Noto Sans JP',sans-serif;color:#1a1d27;margin-bottom:12px}
+#authGate .ag-msg{font:500 15px/1.8 'Noto Sans JP',sans-serif;color:#333;white-space:pre-line;margin-bottom:18px}
+#authGate button{font:700 14px/1 'Noto Sans JP',sans-serif;padding:12px 22px;border:none;border-radius:999px;background:var(--accent);color:#fff;cursor:pointer}
 #verBar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:350;display:flex;gap:10px;align-items:center;background:#1a1d27;color:#fff;padding:10px 14px 10px 16px;border-radius:10px;font:500 13px/1.3 'Noto Sans JP',sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100vw - 32px)}
 #verBar button{font:700 13px/1 'Noto Sans JP',sans-serif;padding:8px 12px;border:none;border-radius:999px;background:var(--accent);color:#fff;cursor:pointer;white-space:nowrap}
 #appVer{position:fixed;right:6px;bottom:4px;z-index:150;font:500 10px/1 'Noto Sans JP',sans-serif;color:var(--text-faint);opacity:.7;pointer-events:none;user-select:none}   /* 版の表示（2026-09-17 iller「最新版かどこかで分かれば」） */
@@ -1749,6 +1754,7 @@ table.jobs tr:last-child td{border-bottom:none}
 </div>
 <div id="appVer" title="この端末が読み込んでいる版（コミット日時）"></div>
 <div id="verBar" class="hidden"><span id="verBarText"></span><button type="button" onclick="location.reload()">今すぐ開き直す</button></div>
+<div id="authGate" class="hidden"><div class="ag-box"><div class="ag-ttl" id="authGateTitle"></div><div class="ag-msg" id="authGateMsg"></div><button type="button" onclick="location.reload()">開き直す</button></div></div>
 
 <!-- ===== 案件登録 section ===== -->
 <!-- ===== 資格（免許・技能講習の台帳 dept=qual） ===== -->
@@ -3342,7 +3348,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-17 12:01';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-17 14:21';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -3352,19 +3358,51 @@ const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO8
   try{ const q=new URLSearchParams(location.search); const k=q.get('k'); if(k){ localStorage.setItem('api_key',k); q.delete('k'); const qs=q.toString(); history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+location.hash); } }catch(e){}
   const cid=(function(){ try{ let c=localStorage.getItem('cid'); if(!c){ c=Math.random().toString(36).slice(2,8); localStorage.setItem('cid',c); } return c; }catch(e){ return ''; } })();
   const _f=window.fetch;
+  /* 拒否された時の案内（2026-09-17 iller の文面）。GAS が {error:'auth', reason} を返したら：
+     reason=expired かつ LINE WORKS 内 → 黙ってトークンを取り直して同じ呼び出しをもう1回。それでも駄目なら案内。
+     それ以外（none／badkey）→ 端末未登録の案内。画面全体を覆って止める。 */
+  function gate(kind){
+    const g=document.getElementById('authGate'); if(!g||!g.classList.contains('hidden'))return;
+    const t=document.getElementById('authGateTitle'), m=document.getElementById('authGateMsg');
+    if(kind==='expired'){ t.textContent='LINE WORKS の認証が切れました。'; m.textContent='「業務管理」から開き直してください。'; }
+    else{ t.textContent='この端末はまだ登録されていません。'; m.textContent='スマホの方は LINE WORKS の「業務管理」から開き直してください。\nPC の方は岸田平まで連絡してください。'; }
+    g.classList.remove('hidden');
+  }
+  let _retok=null;
+  async function refreshTok(){   // WOFF から新しいトークンをもらう（同時に何度も呼ばれても1回にまとめる）
+    if(!_retok){ _retok=(async()=>{ try{ if(window.woff&&woff.isInClient&&woff.isInClient()){ const t=woff.getAccessToken(); if(t&&t!==window.__woffToken){ window.__woffToken=t; return true; } } }catch(e){} return false; })().finally(()=>{ setTimeout(()=>{_retok=null},5000); }); }
+    return _retok;
+  }
+  function decorate(u,o){
+    const tok=window.__woffToken||''; let key=''; try{ key=localStorage.getItem('api_key')||''; }catch(e){}
+    const mode=(typeof App!=='undefined'&&App.mode)||''; const c=cid+'-'+mode;
+    if(o&&String(o.method||'').toUpperCase()==='POST'&&typeof o.body==='string'){
+      try{ const b=JSON.parse(o.body); if(tok)b.tok=tok; if(key)b.key=key; b.cid=c; o=Object.assign({},o,{body:JSON.stringify(b)}); }catch(e){}
+    }else{
+      u+=(u.indexOf('?')<0?'?':'&')+(tok?'tok='+encodeURIComponent(tok)+'&':'')+(key?'key='+encodeURIComponent(key)+'&':'')+'cid='+encodeURIComponent(c);
+    }
+    return [u,o];
+  }
   window.fetch=function(u,o){
-    try{
-      if(typeof u==='string'&&u.indexOf(API)===0){
-        const tok=window.__woffToken||''; let key=''; try{ key=localStorage.getItem('api_key')||''; }catch(e){}
-        const mode=(typeof App!=='undefined'&&App.mode)||''; const c=cid+'-'+mode;
-        if(o&&String(o.method||'').toUpperCase()==='POST'&&typeof o.body==='string'){
-          try{ const b=JSON.parse(o.body); if(tok)b.tok=tok; if(key)b.key=key; b.cid=c; o=Object.assign({},o,{body:JSON.stringify(b)}); }catch(e){}
-        }else{
-          u+=(u.indexOf('?')<0?'?':'&')+(tok?'tok='+encodeURIComponent(tok)+'&':'')+(key?'key='+encodeURIComponent(key)+'&':'')+'cid='+encodeURIComponent(c);
+    let isApi=false; try{ isApi=(typeof u==='string'&&u.indexOf(API)===0); }catch(e){}
+    if(!isApi) return _f.call(this,u,o);
+    const u0=u, o0=o;
+    const go=async(retried)=>{
+      const [u1,o1]=decorate(u0,o0);
+      const res=await _f.call(window,u1,o1);
+      // 返事が読める（GET）時だけ検査。POST は no-cors で読めない
+      try{
+        if(res&&res.ok&&res.type!=='opaque'&&/json/i.test(res.headers.get('content-type')||'')){
+          const j=await res.clone().json();
+          if(j&&j.success===false&&j.error==='auth'){
+            if(j.reason==='expired'&&!retried&&await refreshTok()) return go(true);
+            gate(j.reason==='expired'?'expired':'none');
+          }
         }
-      }
-    }catch(e){}
-    return _f.call(this,u,o);
+      }catch(e){}
+      return res;
+    };
+    return go(false);
   };
 })();
 /* 秘密の「経営者モード」：?boss=<キー> 一本で 本当のフルモード＝全ゾーン＋日報の記入状況ランキング＋人事考課マスター を解錠。
