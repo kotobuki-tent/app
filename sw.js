@@ -75,6 +75,9 @@ self.addEventListener('fetch', (event) => {
   // クロスオリジンは素通し
   if (url.origin !== self.location.origin) return;
 
+  // ?nocache= 付きは素通し（キャッシュに入れない・読まない）。spa.html が新版の有無を見る ver.txt の取得と、ローカル検証用（2026-09-17）
+  if (url.searchParams.has('nocache')) return;
+
 // 同一オリジンの静的リソース：stale-while-revalidate
 // キャッシュから即返してUIを速く表示、裏でネットワーク取得して次回用に更新
   event.respondWith(

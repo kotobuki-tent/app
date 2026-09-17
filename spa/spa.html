@@ -140,6 +140,8 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 .nav-link.on::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2.5px;border-radius:2px;background:var(--accent)}
 .home-link{font-weight:700;display:inline-flex;align-items:center}
 .nav-div{flex:0 0 auto;align-self:center;width:1px;height:18px;background:var(--border);margin:0 6px}
+#verBar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:350;display:flex;gap:10px;align-items:center;background:#1a1d27;color:#fff;padding:10px 14px 10px 16px;border-radius:10px;font:500 13px/1.3 'Noto Sans JP',sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100vw - 32px)}
+#verBar button{font:700 13px/1 'Noto Sans JP',sans-serif;padding:8px 12px;border:none;border-radius:999px;background:var(--accent);color:#fff;cursor:pointer;white-space:nowrap}
 #appVer{position:fixed;right:6px;bottom:4px;z-index:150;font:500 10px/1 'Noto Sans JP',sans-serif;color:var(--text-faint);opacity:.7;pointer-events:none;user-select:none}   /* 版の表示（2026-09-17 iller「最新版かどこかで分かれば」） */
 .hdr-btn{background:var(--surface2);border:1px solid var(--border-light);color:var(--text-dim);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
 .hdr-btn:hover{color:var(--text);border-color:var(--border)}
@@ -1745,7 +1747,8 @@ table.jobs tr:last-child td{border-bottom:none}
   </div>
   <div class="boss-badge hidden" id="bossBadge" title="BOSS MODE（?boss=）で開いています"><span class="boss-crown">♛</span>BOSS MODE<span class="boss-crown">♛</span></div>
 </div>
-<div id="appVer" title="この端末が読み込んでいる版（コミット日時）。新しい版は開き直し2回目で届く"></div>
+<div id="appVer" title="この端末が読み込んでいる版（コミット日時）"></div>
+<div id="verBar" class="hidden"><span id="verBarText"></span><button type="button" onclick="location.reload()">今すぐ開き直す</button></div>
 
 <!-- ===== 案件登録 section ===== -->
 <!-- ===== 資格（免許・技能講習の台帳 dept=qual） ===== -->
@@ -3339,7 +3342,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-17 11:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-17 12:01';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -9434,6 +9437,30 @@ $('refreshBtn').addEventListener('click', function(){
 let _bgBusy=false;
 // 見回り（2026-09-17）：30秒ごとに「表示中の画面が90秒以上古ければ取り直す」。従来は5分固定。
 setInterval(()=>{ App.softRefresh(); },30*1000);
+/* 新版の検知（2026-09-17 iller「spa の更新は届くのか」）：10分ごと（＋端末が表示に戻った時）に spa/ver.txt（コミット日時だけ・20バイト、
+   ?nocache= で SW を素通り）を見て、自分の APP_VER と違えば新版あり。裏で自分の URL を1回取り直して SW のキャッシュを新版にしてから
+   （＝開き直し1回で反映）、画面下に知らせる。10分以上誰も触っていない端末（1Fのタブレット等）は、入力中・モーダル中でなければ自分で読み直す。 */
+const Ver=(function(){
+  let newVer='', lastAct=Date.now(), primed=false, checking=false;
+  ['pointerdown','keydown','touchstart','wheel'].forEach(ev=>document.addEventListener(ev,()=>{lastAct=Date.now()},{passive:true,capture:true}));
+  async function check(){
+    if(checking||newVer)return; checking=true;
+    try{
+      const r=await fetch('ver.txt?nocache='+Date.now(),{cache:'no-store'}); if(!r.ok)return;
+      const v=(await r.text()).trim(); if(!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(v)||v===APP_VER||v<APP_VER)return;
+      newVer=v;
+      try{ await fetch(location.pathname+location.search,{cache:'reload'}); }catch(e){}   // SW に新版を取らせる（stale-while-revalidate の裏取得）
+      setTimeout(()=>{primed=true; show();},8000);   // 裏取得が終わる頃合いを待つ
+    }catch(e){}finally{checking=false}
+  }
+  function busy(){ const ae=document.activeElement; return !!(document.querySelector('.mo-bg.show')||(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&ae.type!=='button')); }
+  function show(){ const b=$('verBar'),t=$('verBarText'); if(!b||!t)return; t.textContent='新しい版（'+newVer.slice(5)+'）があります。開き直すと反映されます'; b.classList.remove('hidden'); }
+  setInterval(()=>{ if(newVer&&primed&&Date.now()-lastAct>10*60*1000&&!busy()) location.reload(); },60*1000);   // 放置中は自分で読み直す
+  setInterval(check,10*60*1000);
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') check(); });
+  setTimeout(check,60*1000);
+  return {check, get newVer(){return newVer}, _touch:(ms)=>{lastAct=Date.now()-ms}};
+})();
 // 端末が表示に戻った時（タブレットのスリープ明け・タブ切替・アプリ復帰）も同じルールで取り直す
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') App.softRefresh(); });
 window.addEventListener('focus',()=>App.softRefresh());
