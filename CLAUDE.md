@@ -68,9 +68,9 @@ Operational constraints and how-tos live in dedicated `.claude/` files (loaded a
 - **`.claude/rules/working-with-iller.md`** — tone, judgment, deploy/commit conventions, how to show iller visuals (`show_widget`, not `preview_screenshot`).
 - **`.claude/skills/gas-update`** — the procedure to change & deploy the GAS backend (`Code.gs`): edit → JavaScriptCore syntax-check → paste into Apps Script → redeploy only for web-handler changes. Includes the real-vs-backup-project tell-tale and the "never change the API URL" rule.
 
-### 経営者ページ（separate GAS, 2026-09-17）
+### 経営者ページ（local file, 2026-09-17）
 
-Boss-only features were **removed from the SPA** (日報「記入状況」ranking, 人事考課 link, the whole `?boss=` / `BOSS_KEY` / `bossTap` / crown-badge machinery). They live in a separate Apps Script web app **「寿テント 経営」** (kototen.office, deployed *execute as me / access: myself only* — Google login required, the URL alone opens nothing). Source of truth: iCloud `♿️SEQUENCE LAB/経営/Code.gs` + `Index.html`. It reads the 業務管理 spreadsheet by ID (read-only) and shows the ranking, a 人事考課 button (`?m=` key from Script Property `HR_MASTER_KEY`) and the `auth_log` tail. The ¥合計 badge stays in the SPA (it is for staff). The legacy `dept=hr` handler was deleted from `Code.gs` the same day; 人事考課 is its own project (`人事考課データ`, owner kcdtaipei).
+Boss-only features were **removed from the SPA** (日報「記入状況」ranking, 人事考課 link, the whole `?boss=` / `BOSS_KEY` / `bossTap` / crown-badge machinery). They now live in **one local HTML file outside this repo**: iCloud `🔑PW/寿テント_経営.html` (double-click to open). The file embeds the API passphrase and the 人事考課 master key, calls this same GAS endpoint (`staff_for_daily`, `daily read`, `read_absence` range, `dept=auth&action=log`) and computes the ranking client-side (`cid=boss-local`). **Never copy it into the repo or any public place.** If `API_KEY` is rotated, update the `KEY` line in that file. The ¥合計 badge stays in the SPA (it is for staff). A short-lived GAS version (「寿テント 経営」) was trashed the same day; its source remains in iCloud `♿️SEQUENCE LAB/経営/` for reference. The legacy `dept=hr` handler was deleted from `Code.gs`; 人事考課 is its own project (`人事考課データ`, owner kcdtaipei).
 
 ## Reference
 
