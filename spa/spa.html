@@ -163,16 +163,16 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 /* ===== 生産固有CSS（カード/フィルター/STAFF/slog/ステータス変更/ファイル） ===== */
 .factory-view{padding:16px}
 .fv-date{display:none}
-.fv-sum{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap;align-items:center}
+.fv-sum{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}   /* 2026-09-17 iller「フィルターがでかすぎる」→ PC もピル型（スマホ版と同じ形）で高さを1/2以下に */
 .fv-flt-mb{display:none}
 .tmp-badge{display:inline-block;font-size:10px;font-weight:600;color:#fff;background:#94a3b8;padding:2px 8px;border-radius:10px;margin-left:6px;letter-spacing:.02em;vertical-align:middle}
 .stale-badge{display:inline-block;font-size:11px;font-weight:700;color:#c0392b;background:#fdeaea;border:1px solid #f1b9b3;padding:2px 8px;border-radius:6px;margin-left:6px;white-space:nowrap;vertical-align:middle;cursor:help}
 @media(max-width:480px),(orientation:portrait){.fv-sum .av-add{display:none !important}}
-.fv-si{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:90px;text-align:center;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.fv-si{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 12px;min-width:0;text-align:left;cursor:pointer;transition:.15s;box-shadow:none;white-space:nowrap}
 .fv-si:hover{border-color:var(--accent)}
 .fv-si.on{border-color:var(--accent);background:var(--accent-dim)}
-.fv-si .n{font-size:26px;font-weight:900;line-height:1.1}
-.fv-si .l{font-size:11px;color:var(--text-dim);margin-top:2px}
+.fv-si .n{font-size:15px;font-weight:800;line-height:1;order:2}
+.fv-si .l{font-size:12px;font-weight:600;color:var(--text-dim);margin:0;line-height:1;order:1}
 .fv-grp{margin-bottom:28px}
 .fv-grp-hd{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .fv-grp-hd::after{content:'';flex:1;height:1px;background:var(--border)}
@@ -726,7 +726,7 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 .st-メンテ中{background:#fee2e2;color:#dc2626}
 .st-廃棄予定{background:#e5e7eb;color:#374151}
 /* ===== 在庫ガント（試作 lab/gantt.html を移植。帯＝予定、品名の下＝未返却、数字＝残） ===== */
-#v_gantt .gt-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-8px 0 12px}
+#v_gantt .gt-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 10px}
 #v_gantt .gt-controls label{font-size:12px;color:var(--text-dim);display:inline-flex;align-items:center;gap:6px}
 #v_gantt .gt-controls input,#v_gantt .gt-controls select{font:500 13px/1 'Noto Sans JP',sans-serif;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text)}
 #v_gantt .gt-nav{display:inline-flex;gap:4px;margin-left:4px}
