@@ -28,7 +28,8 @@ GAS 正本 = `Code.gs`（iCloud `~/Library/Mobile Documents/com~apple~CloudDocs/
    - クリップボード（pbcopy）はこのセッションからは使えない。代わりに scratchpad に CORS 付きの小さな配信サーバー（`Access-Control-Allow-Origin: *` を返す python http.server、port 8772）を `.claude/launch.json` に一時登録して preview_start で立て、エディタのページで `javascript_tool`:
      `const t=await (await fetch('http://localhost:8772/Code.gs')).text(); const m=monaco.editor.getModels()[0]; monaco.editor.getEditors()[0].executeEdits('claude',[{range:m.getFullModelRange(),text:t}]); m.getLineCount()`
      で流し込む → エディタをクリック → `cmd+s`（画面上部に「ドライブに保存しました」）。終わったら launch.json の一時登録は `git checkout` で戻し、サーバーを止める。
-   - 手動関数を動かす時は、関数選択のドロップダウンをクリックして関数名をタイプ → Return（リストのクリックでは選べない）→ 実行 → 実行ログで確認。エディタから実行する関数は `SpreadsheetApp.getUi().alert` が使えないので **`Logger.log` で書く**。
+   - 手動関数を動かす時は、関数選択のドロップダウン（find で listbox「実行する関数を選択」）をクリック → **Down/Up キーで移動 → Return**（09-17：タイプすると文字がエディタ本文に入って壊れる。入ったら正本を流し直して保存）→ 実行 → 実行ログで確認。スクリプトプロパティは `…/settings` 画面の「スクリプト プロパティを追加」で手入力できる。
+   - デプロイのバージョン欄は「クリックで開く → リスト内の『新バージョン』を座標クリック」（Return が効かない時がある）。終わったら「バージョン N」が増えたことをダイアログで確認。エディタから実行する関数は `SpreadsheetApp.getUi().alert` が使えないので **`Logger.log` で書く**。
 6. **デプロイ（必要な時だけ）**: doGet/doPost 経由で動く **web handler を変えた時だけ** 「デプロイ ▼ → デプロイを管理 → 既存デプロイの鉛筆(編集) → バージョン=新しいバージョン → デプロイ」。手動関数・トリガーは **保存だけで反映**（再デプロイ不要）。
 7. **既存データの一括処理**が要る変更は、手動関数を Apps Script で1回実行（例: `recalcAllCases`）。SpreadsheetApp しか使わない関数は承認ダイアログが出ない＝それが正常。
 
