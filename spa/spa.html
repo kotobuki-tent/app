@@ -734,9 +734,11 @@ body.boss .hdr{border-bottom:2px solid #f0a900}
 #v_gantt .gt-nav button:hover{background:#e2e5f0;color:var(--text)}
 #view-inv th.rs-th{cursor:pointer;white-space:nowrap}
 #v_gantt .gt-wrap{overflow-x:auto}
+@media(min-width:900px){#v_gantt .gt-wrap{overflow:visible}}   /* 横スクロール枠があると日付行の sticky が効かない（枠の中でしか固定されない）。広い画面では枠を外して画面に固定 */
 #v_gantt .bar.dim{opacity:.3}
 #v_gantt .gt{display:grid;grid-template-columns:220px 1fr;min-width:800px;border:1px solid var(--border);background:var(--surface);border-radius:10px;overflow:clip;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-#v_gantt .gt .hd{position:sticky;top:0;z-index:2;background:var(--surface2);border-bottom:1px solid var(--border)}
+#v_gantt .gt .hd{position:sticky;top:48px;z-index:2;background:var(--surface2);border-bottom:1px solid var(--border)}   /* 48px＝固定ヘッダーの高さ */
+html.in-woff #v_gantt .gt .hd{top:0}
 #v_gantt .gt .hd.name{padding:8px 12px;font-size:12px;font-weight:700}
 #v_gantt .gt .name{padding:6px 12px;border-bottom:1px solid var(--surface3);border-right:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:6px;overflow:hidden;cursor:default}
 #v_gantt .gt .name .nm{min-width:0;display:flex;flex-direction:column;gap:1px}
