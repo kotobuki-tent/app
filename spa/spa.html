@@ -3412,7 +3412,8 @@ function _getCache(key){
 function _setCache(key,data){
   try{sessionStorage.setItem('seq_'+key,JSON.stringify(data));}catch(e){}
 }
-function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+function _ffSend(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)}).catch(()=>{})}catch(e){}}
+function fireAndForget(body){Pending.track(body&&body.dept,body,_ffSend);_ffSend(body)}
 
 // 楽観的更新の保護：ローカルのtmp_*レコードのうち、サーバに反映済みのものは除外し、
 // 未反映のもの（まだサーバから返ってこない）はサーバデータと統合して保持する。
@@ -3428,6 +3429,42 @@ function mergeWithTmp(serverData, currentLocal, keyFn){
   });
   return stillPending.length ? [...serverData, ...stillPending] : serverData;
 }
+
+/* 送った変更の控え（2026-09-17、在庫で入れた仕組みの全画面版）
+   既存 ID の行を書き換える POST は no-cors で結果が読めない。8秒後や自動更新の取り直しで GAS が未反映（or POST が落ちた）だと
+   サーバーの古い値に戻って「変えたのに戻る」になる（mergeWithTmp が守るのは新規 tmp_ 行だけ）。
+   各画面の送信関数が Pending.track(dept, body, send) で控えを取り、loadAll が Pending.apply(dept, kind, rows) で取り直し結果に当てる：
+   サーバーに反映済み→控えを消す／15秒経っても未反映→1回だけ再送／60秒で諦めて「保存が確認できません」。
+   kind＝action の '_' より後ろ（save_rental→'rental'、delete_holding→'holding'、save/delete/status/archive→''）。
+   直近10秒以内に何か送っていれば App.softRefresh も見送る（Pending.sinceWrite）。 */
+const Pending=(function(){
+  const store={}; let lastWrite=0;
+  const kindOf=a=>{a=String(a||'');const i=a.indexOf('_');return i<0?'':a.slice(i+1)};
+  const isDel=a=>/^(delete|del)(_|$)/.test(String(a||''));
+  function norm(v){ if(v==null)return ''; if(typeof v==='boolean')return v?'TRUE':'FALSE'; if(typeof v==='object')return JSON.stringify(v); let t=String(v).trim(); if(/^(true|false)$/i.test(t))return t.toUpperCase(); if(/^\d{4}-\d{2}-\d{2}T/.test(t))t=t.slice(0,10); if(t!==''&&!isNaN(t)&&!/^0\d/.test(t))return String(Number(t)); return t; }
+  function same(row,body){ return Object.keys(body).every(k=>{ if(k==='action'||k==='dept'||k==='id'||k==='case_id'||k[0]==='_')return true; if(!(k in row))return true; return norm(row[k])===norm(body[k]); }); }
+  const label=b=>b.project||b.item_name||b.name||b.driver||b.client||b.person||b.inspector||String(b.id);
+  function touch(){ lastWrite=Date.now(); }
+  function track(dept,body,send){ lastWrite=Date.now(); if(!dept||!body||!body.action||typeof send!=='function')return; const id=body.id; if(!id||/^(tmp_|s_|abs_tmp_)/.test(String(id)))return; store[dept+'|'+kindOf(body.action)+'|'+id]={body:{...body},ts:lastWrite,retried:false,send,del:isDel(body.action)}; }
+  function apply(dept,kind,rows){
+    if(!Array.isArray(rows))return rows;
+    const now=Date.now(),pre=dept+'|'+(kind||'')+'|'; let out=rows;
+    Object.keys(store).forEach(key=>{
+      if(key.indexOf(pre)!==0)return;
+      const p=store[key],id=String(p.body.id),age=now-p.ts;
+      if(out===rows)out=rows.slice();
+      const i=out.findIndex(r=>String(r.id)===id);
+      const done=p.del?(i<0):(i>=0&&same(out[i],p.body));
+      if(done){delete store[key];return}
+      if(age>60000){delete store[key];showCenter('保存が確認できません：'+label(p.body)+'（もう一度やり直してください）','err',4000);return}
+      if(age>15000&&!p.retried){p.retried=true;try{p.send(p.body)}catch(e){}}
+      if(p.del){if(i>=0)out.splice(i,1)}
+      else{const local={...(i>=0?out[i]:{}),...p.body};delete local.action;delete local.dept;if(i>=0)out[i]=local;else out.push(local)}
+    });
+    return out;
+  }
+  return {track,apply,touch,sinceWrite:()=>Date.now()-lastWrite};
+})();
 
 // モバイルフィルター：各.fv-sumの隣に<select>を自動生成。PCでは非表示、モバイル時のみ表示。
 // 各IIFEに手を入れず、.fv-sumの内容変化をMutationObserverで監視して同期する。
@@ -3617,7 +3654,7 @@ const Prod = (function(){
   const diffDays=(a,b)=>Math.round((a-b)/864e5);
 
   // ===== データ読み込み（loadAll本物化：production+attendanceの2本。driveは遅延取得のまま含めない） =====
-  async function loadProd(){try{const r=await fetch(API+'?action=read&dept=production');const j=await r.json();if(j.success){const arr=Array.isArray(j.data)?j.data.slice().reverse():[];prodData=mergeWithTmp(arr,prodData,r=>String(r.project||'')+'|'+String(r.order_no||''));detectStatusChanges()}}catch(e){toast('生産部データ取得エラー',true)}}
+  async function loadProd(){try{const r=await fetch(API+'?action=read&dept=production');const j=await r.json();if(j.success){const arr=Array.isArray(j.data)?j.data.slice().reverse():[];prodData=Pending.apply('production','',mergeWithTmp(arr,prodData,r=>String(r.project||'')+'|'+String(r.order_no||'')));detectStatusChanges()}}catch(e){toast('生産部データ取得エラー',true)}}
   async function loadAttendance(){
     try{
       const d=new Date();const todayStr=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -4146,7 +4183,7 @@ const Proj = (function(){
   function ganttDateHeaders(dates){let h='';dates.forEach(d=>{const ds=dateStr(d);const isT=ds===dateStr(today);const dn=d.getDay();const hol=HOLIDAYS[ds];let cls='gantt-date-cell';if(isT)cls+=' today';if(dn===0||hol)cls+=' holiday';else if(dn===6)cls+=' sat';h+=`<div class="${cls}"><span class="dow">${hol||dow[dn]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`});return h}
 
   // ===== データ読み込み（loadAll本物化：project+rentals+inventoryの3本。rentals/inventoryはviewProj/ganttで即使うため起動時取得） =====
-  async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success){const arr=Array.isArray(j.data)?j.data.slice().reverse():[];projData=mergeWithTmp(arr,projData,r=>String(r.project||'')+'|'+String(r.estimate_no||''));detectStatusChanges()}}catch(e){toast('企画制作データ取得エラー',true)}}
+  async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success){const arr=Array.isArray(j.data)?j.data.slice().reverse():[];projData=Pending.apply('project','',mergeWithTmp(arr,projData,r=>String(r.project||'')+'|'+String(r.estimate_no||'')));detectStatusChanges()}}catch(e){toast('企画制作データ取得エラー',true)}}
   async function loadRentals(){try{const r=await fetch(API+'?dept=inventory&action=rentals');const j=await r.json();rentalsData=j||[]}catch(e){rentalsData=[]}}
   async function loadInventoryItems(){try{const r=await fetch(API+'?dept=inventory&action=list');const j=await r.json();inventoryItems=j||[]}catch(e){inventoryItems=[]}}
   async function loadAll(){
@@ -5172,30 +5209,7 @@ const Inv = (function(){
     }catch(e){console.error('apiGet失敗(inventory):',e);return null;}
   }
   function _send(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'inventory',...body})}).catch(()=>{})}catch(e){}}
-  /* 送った変更の控え（2026-09-17）：貸出/予約・メンテの行は既存 ID（RNTC-）のまま状態を変えるので、
-     8秒後や自動更新の取り直しで GAS がまだ書き終えていない（or POST が落ちた）とサーバーの古い値で上書きされ、
-     「メンテで変えたのにガントに出ない」「分けた行が消えた」に見えていた。控えは applyPending で取り直し結果に当てる：
-     サーバーに反映済み→控えを消す／15秒経っても未反映→1回だけ再送／60秒で諦めて警告。 */
-  const _pend={};
-  function fireAndForget(body){
-    if(body&&(body.action==='save_rental'||body.action==='delete_rental')&&body.id&&String(body.id).indexOf('tmp_')!==0){_pend[String(body.id)]={body:{...body},ts:Date.now(),retried:false};}
-    _send(body);
-  }
-  const _d10=v=>String(v||'').slice(0,10), _s=v=>String(v==null?'':v).trim();
-  function _sameAsPending(row,b){return _s(row.status)===_s(b.status)&&(Number(row.qty)||0)===(Number(b.qty)||0)&&_d10(row.date_start)===_d10(b.date_start)&&_d10(row.date_end)===_d10(b.date_end)&&_s(row.client_name)===_s(b.client_name)}
-  function applyPending(srv){
-    const now=Date.now(),out=srv.slice();
-    Object.keys(_pend).forEach(id=>{
-      const p=_pend[id],age=now-p.ts,i=out.findIndex(r=>String(r.id)===id);
-      const done=p.body.action==='delete_rental'?(i<0):(i>=0&&_sameAsPending(out[i],p.body));
-      if(done){delete _pend[id];return}
-      if(age>60000){delete _pend[id];toast('保存が確認できません：'+(p.body.item_name||id)+'（もう一度やり直してください）',true);return}
-      if(age>15000&&!p.retried){p.retried=true;_send(p.body);}
-      if(p.body.action==='delete_rental'){if(i>=0)out.splice(i,1)}
-      else{const local={...(i>=0?out[i]:{}),...p.body};delete local.action;delete local.dept;if(i>=0)out[i]=local;else out.push(local)}
-    });
-    return out;
-  }
+  function fireAndForget(body){Pending.track('inventory',body,_send);_send(body)}   // 控え＝共通 Pending（2026-09-17）
 
   // ===== ステータスログ =====
   function detectInvChanges(){
@@ -5271,8 +5285,8 @@ const Inv = (function(){
         apiGet({action:'projects'}).catch(()=>[]),
         fetch(API+'?dept=project&action=read').then(r=>r.json()).catch(()=>null)   // 現場のステータス（ガントの仮押さえ判定用）
       ]);
-      items=mergeWithTmp(inv||[],items,r=>String(r.category||'')+'|'+String(r.item_name||''));
-      rentals=applyPending(mergeWithTmp(rnt||[],rentals,r=>String(r.item_name||'')+'|'+String(r.date_start||'')+'|'+String(r.client_name||'')));
+      items=Pending.apply('inventory','item',mergeWithTmp(inv||[],items,r=>String(r.category||'')+'|'+String(r.item_name||'')));
+      rentals=Pending.apply('inventory','rental',mergeWithTmp(rnt||[],rentals,r=>String(r.item_name||'')+'|'+String(r.date_start||'')+'|'+String(r.client_name||'')));
       projects=prj||[];
       if(pst&&Array.isArray(pst.data)){projStatus={};pst.data.forEach(p=>{if(p.project)projStatus[p.project]=p.status})}
       populateCategoryFilters();
@@ -5792,9 +5806,10 @@ const Veh = (function(){
   function dateJP(d){if(!d)return'';const dd=new Date(d+'T00:00:00');if(isNaN(dd))return d;return`${dd.getMonth()+1}/${dd.getDate()}（${dow[dd.getDay()]}）`}
   function diffDays(dateStr){if(!dateStr)return null;const d=new Date(dateStr+'T00:00:00');if(isNaN(d))return null;return Math.ceil((d-today)/(1000*60*60*24))}
   function fmtKm(v){if(v==null||v==='')return'';return Number(v).toLocaleString()+' km'}
+  function _vSend(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)}).catch(()=>{})}catch(e){}}
   function fireAndForget(body){
     body.dept='vehicle';
-    fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)});
+    Pending.track('vehicle',body,_vSend);_vSend(body);
   }
   function _vesc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 
@@ -5870,7 +5885,7 @@ const Veh = (function(){
     try{
       const res=await fetch(API+'?dept=vehicle');
       const json=await res.json();
-      vehicleData=mergeWithTmp(json.vehicles||[],vehicleData,r=>String(r.name||'')+'|'+String(r.number||''));
+      vehicleData=Pending.apply('vehicle','',mergeWithTmp(json.vehicles||[],vehicleData,r=>String(r.name||'')+'|'+String(r.number||'')));
       vehicleData.forEach(v=>{
         if(typeof v.maintenance_log==='string'&&v.maintenance_log){
           try{v._maint=JSON.parse(v.maintenance_log)}catch(e){v._maint=[]}
@@ -6301,7 +6316,8 @@ const Sales = (function(){
 
   // ===== 販売方言ユーティリティ =====
   async function apiGet(params){try{const u=API+'?dept='+DEPT+'&'+new URLSearchParams(params);const r=await fetch(u);return r.json()}catch(e){console.error('apiGet失敗(sales):',e);return null}}
-  function apiPost(body){body.dept=DEPT;fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+  function _sSend(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)}).catch(()=>{})}catch(e){}}
+  function apiPost(body){body.dept=DEPT;Pending.track(DEPT,body,_sSend);_sSend(body)}
   function fmtDate(d){if(!d)return'';const dt=(d instanceof Date)?d:new Date(d);if(isNaN(dt))return String(d).slice(0,10);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')}
   function fmtDateJP(s){if(!s)return'';const dt=new Date(s);if(isNaN(dt))return String(s);return(dt.getMonth()+1)+'/'+dt.getDate()+'（'+dow[dt.getDay()]+'）'}
   function fmtAmount(v){if(v===''||v==null||isNaN(Number(v)))return'';return'¥'+Number(v).toLocaleString()}
@@ -6382,7 +6398,7 @@ const Sales = (function(){
     if(cached&&cached.entries){allEntries=cached.entries;render()}
     try{
       const j=await apiGet({action:'read'});
-      if(j.success){allEntries=mergeWithTmp(j.data||[],allEntries,r=>String(r.project||'')+'|'+String(r.estimate_no||''));detectStatusChanges()}
+      if(j.success){allEntries=Pending.apply('sales','',mergeWithTmp(j.data||[],allEntries,r=>String(r.project||'')+'|'+String(r.estimate_no||'')));detectStatusChanges()}
     }catch(e){console.warn('load error',e)}
     _setCache('sales',{entries:allEntries});
     render();refreshDatalists();
@@ -6906,7 +6922,7 @@ const Labor = (function(){
     $('detailModal').classList.add('show');
   }
   function closeDetail(){$('detailModal').classList.remove('show')}
-  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+  function fireAndForget(body){Pending.track(body&&body.dept,body,_ffSend);_ffSend(body)}
   function setArchive(id,on){
     if(_arcBusy)return;
     if(!confirm(on?'この工数をアーカイブへ移しますか？（一覧から見えなくなります）':'アーカイブを解除して一覧に戻しますか？'))return;
@@ -6956,14 +6972,14 @@ const Daily = (function(){
   let editingId=null;
 
   function isOffDay(d){const dw=d.getDay();return dw===0||dw===6||HOLIDAYS.hasOwnProperty(dateStr(d))}
-  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)})}
+  function fireAndForget(body){Pending.track(body&&body.dept,body,_ffSend);_ffSend(body)}
   // 日報のトーストに効果音を付ける（err=成功失敗の判定がそのまま音に対応）。グローバルtoastをこのIIFE内で包む
   function toast(msg,err){ showCenter(msg, err?'err':'ok'); if(err){sndError();}else{sndOK();} }
 
   // ===== データ取得 =====
   async function loadStaff(){try{const r=await fetch(API+'?dept=daily&action=staff_for_daily');const j=await r.json();if(j.success)staffList=j.staff||[]}catch(e){}}
   async function loadProjects(){try{const r=await fetch(API+'?dept=daily&action=projects');const j=await r.json();if(j.success){prodProjects=j.production||[];projProjects=j.projects||[]}}catch(e){}}
-  async function loadReports(){try{const to=new Date();const from=new Date();from.setDate(from.getDate()-30);const r=await fetch(API+'?dept=daily&action=read&date_from='+dateStr(from)+'&date_to='+dateStr(to));const j=await r.json();if(j.success)allReports=mergeWithTmp(j.data||[],allReports,r=>String(r.employee_no||'')+'|'+String(r.date||'')+'|'+String(r.project||'')+'|'+String(r.work||r.action||''))}catch(e){}}
+  async function loadReports(){try{const to=new Date();const from=new Date();from.setDate(from.getDate()-30);const r=await fetch(API+'?dept=daily&action=read&date_from='+dateStr(from)+'&date_to='+dateStr(to));const j=await r.json();if(j.success)allReports=Pending.apply('daily','',mergeWithTmp(j.data||[],allReports,r=>String(r.employee_no||'')+'|'+String(r.date||'')+'|'+String(r.project||'')+'|'+String(r.work||r.action||'')))}catch(e){}}
   async function loadAbsenceList(date){try{const r=await fetch(API+'?dept=daily&action=read_absence&date='+date);const j=await r.json();if(j.success)absenceList=j.data||[];else absenceList=[]}catch(e){absenceList=[]}}
   async function loadAbsenceRange(){try{const to=new Date();const from=new Date();from.setDate(from.getDate()-30);const r=await fetch(API+'?dept=daily&action=read_absence&date_from='+dateStr(from)+'&date_to='+dateStr(to));const j=await r.json();if(j.success)absenceRange=j.data||[]}catch(e){}}
   async function loadAll(){
@@ -7336,7 +7352,7 @@ const Ot = (function(){
   function todayStr(){return fmtDate(new Date())}
   function oesc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
   async function apiGet(params){try{const qs=new URLSearchParams({dept:DEPT,...params}).toString();const r=await fetch(API+'?'+qs);return r.json()}catch(e){console.error('apiGet失敗(daily):',e);return null}}
-  function apiPost(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:DEPT,...body})});return{success:true}}
+  function apiPost(body){Pending.touch();fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:DEPT,...body})});return{success:true}}
 
   function scheduleSyncFromServer(){
     if(syncTimer)clearTimeout(syncTimer);
@@ -7509,7 +7525,7 @@ const Card = (function(){
   function parseTs(s){ const m=String(s||'').match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/); return m?{date:`${m[1]}-${m[2]}-${m[3]}`,hm:`${+m[4]}:${m[5]}`}:null; }
   function lbl(d){ return `${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}）`; }
   async function apiGet(){ try{ const r=await fetch(API+'?dept=card&action=read'); return await r.json(); }catch(e){ return null; } }
-  function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'card',...body})}); }catch(e){} }
+  function fire(body){ Pending.touch(); try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'card',...body})}); }catch(e){} }
   async function loadAll(){ const d=await apiGet(); if(d){ loans=d.loans||[]; staff=(d.staff||[]).map(s=>typeof s==='string'?{name:s,reg:true}:s); } render(); }
   function openLoan(){ return loans.find(l=>!l.return_at); } // loansはout_at降順＝先頭の未返却が最新
   function prevWeek(){ _wk=addDays(_wk,-7); render(); }
@@ -7644,7 +7660,7 @@ const Wb = (function(){
   function holName(dt){ return buildJpHolidays(dt.getFullYear())[(dt.getMonth()+1)+'-'+dt.getDate()]||null; }
 
   async function apiGet(){ try{ const r=await fetch(API+'?dept=wb&action=read'); return await r.json(); }catch(e){ return null; } }
-  function fire(body){ try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'wb',...body})}); }catch(e){} }
+  function fire(body){ Pending.touch(); try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'wb',...body})}); }catch(e){} }
   function isTmp(id){ return String(id).indexOf('tmp_')===0; }
   function nkey(n){ return [n.person,n.date_from||'',n.date_to||'',n.category||'',n.text||'',n.memo||''].join('|'); }
   // 楽観更新をreconcileで消さない：サーバ確定を土台に、未反映のtmp追加は残し、削除済みidは隠し、並び順はローカル優先
@@ -8151,12 +8167,12 @@ const Cases = (function(){
     try{
       const grab=d=>fetch(API+'?dept='+d+'&action=read').then(r=>r.json()).catch(()=>({}));
       const [cs,od,pj,sl,st]=await Promise.all([grab('cases'),grab('production'),grab('project'),grab('sales'),fetch(API+'?dept=cases&action=staff').then(r=>r.json()).catch(()=>({}))]);
-      _cases=(cs&&cs.data)||[];
+      _cases=Pending.apply('cases','',(cs&&cs.data)||[]);
       _staff=(st&&st.data)||[];
       const dl=$('caseStaffList'); if(dl) dl.innerHTML=_staff.map(s=>`<option value="${esc(s.name)}">`).join('');
       _children={};
       const add=(dept,rows)=>{(rows||[]).forEach(r=>{const cid=String(r.case_id||'').trim(); if(!cid)return; (_children[cid]=_children[cid]||[]).push({dept,id:r.id,project:r.project,status:r.status,invoiced:r.invoiced,deadline:r.deadline,start_date:r.start_date,type:r.type,date_load_in:r.date_load_in,date_setup:r.date_setup,date_event:r.date_event,date_teardown:r.date_teardown,date_rental_out:r.date_rental_out,date_rental_return:r.date_rental_return,date_delivery:r.date_delivery});});};
-      add('production',(od&&od.data)); add('project',(pj&&pj.data)); add('sales',(sl&&sl.data));
+      add('production',Pending.apply('production','',(od&&od.data)||[])); add('project',Pending.apply('project','',(pj&&pj.data)||[])); add('sales',Pending.apply('sales','',(sl&&sl.data)||[]));
     }catch(e){}
     // 検索ボックスに入力中なら描き直さない（フォーカスと入力が飛ぶため。データは更新済みで次の操作から反映）
     const typing=document.activeElement&&document.activeElement.id==='casesSearch';
@@ -8637,7 +8653,8 @@ function nowHHMM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinu
 function fmtTime(t){if(!t)return'';t=String(t);if(/^\d{1,2}:\d{2}/.test(t))return t.slice(0,5);const d=new Date(t);if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);return t;}
 
 async function apiGet(params){const url=API+'?dept=alcohol&'+new URLSearchParams(params);const r=await fetch(url);return r.json();}
-function apiPost(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'alcohol',...body})}).catch(function(){});}catch(e){}}
+function _aSend(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'alcohol',...body})}).catch(function(){});}catch(e){}}
+function apiPost(body){Pending.track('alcohol',body,_aSend);_aSend(body)}
 
 function segPick(segId,btn){[...$(segId).children].forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
 function segVal(segId){const on=$(segId).querySelector('.on');return on?on.dataset.v:'';}
@@ -8702,7 +8719,7 @@ async function boot(){
 
 async function loadDay(date,silent){
   if(!silent)$('dayMtx').innerHTML='<div class="empty">読み込み中...</div>';
-  try{const r=await apiGet({action:'list',date});const srv=(r.data||[]);
+  try{const r=await apiGet({action:'list',date});const srv=Pending.apply('alcohol','',(r.data||[]));
     // 直前に登録した楽観行は、GAS がまだ書き終えていない（POST 2〜3秒＋ぶれ）と list に無い。
     // 消してしまうと「登録したのに消えた」に見えるので、同じ日・人・前後の行が来るまで残す（20秒まで）
     const keep=records.filter(x=>x._optimistic&&x.date===date&&(Date.now()-(+String(x.id).slice(4)||0))<20000&&!srv.some(y=>y.driver===x.driver&&y.phase===x.phase));
@@ -8947,7 +8964,8 @@ function monthStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth
 function nowHHMM(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes());}
 
 async function apiGet(params){const url=API+'?dept=forklift&'+new URLSearchParams(params);const r=await fetch(url);return r.json();}
-function apiPost(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'forklift',...body})}).catch(function(){});}catch(e){}}
+function _fSend(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'forklift',...body})}).catch(function(){});}catch(e){}}
+function apiPost(body){Pending.track('forklift',body,_fSend);_fSend(body)}
 
 async function boot(){
   $('fk_f_date').value=todayStr();$('fk_f_month').value=monthStr();
@@ -9062,7 +9080,7 @@ function record(){
 
 async function loadDay(date,silent){
   if(!silent)$('fk_dayList').innerHTML='<div class="empty">読み込み中...</div>';
-  try{const r=await apiGet({action:'list',date});records=(r.data||[]);}catch(e){records=[];}
+  try{const r=await apiGet({action:'list',date});records=Pending.apply('forklift','',(r.data||[]));}catch(e){records=[];}
   renderDayList(); renderMachines();
 }
 function renderDayList(){
@@ -9132,10 +9150,11 @@ const Qual = (function(){
     const q=new URLSearchParams(Object.assign({dept:'qual'},params)).toString();
     return fetch(API+'?'+q).then(r=>r.json()).catch(()=>null);
   }
-  function fireAndForget(body){fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({dept:'qual'},body))})}
+  function _qSend(body){try{fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({dept:'qual'},body))}).catch(()=>{})}catch(e){}}
+  function fireAndForget(body){Pending.track('qual',body,_qSend);_qSend(body)}
   async function loadAll(){
     const [d,st]=await Promise.all([apiGet({action:'read'}),apiGet({action:'staff'})]);
-    if(d&&d.quals){quals=d.quals;holdings=d.holdings||[]}
+    if(d&&d.quals){quals=d.quals;holdings=Pending.apply('qual','holding',d.holdings||[])}
     if(st&&st.data)staffList=st.data;
     render();
   }
@@ -9368,6 +9387,7 @@ const App = {
     if(!this._loaded[name]||this._loading[name]||_bgBusy)return;
     if(document.visibilityState!=='visible')return;
     if(Date.now()-(this._loadedAt[name]||0)<this.STALE_MS)return;
+    if(Pending.sinceWrite()<10000)return;   // 送った直後は GAS が書き終えるまで取り直さない
     const ae=document.activeElement; if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&ae.type!=='button')return;
     if(document.querySelector('.mo-bg.show'))return;
     _bgBusy=true;
