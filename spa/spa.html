@@ -6,7 +6,6 @@
 <title>業務管理</title>
 <link rel="manifest" href="manifest.json">
 <script>/* LINE WORKS（WOFF）内で開いてる時はヘッダーを最初から出さない：前回WOFF内と判定した印（このWebView専用のlocalStorage）か、WOFFのパス引数（woff.state）があれば描画前にin-woffを付ける。本判定はwoffBootで行い、違っていれば外す */try{if(localStorage.getItem('in_woff')==='1'||/[?&]woff\.state=/.test(location.search))document.documentElement.classList.add('in-woff');}catch(e){}</script>
-<script>/* 経営者モード(?boss=)で開いた時はmanifestを外す＝ホーム画面に追加した起動URLに ?boss= を残す（start_urlで上書きされないように） */try{if(new URLSearchParams(location.search).get('boss')){var _m=document.querySelector('link[rel="manifest"]');if(_m)_m.remove();}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -130,10 +129,6 @@ html.in-woff #view-alcohol .kiosk, html.in-woff #view-forklift .kiosk{height:aut
 html.in-woff .portal-logo, html.in-woff .portal-sub, html.in-woff .portal-modeswitch, html.in-woff .portal-footer{display:none}
 html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-height:0}
 @media(max-width:480px){.mny-btn{display:none!important}}
-.boss-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:250;pointer-events:none;display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:999px;font:800 12px/1 'Noto Sans JP',sans-serif;color:#7a5300;background:linear-gradient(135deg,#fde68a,#fbbf24);border:1px solid #f0a900;white-space:nowrap;box-shadow:0 2px 8px rgba(217,138,0,.4);letter-spacing:.08em}
-.boss-badge .boss-crown{font-size:14px;line-height:1}
-body.boss .hdr{border-bottom:2px solid #f0a900}
-@media(max-width:600px){ .boss-badge{font-size:0;gap:0;padding:6px 9px} .boss-badge .boss-crown{font-size:15px} .boss-badge .boss-crown:last-child{display:none} }
 .nav-link{background:transparent;border:none;color:var(--text-dim);font:500 13px/1 'Noto Sans JP',sans-serif;padding:0 13px;border-radius:8px 8px 0 0;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;margin-bottom:0;position:relative;white-space:nowrap}
 .nav-link:hover{color:var(--text);background:var(--surface3)}
 .nav-link.on{background:transparent;color:var(--text);font-weight:700}
@@ -1167,20 +1162,6 @@ table.jobs tr:last-child td{border-bottom:none}
 #dailyViewContent>.member-group{margin-bottom:0}
 #dailyViewContent>.dv-tblwrap{grid-column:1/-1}
 /* 記入状況ランキング */
-#statsView .stats-head{margin-bottom:12px}
-#statsView .stats-sub{font-size:14px;color:var(--text)}
-#statsView .stats-sub b{color:var(--accent)}
-#statsView .stats-note{font-size:11px;color:var(--text-dim);margin-top:2px}
-#statsView .stats-list{display:flex;flex-direction:column;gap:6px}
-#statsView .stats-row{display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--surface);border:1px solid var(--border-light);border-radius:8px}
-#statsView .stats-rank{width:22px;text-align:center;font-weight:700;color:var(--text-dim);flex:0 0 auto}
-#statsView .stats-name{flex:0 0 120px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#statsView .stats-bar-wrap{flex:1;min-width:40px;height:14px;background:var(--surface2);border-radius:7px;overflow:hidden}
-#statsView .stats-bar{display:block;height:100%;border-radius:7px}
-#statsView .stats-rate{width:46px;text-align:right;font-weight:700;color:var(--text);flex:0 0 auto}
-#statsView .stats-miss{width:92px;text-align:right;font-size:12px;color:var(--text-dim);flex:0 0 auto}
-#statsView .stats-miss b{color:var(--text)}
-@media(max-width:480px),(orientation:portrait){#statsView .stats-name{flex-basis:84px}#statsView .stats-miss{width:70px}}
 @media(max-width:480px),(orientation:portrait){#view-daily .app{padding:14px 10px}}
 @media(max-width:480px),(orientation:portrait){
   .mobile-date{display:none!important}
@@ -1746,11 +1727,9 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link" id="navQual" onclick="App.nav('qual')">資格</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navWb" onclick="App.nav('wb')">ボード</button>
-    <button class="nav-link hidden" id="navHrLink" onclick="App.openHr()">人事考課</button>
     <span class="nav-div"></span>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
-  <div class="boss-badge hidden" id="bossBadge" title="BOSS MODE（?boss=）で開いています"><span class="boss-crown">♛</span>BOSS MODE<span class="boss-crown">♛</span></div>
 </div>
 <div id="appVer" title="この端末が読み込んでいる版（コミット日時）"></div>
 <div id="verBar" class="hidden"><span id="verBarText"></span><button type="button" onclick="location.reload()">今すぐ開き直す</button></div>
@@ -2541,7 +2520,6 @@ table.jobs tr:last-child td{border-bottom:none}
     <span class="subtab-date" id="dailyPcDate"></span>
     <button class="sub-tab on" data-view="write">自分で書く</button>
     <button class="sub-tab" data-view="view">みんなの日報</button>
-    <button class="sub-tab" data-view="stats" id="statsTab" style="display:none">記入状況</button>
     <input class="subtab-search" id="dailyPcSearch" placeholder="検索...">
   </div>
 
@@ -2604,7 +2582,6 @@ table.jobs tr:last-child td{border-bottom:none}
       </div>
       <div id="dailyViewContent"></div>
     </div>
-    <div id="statsView" class="hidden"></div>
   </div>
 </section>
 
@@ -2673,7 +2650,7 @@ table.jobs tr:last-child td{border-bottom:none}
 <!-- ===== ポータル section（入口・リンク集） ===== -->
 <section id="view-portal">
   <div class="portal-wrap">
-    <div class="portal-logo" onclick="bossTap()"><img class="portal-logo-mark" src="../icons/logo-mark.png" alt="">寿テント</div>
+    <div class="portal-logo"><img class="portal-logo-mark" src="../icons/logo-mark.png" alt="">寿テント</div>
     <div class="portal-sub">業務管理システム</div>
     <div class="portal-modeswitch">
       <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
@@ -3348,7 +3325,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-17 14:39';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-17 15:20';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -3405,44 +3382,7 @@ const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO8
     return go(false);
   };
 })();
-/* 秘密の「経営者モード」：?boss=<キー> 一本で 本当のフルモード＝全ゾーン＋日報の記入状況ランキング＋人事考課マスター を解錠。
-   URL自体が合言葉（localStorage不使用・端末に痕跡を残さない）。旧 ?stats= / ?hrm= も後方互換で有効。 */
-const BOSS_KEY='kotobuki-keiei';
-/* boss解錠。PCブラウザ等の通常タブは「URLに ?boss=キー がある時だけ」＝保持しない（共用PCで漏れない）。
-   ホーム画面アプリ(standalone/PWA)の時だけ localStorage に保持＝アイコン起動でも維持。?boss=off で解除。 */
-function bossStandalone(){ try{ return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true; }catch(e){ return false; } }
-function bossOn(){
-  try{
-    /* 点検モード端末（事務所前・工場のタブレット）は経営者モードにしない＝共用kioskで人事考課等が絶対に出ない安全ガード */
-    try{ if(localStorage.getItem('spa_mode')==='kiosk'){ localStorage.removeItem('spa_boss'); return false; } }catch(e){}
-    const v=new URLSearchParams(location.search).get('boss');
-    if(v==='off'){ try{localStorage.removeItem('spa_boss');}catch(e){} return false; }
-    if(v===BOSS_KEY){ if(bossStandalone()){ try{localStorage.setItem('spa_boss','1');}catch(e){} } return true; }
-    /* 保持を読むのはホーム画面アプリ(standalone)の時だけ＝通常ブラウザはURLに ?boss= が無ければ常にOFF（残骸で居座らない・共用PCで漏れない） */
-    if(bossStandalone()){ try{ return localStorage.getItem('spa_boss')==='1'; }catch(e){} }
-    return false;
-  }catch(e){ return false; }
-}
-/* ポータルの「寿テント」を素早く7回タップ→キー入力で経営者モードON（保持）。iOSのホーム画面アプリ用の確実な入口。もう一度7回で解除。 */
-function bossTap(){
-  try{
-    var f=bossTap, now=Date.now();
-    if(!f._t || now-f._t>1500) f._n=0;
-    f._t=now; f._n=(f._n||0)+1;
-    if(f._n>=7){
-      f._n=0;
-      if(document.body.classList.contains('boss')){
-        /* 解除＝端末保持を消す＋URLの?boss=も外す（URLに合言葉が残っていると解除してもONに戻るため） */
-        if(confirm('経営者モードを解除しますか？')){ try{localStorage.removeItem('spa_boss');}catch(e){} var u=new URL(location.href); u.searchParams.delete('boss'); location.href=u.toString(); }
-      }else{
-        var k=prompt('経営者キーを入力');
-        /* 合言葉が正しければ ?boss= 付きURLで開き直す＝通常ブラウザでも有効。standaloneならbossOn()が保持も保存する */
-        if(k===BOSS_KEY){ var u2=new URL(location.href); u2.searchParams.set('boss',k); location.href=u2.toString(); }
-        else if(k!=null){ alert('キーが違います'); }
-      }
-    }
-  }catch(e){}
-}
+/* 経営者モード（?boss=・BOSS_KEY・bossTap）は 2026-09-17 に撤去。経営者向けの機能は GAS の別ウェブアプリ（Google ログイン必須）へ */
 const dow='日月火水木金土';
 const today=new Date();today.setHours(0,0,0,0);
 const pad=n=>String(n).padStart(2,'0');
@@ -7025,7 +6965,7 @@ const Daily = (function(){
   const WORK_PROJECT=['設営','撤去','施工','メンテナンス','準備','下見','積み込み','運搬'];
   const WORK_COMMON=['事務','打ち合わせ','清掃','車両運行'];
   let curView='write';
-  let staffList=[],prodProjects=[],projProjects=[],allReports=[],absenceList=[],absenceRange=[];
+  let staffList=[],prodProjects=[],projProjects=[],allReports=[],absenceList=[];
   let _absenceLoadedDate=null;
   let viewingDate=new Date();
   let writeDate=new Date();
@@ -7041,7 +6981,6 @@ const Daily = (function(){
   async function loadProjects(){try{const r=await fetch(API+'?dept=daily&action=projects');const j=await r.json();if(j.success){prodProjects=j.production||[];projProjects=j.projects||[]}}catch(e){}}
   async function loadReports(){try{const to=new Date();const from=new Date();from.setDate(from.getDate()-30);const r=await fetch(API+'?dept=daily&action=read&date_from='+dateStr(from)+'&date_to='+dateStr(to));const j=await r.json();if(j.success)allReports=Pending.apply('daily','',mergeWithTmp(j.data||[],allReports,r=>String(r.employee_no||'')+'|'+String(r.date||'')+'|'+String(r.project||'')+'|'+String(r.work||r.action||'')))}catch(e){}}
   async function loadAbsenceList(date){try{const r=await fetch(API+'?dept=daily&action=read_absence&date='+date);const j=await r.json();if(j.success)absenceList=j.data||[];else absenceList=[]}catch(e){absenceList=[]}}
-  async function loadAbsenceRange(){try{const to=new Date();const from=new Date();from.setDate(from.getDate()-30);const r=await fetch(API+'?dept=daily&action=read_absence&date_from='+dateStr(from)+'&date_to='+dateStr(to));const j=await r.json();if(j.success)absenceRange=j.data||[]}catch(e){}}
   async function loadAll(){
     const cached=_getCache('daily');
     if(cached){
@@ -7055,7 +6994,7 @@ const Daily = (function(){
         initWhoSelect();render();
       }catch(e){}
     }
-    await Promise.all([loadStaff(),loadProjects(),loadReports(),loadAbsenceList(dateStr(viewingDate)),loadAbsenceRange()]);
+    await Promise.all([loadStaff(),loadProjects(),loadReports(),loadAbsenceList(dateStr(viewingDate))]);
     _absenceLoadedDate=dateStr(viewingDate);
     initWhoSelect();
     _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
@@ -7082,51 +7021,12 @@ const Daily = (function(){
     if(w&&curView==='write')openAddForm(true);
   }
 
-  // 記入状況は「URLを知ってる経営だけ」：spa.html?stats=キー で開いた時だけ表示。
-  // 記憶しない＝内緒URLで開いてる間だけ見える（通常URLなら出ない・共用端末でも痕跡なし）。キーはこの1行を書き換えるだけ。
-  const STATS_KEY='kotobuki';
-  function statsUnlocked(){
-    try{ return bossOn() || new URLSearchParams(location.search).get('stats')===STATS_KEY; }catch(e){ return false; }
-  }
+  // 記入状況ランキングは 2026-09-17 に経営者ページ（GAS 別アプリ）へ移した
   function render(){
-    const unlocked=statsUnlocked(); const st=$('statsTab'); if(st) st.style.display=unlocked?'':'none';
-    if(curView==='stats' && !unlocked) curView='view';
-    ['writeView','viewView','statsView'].forEach(id=>$(id).classList.add('hidden'));
+    ['writeView','viewView'].forEach(id=>$(id).classList.add('hidden'));
     if(curView==='write'){$('writeView').classList.remove('hidden');renderWrite()}
-    else if(curView==='stats'){$('statsView').classList.remove('hidden');renderStats()}
     else{$('viewView').classList.remove('hidden');renderView()}
   }
-  // 記入状況：直近30日の営業日で、各スタッフの日報記入日数・未記入日数・記入率を集計してランキング＋横棒に
-  function renderStats(){
-    const el=$('statsView'); const today0=new Date(); today0.setHours(0,0,0,0);
-    const bizDays=[]; for(let i=0;i<30;i++){ const d=new Date(today0); d.setDate(d.getDate()-i); if(!isOffDay(d)) bizDays.push(dateStr(d)); }
-    const bizSet=new Set(bizDays); const N=bizDays.length;
-    const byEmp={}; allReports.forEach(r=>{ const e=String(r.employee_no||''); const dt=String(r.date||'').slice(0,10);
-      if(!e||!bizSet.has(dt))return; (byEmp[e]=byEmp[e]||new Set()).add(dt); });
-    const absByEmp={}; absenceRange.forEach(a=>{ const e=String(a.employee_no||''); const dt=String(a.date||'').slice(0,10);
-      if(!e||!bizSet.has(dt))return; (absByEmp[e]=absByEmp[e]||new Set()).add(dt); });
-    const rows=staffList.map(s=>{ const key=String(s.employee_no);
-      const absN=(absByEmp[key]||new Set()).size; const target=Math.max(0,N-absN);
-      const done=(byEmp[key]||new Set()).size; const miss=Math.max(0,target-done);
-      return {name:s.name, done, miss, target, rate:target?Math.round(done/target*100):100}; });
-    rows.sort((a,b)=>b.miss-a.miss||a.rate-b.rate||a.name.localeCompare(b.name));
-    const totalDone=rows.reduce((s,r)=>s+r.done,0), totalPoss=rows.reduce((s,r)=>s+r.target,0);
-    const overall=totalPoss?Math.round(totalDone/totalPoss*100):0;
-    let h=`<div class="stats-head"><div class="stats-sub">直近30日の営業日 <b>${N}日</b>（土日祝を除く）／ 全体記入率 <b>${overall}%</b></div>`
-      +`<div class="stats-note">※出勤日ベース。欠勤日は除外して計算。日報が1件でもある日を「記入」とカウント。</div></div>`;
-    h+='<div class="stats-list">';
-    rows.forEach((r,i)=>{ const col=r.rate>=80?'var(--green)':r.rate>=50?'var(--orange)':'var(--red)';
-      h+=`<div class="stats-row">`
-        +`<span class="stats-rank">${i+1}</span>`
-        +`<span class="stats-name">${esc(r.name)}</span>`
-        +`<span class="stats-bar-wrap"><span class="stats-bar" style="width:${r.rate}%;background:${col}"></span></span>`
-        +`<span class="stats-rate">${r.rate}%</span>`
-        +`<span class="stats-miss">未記入 <b>${r.miss}</b>日</span>`
-      +`</div>`; });
-    h+='</div>';
-    el.innerHTML=h;
-  }
-
   // ===== 自分で書く =====
   function renderWrite(){
     const d=writeDate;
@@ -9370,13 +9270,6 @@ const Qual = (function(){
 
 const App = {
   current:null,
-  /* 人事考課（独立GASアプリ・給与データは持たない）を開く。経営キーは公開リポに置かず初回入力→端末保存 */
-  HR_URL:'https://script.google.com/macros/s/AKfycbxEehTaaBIJrUp5i-15-_frsMcDVSlR5uAba1JRHnjk1w-j5osgS5RWjrmImbXsZZfX/exec',
-  openHr(){
-    let k=''; try{k=localStorage.getItem('hr_master_key')||''}catch(e){}
-    if(!k){ k=(prompt('人事考課の経営キーを入力（初回のみ・この端末に保存）')||'').trim(); if(!k)return; try{localStorage.setItem('hr_master_key',k)}catch(e){} }
-    window.open(App.HR_URL+'?m='+encodeURIComponent(k),'_blank');
-  },
   // アプリ登録：ここに {key, ns(IIFE), sectionId, navId, zone, kiosk} を足すだけで全機構が回る（単一情報源）
   // zone=アクセス判定＋表示。dispZone=表示だけ別ゾーンにしたい時（例:カードはfloorで遷移可・ナビ非表示）。kiosk:true=点検モードに出す
   REG:[
@@ -9510,10 +9403,8 @@ window.addEventListener('load', async ()=>{
   await woffBoot();   // LINE WORKS内なら本人特定（WOFF_ID未設定なら即戻る）
   App.REG.forEach(r=>{ const ns=r.ns(); if(ns && ns.init) ns.init(); });
   initMobileFilters();
-  // 経営者モード（?boss=）＝本当のフルモード：全ゾーン表示に強制（localStorageには保存しない＝URLでだけ有効）
   // LINE WORKS（WOFF）内＝スマホ個人利用なので端末モードは常にフル（ポータルのモード切替も出さない）
   if(document.documentElement.classList.contains('in-woff')) App.mode='full';
-  if(bossOn()){ App.mode='full'; document.body.classList.add('boss'); const bb=$('bossBadge'); if(bb) bb.classList.remove('hidden'); const hn=$('navHrLink'); if(hn) hn.classList.remove('hidden'); }
   App.injectZones();
   App.applyMode();
   App.current=null;
