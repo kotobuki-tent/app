@@ -728,8 +728,6 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .st-予約{background:#ede9fe;color:#7c3aed}
 .st-貸出中{background:#dbeafe;color:#2563eb}
 .st-返却済{background:#d1fae5;color:#059669}
-.st-検品中{background:#fef9c3;color:#a16207}
-.st-メンテ待ち{background:#ffedd5;color:#c2410c}
 .st-メンテ中{background:#fee2e2;color:#dc2626}
 .st-廃棄予定{background:#e5e7eb;color:#374151}
 /* ===== 在庫ガント（試作 lab/gantt.html を移植。帯＝予定、品名の下＝未返却、数字＝残） ===== */
@@ -1993,7 +1991,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="mo-row full"><div class="mo-field"><label>金額（円）</label><input type="number" id="pf_amount" min="0" step="1" placeholder="空欄可"></div></div>
     <div class="mo-row">
       <div class="mo-field"><label>作業場所</label><select id="pf_section"><option>未定</option><option>2F工場</option><option>1F工場</option><option>出力関係</option><option>外注</option><option>その他</option></select></div>
-      <div class="mo-field"><label>ステータス</label><select id="pf_status"><option>見積中</option><option>受注</option><option>製作中</option><option>完成</option><option>出荷済</option><option>見送り</option></select></div>
+      <div class="mo-field"><label>ステータス</label><select id="pf_status"><option>受注</option><option>製作中</option><option>完成</option><option>出荷済</option></select></div>
     </div>
     <div class="mo-row full"><div class="mo-field"><label>外注先</label><input id="pf_subcontractor" placeholder="例: 丸正帆布工業"></div></div>
     <div class="mo-row"><div class="mo-field"><label>作業開始予定日</label><input type="date" id="pf_start_date"></div><div class="mo-field"><label>納期</label><input type="date" id="pf_deadline"></div></div>
@@ -2077,7 +2075,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="xf_our_person" placeholder="自社の担当者"></div></div>
     <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="xf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="xf_order_no"></div></div>
     <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="xf_client" placeholder="例: 鳥取県観光局"></div><div class="mo-field f3"><label>窓口</label><input id="xf_person" placeholder="例: 纐纈"></div></div>
-    <div class="mo-row"><div class="mo-field not-make"><label>会場名</label><input id="xf_venue" placeholder="例: 鳥取砂丘特設会場"></div><div class="mo-field"><label>ステータス</label><select id="xf_status"><option>見積中</option><option>受注</option><option>準備中</option><option>現場中</option><option>レンタル中</option><option>メンテ中</option><option>終了</option><option>見送り</option></select></div></div>
+    <div class="mo-row"><div class="mo-field not-make"><label>会場名</label><input id="xf_venue" placeholder="例: 鳥取砂丘特設会場"></div><div class="mo-field"><label>ステータス</label><select id="xf_status"><option>受注</option><option>進行中</option><option>終了</option></select></div></div>
     <div class="mo-row full"><div class="mo-field"><label>金額（円）</label><input type="number" id="xf_amount" min="0" step="1" placeholder="空欄可"></div></div>
     <div class="mo-row full not-make"><div class="mo-field"><label>住所</label><input id="xf_address" placeholder="例: 鳥取県鳥取市福部町"></div></div>
     <div class="phase-hd">日程</div>
@@ -2192,7 +2190,7 @@ table.jobs tr:last-child td{border-bottom:none}
     </div>
     <!-- 廃棄リスト -->
     <div id="v_discard" class="hidden">
-      <div class="cases-hint">廃棄予定に入れた品のリスト。「廃棄を確定」で台帳から消えて保有数が減る（不可逆）。それまでは「戻す」でメンテ待ちに復帰できる。</div>
+      <div class="cases-hint">廃棄予定に入れた品のリスト。「廃棄を確定」で台帳から消えて保有数が減る（不可逆）。それまでは「戻す」でメンテ中に復帰できる。</div>
       <div class="tbl-wrap">
         <table>
           <thead><tr><th class="rs-th" data-col="status" onclick="Inv.sortRentals('status')">ステータス <span class="arrow rs-arrow" data-col="status"></span></th><th class="rs-th" data-col="category" onclick="Inv.sortRentals('category')">カテゴリ <span class="arrow rs-arrow" data-col="category"></span></th><th class="rs-th" data-col="item_name" onclick="Inv.sortRentals('item_name')">商品名 <span class="arrow rs-arrow" data-col="item_name"></span></th><th class="rs-th" data-col="qty" onclick="Inv.sortRentals('qty')">数量 <span class="arrow rs-arrow" data-col="qty"></span></th><th class="rs-th" data-col="date_start" onclick="Inv.sortRentals('date_start')">開始日 <span class="arrow rs-arrow" data-col="date_start"></span></th><th class="rs-th" data-col="date_end" onclick="Inv.sortRentals('date_end')">終了日 <span class="arrow rs-arrow" data-col="date_end"></span></th><th class="rs-th" data-col="client_name" onclick="Inv.sortRentals('client_name')">案件/顧客 <span class="arrow rs-arrow" data-col="client_name"></span></th><th>備考</th><th>操作</th></tr></thead>
@@ -2243,7 +2241,7 @@ table.jobs tr:last-child td{border-bottom:none}
       </div>
       <div class="mo-row">
         <div class="mo-field"><label>数量 *</label><input id="xf_r_qty" type="number" min="1" value="1"></div>
-        <div class="mo-field"><label>ステータス</label><select id="xf_r_status"><option>予約</option><option>貸出中</option><option>返却済</option><option>検品中</option><option>メンテ待ち</option><option>メンテ中</option><option>廃棄予定</option></select></div>
+        <div class="mo-field"><label>ステータス</label><select id="xf_r_status"><option>予約</option><option>貸出中</option><option>返却済</option><option>メンテ中</option><option>廃棄予定</option></select></div>
       </div>
       <div class="mo-row">
         <div class="mo-field"><label>開始日 *</label><input id="xf_r_start" type="date"></div>
@@ -2272,7 +2270,7 @@ table.jobs tr:last-child td{border-bottom:none}
       <div id="xf_sp_info" style="font-size:13px;color:var(--text-dim);margin-bottom:12px;line-height:1.6"></div>
       <div class="mo-row">
         <div class="mo-field"><label>うち何個</label><input id="xf_sp_qty" type="number" min="1" value="1"></div>
-        <div class="mo-field"><label>どうする</label><select id="xf_sp_status"><option>メンテ中</option><option>返却済</option><option>メンテ待ち</option><option>廃棄予定</option><option>検品中</option><option>貸出中</option><option>予約</option></select></div>
+        <div class="mo-field"><label>どうする</label><select id="xf_sp_status"><option>メンテ中</option><option>返却済</option><option>廃棄予定</option><option>貸出中</option><option>予約</option></select></div>
       </div>
       <div style="font-size:12px;color:var(--text-faint);margin-top:-4px">残りは今の状態のまま。全部なら数量そのままで「どうする」だけ選べば行ごと変わります。</div>
       <div class="mo-foot">
@@ -2439,10 +2437,9 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-row full">
         <div class="mo-field"><label>ステータス</label>
           <select id="f_status">
-            <option value="見積中">見積中</option><option value="受注">受注</option>
+            <option value="受注">受注</option>
             <option value="発注済">発注済</option><option value="入荷済">入荷済</option>
             <option value="納品済">納品済</option>
-            <option value="見送り">見送り</option>
           </select>
         </div>
       </div>
@@ -3329,7 +3326,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-18 12:44';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-18 18:09';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -3447,6 +3444,23 @@ function mergeWithTmp(serverData, currentLocal, keyFn){
    サーバーに反映済み→控えを消す／15秒経っても未反映→1回だけ再送／60秒で諦めて「保存が確認できません」。
    kind＝action の '_' より後ろ（save_rental→'rental'、delete_holding→'holding'、save/delete/status/archive→''）。
    直近10秒以内に何か送っていれば App.softRefresh も見送る（Pending.sinceWrite）。 */
+// ===== 言葉の統一（2026-09-18 iller）=====
+// 企画制作の状態＝受注→進行中→終了（見積中・見送りは案件の言葉。子は案件から降りてきたものを表示するだけで、自分では選ばない）。
+// 企画制作の種別＝現場・レンタル・製作（施工→現場、納品→レンタル）。在庫のレンタル品＝予約→貸出中→返却済→メンテ中／廃棄予定。
+// シートに古い言葉のまま残る行と、古い版の端末が書いてくる行は、読み込み時にここで新しい言葉へ読み替える。
+const Norm={
+  PST:{'準備中':'進行中','現場中':'進行中','レンタル中':'進行中','メンテ中':'進行中'},
+  PTY:{'施工':'現場','納品':'レンタル'},
+  RST:{'メンテ待ち':'メンテ中','検品中':'メンテ中'},
+  proj(rows){(rows||[]).forEach(d=>{if(!d)return;if(this.PST[d.status])d.status=this.PST[d.status];
+    if(d.type==='納品'&&!d.date_rental_out&&d.date_delivery)d.date_rental_out=d.date_delivery;
+    if(this.PTY[d.type])d.type=this.PTY[d.type]});return rows},
+  rent(rows){(rows||[]).forEach(r=>{if(r&&this.RST[r.status])r.status=this.RST[r.status]});return rows},
+  // 状態の<select>に値を入れる。選択肢に無い値（案件から降りてきた見積中・見送り）はその場で1つ足して、保存で勝手に書き換わらないようにする
+  setSel(el,v){if(!el)return;[...el.querySelectorAll('option[data-inherited]')].forEach(o=>o.remove());
+    if(v&&![...el.options].some(o=>o.value===v)){const o=document.createElement('option');o.value=v;o.textContent=v+'（案件の状態）';o.dataset.inherited='1';el.insertBefore(o,el.firstChild)}
+    el.value=v||el.options[0].value}
+};
 const Pending=(function(){
   const store={}; let lastWrite=0;
   const kindOf=a=>{a=String(a||'');const i=a.indexOf('_');return i<0?'':a.slice(i+1)};
@@ -4076,7 +4090,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
   }
 
   // ===== モーダル操作 =====
-  function openProdMo(d){$('prodMoTitleText').textContent=d?'案件編集':'案件登録';$('pf_id').value=d?d.id:'';$('pf_project').value=d?d.project:'';$('pf_our_person').value=d?d.our_person||'':'';$('pf_estimate_no').value=d?d.estimate_no||'':'';$('pf_order_no').value=d?d.order_no||'':'';$('pf_client').value=d?d.client||'':'';$('pf_person').value=d?d.person||'':'';$('pf_amount').value=d?(d.amount===''||d.amount==null?'':d.amount):'';$('pf_section').value=d?d.section||'未定':'未定';$('pf_status').value=d?d.status||'受注':'受注';$('pf_subcontractor').value=d?d.subcontractor||'':'';$('pf_start_date').value=d?d.start_date||'':'';$('pf_deadline').value=d?d.deadline||'':'';$('pf_notes').value=d?d.notes||'':'';
+  function openProdMo(d){$('prodMoTitleText').textContent=d?'案件編集':'案件登録';$('pf_id').value=d?d.id:'';$('pf_project').value=d?d.project:'';$('pf_our_person').value=d?d.our_person||'':'';$('pf_estimate_no').value=d?d.estimate_no||'':'';$('pf_order_no').value=d?d.order_no||'':'';$('pf_client').value=d?d.client||'':'';$('pf_person').value=d?d.person||'':'';$('pf_amount').value=d?(d.amount===''||d.amount==null?'':d.amount):'';$('pf_section').value=d?d.section||'未定':'未定';Norm.setSel($('pf_status'),d?d.status||'受注':'受注');$('pf_subcontractor').value=d?d.subcontractor||'':'';$('pf_start_date').value=d?d.start_date||'':'';$('pf_deadline').value=d?d.deadline||'':'';$('pf_notes').value=d?d.notes||'':'';
     const isEdit=!!d, isArch=isEdit&&String(d.archived||'').toUpperCase()==='TRUE';
     $('pfDel').classList.toggle('hidden',!isEdit);
     $('pfArch').classList.toggle('hidden',!isEdit||isArch);
@@ -4088,7 +4102,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
   function editProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(d)openProdMo(d)}
   // 既存案件に生産を後付け：case_idと案件ヘッダを引き継いだ新規入力で開く
   let _addCaseId='';
-  function addToCase(c){openProdMo(null);$('pf_project').value=c.name||'';$('pf_our_person').value=c.our_person||'';$('pf_estimate_no').value=c.estimate_no||'';$('pf_order_no').value=c.order_no||'';$('pf_client').value=c.client||'';$('pf_person').value=c.contact||'';$('pf_amount').value=(c.amount===''||c.amount==null)?'':c.amount;$('pf_status').value='受注';_addCaseId=String(c.id||'');$('prodMoTitleText').textContent='生産を追加：'+(c.name||'');}
+  function addToCase(c){openProdMo(null);$('pf_project').value=c.name||'';$('pf_our_person').value=c.our_person||'';$('pf_estimate_no').value=c.estimate_no||'';$('pf_order_no').value=c.order_no||'';$('pf_client').value=c.client||'';$('pf_person').value=c.contact||'';$('pf_amount').value=(c.amount===''||c.amount==null)?'':c.amount;Norm.setSel($('pf_status'),'受注');_addCaseId=String(c.id||'');$('prodMoTitleText').textContent='生産を追加：'+(c.name||'');}
 
   // ===== 保存（楽観的更新） =====
   let _savingProd=false;
@@ -4167,7 +4181,7 @@ const Proj = (function(){
   function moneySum(){moneySummary()}
   const SLOG_LIST_KEY='proj_status_log';
   const SLOG_UNREAD_KEY='proj_status_unread';
-  const ACTIVE_PROJ_ST=['見積中','受注','準備中','現場中','レンタル中','メンテ中'];
+  const ACTIVE_PROJ_ST=['見積中','受注','進行中'];   // 見積中は案件から降りてくる分の表示用（自分では選べない）
   const VEHICLES=['3.5tトラック','2tトラック','1.5tトラック','軽トラック','ハイエース','エブリイ','トール','レンタカー'];
   const VH_PHASES=['load_in','setup','event','teardown','rental_out','rental_return'];
   const HOLIDAYS={
@@ -4180,7 +4194,7 @@ const Proj = (function(){
     '2027-07-19':'海の日','2027-08-11':'山の日','2027-09-20':'敬老の日','2027-09-23':'秋分の日','2027-10-11':'スポーツの日','2027-11-03':'文化の日','2027-11-23':'勤労感謝の日'
   };
   function stColorVar(s){
-    return{'見積中':'--text-faint','受注':'--purple','準備中':'--orange','現場中':'--green','レンタル中':'--accent','メンテ中':'--red','終了':'--text-dim','完了':'--text-dim','見送り':'--red'}[s]||'--text';
+    return{'見積中':'--text-faint','受注':'--purple','進行中':'--green','準備中':'--orange','現場中':'--green','レンタル中':'--accent','メンテ中':'--red','終了':'--text-dim','完了':'--text-dim','見送り':'--red'}[s]||'--text';
   }
 
   // ===== 企画固有ユーティリティ（today/dateStr/dateJP/dow/pad/parseD/esc/vr等は共通土台を使用） =====
@@ -4193,14 +4207,14 @@ const Proj = (function(){
   function ganttDateHeaders(dates){let h='';dates.forEach(d=>{const ds=dateStr(d);const isT=ds===dateStr(today);const dn=d.getDay();const hol=HOLIDAYS[ds];let cls='gantt-date-cell';if(isT)cls+=' today';if(dn===0||hol)cls+=' holiday';else if(dn===6)cls+=' sat';h+=`<div class="${cls}"><span class="dow">${hol||dow[dn]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`});return h}
 
   // ===== データ読み込み（loadAll本物化：project+rentals+inventoryの3本。rentals/inventoryはviewProj/ganttで即使うため起動時取得） =====
-  async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success){const arr=Array.isArray(j.data)?j.data.slice().reverse():[];projData=Pending.apply('project','',mergeWithTmp(arr,projData,r=>String(r.project||'')+'|'+String(r.estimate_no||'')));detectStatusChanges()}}catch(e){toast('企画制作データ取得エラー',true)}}
-  async function loadRentals(){try{const r=await fetch(API+'?dept=inventory&action=rentals');const j=await r.json();rentalsData=j||[]}catch(e){rentalsData=[]}}
+  async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success){const arr=Norm.proj(Array.isArray(j.data)?j.data.slice().reverse():[]);projData=Pending.apply('project','',mergeWithTmp(arr,projData,r=>String(r.project||'')+'|'+String(r.estimate_no||'')));detectStatusChanges()}}catch(e){toast('企画制作データ取得エラー',true)}}
+  async function loadRentals(){try{const r=await fetch(API+'?dept=inventory&action=rentals');const j=await r.json();rentalsData=Norm.rent(j||[])}catch(e){rentalsData=[]}}
   async function loadInventoryItems(){try{const r=await fetch(API+'?dept=inventory&action=list');const j=await r.json();inventoryItems=j||[]}catch(e){inventoryItems=[]}}
   async function loadAll(){
     const cached=_getCache('project');
     if(cached){
-      if(cached.proj)projData=cached.proj;
-      if(cached.rent)rentalsData=cached.rent;
+      if(cached.proj)projData=Norm.proj(cached.proj);
+      if(cached.rent)rentalsData=Norm.rent(cached.rent);
       if(cached.inv)inventoryItems=cached.inv;
       render();
     }
@@ -4313,7 +4327,7 @@ const Proj = (function(){
   // ===== ボード（案件カード一覧・生産の工場ボードと同作法） =====
   function renderBoard(){
     const el=$('projBoard'); if(!el)return;
-    const STC={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],'レンタル中':['var(--cyan)','var(--cyan-dim)'],'メンテ中':['var(--red)','var(--red-dim)']};
+    const STC={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],進行中:['var(--green)','var(--green-dim)']};
     const FIELDS=[['date_load_in','搬入'],['date_setup','設営'],['date_event','現場'],['date_teardown','撤去'],['date_rental_out','貸出'],['date_delivery','発送'],['date_rental_return','返却'],['date_make_start','作業開始'],['date_make_end','完成']];
     const day0=new Date(today.getFullYear(),today.getMonth(),today.getDate());
     const dd=dt=>Math.round((new Date(dt.getFullYear(),dt.getMonth(),dt.getDate())-day0)/86400000);
@@ -4340,7 +4354,7 @@ const Proj = (function(){
     h+=si('all',items.length,'すべて','');
     h+=si('today',items.filter(d=>d._urgN===0).length,'今日','var(--red)');
     h+=si('soon',items.filter(d=>d._urgN===1).length,'3日以内','var(--orange)');
-    ['見積中','受注','準備中','現場中','レンタル中','メンテ中'].forEach(st=>{h+=si(st,items.filter(d=>d.status===st).length,st,'')});
+    ACTIVE_PROJ_ST.forEach(st=>{h+=si(st,items.filter(d=>d.status===st).length,st,'')});
     const pastN=items.filter(d=>d._urgN===888).length;
     if(pastN)h+=si('past',pastN,'日程超過','var(--red)');
     h+='</div>';
@@ -4456,7 +4470,7 @@ const Proj = (function(){
     if(!items.length){h+=`<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px">${emptyMsg}</div>`;h+='</div></div>';}
     else{
     items.forEach(d=>{
-      const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],'レンタル中':['var(--cyan)','var(--cyan-dim)'],'メンテ中':['var(--red)','var(--red-dim)'],終了:['var(--text-dim)','var(--surface3)'],完了:['var(--text-dim)','var(--surface3)']};
+      const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],進行中:['var(--green)','var(--green-dim)'],終了:['var(--text-dim)','var(--surface3)'],完了:['var(--text-dim)','var(--surface3)']};
       const sc=stColors[d.status]||['var(--text-faint)','var(--surface3)'];
       const allDates=[].concat(parseDates(d.date_load_in),parseDates(d.date_setup),parseDates(d.date_event),parseDates(d.date_teardown),parseDates(d.date_rental_out),parseDates(d.date_rental_return),parseDates(d.date_delivery),parseDates(d.date_make_start),parseDates(d.date_make_end)).filter(Boolean).sort((a,b)=>a-b);
       const dateRange=allDates.length?`${allDates[0].getMonth()+1}/${allDates[0].getDate()}〜${allDates[allDates.length-1].getMonth()+1}/${allDates[allDates.length-1].getDate()}`:'日程未定';
@@ -4483,7 +4497,7 @@ const Proj = (function(){
     if(!items.length){h+=`<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:13px">${emptyMsg}</div>`;}
     else{
       items.forEach(d=>{
-        const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],準備中:['var(--orange)','var(--orange-dim)'],現場中:['var(--green)','var(--green-dim)'],'レンタル中':['var(--cyan)','var(--cyan-dim)'],'メンテ中':['var(--red)','var(--red-dim)'],終了:['var(--text-dim)','var(--surface3)'],完了:['var(--text-dim)','var(--surface3)']};
+        const stColors={見積中:['var(--text-faint)','var(--surface3)'],受注:['var(--purple)','var(--purple-dim)'],進行中:['var(--green)','var(--green-dim)'],終了:['var(--text-dim)','var(--surface3)'],完了:['var(--text-dim)','var(--surface3)']};
         const sc=stColors[d.status]||['var(--text-faint)','var(--surface3)'];
         const allDates=[].concat(parseDates(d.date_load_in),parseDates(d.date_setup),parseDates(d.date_event),parseDates(d.date_teardown),parseDates(d.date_rental_out),parseDates(d.date_rental_return),parseDates(d.date_delivery),parseDates(d.date_make_start),parseDates(d.date_make_end)).filter(Boolean).sort((a,b)=>a-b);
         const dateRange=allDates.length?`${allDates[0].getMonth()+1}/${allDates[0].getDate()}〜${allDates[allDates.length-1].getMonth()+1}/${allDates[allDates.length-1].getDate()}`:'日程未定';
@@ -4659,16 +4673,17 @@ const Proj = (function(){
     h+='</div>'}if(d.material)h+='<div class="view-section"><h3>材料・仕入</h3><div class="view-row"><div class="view-val">'+esc(d.material)+'</div></div></div>';
     if(d.type!=='製作')h+='<div class="rental-add-section"><h3>レンタル品</h3><div id="pvBlockHost"></div></div>';   // 製作（鉄工所）はレンタル品なし
     if(d.notes)h+='<div class="view-section"><h3>備考</h3><div class="view-row"><div class="view-val">'+esc(d.notes)+'</div></div></div>';
+    {const mt=maintTargets(d);if(mt.length)h+='<div class="st-change"><div class="st-change-label">返ってきた品</div><button type="button" class="st-toggle" onclick="Proj.sendMaint(\''+esc(String(id))+'\')">メンテ送り（'+mt.length+'件を在庫のメンテ中へ）</button></div>'}
     h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
     h+=`<button class="st-toggle" id="projStToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
     h+='<div class="st-opts" id="projStOpts">';
-    ['見積中','受注','準備中','現場中','レンタル中','メンテ中','終了'].forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${s}">${s}</button>`});
+    ['受注','進行中','終了'].forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${s}">${s}</button>`});
     h+='</div></div>';
     $('projViewContent').innerHTML=h;
     if($('pvBlockHost'))renderBlock('pvBlockHost',d,'_pv');
     const ptgl=$('projStToggle'),popts=$('projStOpts');
     if(ptgl&&popts)ptgl.onclick=()=>{ptgl.classList.toggle('open');popts.classList.toggle('open')};
-    $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}if(newSt==='終了'&&String(d.invoiced||'').toUpperCase()!=='TRUE'&&!confirm('伝票が済んでいませんが終了にしますか？'))return;if((newSt==='レンタル中'||newSt==='現場中')&&d.status==='メンテ中'){const mw=rentalsData.filter(r=>r.client_name===d.project&&r.status==='メンテ待ち');if(mw.length){restoreChoice(d,id,newSt,mw);return}}if(newSt==='メンテ中'){const mt=rentalsData.filter(r=>r.client_name===d.project&&(r.status==='貸出中'||r.status==='予約'));if(mt.length){maintChoice(d,id,mt);return}}applyProjStatus(d,id,newSt,false)}});
+    $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}if(newSt==='終了'&&String(d.invoiced||'').toUpperCase()!=='TRUE'&&!confirm('伝票が済んでいませんが終了にしますか？'))return;applyProjStatus(d,id,newSt)}});
     $('projViewBg').classList.add('show');
 
     requestAnimationFrame(()=>{$('projViewBg').scrollTop=0;const _mo=$('projViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
@@ -4684,7 +4699,7 @@ const Proj = (function(){
     $('xf_person').value=d?d.person||'':'';
     $('xf_venue').value=d?d.venue||'':'';
     $('xf_address').value=d?d.address||'':'';
-    $('xf_status').value=d?d.status||'受注':'受注';
+    Norm.setSel($('xf_status'),d?d.status||'受注':'受注');
     ['load_in','setup','event','teardown','rental_out','rental_return','make_start','make_end'].forEach(phase=>{const key='date_'+phase;
     const el=$('xf_dates_'+phase);
     el.innerHTML='';
@@ -4740,7 +4755,7 @@ const Proj = (function(){
   function editProj(id){const d=projData.find(x=>x.id===id);if(d)openProjMo(d)}
   // 既存案件に企画を後付け：case_idと案件ヘッダを引き継いだ新規入力で開く
   let _addCaseId='', _xfType='現場';
-  function addToCase(c){openProjMo(null);$('xf_project').value=c.name||'';$('xf_our_person').value=c.our_person||'';$('xf_estimate_no').value=c.estimate_no||'';$('xf_order_no').value=c.order_no||'';$('xf_client').value=c.client||'';$('xf_person').value=c.contact||'';$('xf_amount').value=(c.amount===''||c.amount==null)?'':c.amount;$('xf_status').value='受注';_addCaseId=String(c.id||'');$('projMoTitleText').textContent='企画を追加：'+(c.name||'');}
+  function addToCase(c){openProjMo(null);$('xf_project').value=c.name||'';$('xf_our_person').value=c.our_person||'';$('xf_estimate_no').value=c.estimate_no||'';$('xf_order_no').value=c.order_no||'';$('xf_client').value=c.client||'';$('xf_person').value=c.contact||'';$('xf_amount').value=(c.amount===''||c.amount==null)?'':c.amount;Norm.setSel($('xf_status'),'受注');_addCaseId=String(c.id||'');$('projMoTitleText').textContent='企画を追加：'+(c.name||'');}
 
   // ===== 保存（楽観的更新） =====
   let _savingProj=false;
@@ -4809,7 +4824,6 @@ const Proj = (function(){
     fireAndForget(body);
     syncRentalDates(name,body);   // 現場の日程を変えたら、その現場のレンタル品の日付も揃える（日付は現場に1つ）。ステータス連動より先に
     cascadeRentalStatus(name,body.status);
-    cascadeMaint(name,prevSt,body.status);   // 編集フォームからの変更でも在庫のメンテ連動を必ず走らせる（詳細画面のボタンと同じ結果）
     if(_rRows.length)saveProjectRentals(name,_rPfx,true);   // 足したまま「まとめて登録」を押していない行も保存で一緒に登録
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('保存しました');
@@ -4863,9 +4877,9 @@ const Proj = (function(){
     const rows=$('rentalAddRows'+pfx).querySelectorAll('.rental-add-row');
     if(!rows.length){toast('追加する行がありません',true);return}
     const items=[];
-    // 案件が既にメンテ中なら後入れの品は最初からメンテ待ち、レンタル中なら貸出中（後入れでも連動が抜けないように）
+    // 現場が既に進行中なら後入れの品は最初から貸出中（後入れでも連動が抜けないように）
     const pj=projData.find(x=>x.project===projectName);
-    const initSt=pj&&pj.status==='メンテ中'?'メンテ待ち':(pj&&pj.status==='レンタル中'?'貸出中':'予約');
+    const initSt=pj&&pj.status==='進行中'?'貸出中':'予約';
     for(const row of rows){
       const cat=row.querySelector('.ra-cat').value;
       const item=row.querySelector('.ra-item').value;
@@ -5087,81 +5101,50 @@ const Proj = (function(){
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('レンタル品'+t.length+'件の日付を現場の日程に揃えました');
   }
-  // 現場ステータス→レンタル品ステータス連動：レンタル中になったら「予約」を「貸出中」へ
+  // 現場ステータス→レンタル品ステータス連動：進行中になったら「予約」を「貸出中」へ
   function cascadeRentalStatus(projectName,newSt){
-    if(newSt!=='レンタル中')return;
+    if(newSt!=='進行中')return;
     const targets=rentalsData.filter(r=>r.client_name===projectName&&r.status==='予約');
     if(!targets.length)return;
     targets.forEach(r=>{r.status='貸出中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
     toast('レンタル品'+targets.length+'件を貸出中にしました');
   }
-  // 編集フォーム経由の連動：メンテ中にしたら 予約/貸出中 のレンタル品をメンテ待ちへ、メンテ中から現場中/レンタル中へ戻したらメンテ待ちを貸出中へ
-  function cascadeMaint(projectName,prevSt,newSt){
-    if(prevSt===newSt)return;
-    if(newSt==='メンテ中'){
-      const t=rentalsData.filter(r=>r.client_name===projectName&&(r.status==='貸出中'||r.status==='予約'));
-      if(!t.length)return;
-      t.forEach(r=>{r.status='メンテ待ち';fireAndForget({dept:'inventory',action:'save_rental',...r})});
-      toast('レンタル品'+t.length+'件をメンテ待ちへ');
-    }else if(prevSt==='メンテ中'&&(newSt==='現場中'||newSt==='レンタル中')){
-      const t=rentalsData.filter(r=>r.client_name===projectName&&r.status==='メンテ待ち');
-      if(!t.length)return;
-      t.forEach(r=>{r.status='貸出中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
-      toast('メンテ待ちの品'+t.length+'件を貸出中に戻しました');
-    }
-  }
-  // ステータス変更の実行部。sendMaint=trueならレンタル品をメンテ待ちへ送る
-  function applyProjStatus(d,id,newSt,sendMaint,restoreMaint){
+  // ステータス変更の実行部
+  function applyProjStatus(d,id,newSt){
     _changingStatus=true;
     d.status=newSt;
     fireAndForget({dept:'project',action:'save',id:d.id,status:newSt});
     setTimeout(moneyFetch,8000);
     cascadeRentalStatus(d.project,newSt);
-    if(sendMaint){
-      const targets=rentalsData.filter(r=>r.client_name===d.project&&(r.status==='貸出中'||r.status==='予約'));
-      targets.forEach(r=>{r.status='メンテ待ち';fireAndForget({dept:'inventory',action:'save_rental',...r})});
-      _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
-    }
-    if(restoreMaint){
-      const targets=rentalsData.filter(r=>r.client_name===d.project&&r.status==='メンテ待ち');
-      targets.forEach(r=>{r.status='貸出中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
-      _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
-    }
-    toast(newSt+'に変更しました'+(sendMaint?'（レンタル品をメンテ待ちへ）':(restoreMaint?'（メンテ待ちの品を貸出中に戻しました）':'')));
+    toast(newSt+'に変更しました');
     setTimeout(()=>{_changingStatus=false},1500);
     viewProj(id);render();
   }
-  // メンテ中への変更時の3択（送る/送らない/やめる）。「やめる」は何も変えない
-  function maintChoice(d,id,targets){
+  // メンテ送り：状態ではなくボタン（2026-09-18 iller）。この現場の 予約/貸出中 の品を在庫の「メンテ中」へ送る。現場の状態は変えない
+  function maintTargets(d){return rentalsData.filter(r=>r.client_name===d.project&&(r.status==='貸出中'||r.status==='予約'))}
+  let _busyMaint=false;
+  function sendMaint(id){
+    const d=projData.find(x=>x.id===id);if(!d||_busyMaint)return;
+    const targets=maintTargets(d);if(!targets.length){toast('メンテに送る品がありません',true);return}
     const list=targets.map(r=>esc(r.item_name)+'×'+r.qty).join('、');
     const bg=document.createElement('div');
     bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
     bg.innerHTML='<div style="background:var(--surface);border-radius:14px;max-width:480px;width:100%;padding:22px 24px;font-size:14px;line-height:1.7;box-shadow:0 12px 40px rgba(0,0,0,.25)">'
-      +'<div style="font-weight:700;font-size:16px;margin-bottom:8px;color:var(--text)">メンテ中に変更</div>'
+      +'<div style="font-weight:700;font-size:16px;margin-bottom:8px;color:var(--text)">メンテ送り</div>'
       +'<div style="color:var(--text-dim);font-size:12.5px;margin-bottom:4px">レンタル品：'+list+'</div>'
-      +'<div style="color:var(--text-dim);font-size:12.5px;margin-bottom:14px">→ 在庫のメンテ待ちに移動します</div>'
-      +'<button id="mcSend" style="display:block;width:100%;margin-bottom:8px;padding:12px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">メンテ中にする</button>'
+      +'<div style="color:var(--text-dim);font-size:12.5px;margin-bottom:14px">→ 在庫の「メンテ中」に移動します（現場の状態は変わりません）</div>'
+      +'<button id="mcSend" style="display:block;width:100%;margin-bottom:8px;padding:12px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">メンテに送る</button>'
       +'<button id="mcNo" style="display:block;width:100%;padding:11px;border:none;border-radius:9px;background:transparent;color:var(--text-faint);font-size:13px;cursor:pointer">やめる</button></div>';
     document.body.appendChild(bg);
-    bg.querySelector('#mcSend').onclick=()=>{bg.remove();applyProjStatus(d,id,'メンテ中',true)};
+    bg.querySelector('#mcSend').onclick=()=>{bg.remove();_busyMaint=true;
+      targets.forEach(r=>{r.status='メンテ中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
+      _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
+      App._loaded['inv']=false;
+      toast('レンタル品'+targets.length+'件をメンテへ送りました');
+      setTimeout(()=>{_busyMaint=false},1500);
+      viewProj(id);render()};
     bg.querySelector('#mcNo').onclick=()=>bg.remove();
-    bg.onclick=e=>{if(e.target===bg)bg.remove()};
-  }
-  // メンテ中から現場中/レンタル中へ戻す時：メンテ待ちに送った品を貸出中へ戻す（誤操作の戻り道）
-  function restoreChoice(d,id,newSt,targets){
-    const list=targets.map(r=>esc(r.item_name)+'×'+r.qty).join('、');
-    const bg=document.createElement('div');
-    bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
-    bg.innerHTML='<div style="background:var(--surface);border-radius:14px;max-width:480px;width:100%;padding:22px 24px;font-size:14px;line-height:1.7;box-shadow:0 12px 40px rgba(0,0,0,.25)">'
-      +'<div style="font-weight:700;font-size:16px;margin-bottom:8px;color:var(--text)">'+esc(newSt)+'に変更</div>'
-      +'<div style="color:var(--text-dim);font-size:12.5px;margin-bottom:4px">メンテ待ちのレンタル品：'+list+'</div>'
-      +'<div style="color:var(--text-dim);font-size:12.5px;margin-bottom:14px">→ 貸出中に戻します</div>'
-      +'<button id="rcOk" style="display:block;width:100%;margin-bottom:8px;padding:12px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">'+esc(newSt)+'にする</button>'
-      +'<button id="rcNo" style="display:block;width:100%;padding:11px;border:none;border-radius:9px;background:transparent;color:var(--text-faint);font-size:13px;cursor:pointer">やめる</button></div>';
-    document.body.appendChild(bg);
-    bg.querySelector('#rcOk').onclick=()=>{bg.remove();applyProjStatus(d,id,newSt,false,true)};
-    bg.querySelector('#rcNo').onclick=()=>bg.remove();
     bg.onclick=e=>{if(e.target===bg)bg.remove()};
   }
   function deleteProjectRental(id,pfx){
@@ -5190,7 +5173,7 @@ const Proj = (function(){
     loadAll, render, init,
     openSlog, closeSlog, clearSlog,
     openProjMo, closeProjMo, editProj, saveProj, delProj, toggleProjType, addToCase,
-    changeProjStatus, toggleProjInvoiced,
+    changeProjStatus, toggleProjInvoiced, sendMaint,
     archiveProj, unarchiveProj,
     viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput, moneySum,
     ensureRentalData, hasRentalData, rentalPanelHtml, addExtraRow, composeExtras, splitExtras, fillExtras, projRentalsText, setProjRentalsText, printLedgerCandidates,
@@ -5203,8 +5186,8 @@ const Proj = (function(){
 const Inv = (function(){
   // ===== 状態（旧グローバル変数→IIFE内に隔離） =====
   const DEFAULT_CATS=['テント','横幕','テーブル','イス','備品'];
-  const ACTIVE_STATUSES=['予約','貸出中','メンテ待ち','メンテ中','廃棄予定'];   // 廃棄予定＝まだ物はある（貸せないだけ）ので在庫計算では引く
-  const RENTAL_ST=['予約','貸出中','返却済','検品中','メンテ待ち','メンテ中','廃棄予定'];
+  const ACTIVE_STATUSES=['予約','貸出中','メンテ中','廃棄予定'];   // 廃棄予定＝まだ物はある（貸せないだけ）ので在庫計算では引く
+  const RENTAL_ST=['予約','貸出中','返却済','メンテ中','廃棄予定'];
   let items=[], rentals=[], projects=[];
   let itemSort={col:'category',asc:true};
   let itemCatFilter='';
@@ -5294,7 +5277,7 @@ const Inv = (function(){
   async function loadAll(){
     const cached=_getCache('inventory');
     if(cached){
-      items=cached.items||[];rentals=cached.rentals||[];projects=cached.projects||[];projStatus=cached.projStatus||{};
+      items=cached.items||[];rentals=Norm.rent(cached.rentals||[]);projects=cached.projects||[];projStatus=cached.projStatus||{};
       populateCategoryFilters();
       populateProjectSelect();
       renderItems();renderRentals();renderMaint();renderGantt();
@@ -5308,7 +5291,7 @@ const Inv = (function(){
         fetch(API+'?dept=project&action=read').then(r=>r.json()).catch(()=>null)   // 現場のステータス（ガントの仮押さえ判定用）
       ]);
       items=Pending.apply('inventory','item',mergeWithTmp(inv||[],items,r=>String(r.category||'')+'|'+String(r.item_name||'')));
-      rentals=Pending.apply('inventory','rental',mergeWithTmp(rnt||[],rentals,r=>String(r.item_name||'')+'|'+String(r.date_start||'')+'|'+String(r.client_name||'')));
+      rentals=Pending.apply('inventory','rental',mergeWithTmp(Norm.rent(rnt||[]),rentals,r=>String(r.item_name||'')+'|'+String(r.date_start||'')+'|'+String(r.client_name||'')));
       projects=prj||[];
       if(pst&&Array.isArray(pst.data)){projStatus={};pst.data.forEach(p=>{if(p.project)projStatus[p.project]=p.status})}
       populateCategoryFilters();
@@ -5455,7 +5438,7 @@ const Inv = (function(){
   function sortRentals(col){if(rentalSort.col===col)rentalSort.asc=!rentalSort.asc;else{rentalSort.col=col;rentalSort.asc=true}renderRentals();renderMaint();renderDiscard()}
   function applyRentalSort(arr){
     const c=rentalSort.col;if(!c)return arr;
-    const ST_ORDER={'予約':0,'貸出中':1,'返却済':2,'検品中':3,'メンテ待ち':4,'メンテ中':5,'廃棄予定':6};
+    const ST_ORDER={'予約':0,'貸出中':1,'返却済':2,'メンテ中':3,'廃棄予定':4};
     return arr.slice().sort((a,b)=>{
       let va=a[c],vb=b[c],r;
       if(c==='qty')r=(Number(va)||0)-(Number(vb)||0);
@@ -5469,7 +5452,7 @@ const Inv = (function(){
   // ===== メンテ =====
   function setMaintFilter(v){maintStatusFilter=v;renderMaint()}
   function renderMaint(){
-    const MAINT_ST=['メンテ待ち','メンテ中'];
+    const MAINT_ST=['メンテ中'];
     let f=rentals.filter(r=>MAINT_ST.includes(r.status));
     const chipEl=$('maintChips');
     if(chipEl){
@@ -5484,7 +5467,7 @@ const Inv = (function(){
     if(maintStatusFilter)f=f.filter(r=>r.status===maintStatusFilter);
     f=applyRentalSort(f);updateRentalSortArrows();
     const tb=$('maint_tbody');
-    if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">メンテ待ち・メンテ中の商品はありません</td></tr>';return}
+    if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">メンテ中の商品はありません</td></tr>';return}
     tb.innerHTML=f.map(r=>`<tr>
       <td><span class="st st-${r.status}">${r.status}</span></td>
       <td><span class="cat-tag">${esc(r.category)}</span></td>
@@ -5632,7 +5615,7 @@ const Inv = (function(){
     $('xf_sp_id').value=id;
     $('xf_sp_info').innerHTML=`<b>${esc(r.item_name)}</b> × ${r.qty}　<span class="st st-${esc(r.status)}">${esc(r.status)}</span><br>${esc(r.client_name||'')}　${dateJP(r.date_start)}〜${dateJP(r.date_end)}`;
     $('xf_sp_qty').value=1;$('xf_sp_qty').max=Number(r.qty)||1;
-    $('xf_sp_status').value=r.status==='メンテ待ち'?'メンテ中':(r.status==='メンテ中'||r.status==='貸出中'||r.status==='検品中')?'返却済':'メンテ中';
+    $('xf_sp_status').value=(r.status==='メンテ中'||r.status==='貸出中')?'返却済':'メンテ中';
     $('splitMoBg').classList.add('show');
     setTimeout(()=>{$('xf_sp_qty').focus();$('xf_sp_qty').select()},50);
   }
@@ -5688,9 +5671,9 @@ const Inv = (function(){
     if(_busyToDiscard)return;
     const r=rentals.find(x=>x.id===id);if(!r)return;
     _busyToDiscard=true;
-    r.status='メンテ待ち';
+    r.status='メンテ中';
     fireAndForget({action:'save_rental',...r});
-    toast('メンテ待ちに戻しました');
+    toast('メンテ中に戻しました');
     renderRentals();renderMaint();renderGantt();renderDiscard();
     setTimeout(()=>{_busyToDiscard=false},1500);
   }
@@ -5722,15 +5705,15 @@ const Inv = (function(){
 
   // ===== 在庫確認 =====
   // ===== ガント（試作 lab/gantt.html を移植） =====
-  // 帯＝予定どおりの期間。返却日を過ぎてステータスが「貸出中/メンテ待ち/メンテ中/廃棄予定」のままの分は
+  // 帯＝予定どおりの期間。返却日を過ぎてステータスが「貸出中/メンテ中/廃棄予定」のままの分は
   // 「未返却」として品名の下に出し、残からは引き続ける（予約は予定なので日付どおり）。帯クリック＝その行の編集。
-  const GT_OUT=['貸出中','メンテ待ち','メンテ中','廃棄予定'];
+  const GT_OUT=['貸出中','メンテ中','廃棄予定'];
   const GT_HOL={'2025-01-01':'元日','2025-01-13':'成人の日','2025-02-11':'建国記念の日','2025-02-23':'天皇誕生日','2025-02-24':'振替休日','2025-03-20':'春分の日','2025-04-29':'昭和の日','2025-05-03':'憲法記念日','2025-05-04':'みどりの日','2025-05-05':'こどもの日','2025-05-06':'振替休日','2025-07-21':'海の日','2025-08-11':'山の日','2025-09-15':'敬老の日','2025-09-23':'秋分の日','2025-10-13':'スポーツの日','2025-11-03':'文化の日','2025-11-23':'勤労感謝の日','2025-11-24':'振替休日','2026-01-01':'元日','2026-01-12':'成人の日','2026-02-11':'建国記念の日','2026-02-23':'天皇誕生日','2026-03-20':'春分の日','2026-04-29':'昭和の日','2026-05-03':'憲法記念日','2026-05-04':'みどりの日','2026-05-05':'こどもの日','2026-05-06':'振替休日','2026-07-20':'海の日','2026-08-11':'山の日','2026-09-21':'敬老の日','2026-09-22':'国民の休日','2026-09-23':'秋分の日','2026-10-12':'スポーツの日','2026-11-03':'文化の日','2026-11-23':'勤労感謝の日','2027-01-01':'元日','2027-01-11':'成人の日','2027-02-11':'建国記念の日','2027-02-23':'天皇誕生日','2027-03-21':'春分の日','2027-03-22':'振替休日','2027-04-29':'昭和の日','2027-05-03':'憲法記念日','2027-05-04':'みどりの日','2027-05-05':'こどもの日','2027-07-19':'海の日','2027-08-11':'山の日','2027-09-20':'敬老の日','2027-09-23':'秋分の日','2027-10-11':'スポーツの日','2027-11-03':'文化の日','2027-11-23':'勤労感謝の日'};
   function gtYmd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
   function gtCls(d,t){const s=gtYmd(d),w=d.getDay();return (s===t?'today':GT_HOL[s]?'hol':w===6?'sat':w===0?'sun':'')+(s===ganttSel?' sel':'')}
   function ganttPick(ds){ganttSel=(ganttSel===ds?'':ds);renderGantt()}
   function gtOverdue(r){return GT_OUT.indexOf(r.status)>=0&&String(r.date_end||'').slice(0,10)<todayStr()}
-  function gtBarCls(r){const st=r.status||'';if(st==='貸出中')return'out';if(st==='メンテ待ち'||st==='メンテ中')return'mnt';if(st==='廃棄予定')return'dsp';if(st==='予約')return projStatus[r.client_name]==='見積中'?'est':'res';return'oth'}
+  function gtBarCls(r){const st=r.status||'';if(st==='貸出中')return'out';if(st==='メンテ中')return'mnt';if(st==='廃棄予定')return'dsp';if(st==='予約')return projStatus[r.client_name]==='見積中'?'est':'res';return'oth'}
   function gtRowsOf(it,dstr,N){return rentals.filter(r=>{if(r.category!==it.category||r.item_name!==it.item_name||ACTIVE_STATUSES.indexOf(r.status)<0)return false;if(gtOverdue(r))return true;const e=String(r.date_end||'').slice(0,10),st=String(r.date_start||'').slice(0,10);return (e<st?st:e)>=dstr[0]&&st<=dstr[N-1]})}
   function ganttToday(){const d=new Date();d.setDate(d.getDate()-3);$('gt_d0').value=gtYmd(d);renderGantt()}
   function ganttMove(n){const d=new Date(($('gt_d0').value||todayStr())+'T00:00:00');d.setDate(d.getDate()+n);$('gt_d0').value=gtYmd(d);renderGantt()}
@@ -6329,6 +6312,7 @@ const Sales = (function(){
   const ACTIVE_ST=['見積中','受注','発注済','入荷済'];
   const ARCHIVE_ST=['納品済','見送り'];
   const ALL_ST=[...ACTIVE_ST,...ARCHIVE_ST];
+  const SEL_ST=['受注','発注済','入荷済','納品済'];   // 自分で選べる状態（2026-09-18 iller。見積中・見送りは案件の言葉）
 
   // ===== 販売方言ユーティリティ =====
   async function apiGet(params){try{const u=API+'?dept='+DEPT+'&'+new URLSearchParams(params);const r=await fetch(u);return r.json()}catch(e){console.error('apiGet失敗(sales):',e);return null}}
@@ -6527,7 +6511,7 @@ const Sales = (function(){
       h+=`<tr onclick="Sales.openMo('${esc(d.id)}')" style="cursor:pointer">`;
       cols.forEach(c=>{
         let v=d[c.key]||'';
-        if(c.key==='status'){h+=`<td onclick="event.stopPropagation()"><select class="st-mini" onchange="Sales.changeStatus('${esc(d.id)}',this.value)">`;ALL_ST.forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});h+='</select></td>';}
+        if(c.key==='status'){h+=`<td onclick="event.stopPropagation()"><select class="st-mini" onchange="Sales.changeStatus('${esc(d.id)}',this.value)">`;(SEL_ST.includes(v)?SEL_ST:[v,...SEL_ST]).forEach(o=>{h+=`<option${v===o?' selected':''}>${o}</option>`});h+='</select></td>';}
         else if(c.key==='deadline'){h+=`<td>${fmtDateJP(v)}</td>`;}
         else if(c.key==='amount'){h+=`<td style="text-align:right;font-variant-numeric:tabular-nums">${fmtAmount(v)}</td>`;}
         else{h+=`<td>${esc(v)}</td>`;}
@@ -6667,7 +6651,7 @@ const Sales = (function(){
     h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
     h+=`<button class="st-toggle" id="salesStToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
     h+='<div class="st-opts" id="salesStOpts">';
-    ALL_ST.forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${esc(s)}">${esc(s)}</button>`});
+    SEL_ST.forEach(s=>{const on=d.status===s?' on':'';h+=`<button class="st-opt${on}" data-st="${esc(s)}">${esc(s)}</button>`});
     h+='</div></div>';
     $('viewContent').innerHTML=h;
     const stgl=$('salesStToggle'),sopts=$('salesStOpts');
@@ -6697,7 +6681,7 @@ const Sales = (function(){
     $('f_amount').value=isEdit?(e.amount===''||e.amount==null?'':e.amount):'';
     $('f_created_at').value=isEdit?fmtDate(e.created_at):fmtDate(new Date());
     $('f_deadline').value=isEdit?fmtDate(e.deadline):'';
-    $('f_status').value=isEdit?(e.status||'見積中'):'見積中';
+    Norm.setSel($('f_status'),isEdit?(e.status||'受注'):'受注');
     $('f_notes').value=isEdit?(e.notes||''):'';
     refreshDatalists();
     const isArchS=isEdit&&String(e.archived||'').toUpperCase()==='TRUE';
@@ -6711,7 +6695,7 @@ const Sales = (function(){
   function closeMo(){$('moBg').classList.remove('show');_addCaseId=''}
   // 既存案件に販売を後付け：case_idと案件ヘッダを引き継いだ新規入力で開く
   let _addCaseId='';
-  function addToCase(c){openMo('');$('f_project').value=c.name||'';$('f_our_person').value=c.our_person||'';$('f_estimate_no').value=c.estimate_no||'';$('f_order_no').value=c.order_no||'';$('f_client').value=c.client||'';$('f_person').value=c.contact||'';$('f_amount').value=(c.amount===''||c.amount==null)?'':c.amount;$('f_status').value='受注';_addCaseId=String(c.id||'');$('moTitleText').textContent='販売を追加：'+(c.name||'');}
+  function addToCase(c){openMo('');$('f_project').value=c.name||'';$('f_our_person').value=c.our_person||'';$('f_estimate_no').value=c.estimate_no||'';$('f_order_no').value=c.order_no||'';$('f_client').value=c.client||'';$('f_person').value=c.contact||'';$('f_amount').value=(c.amount===''||c.amount==null)?'':c.amount;Norm.setSel($('f_status'),'受注');_addCaseId=String(c.id||'');$('moTitleText').textContent='販売を追加：'+(c.name||'');}
   let _savingEntry=false;
   function saveEntry(){
     if(_savingEntry) return;
@@ -7058,7 +7042,7 @@ const Daily = (function(){
     let h='<option value="">-- 案件を選ぶ --</option><option value="other">その他(自由記述)</option>';
     const w=getWho();const me=staffList.find(s=>String(s.employee_no)===String(w));const myDept=me?me.dept:'';
     const PROD_ST_ORDER={'製作中':0,'完成':1,'受注':2,'見積中':3};
-    const PROJ_ST_ORDER={'現場中':0,'レンタル中':1,'メンテ中':1.5,'準備中':2,'受注':3,'見積中':4};
+    const PROJ_ST_ORDER={'進行中':0,'現場中':0,'レンタル中':1,'メンテ中':1.5,'準備中':2,'受注':3,'見積中':4};   // 古い言葉は日報の案件一覧（GAS が返す生の値）用に残す
     // 企画は複数の日付候補から「今日以降で最も近い日付」を取得（無ければ最も古いもの）
     const getProjNearestDate=(p)=>{
       const keys=['date_load_in','date_setup','date_event','date_teardown','date_rental_out','date_rental_return','date_delivery','date_make_start','date_make_end'];
@@ -8012,7 +7996,7 @@ const Cases = (function(){
       return `<div class="fv-si cl-tgl${on?' on':' off'}" data-f="cl:${k}" onclick="Cases.toggleCl('${k}')" title="${on?'クリックで非表示':'クリックで表示'}"><div class="n">${n}</div><div class="l">${l}</div></div>`; }).join('');
   }
   function toggleCl(k){ if(_hideCl.has(k))_hideCl.delete(k); else _hideCl.add(k); try{localStorage.setItem('cases_hideCl',JSON.stringify([..._hideCl]));}catch(e){} render(); }
-  const C_RANK={production:{'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4},project:{'見積中':0,'受注':1,'準備中':2,'現場中':3,'レンタル中':3,'メンテ中':3,'終了':4},sales:{'見積中':0,'受注':1,'発注済':2,'入荷済':3,'納品済':4}};
+  const C_RANK={production:{'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4},project:{'見積中':0,'受注':1,'進行中':3,'準備中':2,'現場中':3,'レンタル中':3,'メンテ中':3,'終了':4},sales:{'見積中':0,'受注':1,'発注済':2,'入荷済':3,'納品済':4}};
   function cRank(k){ return (C_RANK[k.dept]&&C_RANK[k.dept][k.status])!=null?C_RANK[k.dept][k.status]:0; }
   // 案件の進捗＝見送り以外の子のうち一番遅れてる子のランク（全子終端なら4、見積中の子が居れば0）。子なしは-1で末尾へ。
   function caseProgress(id){ const ks=(_children[String(id)]||[]).filter(k=>k.status!=='見送り'); if(!ks.length)return -1; return Math.min.apply(null, ks.map(cRank)); }
@@ -8151,8 +8135,8 @@ const Cases = (function(){
       _staff=(st&&st.data)||[];
       const dl=$('caseStaffList'); if(dl) dl.innerHTML=_staff.map(s=>`<option value="${esc(s.name)}">`).join('');
       _children={};
-      const add=(dept,rows)=>{(rows||[]).forEach(r=>{const cid=String(r.case_id||'').trim(); if(!cid)return; (_children[cid]=_children[cid]||[]).push({dept,id:r.id,project:r.project,status:r.status,invoiced:r.invoiced,deadline:r.deadline,start_date:r.start_date,type:r.type,date_load_in:r.date_load_in,date_setup:r.date_setup,date_event:r.date_event,date_teardown:r.date_teardown,date_rental_out:r.date_rental_out,date_rental_return:r.date_rental_return,date_delivery:r.date_delivery});});};
-      add('production',Pending.apply('production','',(od&&od.data)||[])); add('project',Pending.apply('project','',(pj&&pj.data)||[])); add('sales',Pending.apply('sales','',(sl&&sl.data)||[]));
+      const add=(dept,rows)=>{(rows||[]).forEach(r=>{const cid=String(r.case_id||'').trim(); if(!cid)return; (_children[cid]=_children[cid]||[]).push({dept,id:r.id,project:r.project,status:r.status,invoiced:r.invoiced,deadline:r.deadline,start_date:r.start_date,type:r.type,date_load_in:r.date_load_in,date_setup:r.date_setup,date_event:r.date_event,date_teardown:r.date_teardown,date_rental_out:r.date_rental_out,date_rental_return:r.date_rental_return,date_delivery:r.date_delivery,date_make_start:r.date_make_start,date_make_end:r.date_make_end});});};
+      add('production',Pending.apply('production','',(od&&od.data)||[])); add('project',Pending.apply('project','',Norm.proj((pj&&pj.data)||[]))); add('sales',Pending.apply('sales','',(sl&&sl.data)||[]));
     }catch(e){}
     // 検索ボックスに入力中なら描き直さない（フォーカスと入力が飛ぶため。データは更新済みで次の操作から反映）
     const typing=document.activeElement&&document.activeElement.id==='casesSearch';
@@ -8393,19 +8377,19 @@ const Cases = (function(){
         <div id="cf_prodWrap" class="cf-hide">
           <div class="mo-row pair"><div class="mo-field"><label>作業場所</label><select id="cf_psection">${SECTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="mo-field"><label>外注先</label><input id="cf_psub"></div></div>
           <div class="mo-row pair"><div class="mo-field"><label>作業開始予定日</label><input type="date" id="cf_pstart"></div><div class="mo-field"><label>納期</label><input type="date" id="cf_pdeadline"></div></div>
+          <div class="mo-row pair"><div class="mo-field"><label>出荷の配送方法</label><select id="cf_pdeliv" onchange="Cases.setPdeliv()"><option value="">未定</option><option>運送便</option><option>自社配送</option><option>引き取り</option></select></div><div class="mo-field cf-hide" id="cf_pcarrier"><label>運送業者</label><input id="cf_pcarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
           <div class="mo-row full"><div class="mo-field"><label>製作物・備考</label><textarea id="cf_pnotes" placeholder="例: ・遮音カーテン膜 1464×2755 3枚 ・納入運賃 1式"></textarea></div></div>
         </div>
       </div>
 
       <div class="cases-card off" id="cf_projCard">
         <div class="cases-sec-hd">
-          <label class="cf-toggle"><input type="checkbox" id="cf_useProj" onchange="Cases.toggle('proj')"> 企画制作（施工・レンタル・納品・製作）</label>
+          <label class="cf-toggle"><input type="checkbox" id="cf_useProj" onchange="Cases.toggle('proj')"> 企画制作（現場・レンタル・製作）</label>
         </div>
         <div id="cf_projWrap" class="cf-hide">
           <div class="cf-typeseg" id="cf_typeseg">
-            <button type="button" data-t="施工" class="on" onclick="Cases.setJType('施工')">施工</button>
+            <button type="button" data-t="現場" class="on" onclick="Cases.setJType('現場')">現場</button>
             <button type="button" data-t="レンタル" onclick="Cases.setJType('レンタル')">レンタル</button>
-            <button type="button" data-t="納品" onclick="Cases.setJType('納品')">納品</button>
             <button type="button" data-t="製作" onclick="Cases.setJType('製作')">製作</button>
           </div>
           <div id="cf_jt_va"><div class="mo-row pair"><div class="mo-field f7"><label>会場名</label><input id="cf_venue"></div><div class="mo-field f3"><label>住所</label><input id="cf_address"></div></div></div>
@@ -8429,15 +8413,6 @@ const Cases = (function(){
             <select id="cf_rdeliv" class="cf-delsel" onchange="Cases.setRdeliv()"><option>引き取り</option><option>自社配送</option><option>運送便</option></select>
             <div id="cf_rcarrier" class="cf-hide" style="margin-top:10px"><div class="mo-field"><label>運送業者</label><input id="cf_rcarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
             <div id="cf_rveh" class="cf-hide hidden" style="margin-top:10px"><div class="cf-grid2">${vhBlock('lend','貸出')}${vhBlock('back','返却')}</div></div>
-          </div>
-          <div id="cf_jt_nouhin" class="cf-hide">
-            <div class="phase-hd">納品日</div>
-            <div class="cf-grid2">${dateBlock('deliv','納品日')}</div>
-            <div class="phase-hd">配送方法</div>
-            <select id="cf_ndeliv" class="cf-delsel" onchange="Cases.setNdeliv()"><option>運送便</option><option>自社配送</option><option>引き取り</option></select>
-            <div id="cf_nhint" class="cases-hint" style="margin:8px 0 0">製作品の出荷なら〈生産〉にもチェック（配送方法・材料は製作物に記録）。保管品などを送るだけなら企画制作のみでOK。</div>
-            <div id="cf_ncarrier" style="margin-top:10px"><div class="mo-field"><label>運送業者</label><input id="cf_ncarrier_in" placeholder="佐川／ヤマト／日通 など"></div></div>
-            <div id="cf_nveh" class="cf-hide hidden" style="margin-top:10px"><div class="cf-grid2">${vhBlock('deliv','納品')}</div></div>
           </div>
           <div id="cf_jt_make" class="cf-hide">
             <div class="phase-hd">製作（鉄工所で切る・溶接する・削る）</div>
@@ -8473,34 +8448,27 @@ const Cases = (function(){
     $(m[1]).classList.toggle('cf-hide',!on);
     $(m[2]).classList.toggle('off',!on);
   }
-  // 企画制作タイプ切替（施工/レンタル/納品/製作）。性質ごとに項目を出し分け。
+  // 企画制作タイプ切替（現場/レンタル/製作）。性質ごとに項目を出し分け。運ぶだけの仕事はレンタルで持つ（2026-09-18 iller）
   function setJType(t){
     [...$('cf_typeseg').children].forEach(b=>b.classList.toggle('on',b.dataset.t===t));
     $('cf_jt_va').classList.toggle('cf-hide', t==='レンタル'||t==='製作');   // 単純レンタル・製作は会場/住所不要
-    $('cf_jt_sekou').classList.toggle('cf-hide', t!=='施工');
+    $('cf_jt_sekou').classList.toggle('cf-hide', t!=='現場');
     $('cf_jt_rental').classList.toggle('cf-hide', t!=='レンタル');
-    $('cf_jt_nouhin').classList.toggle('cf-hide', t!=='納品');
     $('cf_jt_make').classList.toggle('cf-hide', t!=='製作');
     $('cf_jt_stock').classList.toggle('cf-hide', t==='製作');     // 製作はレンタル品を出さない
     $('cf_jt_rentals').classList.toggle('cf-hide', t==='製作');
     $('cf_jt_material').classList.toggle('cf-hide', t==='レンタル'); // レンタルは材料なし
-    if(t==='納品') setNdeliv();
     if(t==='レンタル') setRdeliv();
   }
-  function jType(){ const b=[...$('cf_typeseg').children].find(x=>x.classList.contains('on')); return b?b.dataset.t:'施工'; }
+  function jType(){ const b=[...$('cf_typeseg').children].find(x=>x.classList.contains('on')); return b?b.dataset.t:'現場'; }
   // レンタルの配送方法：客取り＝何も出さない／自社車両＝車両／運送便＝業者
   function setRdeliv(){
     const v=$('cf_rdeliv').value;
     $('cf_rcarrier').classList.toggle('cf-hide', v!=='運送便');
     $('cf_rveh').classList.toggle('cf-hide', v!=='自社配送');
   }
-  // 配送方法：運送便＝業者／自社配送＝車両／引き取り＝なし
-  function setNdeliv(){
-    const v=$('cf_ndeliv').value;
-    $('cf_ncarrier').classList.toggle('cf-hide', v!=='運送便');
-    $('cf_nveh').classList.toggle('cf-hide', v!=='自社配送');
-    const h=$('cf_nhint'); if(h) h.classList.toggle('cf-hide', v==='自社配送');
-  }
+  // 生産の出荷：運送便の時だけ業者名を聞く
+  function setPdeliv(){ $('cf_pcarrier').classList.toggle('cf-hide', $('cf_pdeliv').value!=='運送便'); }
 
   function addDate(containerId,val){
     const wrap=$(containerId);
@@ -8521,8 +8489,7 @@ const Cases = (function(){
     const pick=(id,last)=>{ const v=getDates(id).split(',').map(x=>x.trim()).filter(Boolean).sort(); return v.length?(last?v[v.length-1]:v[0]):''; };
     let r=['',''];
     if(t==='レンタル') r=[pick('cf_d_lend'), pick('cf_d_back',true)];
-    else if(t==='施工') r=[pick('cf_d_load_in')||pick('cf_d_setup')||pick('cf_d_event'), pick('cf_d_teardown',true)||pick('cf_d_event',true)];
-    else if(t==='納品'){ const x=pick('cf_d_deliv'); r=[x,x]; }
+    else if(t==='現場') r=[pick('cf_d_load_in')||pick('cf_d_setup')||pick('cf_d_event'), pick('cf_d_teardown',true)||pick('cf_d_event',true)];
     else if(t==='製作'){ r=[pick('cf_d_make_start'), pick('cf_d_make_end',true)||pick('cf_d_make_start',true)]; }
     const o=$('cf_date_out')?$('cf_date_out').value:'', i=$('cf_date_in')?$('cf_date_in').value:'';   // 出庫日・入庫日があれば優先
     if(o)r[0]=o; if(i)r[1]=i;
@@ -8540,29 +8507,18 @@ const Cases = (function(){
     if(!useProd && !useProj && !useSales){ toast('生産・企画制作・販売のどれかにチェックを入れてください',true); return; }
     const status=$('cf_status').value;
 
-    // 納品×運送便/引き取り：生産にもチェックがあれば「生産案件」扱い（製作品の出荷→配送方法・材料を生産へ焼く）。
-    // 生産なし＝企画制作のみ（保管品の発送など、製作しない出荷）はそのまま企画制作の納品として記録する。
-    let nouhinToProd=false, shipDelivery='', shipMaterial='', shipNotes='';
-    if(useProd && useProj && jType()==='納品' && $('cf_ndeliv').value!=='自社配送'){
-      nouhinToProd=true;
-      const m=$('cf_ndeliv').value;
-      shipDelivery=m==='運送便'?('運送便（'+$('cf_ncarrier_in').value.trim()+'）'):m;
-      shipMaterial=$('cf_material').value.trim();
-      const nd=getDates('cf_d_deliv'); shipNotes=nd?('納品日 '+nd.replace(/-/g,'/')):'';
-    }
-
     // レンタル品の行（企画制作に入る時だけ登録）。未入力の行があれば案件ごと止める
-    const rRows=(useProj && !nouhinToProd && jType()!=='製作' && $('rentalAddRows_cf'))?[...$('rentalAddRows_cf').querySelectorAll('.rental-add-row')]:[];
+    const rRows=(useProj && jType()!=='製作' && $('rentalAddRows_cf'))?[...$('rentalAddRows_cf').querySelectorAll('.rental-add-row')]:[];
     if(rRows.some(r=>!r.querySelector('.ra-cat').value||!r.querySelector('.ra-item').value)){ toast('レンタル品の行はカテゴリ・商品を選んでください',true); return; }
-    if(rRows.length){ const dd=defaultRentalDates(); if(!dd[0]||!dd[1]){ toast('レンタル品を入れるなら、先に日程（貸出日・返却日、施工なら搬入日・撤去日）を入れてください',true); return; } }
+    if(rRows.length){ const dd=defaultRentalDates(); if(!dd[0]||!dd[1]){ toast('レンタル品を入れるなら、先に日程（貸出日・返却日、現場なら搬入日・撤去日）を入れてください',true); return; } }
     // 日程の前後逆は登録させない（返却日が貸出日より前・撤去日が搬入日より前）
-    if(useProj && !nouhinToProd){ const o=$('cf_date_out').value,i=$('cf_date_in').value; if(o&&i&&i<o){ toast('入庫日が出庫日より前になっています（'+o.replace(/-/g,'/')+'〜'+i.replace(/-/g,'/')+'）',true); return; }
+    if(useProj){ const o=$('cf_date_out').value,i=$('cf_date_in').value; if(o&&i&&i<o){ toast('入庫日が出庫日より前になっています（'+o.replace(/-/g,'/')+'〜'+i.replace(/-/g,'/')+'）',true); return; }
       const dd=defaultRentalDates(); if(dd[0]&&dd[1]&&dd[1]<dd[0]){ toast((jType()==='レンタル'?'返却日が貸出日':'撤去日が搬入日')+'より前になっています（'+dd[0].replace(/-/g,'/')+'〜'+dd[1].replace(/-/g,'/')+'）',true); return; } }
 
     // 登録先の確認（チェックの付け間違いで生産と企画制作の両方に入るのを防ぐ）
     const _dests=[];
     if(useProd)_dests.push('生産');
-    if(useProj && !nouhinToProd)_dests.push('企画制作');
+    if(useProj)_dests.push('企画制作');
     if(useSales)_dests.push('販売');
     if(!confirm(`「${projectName}」を登録します。\n\n登録先：${_dests.join(' ＋ ')}${rRows.length?`\nレンタル品：${rRows.length}件`:''}\n\nこの内容でよろしいですか？`))return;
 
@@ -8575,15 +8531,15 @@ const Cases = (function(){
       const pnotes=$('cf_pnotes').value.trim();
       posts.push({dept:'production',action:'save',case_id,...hdr,project:projectName,status,amount:$('cf_case_amount').value,
         section:$('cf_psection').value, subcontractor:$('cf_psub').value.trim(), start_date:$('cf_pstart').value, deadline:$('cf_pdeadline').value,
-        delivery:nouhinToProd?shipDelivery:'', material:nouhinToProd?shipMaterial:'',
-        notes:nouhinToProd?[pnotes,shipNotes].filter(Boolean).join(' / '):pnotes});
+        delivery:(m=>m==='運送便'?('運送便（'+$('cf_pcarrier_in').value.trim()+'）'):m)($('cf_pdeliv').value), material:'',
+        notes:pnotes});
     }
-    if(useProj && !nouhinToProd){
+    if(useProj){
       const t=jType();
       const material=(t==='レンタル')?'':$('cf_material').value.trim();
       const p={dept:'project',action:'save',case_id,...hdr,project:projectName,type:t,status,amount:$('cf_case_amount').value,rentals:t==='製作'?'':Proj.blockExtrasText('_cf'),material,notes,date_out:$('cf_date_out').value,date_in:$('cf_date_in').value,
         venue:t==='レンタル'?'':$('cf_venue').value.trim(), address:t==='レンタル'?'':$('cf_address').value.trim()};
-      if(t==='施工'){
+      if(t==='現場'){
         Object.assign(p,{ delivery:'自社車両',
           date_load_in:getDates('cf_d_load_in'), date_setup:getDates('cf_d_setup'), date_event:getDates('cf_d_event'), date_teardown:getDates('cf_d_teardown'),
           people_load_in:$('cf_p_load_in').value, people_setup:$('cf_p_setup').value, people_event:$('cf_p_event').value, people_teardown:$('cf_p_teardown').value,
@@ -8593,10 +8549,6 @@ const Cases = (function(){
         const delivery=m==='運送便'?('運送便（'+$('cf_rcarrier_in').value.trim()+'）'):m;
         Object.assign(p,{ delivery, date_rental_out:getDates('cf_d_lend'), date_rental_return:getDates('cf_d_back'),
           vehicles_rental_out:m==='自社配送'?getVehicles('lend'):'', vehicles_rental_return:m==='自社配送'?getVehicles('back'):'' });
-      }else if(t==='納品'){ // 自社配送＝車両／運送便＝業者／引き取り＝なし（生産案件化された分は上で除外済み）
-        const m=$('cf_ndeliv').value;
-        const delivery=m==='運送便'?('運送便（'+$('cf_ncarrier_in').value.trim()+'）'):m;
-        Object.assign(p,{ delivery, date_delivery:getDates('cf_d_deliv'), vehicles_rental_out:m==='自社配送'?getVehicles('deliv'):'' });
       }else if(t==='製作'){ // 鉄工所の作業期間だけ。会場・車両・レンタル品なし
         Object.assign(p,{ delivery:'', venue:'', address:'', date_out:'', date_in:'', date_make_start:getDates('cf_d_make_start'), date_make_end:getDates('cf_d_make_end') });
       }
@@ -8620,7 +8572,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setNdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum };
 })();
 
 const Alc=(function(){
