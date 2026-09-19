@@ -66,7 +66,7 @@ SPA本体（`spa/spa.html`）に15画面を統合。1ファイルで全機能完
 GAS（`Code.gs`）に運用系の関数を同梱。**ソースの正本は iCloud `♿️SEQUENCE LAB/Code.gs`**（Apps Scriptへ全消し→貼るで反映）。
 
 - **週次バックアップ（Drive）**：`weeklyBackup` がスプレッドシートを丸ごと日付付きコピー → Drive `業務管理_backups` フォルダに保存、8世代保持。トリガー＝毎週月曜4時（`setupBackupTrigger`で設定）。**復元**＝該当日付のコピーを開いて本番に戻す
-- **週次バックアップ（メール）**：`emailBackupXlsx` がxlsx化して `iller.sao@gmail.com`（kototen.officeの外）へメール送付＝アカウント喪失対策。トリガー＝毎週月曜5時（`setupEmailBackupTrigger`で設定）
+- **週次バックアップ（メール）**：`emailBackupXlsx` がxlsx化して kototen.office の外の個人アドレスへメール送付＝アカウント喪失対策（宛先は `Code.gs` 側に置き、このリポジトリには書かない）。トリガー＝毎週月曜5時（`setupEmailBackupTrigger`で設定）
 - **年度アーカイブ（手動）**：`archiveDailyReports` が指定年度（4月始まり3月締め）の日報を `daily_reports_YYYY年度` シートへ退避＝本番を軽く保つ。決算後・バックアップ直後に手動実行
 - **keepAlive トリガー**：5分間隔の空処理でGASを温める。**削除厳禁**（消すと朝が激遅）
 - ⚠️ **GASを編集するときは、業務管理スプレッドシート→拡張機能→Apps Scriptから開く**。バックアップのコピーにも編集可能なGASが付いてくるので、そっちを開くと「デプロイ無し」になり別物。デプロイ管理が空なら開く先を間違えてるサイン

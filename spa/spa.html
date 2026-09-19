@@ -3323,7 +3323,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-18 18:20';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-20 08:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -3340,7 +3340,7 @@ const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO8
     const g=document.getElementById('authGate'); if(!g||!g.classList.contains('hidden'))return;
     const t=document.getElementById('authGateTitle'), m=document.getElementById('authGateMsg');
     // 未登録でも期限切れでも同じ文面（iller 09-17「登録されていません、より認証が切れました、の方が混乱がない」）
-    t.textContent='認証が切れました。'; m.textContent='スマホの方は LINE WORKS の「業務管理」から開き直してください。\nPC の方は岸田平まで連絡してください。';
+    t.textContent='認証が切れました。'; m.textContent='スマホの方は LINE WORKS の「業務管理」から開き直してください。\nPC の方は事務所までお知らせください。';
     g.classList.remove('hidden');
   }
   let _retok=null;
