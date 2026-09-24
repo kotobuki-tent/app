@@ -902,6 +902,11 @@ html.in-woff #v_gantt .gt .hd{top:0}
 .mo-field .plate-row .pl-class{flex:1}
 .mo-field .plate-row .pl-kana{flex:.8}
 .mo-field .plate-row .pl-seq{flex:1.6}
+.mo-field .vcard-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.mo-field .vcard-box{display:flex;flex-direction:column;gap:2px}
+.mo-field .vcard-box span{font-size:11px;font-weight:600;color:var(--text-faint)}
+.mo-field .vcard-box input{width:100%;min-width:0}
+@media(max-width:480px),(orientation:portrait){.mo-field .vcard-row{grid-template-columns:repeat(2,1fr)}}
 .maint-section{margin-top:20px;border-top:2px solid var(--surface3);padding-top:16px}
 .maint-section h3{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .maint-section h3 button{font-size:12px;background:var(--accent);color:#fff;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-weight:600}
@@ -2345,6 +2350,16 @@ table.jobs tr:last-child td{border-bottom:none}
       <div class="mo-field"><label></label><div></div></div>
     </div>
     <div class="mo-row full">
+      <div class="mo-field"><label>積んでいるカード（番号）</label>
+        <div class="vcard-row">
+          <div class="vcard-box"><span>ENEOS</span><input id="vf_card_eneos" placeholder="番号" autocomplete="off"></div>
+          <div class="vcard-box"><span>AMS</span><input id="vf_card_ams" placeholder="番号" autocomplete="off"></div>
+          <div class="vcard-box"><span>Nbiz</span><input id="vf_card_nbiz" placeholder="番号" autocomplete="off"></div>
+          <div class="vcard-box"><span>ETC</span><input id="vf_card_etc" placeholder="番号" autocomplete="off"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mo-row full">
       <div class="mo-field"><label>備考</label><textarea id="vf_notes" rows="2"></textarea></div>
     </div>
     <div class="mo-foot">
@@ -3328,7 +3343,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-24 11:13';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-24 17:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -5807,6 +5822,8 @@ const Veh = (function(){
   let dashFilter='';
   let currentViewId=null;
   const DEFAULTS={shaken:60,jibaiseki:60,hoken:60,oil_km:5000,oil_days:180};
+  const CARD_KEYS=['card_eneos','card_ams','card_nbiz','card_etc'];
+  const CARD_LABEL={card_eneos:'ENEOSカード',card_ams:'AMSカード',card_nbiz:'Nbizカード',card_etc:'ETCカード'};
   const VLOG_KEY='vehicle_status_snapshot';
   const VLOG_LIST_KEY='vehicle_status_log';
   const VLOG_UNREAD_KEY='vehicle_status_unread';
@@ -6104,6 +6121,7 @@ const Veh = (function(){
     h+=dateFmt('車検満了',v.shaken_date,th.shaken);
     h+=dateFmt('自賠責満了',v.jibaiseki_date,th.jibaiseki);
     h+=dateFmt('任意保険満了',v.hoken_date,th.hoken);
+    CARD_KEYS.forEach(k=>{if(v[k])h+=vr(CARD_LABEL[k],esc(String(v[k])))});
     if(v.notes)h+=vr('備考',esc(v.notes));
     $('vViewContent').innerHTML=h;
     renderMaintList(v);
@@ -6181,6 +6199,7 @@ const Veh = (function(){
     $('vf_shaken').value=d?d.shaken_date||'':'';
     $('vf_jibaiseki').value=d?d.jibaiseki_date||'':'';
     $('vf_hoken').value=d?d.hoken_date||'':'';
+    CARD_KEYS.forEach(k=>{$('vf_'+k).value=d?d[k]||'':''});
     $('vf_notes').value=d?d.notes||'':'';
     $('vMoBg').classList.add('show');
 
@@ -6205,6 +6224,7 @@ const Veh = (function(){
       hoken_date:$('vf_hoken').value,
       notes:$('vf_notes').value.trim()
     };
+    CARD_KEYS.forEach(k=>{body[k]=$('vf_'+k).value.trim()});
     if(editId){
       const idx=vehicleData.findIndex(x=>String(x.id)===String(editId));
       if(idx!==-1){
@@ -6232,6 +6252,7 @@ const Veh = (function(){
       jibaiseki_date:v.jibaiseki_date,hoken_date:v.hoken_date,
       oil_last:v.oil_last,oil_km:v.oil_km,tire_last:v.tire_last,
       notes:v.notes,maintenance_log:JSON.stringify(v._maint||[])};
+    CARD_KEYS.forEach(k=>{body[k]=v[k]||''});
     fireAndForget(body);
   }
   function delVehicle(id){

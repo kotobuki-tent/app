@@ -47,7 +47,7 @@ SPA本体（`spa/spa.html`）に15画面を統合。1ファイルで全機能完
 | `sales` | 販売案件データ（仕入先・受注番号・伝票管理・case_id・amount。amountは案件金額の写し＝参考値、一覧カードに実額表示） |
 | `inventory` | 商品マスタ（カテゴリ・商品名・保有数） |
 | `rentals` | 貸出/予約台帳（ステータス・期間・数量） |
-| `vehicles` | 車両台帳。車種(name)・名称(type)・ナンバー(plate)・寸法(length/width/height＝全長/全幅/全高 mm)・車検/自賠責/任意保険の満了日・備考。GASはヘッダー名で汎用read/write（列追加で自動対応）。旧フォームのusage/status/oil_*/tire_*/current_km列は残存するが現フォーム未使用 |
+| `vehicles` | 車両台帳。車種(name)・名称(type)・ナンバー(plate)・寸法(length/width/height＝全長/全幅/全高 mm)・車検/自賠責/任意保険の満了日・積んでいるカードの番号(card_eneos/card_ams/card_nbiz/card_etc、列は書式なしテキスト＝先頭ゼロ・16桁を保つ)・備考。GASはヘッダー名で汎用read/write（列追加で自動対応）。旧フォームのusage/status/oil_*/tire_*/current_km列は残存するが現フォーム未使用 |
 | `staff` | スタッフ名簿（employee_no・name・name_kana・active・dept・position＋各画面の表示フラグ in_overtime / in_attendance / in_daily / in_alcohol / in_forklift / in_case / in_card＋考課アプリ用 in_hr / hr_kind / hr_evaluator1 / hr_token） |
 | `overtime` | 時間外申告データ |
 | `ot_requests` | 休日出勤希望データ |
@@ -206,9 +206,9 @@ GAS（`Code.gs`）に運用系の関数を同梱。**ソースの正本は iClou
 
 - ダッシュボード：車検・自賠責・任意保険の期限アラートを要対応/注意に分類表示
 - 車両一覧：全車両をカード表示。車種を主役（見出し）に名称を併記（例「キャンター 2t」）、ナンバーを地名/分類/かな/一連番号に分けたプレート風2段表示、寸法（全長/全幅/全高 mm）をプレート右に縦並び、各期限の残日数バッジ。出張時の駐車場探し等でサイズをすぐ確認できる
-- 登録フォーム：車種*（必須）・名称・ナンバー（4枠）・全長/全幅/全高・車検/自賠責/任意保険・備考。ステータス/用途/走行距離/オイル/タイヤ交換は廃止
+- 登録フォーム：車種*（必須）・名称・ナンバー（4枠）・全長/全幅/全高・車検/自賠責/任意保険・積んでいるカード（ENEOS／AMS／Nbiz／ETC の番号、4枠。2026-09-24）・備考。ステータス/用途/走行距離/オイル/タイヤ交換は廃止
 - 管理タブ：新規登録・編集・削除・検索・ソート
-- 車両詳細モーダル：全情報＋メンテナンス履歴の閲覧・追加・削除
+- 車両詳細モーダル：全情報（カード番号は入っているものだけ）＋メンテナンス履歴の閲覧・追加・削除
 - アラート設定：閾値（何日前から表示するか）をカスタマイズ
 - ※ `vehicles` シートへ寸法を保存するには `length`/`width`/`height` 列が必要（`setupVehicleSize` を一度実行して追加）
 
