@@ -887,6 +887,9 @@ html.in-woff #v_gantt .gt .hd{top:0}
 .v-card .v-type{font-size:12px;color:var(--text-faint);margin-bottom:8px}
 .v-card .v-dates{display:flex;flex-wrap:wrap;gap:6px}
 .v-card .v-date{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:500}
+.v-card .v-cards{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.v-card .v-cardno{font-size:11px;padding:3px 8px;border-radius:5px;background:var(--bg);border:1px solid var(--border);color:var(--text-dim);font-variant-numeric:tabular-nums}
+.v-card .v-cardno b{font-weight:700;color:var(--text);margin-right:5px}
 .v-card .v-date.ok{color:var(--green);background:var(--green-dim)}
 .v-card .v-date.warn{color:var(--orange);background:var(--orange-dim)}
 .v-card .v-date.danger{color:var(--red);background:var(--red-dim)}
@@ -3343,7 +3346,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-24 17:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-24 17:48';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -6042,7 +6045,10 @@ const Veh = (function(){
         if(v.shaken_date){const l=dateLevel(shakenDiff,th.shaken);h+=`<span class="v-date ${l}">車検 ${dateJP(v.shaken_date)}${shakenDiff!==null?' ('+shakenDiff+'日)':''}</span>`}
         if(v.jibaiseki_date){const l=dateLevel(jiDiff,th.jibaiseki);h+=`<span class="v-date ${l}">自賠責 ${dateJP(v.jibaiseki_date)}</span>`}
         if(v.hoken_date){const l=dateLevel(hokenDiff,th.hoken);h+=`<span class="v-date ${l}">保険 ${dateJP(v.hoken_date)}</span>`}
-        h+=`</div></div>`;
+        h+=`</div>`;
+        const cards=CARD_KEYS.filter(k=>v[k]).map(k=>`<span class="v-cardno"><b>${CARD_LABEL[k].replace('カード','')}</b>${esc(String(v[k]))}</span>`).join('');
+        if(cards)h+=`<div class="v-cards">${cards}</div>`;
+        h+=`</div>`;
       });
       h+=`</div></div>`;
     }
