@@ -3346,7 +3346,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-24 17:48';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-24 17:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -6033,6 +6033,7 @@ const Veh = (function(){
       let vlist=vehicleData;
       if(dashFilter==='danger')vlist=vehicleData.filter(v=>dangerIds.has(String(v.id)));
       else if(dashFilter==='warn')vlist=vehicleData.filter(v=>warnIds.has(String(v.id)));
+      vlist=[...vlist].sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ja')||String(a.type||'').localeCompare(String(b.type||''),'ja'));
       h+=`<div class="alert-section"><div class="alert-section-hd">車両一覧　${vlist.length}件</div><div class="vlist-grid">`;
       vlist.forEach(v=>{
         const shakenDiff=diffDays(v.shaken_date);
