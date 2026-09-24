@@ -170,6 +170,11 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .fv-flt-mb{display:none}
 .tmp-badge{display:inline-block;font-size:10px;font-weight:600;color:#fff;background:#94a3b8;padding:2px 8px;border-radius:10px;margin-left:6px;letter-spacing:.02em;vertical-align:middle}
 .stale-badge{display:inline-block;font-size:11px;font-weight:700;color:#c0392b;background:#fdeaea;border:1px solid #f1b9b3;padding:2px 8px;border-radius:6px;margin-left:6px;white-space:nowrap;vertical-align:middle;cursor:help}
+/* 見積の経過（2026-09-24 iller）：見積書の有効期限は最長1ヶ月。見積中のまま 2週=黄・3週=橙・31日〜=赤。状態が動いた時にだけ消える */
+.qa-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:6px;white-space:nowrap;vertical-align:middle;cursor:help}
+.qa-badge.qa-2w{color:#8a6d00;background:#fff8d6;border:1px solid #f0dc8a}
+.qa-badge.qa-3w{color:#9a5a00;background:#ffedd5;border:1px solid #f5c58a}
+.qa-badge.qa-exp{color:#c0392b;background:#fdeaea;border:1px solid #f1b9b3}
 @media(max-width:480px),(orientation:portrait){.fv-sum .av-add{display:none !important}}
 .fv-si{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 12px;min-width:0;text-align:left;cursor:pointer;transition:.15s;box-shadow:none;white-space:nowrap}
 .fv-si:hover{border-color:var(--accent)}
@@ -1940,7 +1945,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <div class="mo" style="max-width:560px">
       <h2>案件を編集</h2>
       <div class="mo-row full"><div class="mo-field"><label>案件名（物件名）</label><input id="ce_name"></div></div>
-      <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="ce_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>状態</label><select id="ce_status"><option>見積中</option><option>受注</option><option>完了</option><option>見送り</option></select></div></div>
+      <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="ce_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>状態</label><select id="ce_status"><option>見積中</option><option>受注</option><option>完了</option><option>見送り</option></select><span id="ce_qa"></span></div></div>
       <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="ce_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="ce_order_no"></div></div>
       <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="ce_client"></div><div class="mo-field f3"><label>窓口</label><input id="ce_contact"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>社内納期（目標・仮）<span class="ce-target-note">客の納期ではない／カレンダーに点線で表示</span></label><input type="date" id="ce_target_date"></div></div>
@@ -3323,7 +3328,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-20 08:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-24 11:13';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -3407,6 +3412,19 @@ function rowStale(d, dept){
   return f.length ? f : null;
 }
 function staleBadge(d, dept){ const f=rowStale(d,dept); return f?`<span class="stale-badge" title="${esc(f.join(' / '))}">⚠ 要更新</span>`:''; }
+// 見積の経過バッジ（2026-09-24 iller）。うちの見積書の有効期限は最長1ヶ月。見積中のまま受付（案件の created_at）から
+// 14日で「見積2週」・21日で「見積3週」・31日で「見積期限切れ」。受注か見送りにした時にだけ消える（自動では消さない・自動で見送りにもしない）。
+// 企画制作の行には受付日が無いので、案件の受付日を case_id で引く（Cases が読めていなければ一度だけ cases を読む）。
+const QuoteAge={
+  _c:{}, _p:null,
+  set(rows){ (rows||[]).forEach(c=>{ if(c&&c.id) QuoteAge._c[String(c.id)]=String(c.created_at||'').slice(0,10); }); },
+  ensure(){ if(Object.keys(QuoteAge._c).length) return Promise.resolve(); if(!QuoteAge._p) QuoteAge._p=fetch(API+'?dept=cases&action=read').then(r=>r.json()).then(j=>QuoteAge.set((j&&j.data)||[])).catch(()=>{}).then(()=>{QuoteAge._p=null;}); return QuoteAge._p; },
+  days(created){ const s=String(created||'').slice(0,10); if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const d=new Date(s+'T00:00:00'); if(isNaN(d)) return null; const t=new Date(); t.setHours(0,0,0,0); return Math.floor((t-d)/86400000); },
+  tier(days){ if(days==null) return ''; return days>=31?'exp':days>=21?'3w':days>=14?'2w':''; },
+  badge(status, created){ if(status!=='見積中') return ''; const d=QuoteAge.days(created), t=QuoteAge.tier(d); if(!t) return ''; const L={'2w':'見積2週','3w':'見積3週','exp':'見積期限切れ'}; return `<span class="qa-badge qa-${t}" title="受付から${d}日">${L[t]}</span>`; },
+  forCase(c){ return c?QuoteAge.badge(c.status, c.created_at):''; },
+  forChild(k){ return k?QuoteAge.badge(k.status, k.created_at||QuoteAge._c[String(k.case_id||'')]):''; }
+};
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const vr=(label,val)=>`<div class="view-row"><div class="view-label">${label}</div><div class="view-val">${esc(val||'')}</div></div>`;
 const $=id=>document.getElementById(id);
@@ -4215,7 +4233,7 @@ const Proj = (function(){
       if(cached.inv)inventoryItems=cached.inv;
       render();
     }
-    await Promise.all([loadProj(),loadRentals(),loadInventoryItems()]);
+    await Promise.all([loadProj(),loadRentals(),loadInventoryItems(),QuoteAge.ensure()]);
     _rentalFreshAt=Date.now();
     alignRentalDates();
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
@@ -4373,7 +4391,7 @@ const Proj = (function(){
         else if(d._urgN===1)badge=`<span class="badge thisweek">あと${d._nd}日</span>`;
         const tmpBadge=String(d.id||'').startsWith('tmp_')?'<span class="tmp-badge">保存中…</span>':'';
         const sc=STC[d.status]||['var(--text-faint)','var(--surface3)'];
-        h+=`<div class="fv-card ${cls}" data-id="${d.id}"><div class="top"><span class="pname">${esc(d.project)}${tmpBadge}</span>${badge}${staleBadge(d,'project')}</div>`;
+        h+=`<div class="fv-card ${cls}" data-id="${d.id}"><div class="top"><span class="pname">${esc(d.project)}${tmpBadge}</span>${badge}${staleBadge(d,'project')}${QuoteAge.forChild(d)}</div>`;
         if(d.our_person)h+=`<div class="assignee">担当: <span class="tag person">${esc(d.our_person)}</span></div>`;
         h+=`<div class="meta">${esc(d.client||'')}`;
         if(d.order_no)h+=` <span class="tag eno">${esc(d.order_no)}</span>`;
@@ -4473,7 +4491,7 @@ const Proj = (function(){
       const dateRange=allDates.length?`${allDates[0].getMonth()+1}/${allDates[0].getDate()}〜${allDates[allDates.length-1].getMonth()+1}/${allDates[allDates.length-1].getDate()}`:'日程未定';
       h+=`<div class="gantt-row" data-id="${d.id}"><div class="gantt-row-label"><span class="prj-name">${esc(d.project)}</span>`;
       if(d.our_person)h+=`<span class="prj-assignee">担当: <span style="color:var(--green);background:rgba(42,157,90,.1);font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px">${esc(d.our_person)}</span></span>`;
-      h+=`<span class="prj-meta">${esc(d.client||'')}${d.order_no?' <span style="color:var(--accent);font-weight:600">'+esc(d.order_no)+'</span>':''}</span><span style="font-size:10px;color:var(--text-dim);margin-top:1px">${dateRange}</span><span class="prj-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span>${staleBadge(d,'project')}</div><div class="gantt-bars">`;
+      h+=`<span class="prj-meta">${esc(d.client||'')}${d.order_no?' <span style="color:var(--accent);font-weight:600">'+esc(d.order_no)+'</span>':''}</span><span style="font-size:10px;color:var(--text-dim);margin-top:1px">${dateRange}</span><span class="prj-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span>${staleBadge(d,'project')}${QuoteAge.forChild(d)}</div><div class="gantt-bars">`;
       dates.forEach((dt,i)=>{
         const ds=dateStr(dt);const isT=ds===dateStr(today);const hits=[];
         [{key:'load_in',f:'date_load_in'},{key:'setup',f:'date_setup'},{key:'event',f:'date_event'},{key:'teardown',f:'date_teardown'},{key:'rental_out',f:'date_rental_out'},{key:'rental_out',f:'date_delivery'},{key:'rental_return',f:'date_rental_return'},{key:'make',f:'date_make_start'},{key:'make',f:'date_make_end'}].forEach(p=>{const dates_p=parseDates(d[p.f]);if(dates_p.some(pd=>dateStr(pd)===ds)&&!hits.includes(p.key))hits.push(p.key)});
@@ -4501,7 +4519,7 @@ const Proj = (function(){
         h+=`<div class="prj-card" data-id="${d.id}" style="border-left-color:${sc[0]}">
           <div class="pc-top">
             <div class="pc-name">${esc(d.project||'(現場名なし)')}</div>
-            <span class="pc-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span>
+            <span class="pc-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span>${QuoteAge.forChild(d)}
           </div>
           <div class="pc-meta">
             ${d.our_person?`<span class="pc-person">${esc(d.our_person)}</span>`:''}
@@ -5073,7 +5091,7 @@ const Proj = (function(){
   }
   async function ensureRentalData(){
     if(Date.now()-_rentalFreshAt<60000&&projData.length&&inventoryItems.length)return;
-    await Promise.all([loadProj(),loadRentals(),loadInventoryItems()]);
+    await Promise.all([loadProj(),loadRentals(),loadInventoryItems(),QuoteAge.ensure()]);
     _rentalFreshAt=Date.now();
     alignRentalDates();
     _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
@@ -6449,6 +6467,7 @@ const Sales = (function(){
     h+=`<div class="pname">${esc(d.project||'―')}</div>`;
     h+=`<span class="badge s-${esc(st)}">${esc(st)}</span>`;
     h+=staleBadge(d,'sales');
+    h+=QuoteAge.forChild(d);
     h+='</div>';
     if(d.client)h+=`<div class="assignee">得意先: <span style="font-size:13px;font-weight:600;color:var(--text)">${esc(d.client)}</span></div>`;
     if(d.our_person)h+=`<div class="assignee">担当: <span class="tag person">${esc(d.our_person)}</span></div>`;
@@ -7982,7 +8001,7 @@ const Cases = (function(){
     {k:'sales',      s:'販', n:'販売', c:'#c763b0'}
   ];
   const DEPT=Object.fromEntries(DEPTS.map((d,i)=>[d.k,{s:d.s,n:d.n,c:d.c,o:i}]));
-  let _cases=[], _tab='list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='';
+  let _cases=[], _tab='list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='', _qexp=false;   // _qexp＝「期限切れ」チップで絞り込み中
   // 完了タブの得意先トグル（大口客を隠して残りを見やすく）。非表示中のキーをlocalStorageに保持
   // 'tsp'＝TSP太陽㈱のみ（TSP東日本・西日本・東北・プラスは含めない）。TSP太陽の商品センターは対象外＝トグルで消さない（illerの指示 09-08）
   const CL_GROUPS=[['tsp','TSP太陽',v=>/TSP\s*太陽/i.test(v)&&!v.includes('商品センター')],['taiyo','太陽工業',v=>v.includes('太陽工業')],['ceres','セレスポ',v=>v.includes('セレスポ')]];
@@ -8128,7 +8147,7 @@ const Cases = (function(){
     try{
       const grab=d=>fetch(API+'?dept='+d+'&action=read').then(r=>r.json()).catch(()=>({}));
       const [cs,od,pj,sl,st]=await Promise.all([grab('cases'),grab('production'),grab('project'),grab('sales'),fetch(API+'?dept=cases&action=staff').then(r=>r.json()).catch(()=>({}))]);
-      _cases=Pending.apply('cases','',(cs&&cs.data)||[]);
+      _cases=Pending.apply('cases','',(cs&&cs.data)||[]); QuoteAge.set(_cases);
       _staff=(st&&st.data)||[];
       const dl=$('caseStaffList'); if(dl) dl.innerHTML=_staff.map(s=>`<option value="${esc(s.name)}">`).join('');
       _children={};
@@ -8189,6 +8208,7 @@ const Cases = (function(){
     const base=rows.slice();
     if(t==='done' && _hideCl.size) rows=rows.filter(c=>!_hideCl.has(clKey(c)));
     if(_deptf) rows=rows.filter(c=>caseDepts(c.id)[_deptf]);
+    if(_qexp && (t==='list'||t==='manage')) rows=rows.filter(c=>QuoteAge.tier(QuoteAge.days(c.created_at))==='exp' && c.status==='見積中');
     if(_childf) rows=rows.filter(c=>{ const ks=_children[String(c.id)]||[];
       if(_childf==='__term') return ks.some(k=>cRank(k)===4);
       if(_childf==='__active') return ks.some(k=>k.status!=='見送り'&&cRank(k)>=1&&cRank(k)<4);
@@ -8200,7 +8220,7 @@ const Cases = (function(){
     else if(_sort.col==='amount') rows.sort((a,b)=>{const va=Number(a.amount)||0,vb=Number(b.amount)||0;if(!va&&!vb)return 0;if(!va)return 1;if(!vb)return -1;return (_sort.asc?1:-1)*(va-vb);});
     else if(_sort.col) rows.sort((a,b)=>(_sort.asc?1:-1)*String(a[_sort.col]||'').localeCompare(String(b[_sort.col]||''),'ja',{numeric:true}));
     else rows.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
-    const inner = deptChips(base) + (t==='done' ? clientChips(base) : '') + childStatusFilter() + (t==='manage' ? statusChips() : '');
+    const inner = deptChips(base) + ((t==='list'||t==='manage') ? expChip(base) : '') + (t==='done' ? clientChips(base) : '') + childStatusFilter() + (t==='manage' ? statusChips() : '');
     pane.innerHTML=`<div class="fv-sum">${inner}</div>` + (rows.length?caseTable(rows,t):'<div class="cases-empty">該当する案件はありません</div>');
   }
   function deptChips(base){
@@ -8210,6 +8230,9 @@ const Cases = (function(){
     return si('全部門','',base.length)+DEPTS.map(d=>si(d.n,d.k,count(d.k))).join('');
   }
   function setDeptf(v){ _deptf=(_deptf===v?'':v); render(); }
+  // 「期限切れ」チップ＝見積中のまま受付から31日以上。要対応には数えない（埋もれるので）。札の先でやるのは見送りにするか、もう一度当たるかの2択。
+  function expChip(base){ const n=(base||_cases).filter(c=>c.status==='見積中'&&QuoteAge.tier(QuoteAge.days(c.created_at))==='exp').length; if(!n&&!_qexp) return ''; return `<div class="fv-si${_qexp?' on':''}" data-f="qexp" onclick="Cases.setQexp()" title="見積中のまま受付から31日以上"><div class="n">${n}</div><div class="l">期限切れ</div></div>`; }
+  function setQexp(){ _qexp=!_qexp; render(); }
   function childStatusFilter(){
     const groups=DEPTS.map(d=>[d.k,d.n,Object.keys(C_RANK[d.k])]);
     const opt=(v,l)=>`<option value="${v}"${_childf===v?' selected':''}>${l}</option>`;
@@ -8244,7 +8267,7 @@ const Cases = (function(){
         ? kids.map(k=>{const cl=k.status==='見送り'?'is-kill':(DONE_ST[k.status]?'is-done':'is-active');return `<span class="cchip cchip-${k.dept} ${cl}" title="${DEPT[k.dept]?DEPT[k.dept].n:k.dept}"><span class="cl">${DEPT[k.dept]?DEPT[k.dept].s:'?'}</span>${esc(k.status||'—')}</span>`;}).join('')
         : '<span class="cdept-none">—</span>';
       h+=`<tr${archd?' class="arch"':''} onclick="Cases.openEdit('${id}')" style="cursor:pointer">`
-        +`<td>${esc(c.name||'')}</td>`
+        +`<td>${esc(c.name||'')}${QuoteAge.forCase(c)}</td>`
         +`<td style="white-space:nowrap">${badges}</td>`
         +`<td>${esc(c.client||'')}</td>`
         +`<td>${esc(c.order_no||'')}</td>`
@@ -8302,7 +8325,7 @@ const Cases = (function(){
   function setStf(v){ _stf=(_stf===v?'':v); render(); }
   function openEdit(id){ const c=_find(id); if(!c)return; _editId=id;
     $('ce_name').value=c.name||''; $('ce_client').value=c.client||''; $('ce_contact').value=c.contact||''; $('ce_our_person').value=c.our_person||'';
-    $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; $('ce_status').value=CASE_ST.indexOf(c.status)>=0?c.status:'受注'; $('ce_note').value=c.note||''; $('ce_target_date').value=String(c.target_date||'').slice(0,10); $('ce_amount').value=(c.amount===''||c.amount==null)?'':c.amount;
+    $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; $('ce_status').value=CASE_ST.indexOf(c.status)>=0?c.status:'受注'; $('ce_qa').innerHTML=QuoteAge.forCase(c); $('ce_note').value=c.note||''; $('ce_target_date').value=String(c.target_date||'').slice(0,10); $('ce_amount').value=(c.amount===''||c.amount==null)?'':c.amount;
     const kids=_children[String(id)]||[];
     $('ce_children').innerHTML = kids.length
       ? kids.map(k=>`<button type="button" class="ce-child" onclick="Cases.jumpChild('${k.dept}','${esc(String(k.id))}')"><span class="ce-cdept ce-${k.dept}">${DEPT[k.dept]?DEPT[k.dept].n:k.dept}</span><span class="ce-cname">${esc(k.project||'(無題)')}</span><span class="ce-cst">${esc(k.status||'')}</span><span class="ce-cgo">開く →</span></button>`).join('')
@@ -8569,7 +8592,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp };
 })();
 
 const Alc=(function(){
