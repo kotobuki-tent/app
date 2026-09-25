@@ -892,6 +892,10 @@ html.in-woff #v_gantt .gt .hd{top:0}
 .v-card .v-cardno b{font-weight:700;color:var(--text);margin-right:5px}
 .v-card .v-cardno.none{border-style:dashed;color:var(--text-faint);background:transparent}
 .v-card .v-cardno.none b{color:var(--text-faint)}
+.vf-person-lbl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-dim);cursor:pointer}
+#vMoBg.is-person .veh-only{display:none}
+.v-card.v-person{background:var(--bg)}
+.v-card.v-person .v-name::before{content:'👤 ';font-size:15px}
 .v-card .v-date.ok{color:var(--green);background:var(--green-dim)}
 .v-card .v-date.warn{color:var(--orange);background:var(--orange-dim)}
 .v-card .v-date.danger{color:var(--red);background:var(--red-dim)}
@@ -2328,10 +2332,13 @@ table.jobs tr:last-child td{border-bottom:none}
     <h2 id="vMoTitle"><span id="vMoTitleText">車両登録</span><button class="del-link hidden" id="vfDel" onclick="Veh.delVehicle($('vf_id').value)">削除</button></h2>
     <input type="hidden" id="vf_id">
     <div class="mo-row">
-      <div class="mo-field"><label>車種 *</label><input id="vf_name"></div>
-      <div class="mo-field"><label>名称</label><input id="vf_type"></div>
+      <div class="mo-field"><label id="vf_name_lbl">車種 *</label><input id="vf_name"></div>
+      <div class="mo-field veh-only"><label>名称</label><input id="vf_type"></div>
     </div>
     <div class="mo-row full">
+      <label class="vf-person-lbl"><input type="checkbox" id="vf_person" onchange="Veh.togglePerson()"> 車両ではなく、人が持っているカード（iller・社長など）</label>
+    </div>
+    <div class="mo-row full veh-only">
       <div class="mo-field"><label>ナンバー</label>
         <div class="plate-row">
           <input id="vf_plate_region" class="pl-region">
@@ -2341,16 +2348,16 @@ table.jobs tr:last-child td{border-bottom:none}
         </div>
       </div>
     </div>
-    <div class="mo-row">
+    <div class="mo-row veh-only">
       <div class="mo-field"><label>全長 (mm)</label><input id="vf_length" type="number" inputmode="numeric"></div>
       <div class="mo-field"><label>全幅 (mm)</label><input id="vf_width" type="number" inputmode="numeric"></div>
       <div class="mo-field"><label>全高 (mm)</label><input id="vf_height" type="number" inputmode="numeric"></div>
     </div>
-    <div class="mo-row">
+    <div class="mo-row veh-only">
       <div class="mo-field"><label>車検満了日</label><input id="vf_shaken" type="date"></div>
       <div class="mo-field"><label>自賠責満了日</label><input id="vf_jibaiseki" type="date"></div>
     </div>
-    <div class="mo-row">
+    <div class="mo-row veh-only">
       <div class="mo-field"><label>任意保険満了日</label><input id="vf_hoken" type="date"></div>
       <div class="mo-field"><label></label><div></div></div>
     </div>
@@ -3348,7 +3355,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-24 17:55';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-25 09:21';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -5829,6 +5836,9 @@ const Veh = (function(){
   const DEFAULTS={shaken:60,jibaiseki:60,hoken:60,oil_km:5000,oil_days:180};
   const CARD_KEYS=['card_eneos','card_ams','card_nbiz','card_etc'];
   const CARD_LABEL={card_eneos:'ENEOSカード',card_ams:'AMSカード',card_nbiz:'Nbizカード',card_etc:'ETCカード'};
+  const isPerson=v=>String(v.kind||'')==='person';   // 人が持っているカード（vehicles シート kind=person。点呼の車両一覧からは GAS 側で除外）
+  const cardChips=v=>`<div class="v-cards">`+CARD_KEYS.map(k=>v[k]?`<span class="v-cardno"><b>${CARD_LABEL[k].replace('カード','')}</b>${esc(String(v[k]))}</span>`:`<span class="v-cardno none"><b>${CARD_LABEL[k].replace('カード','')}</b>なし</span>`).join('')+`</div>`;
+  function togglePerson(){$('vMoBg').classList.toggle('is-person',$('vf_person').checked);$('vf_name_lbl').textContent=$('vf_person').checked?'名前 *':'車種 *';$('vMoTitleText').textContent=($('vf_id').value?'編集':'登録')+($('vf_person').checked?'（人のカード）':'')}
   const VLOG_KEY='vehicle_status_snapshot';
   const VLOG_LIST_KEY='vehicle_status_log';
   const VLOG_UNREAD_KEY='vehicle_status_unread';
@@ -5951,7 +5961,7 @@ const Veh = (function(){
     const th=getThresholds();
     const alerts=[];
     vehicleData.forEach(v=>{
-      if(v.status==='休車')return;
+      if(v.status==='休車'||isPerson(v))return;
       const shakenDiff=diffDays(v.shaken_date);
       if(shakenDiff!==null){
         if(shakenDiff<0)alerts.push({vehicle:v,type:'車検',msg:'車検が'+Math.abs(shakenDiff)+'日超過しています',level:'danger',diff:shakenDiff});
@@ -6001,7 +6011,8 @@ const Veh = (function(){
     const warnCount=alerts.filter(a=>a.level==='warn').length;
     let h=`<div class="dash-date">${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日（${dow[today.getDay()]}）</div>`;
     h+=`<div class="summary-bar">`;
-    h+=`<div class="sum-item${dashFilter===''?' on':''}" data-df=""><div class="n">${vehicleData.length}</div><div class="l">全車両</div></div>`;
+    const onlyVeh=vehicleData.filter(v=>!isPerson(v));const persons=vehicleData.filter(isPerson).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ja'));
+    h+=`<div class="sum-item${dashFilter===''?' on':''}" data-df=""><div class="n">${onlyVeh.length}</div><div class="l">全車両</div></div>`;
     h+=`<div class="sum-item danger${dashFilter==='danger'?' on':''}" data-df="danger"><div class="n">${dangerCount}</div><div class="l">要対応</div></div>`;
     h+=`<div class="sum-item warn${dashFilter==='warn'?' on':''}" data-df="warn"><div class="n">${warnCount}</div><div class="l">注意</div></div>`;
     h+=`</div>`;
@@ -6027,14 +6038,14 @@ const Veh = (function(){
         h+=`</div></div>`;
       }
     }
-    if(vehicleData.length){
+    if(onlyVeh.length){
       const th=getThresholds();
       const dateLevel=(diff,thDays)=>{if(diff===null)return'';if(diff<0)return'danger';if(diff<=14)return'danger';if(diff<=thDays)return'warn';return'ok'};
       const dangerIds=new Set(alerts.filter(a=>a.level==='danger').map(a=>String(a.vehicle.id)));
       const warnIds=new Set(alerts.filter(a=>a.level==='warn').map(a=>String(a.vehicle.id)));
-      let vlist=vehicleData;
-      if(dashFilter==='danger')vlist=vehicleData.filter(v=>dangerIds.has(String(v.id)));
-      else if(dashFilter==='warn')vlist=vehicleData.filter(v=>warnIds.has(String(v.id)));
+      let vlist=onlyVeh;
+      if(dashFilter==='danger')vlist=onlyVeh.filter(v=>dangerIds.has(String(v.id)));
+      else if(dashFilter==='warn')vlist=onlyVeh.filter(v=>warnIds.has(String(v.id)));
       vlist=[...vlist].sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ja')||String(a.type||'').localeCompare(String(b.type||''),'ja'));
       h+=`<div class="alert-section"><div class="alert-section-hd">車両一覧　${vlist.length}件</div><div class="vlist-grid">`;
       vlist.forEach(v=>{
@@ -6049,9 +6060,14 @@ const Veh = (function(){
         if(v.jibaiseki_date){const l=dateLevel(jiDiff,th.jibaiseki);h+=`<span class="v-date ${l}">自賠責 ${dateJP(v.jibaiseki_date)}</span>`}
         if(v.hoken_date){const l=dateLevel(hokenDiff,th.hoken);h+=`<span class="v-date ${l}">保険 ${dateJP(v.hoken_date)}</span>`}
         h+=`</div>`;
-        h+=`<div class="v-cards">`+CARD_KEYS.map(k=>v[k]?`<span class="v-cardno"><b>${CARD_LABEL[k].replace('カード','')}</b>${esc(String(v[k]))}</span>`:`<span class="v-cardno none"><b>${CARD_LABEL[k].replace('カード','')}</b>なし</span>`).join('')+`</div>`;
+        h+=cardChips(v);
         h+=`</div>`;
       });
+      h+=`</div></div>`;
+    }
+    if(persons.length&&!dashFilter){
+      h+=`<div class="alert-section"><div class="alert-section-hd">人が持っているカード　${persons.length}人</div><div class="vlist-grid">`;
+      persons.forEach(v=>{h+=`<div class="v-card v-person" data-id="${v.id}"><div class="v-top"><span class="v-name">${esc(v.name)}</span></div>${cardChips(v)}${v.notes?`<div style="font-size:12px;color:var(--text-dim);margin-top:6px">${esc(v.notes)}</div>`:''}</div>`});
       h+=`</div></div>`;
     }
     el.innerHTML=h;
@@ -6072,10 +6088,10 @@ const Veh = (function(){
   // ===== 管理テーブル =====
   function renderAdmin(){
     const el=$('adminView');
-    let items=[...vehicleData];
+    let items=vehicleData.filter(v=>!isPerson(v));
     if(adminSort.col)items.sort((a,b)=>{let va=String(a[adminSort.col]||'').toLowerCase(),vb=String(b[adminSort.col]||'').toLowerCase();return va<vb?(adminSort.asc?-1:1):va>vb?(adminSort.asc?1:-1):0});
     const cols=[{key:'name',label:'車種'},{key:'plate',label:'ナンバー'},{key:'type',label:'名称'},{key:'length',label:'全長'},{key:'width',label:'全幅'},{key:'height',label:'全高'},{key:'shaken_date',label:'車検満了'},{key:'jibaiseki_date',label:'自賠責満了'},{key:'hoken_date',label:'任意保険満了'}];
-    let h=`<div class="fv-sum"><div class="fv-si on"><div class="n">${vehicleData.length}</div><div class="l">全車両</div></div><button class="av-add" style="margin-left:auto" onclick="Veh.openVMo()">+ 車両登録</button></div>`;
+    let h=`<div class="fv-sum"><div class="fv-si on"><div class="n">${items.length}</div><div class="l">全車両</div></div><div class="fv-si"><div class="n">${vehicleData.filter(isPerson).length}</div><div class="l">人のカード</div></div><button class="av-add" style="margin-left:auto" onclick="Veh.openVMo()">+ 車両登録</button></div>`;
     h+='<div class="tbl-wrap"><table><thead><tr>';
     cols.forEach(c=>{const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
     h+='<th>操作</th></tr></thead><tbody>';
@@ -6106,9 +6122,19 @@ const Veh = (function(){
     const v=vehicleData.find(x=>String(x.id)===String(id));if(!v)return;
     currentViewId=id;
     const th=getThresholds();
-    $('vViewTitle').textContent=v.name+(v.plate?' — '+plateLine(v.plate):'');
+    $('vViewTitle').textContent=(isPerson(v)?'👤 ':'')+v.name+(v.plate?' — '+plateLine(v.plate):'');
     const vr=(l,val)=>`<div class="view-row"><div class="vr-label">${l}</div><div class="vr-value">${val||'—'}</div></div>`;
     let h='';
+    if(isPerson(v)){
+      h+=vr('名前',esc(v.name));
+      CARD_KEYS.forEach(k=>{h+=vr(CARD_LABEL[k],v[k]?esc(String(v[k])):'')});
+      if(v.notes)h+=vr('備考',esc(v.notes));
+      $('vViewContent').innerHTML=h;
+      document.querySelector('#vViewBg .maint-section').classList.add('hidden');
+      $('vViewBg').classList.add('show');
+      return;
+    }
+    document.querySelector('#vViewBg .maint-section').classList.remove('hidden');
     h+=vr('車種',esc(v.name));
     h+=vr('ナンバー',esc(plateLine(v.plate)));
     h+=vr('名称',esc(v.type));
@@ -6195,6 +6221,7 @@ const Veh = (function(){
     $('vfDel').classList.toggle('hidden',!d);
     $('vf_id').value=d?d.id:'';
     $('vf_name').value=d?d.name:'';
+    $('vf_person').checked=!!(d&&isPerson(d));togglePerson();
     const pp=parsePlate(d?d.plate||'':'');
     $('vf_plate_region').value=pp.region;
     $('vf_plate_class').value=pp.cls;
@@ -6221,7 +6248,7 @@ const Veh = (function(){
   function saveVehicle(){
     if(_savingVehicle) return;
     const name=$('vf_name').value.trim();
-    if(!name){toast('車種を入力してください',true);return}
+    if(!name){toast($('vf_person').checked?'名前を入力してください':'車種を入力してください',true);return}
     const editId=$('vf_id').value;
     const plate=[$('vf_plate_region').value,$('vf_plate_class').value,$('vf_plate_kana').value,$('vf_plate_seq').value].map(x=>x.trim()).filter(Boolean).join(' ');
     const body={
@@ -6233,6 +6260,7 @@ const Veh = (function(){
       notes:$('vf_notes').value.trim()
     };
     CARD_KEYS.forEach(k=>{body[k]=$('vf_'+k).value.trim()});
+    body.kind=$('vf_person').checked?'person':'';
     if(editId){
       const idx=vehicleData.findIndex(x=>String(x.id)===String(editId));
       if(idx!==-1){
@@ -6261,6 +6289,7 @@ const Veh = (function(){
       oil_last:v.oil_last,oil_km:v.oil_km,tire_last:v.tire_last,
       notes:v.notes,maintenance_log:JSON.stringify(v._maint||[])};
     CARD_KEYS.forEach(k=>{body[k]=v[k]||''});
+    body.kind=v.kind||'';
     fireAndForget(body);
   }
   function delVehicle(id){
@@ -6328,7 +6357,7 @@ const Veh = (function(){
   return {
     loadAll, init,
     openSlog, closeSlog, clearSlog,
-    openVMo, closeVMo, editVehicle, saveVehicle, delVehicle,
+    openVMo, closeVMo, editVehicle, saveVehicle, delVehicle, togglePerson,
     viewVehicle, closeVView, editFromView,
     toggleMaintAdd, addMaintEntry, delMaintEntry,
     saveSettings, unifiedSearch
