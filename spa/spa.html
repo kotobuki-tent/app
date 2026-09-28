@@ -3355,7 +3355,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-28 09:29';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-28 13:56';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -5838,7 +5838,8 @@ const Veh = (function(){
   const CARD_KEYS=['card_eneos','card_ams','card_nbiz','card_etc'];
   const CARD_LABEL={card_eneos:'ENEOSカード',card_ams:'AMSカード',card_nbiz:'Nbizカード',card_etc:'ETCカード'};
   const isPerson=v=>String(v.kind||'')==='person';   // 人が持っているカード（vehicles シート kind=person。点呼の車両一覧からは GAS 側で除外）
-  const cardChips=v=>`<div class="v-cards">`+CARD_KEYS.map(k=>v[k]?`<span class="v-cardno"><b>${CARD_LABEL[k].replace('カード','')}</b>${esc(String(v[k]))}</span>`:`<span class="v-cardno none"><b>${CARD_LABEL[k].replace('カード','')}</b>なし</span>`).join('')+`</div>`;
+  const CHIP_ORDER=['card_nbiz','card_ams','card_eneos','card_etc'];   // 一覧のカード内の並び（iller 2026-09-28）
+  const cardChips=v=>`<div class="v-cards">`+CHIP_ORDER.map(k=>v[k]?`<span class="v-cardno"><b>${CARD_LABEL[k].replace('カード','')}</b>${esc(String(v[k]))}</span>`:`<span class="v-cardno none"><b>${CARD_LABEL[k].replace('カード','')}</b>なし</span>`).join('')+`</div>`;
   function togglePerson(){$('vMoBg').classList.toggle('is-person',$('vf_person').checked);$('vf_name_lbl').textContent=$('vf_person').checked?'名前 *':'車種 *';$('vMoTitleText').textContent=($('vf_id').value?'編集':'登録')+($('vf_person').checked?'（人のカード）':'')}
   const VLOG_KEY='vehicle_status_snapshot';
   const VLOG_LIST_KEY='vehicle_status_log';
