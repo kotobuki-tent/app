@@ -3355,7 +3355,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-28 09:19';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-09-28 09:29';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -3445,7 +3445,7 @@ function staleBadge(d, dept){ const f=rowStale(d,dept); return f?`<span class="s
 const QuoteAge={
   _c:{}, _p:null,
   set(rows){ (rows||[]).forEach(c=>{ if(c&&c.id) QuoteAge._c[String(c.id)]=String(c.created_at||'').slice(0,10); }); },
-  ensure(){ if(Object.keys(QuoteAge._c).length) return Promise.resolve(); if(!QuoteAge._p) QuoteAge._p=fetch(API+'?dept=cases&action=read').then(r=>r.json()).then(j=>QuoteAge.set((j&&j.data)||[])).catch(()=>{}).then(()=>{QuoteAge._p=null;}); return QuoteAge._p; },
+  ensure(){ if(Object.keys(QuoteAge._c).length || (typeof App!=='undefined'&&App.denied.indexOf('cases')>=0)) return Promise.resolve();   /* 案件を見られない人（LINE WORKS）は GAS も返さないので取りに行かない */ if(!QuoteAge._p) QuoteAge._p=fetch(API+'?dept=cases&action=read').then(r=>r.json()).then(j=>QuoteAge.set((j&&j.data)||[])).catch(()=>{}).then(()=>{QuoteAge._p=null;}); return QuoteAge._p; },
   days(created){ const s=String(created||'').slice(0,10); if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const d=new Date(s+'T00:00:00'); if(isNaN(d)) return null; const t=new Date(); t.setHours(0,0,0,0); return Math.floor((t-d)/86400000); },
   tier(days){ if(days==null) return ''; return days>=31?'exp':days>=21?'3w':days>=14?'2w':''; },
   badge(status, created){ if(status!=='見積中') return ''; const d=QuoteAge.days(created), t=QuoteAge.tier(d); if(!t) return ''; const L={'2w':'見積2週','3w':'見積3週','exp':'見積期限切れ'}; return `<span class="qa-badge qa-${t}" title="受付から${d}日">${L[t]}</span>`; },
@@ -3592,6 +3592,7 @@ function moneyShort(v){if(v==null)return'¥ 合計';if(!v)return'¥0';if(v>=1e8)
 function updateMoneyBadges(){document.querySelectorAll('.mny-btn').forEach(b=>{b.textContent=moneyShort(_moneyTotal)})}
 // 案件>一覧と同条件（アーカイブ・完了・見送り除外）の案件の金額（一案件＝一金額）を合算
 function moneyFetch(){
+  if(typeof App!=='undefined'&&App.denied.indexOf('cases')>=0) return Promise.resolve(null);   // 同上
   return fetch(API+'?dept=cases&action=read').then(r=>r.json()).catch(()=>null).then(cs=>{
     if(!cs||!Array.isArray(cs.data))return null;
     const isT=v=>v===true||v==='true'||v==='TRUE';
