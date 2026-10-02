@@ -3355,7 +3355,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-02 09:05';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-02 09:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -7511,11 +7511,11 @@ requestAnimationFrame(()=>{$('staffModalBg').scrollTop=0;const _mo=$('staffModal
     const container=$('staffListItems');
     if(staffList.length===0){container.innerHTML='<div class="empty-msg" style="padding:12px">まだ登録されていません</div>';return}
     let html='';
-    staffList.forEach(s=>{const name=s.name;html+=`<div class="staff-list-item"><span>${oesc(name)}</span><button class="staff-del" onclick="Ot.removeStaff('${oesc(name)}')">削除</button></div>`});
+    staffList.forEach(s=>{const name=s.name;html+=`<div class="staff-list-item"><span>${oesc(name)}</span><button class="staff-del" onclick="Ot.removeStaff('${oesc(name)}')">外す</button></div>`});
     container.innerHTML=html;
   }
   function addStaff(){if(_busyStaff)return;const input=$('newStaffName');const name=input.value.trim();if(!name)return;if(staffList.some(s=>s.name===name)){toast('すでに登録されています');return}_busyStaff=true;staffList.push({name:name,dept:'',employee_no:''});apiPost({action:'save_staff',name:name,active:true});input.value='';renderStaffView();renderStaffList();renderAdminView();setTimeout(()=>{_busyStaff=false},1500);}
-  function removeStaff(name){if(_busyStaff)return;if(!confirm(name+' を削除しますか？'))return;_busyStaff=true;staffList=staffList.filter(s=>s.name!==name);apiPost({action:'delete_staff',name:name});if(selectedStaff===name){selectedStaff='';localStorage.removeItem('ot_my_name')}renderStaffView();renderStaffList();renderAdminView();setTimeout(()=>{_busyStaff=false},1500);}
+  function removeStaff(name){if(_busyStaff)return;if(!confirm(name+' を時間外の名簿から外しますか？\n（日報・点呼など他の画面の名簿には残ります）'))return;_busyStaff=true;staffList=staffList.filter(s=>s.name!==name);apiPost({action:'delete_staff',name:name});if(selectedStaff===name){selectedStaff='';localStorage.removeItem('ot_my_name')}renderStaffView();renderStaffList();renderAdminView();setTimeout(()=>{_busyStaff=false},1500);}
   function openRequestModal(){$('reqModalBg').classList.add('show');
 requestAnimationFrame(()=>{$('reqModalBg').scrollTop=0;const _mo=$('reqModalBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});$('reqMessage').value=currentRequest&&currentRequest.active?currentRequest.message:''}
   function closeReqModal(){$('reqModalBg').classList.remove('show')}
