@@ -3355,7 +3355,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-09-28 13:56';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-02 09:05';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
@@ -7381,6 +7381,9 @@ const Ot = (function(){
   let selectedStaff=localStorage.getItem('ot_my_name')||'';
   let currentTab='staff';
   let syncTimer=null,pendingOps=0;
+  // 名簿は部署順（生産部→企画制作部→財務部→その他）。部署の中は GAS が返す50音順のまま
+  const OT_DEPT_ORDER=['生産部','企画制作部','財務部'];
+  function sortStaff(list){const rank=s=>{const i=OT_DEPT_ORDER.indexOf(s.dept||'');return i<0?OT_DEPT_ORDER.length:i};return list.map((s,i)=>[s,i]).sort((a,b)=>rank(a[0])-rank(b[0])||a[1]-b[1]).map(x=>x[0])}
 
   function getMonday(d){const dt=new Date(d);const day=dt.getDay();const diff=day===0?-6:1-day;dt.setDate(dt.getDate()+diff);dt.setHours(0,0,0,0);return dt}
   function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -7404,14 +7407,14 @@ const Ot = (function(){
   async function loadAll(){
     const cacheKey='overtime_'+fmtDate(currentWeekStart);
     const cached=_getCache(cacheKey);
-    if(cached){staffList=cached.staff||[];entries=cached.entries||[];currentRequest=cached.req||null;render()}
+    if(cached){staffList=sortStaff(cached.staff||[]);entries=cached.entries||[];currentRequest=cached.req||null;render()}
     try{
       const[staffRes,entryRes,reqRes]=await Promise.all([
         apiGet({action:'staff'}),
         apiGet({action:'entries',week_start:fmtDate(currentWeekStart)}),
         apiGet({action:'request',week_start:fmtDate(currentWeekStart)})
       ]);
-      staffList=staffRes.data||[];entries=entryRes.data||[];currentRequest=reqRes.data||null;
+      staffList=sortStaff(staffRes.data||[]);entries=entryRes.data||[];currentRequest=reqRes.data||null;
       _setCache(cacheKey,{staff:staffList,entries:entries,req:currentRequest});
     }catch(e){if(!cached){staffList=[];entries=[];currentRequest=null;toast('データ取得に失敗しました',true)}}
     render();
@@ -7437,10 +7440,12 @@ const Ot = (function(){
   function renderStaffView(){
     if(!selectedStaff&&window.__woffUser&&staffList.length){const m=woffMatch(staffList,s=>s.name);if(m)selectedStaff=m.name;}
     const container=$('staffChips');
-    let html='<label style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px;width:100%">自分を選択（50音順）：';
+    let html='<label style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px;width:100%">自分を選択（部署順）：';
     html+='<select id="otStaffSelect" onchange="Ot.onStaffSelectChange()" style="flex:1;min-width:0;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 \'Noto Sans JP\',sans-serif;background:var(--surface)">';
     html+='<option value="">-- 氏名を選んでください --</option>';
-    staffList.forEach(s=>{const sel=s.name===selectedStaff?' selected':'';html+=`<option value="${oesc(s.name)}"${sel}>${oesc(s.name)}</option>`});
+    let curDept=null;
+    staffList.forEach(s=>{const d=s.dept||'その他';if(d!==curDept){if(curDept!==null)html+='</optgroup>';html+=`<optgroup label="${oesc(d)}">`;curDept=d}const sel=s.name===selectedStaff?' selected':'';html+=`<option value="${oesc(s.name)}"${sel}>${oesc(s.name)}</option>`});
+    if(curDept!==null)html+='</optgroup>';
     html+='</select></label>';
     container.innerHTML=html;
     const grid=$('dayGrid');
