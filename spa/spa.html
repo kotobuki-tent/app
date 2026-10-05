@@ -140,6 +140,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 #authGate .ag-ttl{font:800 20px/1.4 'Noto Sans JP',sans-serif;color:#1a1d27;margin-bottom:12px}
 #authGate .ag-msg{font:500 15px/1.8 'Noto Sans JP',sans-serif;color:#333;white-space:pre-line;margin-bottom:18px}
 #authGate button{font:700 14px/1 'Noto Sans JP',sans-serif;padding:12px 22px;border:none;border-radius:999px;background:var(--accent);color:#fff;cursor:pointer}
+#dataStale{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:150;font:500 11px/1 'Noto Sans JP',sans-serif;color:#fff;background:rgba(40,44,52,.82);padding:6px 12px;border-radius:999px;pointer-events:none;user-select:none}   /* 前回のデータを表示中（2026-10-05） */
 #appVer{position:fixed;right:6px;bottom:4px;z-index:150;font:500 10px/1 'Noto Sans JP',sans-serif;color:var(--text-faint);opacity:.7;pointer-events:none;user-select:none}   /* 版の表示（2026-09-17 iller「最新版かどこかで分かれば」） */
 .hdr-btn{background:var(--surface2);border:1px solid var(--border-light);color:var(--text-dim);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
 .hdr-btn:hover{color:var(--text);border-color:var(--border)}
@@ -1749,6 +1750,7 @@ table.jobs tr:last-child td{border-bottom:none}
   </div>
 </div>
 <div id="appVer" title="この端末が読み込んでいる版（コミット日時）"></div>
+<div id="dataStale" class="hidden">前回のデータを表示中・最新を取得しています</div>
 <div id="authGate" class="hidden"><div class="ag-box"><div class="ag-ttl" id="authGateTitle"></div><div class="ag-msg" id="authGateMsg"></div><button type="button" onclick="location.reload()">開き直す</button></div></div>
 
 <!-- ===== 案件登録 section ===== -->
@@ -3355,9 +3357,29 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-02 09:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-05 14:44';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+/* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
+   API の読み取り（GET）の返事を端末の IndexedDB に控える。画面を最初に開く時（App.nav の初回ロード）だけ、控えがあればそれを返して
+   すぐ描き、直後に裏で本物を取り直して差し替える（App.softRefresh）。書き込み（POST）は一切触らない。
+   キー＝API より後ろのクエリ（tok・key・cid が付く前の形）。14日より古い控えは使わず、起動時に掃除する。
+   認証で拒否されたら控えを全部捨てる（鍵を外した端末に古いデータを見せ続けない）。IndexedDB が使えない端末は今までどおり。 */
+const DataCache=(function(){
+  const DBN='sl-data', ST='get', MAX_AGE=14*24*3600*1000;
+  let db=null, depth=0, hits=0, nput=0;
+  const ready=new Promise(res=>{ try{ const r=indexedDB.open(DBN,1); r.onupgradeneeded=()=>{ try{ r.result.createObjectStore(ST); }catch(e){} }; r.onsuccess=()=>{ db=r.result; res(true); prune(); }; r.onerror=()=>res(false); r.onblocked=()=>res(false); }catch(e){ res(false); } });
+  function prune(){ try{ const lim=Date.now()-MAX_AGE; const c=db.transaction(ST,'readwrite').objectStore(ST).openCursor(); c.onsuccess=()=>{ const cur=c.result; if(!cur)return; if(!cur.value||!(cur.value.t>lim)) cur.delete(); cur.continue(); }; }catch(e){} }
+  function key(u){ try{ return String(u).slice(API.length); }catch(e){ return ''; } }
+  async function get(k){ if(!k)return null; await ready; if(!db)return null;
+    return new Promise(res=>{ try{ const q=db.transaction(ST).objectStore(ST).get(k); q.onsuccess=()=>{ const v=q.result; if(v&&typeof v.b==='string'&&Date.now()-v.t<MAX_AGE){ hits++; res(v.b); } else res(null); }; q.onerror=()=>res(null); }catch(e){ res(null); } }); }
+  function put(k,text){ nput++; if(!k||!db)return; try{ db.transaction(ST,'readwrite').objectStore(ST).put({t:Date.now(),b:text},k); }catch(e){} }
+  function clear(){ if(!db)return; try{ db.transaction(ST,'readwrite').objectStore(ST).clear(); }catch(e){} }
+  // begin〜end の間に出た読み取りは控えを先に見る。end は「控えを1つでも使ったか」を返す
+  function begin(){ if(depth===0) hits=0; depth++; }
+  function end(){ depth=Math.max(0,depth-1); return hits>0; }
+  return {key,get,put,clear,begin,end,reading:()=>depth>0,puts:()=>nput};
+})();
 /* GAS への身分証（2026-09-17）。fetch を一か所で包み、API 宛の呼び出し全部に自動で添える（各画面の apiGet/apiPost は触らない）：
    tok = LINE WORKS（WOFF）のアクセストークン（woffBoot で取得）／key = 端末に1回入れる合言葉（?k=… で開くと localStorage に保存）／cid = 端末の印。
    GET はクエリに、POST は JSON 本文に入れる。GAS 側は当面「記録だけ」、拒否はスクリプトプロパティで切替。 */
@@ -3394,17 +3416,20 @@ const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO8
     let isApi=false; try{ isApi=(typeof u==='string'&&u.indexOf(API)===0); }catch(e){}
     if(!isApi) return _f.call(this,u,o);
     const u0=u, o0=o;
+    const ck=(!o||!o.method||String(o.method).toUpperCase()==='GET')?DataCache.key(u0):'';   // 読み取りだけ控えの対象
     const go=async(retried)=>{
+      if(ck&&!retried&&DataCache.reading()){ const hit=await DataCache.get(ck); if(hit!=null) return new Response(hit,{status:200,headers:{'Content-Type':'application/json'}}); }
       const [u1,o1]=decorate(u0,o0);
       const res=await _f.call(window,u1,o1);
       // 返事が読める（GET）時だけ検査。POST は no-cors で読めない
       try{
         if(res&&res.ok&&res.type!=='opaque'&&/json/i.test(res.headers.get('content-type')||'')){
-          const j=await res.clone().json();
+          const txt=await res.clone().text(); const j=JSON.parse(txt);
           if(j&&j.success===false&&j.error==='auth'){
             if(j.reason==='expired'&&!retried&&await refreshTok()) return go(true);
+            DataCache.clear();
             gate(j.reason==='expired'?'expired':'none');
-          }
+          }else if(ck&&!(j&&j.success===false)) DataCache.put(ck,txt);
         }
       }catch(e){}
       return res;
@@ -9380,6 +9405,7 @@ const App = {
       const nv=$(r.nav); if(nv) nv.classList.toggle('on', r.key===name);
     });
     this.current=name;
+    this.staleNote();
     centerActiveNav();
 
     // サブタブを最初のタブにリセット（行って戻ると直前のサブタブが残る問題の対策）
@@ -9390,16 +9416,20 @@ const App = {
     if(!this._loaded[name] && !this._loading[name]){
       this._loading[name]=true;
       $('loader').classList.remove('hidden');
+      let fromCache=false;
       try{
-        await app.loadAll();
-        this._loaded[name]=true; this._loadedAt[name]=Date.now();
+        DataCache.begin();
+        try{ await app.loadAll(); }finally{ fromCache=DataCache.end(); }
+        this._loaded[name]=true; this._loadedAt[name]=fromCache?0:Date.now();   // 控えで描いた時は「古い」扱いにして、すぐ裏で取り直す
       }catch(e){
         toast('データ取得エラー',true);
       }finally{
         this._loading[name]=false;
         if(!this._loading[this.current]) $('loader').classList.add('hidden');
       }
+      if(fromCache&&this._loaded[name]){ this._stale[name]=true; this.staleNote(); this.softRefresh(); }
     }else{
+      this.staleNote();
       this.softRefresh();   // 2回目以降に戻ってきた時：古ければ裏で取り直す（2026-09-17）
     }
   },
@@ -9418,16 +9448,20 @@ const App = {
     const ae=document.activeElement; if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&ae.type!=='button')return;
     if(document.querySelector('.mo-bg.show'))return;
     _bgBusy=true;
-    const app=this.reg(name).ns();
-    Promise.resolve(app.loadAll()).then(()=>{this._loadedAt[name]=Date.now();}).catch(()=>{}).finally(()=>{_bgBusy=false});
+    const app=this.reg(name).ns(), n0=DataCache.puts();
+    Promise.resolve(app.loadAll()).then(()=>{this._loadedAt[name]=Date.now(); if(DataCache.puts()>n0) this._stale[name]=false;   /* ネットから1件も取れなかった時は「前回のデータ」の表示を残す */}).catch(()=>{}).finally(()=>{_bgBusy=false; this.staleNote();});
   },
+  /* 「前回のデータを表示中」の小さな表示。控えで描いた画面が、裏の取り直しで最新になるまで出す（古い数字を最新だと思わせない） */
+  _stale:{},
+  staleNote(){ const el=document.getElementById('dataStale'); if(el) el.classList.toggle('hidden', !this._stale[this.current]); },
   // 更新：今表示中のアプリだけ再取得（裏アプリのGASは叩かない＝SEQ-011全停止対策）
   async refreshCurrent(){
     const name=this.current;
     const app=this.reg(name).ns();
     this._loading[name]=true;
-    try{ await app.loadAll(); this._loaded[name]=true; this._loadedAt[name]=Date.now(); }
-    finally{ this._loading[name]=false; }
+    const n0=DataCache.puts();
+    try{ await app.loadAll(); this._loaded[name]=true; this._loadedAt[name]=Date.now(); if(DataCache.puts()>n0) this._stale[name]=false; }
+    finally{ this._loading[name]=false; this.staleNote(); }
   }
 };
 
