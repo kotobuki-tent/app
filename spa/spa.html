@@ -1739,7 +1739,7 @@ table.jobs tr:last-child td{border-bottom:none}
     <button class="nav-link home-link on" id="navHome" onclick="App.nav('portal')"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</button>
     <button class="nav-link" id="navDaily" onclick="App.nav('daily')">日報</button>
     <button class="nav-link" id="navOt" onclick="App.nav('ot')">時間外</button>
-    <button class="nav-link" id="navCal" onclick="App.nav('cal')">今日</button>
+    <button class="nav-link" id="navCal" onclick="App.nav('cal')">予定</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navAlcohol" onclick="App.nav('alcohol')">点呼</button>
     <button class="nav-link" id="navForklift" onclick="App.nav('forklift')">リフト</button>
@@ -3391,7 +3391,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-08 18:42';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-08 18:44';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
