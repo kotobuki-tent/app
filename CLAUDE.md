@@ -72,7 +72,7 @@ Operational constraints and how-tos live in dedicated `.claude/` files (loaded a
 
 ### 今日の予定（画面「今日」, dept=cal, 2026-10-08）
 
-画面「今日」（IIFE `Cal`、`view-cal`、nav `navCal`、zone shared、ポータルに「今日の予定」カード）に、全員の今日の LINE WORKS カレンダーを出す（人を縦、予定を横にチップ。終日→時刻順、休み系は灰色、予定なしは「—」）。GAS `handleCalGet` が LINE WORKS のサービスアカウント（JWT RS256、Client App「SEQUENCE LAB」、scope `user.read calendar.read`）で全員の `/users/{id}/calendar/events` を `fetchAll` で読み、CacheService に 5 分控える。鍵はスクリプトプロパティ `LW_CLIENT_ID` / `LW_CLIENT_SECRET` / `LW_SERVICE_ACCOUNT` / `LW_PRIVATE_KEY`（1行の鍵は区切りが「¥n」でも読める `lwPem_`）。`?dept=cal&action=keycheck` は鍵の形の診断（中身は返さない）。SPA 側は `Cal.loadAll`（softRefresh で 90 秒ごとに取り直す）。最初はポータルの一番上に置いたが iller「トップに載せることはない」→ 別タブに（10/8）。人は staff の active、LINE WORKS に居ない人は出ない。
+画面「今日」（IIFE `Cal`、`view-cal`、nav `navCal`、zone shared、ポータルに「今日の予定」カード）に、全員の今日の LINE WORKS カレンダーを出す（人を縦、予定を横にチップ。終日→時刻順、休み系は灰色、予定なしは「—」）。GAS `handleCalGet` が LINE WORKS のサービスアカウント（JWT RS256、Client App「SEQUENCE LAB」、scope `user.read calendar.read`）で全員の `/users/{id}/calendar/events` を `fetchAll` で読み、CacheService に 5 分控える。鍵はスクリプトプロパティ `LW_CLIENT_ID` / `LW_CLIENT_SECRET` / `LW_SERVICE_ACCOUNT` / `LW_PRIVATE_KEY`（1行の鍵は区切りが「¥n」でも読める `lwPem_`）。`?dept=cal&action=keycheck` は鍵の形の診断（中身は返さない）。SPA 側は `Cal.loadAll`（softRefresh で 90 秒ごとに取り直す）。最初はポータルの一番上に置いたが iller「トップに載せることはない」→ 別タブに（10/8）。人は staff の active、LINE WORKS に居ない人は出ない。**並びは LINE WORKS Admin のメンバー一覧と同じ**（役職→職級→フリガナ。順は Code.gs の `LW_POS_ORDER`／`LW_LEVEL_ORDER` に手書き＝Admin で役職・職級を変えたらここも直す。10/9）。
 
 ### PW管理（local file, 2026-10-02）
 
