@@ -39,7 +39,7 @@ The **`App` registry** (search `const App = {`) is the orchestrator:
 
 ### Backend: one GAS endpoint, `?dept=` routing
 
-Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every request carries a `dept` param routing to a department handler (`production`/`project`/`sales`/`inventory`/`overtime`/`vehicle`/`daily`/`labor`/`attendance`/`drive`/`alcohol`/`forklift`/`cases`/`card`/`wb`/`qual`/`auth`/`pw`). Each IIFE has its **own** `apiGet`/`apiPost`/`fireAndForget` with its `dept` baked in — they are intentionally duplicated per-namespace, not shared.
+Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every request carries a `dept` param routing to a department handler (`production`/`project`/`sales`/`inventory`/`overtime`/`vehicle`/`daily`/`labor`/`attendance`/`drive`/`alcohol`/`forklift`/`cases`/`card`/`wb`/`qual`/`auth`/`pw`/`cal`). Each IIFE has its **own** `apiGet`/`apiPost`/`fireAndForget` with its `dept` baked in — they are intentionally duplicated per-namespace, not shared.
 
 - **Auth (2026-09-17, enforced since 14:2x the same day — `AUTH_ENFORCE=true`)**: a global `window.fetch` wrapper right after `const API=` appends `tok` (LINE WORKS WOFF access token from `woff.getAccessToken()`), `key` (device passphrase stored in localStorage `api_key` by opening `spa.html?k=…` once) and `cid` (device id) to every API call — GET query / POST JSON body. GAS `authCheck_` verifies tok via LINE WORKS `/users/me` (10-min cache) or key via Script Property `API_KEY`, logs to sheet `auth_log`, and rejects when Script Property `AUTH_ENFORCE` is `true` (it is). Never put the key in the repo. **After changing the GAS entry, audit every automated caller** (`nippo_notify.py`, the boss page) — they must send `key`+`cid` too.
 - **Vocabulary (2026-09-18, iller)** — full table in README「企画制作」. 見積中/見送り belong to the case (parent) only; children never offer them in selects but keep an inherited value via `Norm.setSel` (option 「…（案件の状態）」). 企画制作 status = 受注→進行中→終了; `type` = `現場`／`レンタル`／`製作` (dates `date_make_start`/`date_make_end`); 納品 type removed. 「メンテ送り」 is a button (`Proj.sendMaint`), not a status. Rental items = 予約→貸出中→返却済→メンテ中／廃棄予定. Legacy words (準備中/現場中/レンタル中/メンテ中 as project status, 施工/納品, メンテ待ち/検品中) are rewritten on load by the global `Norm` (just before `Pending`) — **any new loader of projects/rentals must pass rows through `Norm.proj`/`Norm.rent`**; GAS `CHILD_RANK` keeps the legacy words so old clients cannot roll a case back.
@@ -69,6 +69,10 @@ Operational constraints and how-tos live in dedicated `.claude/` files (loaded a
 - **`.claude/rules/guardrails.md`** — hard prohibitions that break the whole app/data: never edit `sw.js`, don't conflate the two manifests, never touch Google Sheet row 1 / column A, never delete the `.hidden` CSS rule.
 - **`.claude/rules/working-with-iller.md`** — tone, judgment, deploy/commit conventions, how to show iller visuals (`show_widget`, not `preview_screenshot`).
 - **`.claude/skills/gas-update`** — the procedure to change & deploy the GAS backend (`Code.gs`): edit → JavaScriptCore syntax-check → paste into Apps Script → redeploy only for web-handler changes. Includes the real-vs-backup-project tell-tale and the "never change the API URL" rule.
+
+### 今日の予定（dept=cal, 2026-10-08）
+
+ポータルの一番上に、全員の今日の LINE WORKS カレンダーを出す（人を縦、予定を横にチップ。終日→時刻順、休み系は灰色、予定なしは「—」）。GAS `handleCalGet` が LINE WORKS のサービスアカウント（JWT RS256、Client App「SEQUENCE LAB」、scope `user.read calendar.read`）で全員の `/users/{id}/calendar/events` を `fetchAll` で読み、CacheService に 5 分控える。鍵はスクリプトプロパティ `LW_CLIENT_ID` / `LW_CLIENT_SECRET` / `LW_SERVICE_ACCOUNT` / `LW_PRIVATE_KEY`（1行の鍵は区切りが「¥n」でも読める `lwPem_`）。`?dept=cal&action=keycheck` は鍵の形の診断（中身は返さない）。SPA 側は `Portal.loadAll`（`App.softRefresh` の portal 除外を外した＝90 秒で取り直す）。人は staff の active、LINE WORKS に居ない人は出ない。
 
 ### PW管理（local file, 2026-10-02）
 

@@ -1457,6 +1457,20 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-card-body{text-align:center}
 .portal-card-title{font-size:13px;font-weight:600;color:var(--text)}
 .portal-modeswitch{display:flex;align-items:center;gap:8px;justify-content:center;font-size:12px;color:var(--text-dim);margin:0 0 20px}
+/* 今日の予定（LINE WORKS のカレンダー、dept=cal、2026-10-08）：人を縦に、その人の今日の予定を横にチップで */
+.portal-cal{width:100%;max-width:680px;margin:-22px 0 26px}
+.portal-cal:empty{display:none}
+.portal-cal-hd{display:flex;align-items:baseline;justify-content:space-between;font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;padding:0 6px}
+.portal-cal-hd small{font-weight:400;color:var(--text-faint);font-size:11px}
+.portal-cal table{width:100%;border-collapse:collapse;font-size:13px}
+.portal-cal td{padding:3px 6px;border-top:1px solid var(--border-light);vertical-align:top;line-height:1.6}
+.portal-cal td.n{white-space:nowrap;width:1%;font-weight:600;padding-right:14px}
+.portal-cal td.d{color:var(--text-faint)}
+.portal-cal .pc-chip{display:inline-block;background:var(--surface3);border-radius:6px;padding:0 8px;margin:1px 4px 1px 0}
+.portal-cal .pc-chip b{font-weight:600;color:var(--text-dim);margin-right:5px;font-variant-numeric:tabular-nums}
+.portal-cal .pc-chip.off{color:var(--text-faint);background:transparent;border:1px dashed var(--border)}
+.portal-cal .pc-msg{font-size:12px;color:var(--text-faint);padding:4px 6px}
+@media(max-width:480px),(orientation:portrait){.portal-cal td{display:block;border-top:none}.portal-cal td.n{padding:6px 6px 0;border-top:1px solid var(--border-light)}.portal-cal td.d,.portal-cal td.c{padding:0 6px 6px}}
 .pm-btn{padding:6px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font:600 12px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
 .pm-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
@@ -2684,6 +2698,7 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="portal-wrap">
     <div class="portal-logo"><img class="portal-logo-mark" src="../icons/logo-mark.png" alt="">寿テント</div>
     <div class="portal-sub">業務管理システム</div>
+    <div class="portal-cal" id="portalCal"></div>
     <div class="portal-modeswitch">
       <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
       <button class="pm-btn" data-m="floor" onclick="App.setMode('floor')">現場</button>
@@ -3357,7 +3372,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-05 14:44';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-08 09:49';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8048,10 +8063,26 @@ const Wb = (function(){
 
 
 const Portal = (function(){
-  // リンク集のみ。データ取得なし。
-  async function loadAll(){}
+  // リンク集＋「今日の予定」（LINE WORKS のカレンダーを GAS が読む dept=cal、2026-10-08）。
+  // loadAll は App.nav の初回と softRefresh（90秒）で呼ばれる。GAS 側で5分控えているので端末が多くても軽い。
+  let cal=null, calErr='';
+  async function loadAll(){
+    try{ const r=await fetch(API+'?dept=cal&action=today'); const j=await r.json(); if(j&&j.success){ cal=j; calErr=''; } else calErr=(j&&j.error)||'err'; }
+    catch(e){ calErr='net'; }
+    render();
+  }
+  function render(){
+    const el=document.getElementById('portalCal'); if(!el)return;
+    if(!cal){ el.innerHTML=calErr?'<div class="pc-msg">今日の予定を取れませんでした</div>':''; return; }
+    const d=new Date(cal.date+'T00:00:00'), dow='日月火水木金土'[d.getDay()];
+    const rows=(cal.people||[]).map(p=>{
+      const chips=(p.items||[]).map(it=>{ const t=it.allDay?'終日':(it.s||'')+(it.e?'-'+it.e:''); return `<span class="pc-chip${it.off?' off':''}"><b>${esc(t)}</b>${esc(it.t)}</span>`; }).join('');
+      return `<tr><td class="n">${esc(p.name)}</td><td class="${chips?'c':'d'}">${chips||'—'}</td></tr>`;
+    }).join('');
+    el.innerHTML=`<div class="portal-cal-hd"><span>今日の予定　${d.getMonth()+1}/${d.getDate()}（${dow}）</span><small>${esc(cal.updated||'')} 時点</small></div><table>${rows}</table>`;
+  }
   function init(){}
-  return { loadAll, init };
+  return { loadAll, render, init };
 })();
 
 /* ========================================================================
@@ -9440,7 +9471,7 @@ const App = {
   STALE_MS:90*1000,
   _loadedAt:{},
   softRefresh(){
-    const name=this.current; if(!name||name==='portal')return;
+    const name=this.current; if(!name)return;
     if(!this._loaded[name]||this._loading[name]||_bgBusy)return;
     if(document.visibilityState!=='visible')return;
     if(Date.now()-(this._loadedAt[name]||0)<this.STALE_MS)return;
