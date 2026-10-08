@@ -70,9 +70,9 @@ Operational constraints and how-tos live in dedicated `.claude/` files (loaded a
 - **`.claude/rules/working-with-iller.md`** — tone, judgment, deploy/commit conventions, how to show iller visuals (`show_widget`, not `preview_screenshot`).
 - **`.claude/skills/gas-update`** — the procedure to change & deploy the GAS backend (`Code.gs`): edit → JavaScriptCore syntax-check → paste into Apps Script → redeploy only for web-handler changes. Includes the real-vs-backup-project tell-tale and the "never change the API URL" rule.
 
-### 今日の予定（dept=cal, 2026-10-08）
+### 今日の予定（画面「今日」, dept=cal, 2026-10-08）
 
-ポータルの一番上に、全員の今日の LINE WORKS カレンダーを出す（人を縦、予定を横にチップ。終日→時刻順、休み系は灰色、予定なしは「—」）。GAS `handleCalGet` が LINE WORKS のサービスアカウント（JWT RS256、Client App「SEQUENCE LAB」、scope `user.read calendar.read`）で全員の `/users/{id}/calendar/events` を `fetchAll` で読み、CacheService に 5 分控える。鍵はスクリプトプロパティ `LW_CLIENT_ID` / `LW_CLIENT_SECRET` / `LW_SERVICE_ACCOUNT` / `LW_PRIVATE_KEY`（1行の鍵は区切りが「¥n」でも読める `lwPem_`）。`?dept=cal&action=keycheck` は鍵の形の診断（中身は返さない）。SPA 側は `Portal.loadAll`（`App.softRefresh` の portal 除外を外した＝90 秒で取り直す）。人は staff の active、LINE WORKS に居ない人は出ない。
+画面「今日」（IIFE `Cal`、`view-cal`、nav `navCal`、zone shared、ポータルに「今日の予定」カード）に、全員の今日の LINE WORKS カレンダーを出す（人を縦、予定を横にチップ。終日→時刻順、休み系は灰色、予定なしは「—」）。GAS `handleCalGet` が LINE WORKS のサービスアカウント（JWT RS256、Client App「SEQUENCE LAB」、scope `user.read calendar.read`）で全員の `/users/{id}/calendar/events` を `fetchAll` で読み、CacheService に 5 分控える。鍵はスクリプトプロパティ `LW_CLIENT_ID` / `LW_CLIENT_SECRET` / `LW_SERVICE_ACCOUNT` / `LW_PRIVATE_KEY`（1行の鍵は区切りが「¥n」でも読める `lwPem_`）。`?dept=cal&action=keycheck` は鍵の形の診断（中身は返さない）。SPA 側は `Cal.loadAll`（softRefresh で 90 秒ごとに取り直す）。最初はポータルの一番上に置いたが iller「トップに載せることはない」→ 別タブに（10/8）。人は staff の active、LINE WORKS に居ない人は出ない。
 
 ### PW管理（local file, 2026-10-02）
 
