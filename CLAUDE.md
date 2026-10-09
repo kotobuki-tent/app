@@ -80,7 +80,7 @@ iller と社長専用のパスワード台帳。**ローカルの HTML 1枚**（
 
 **2026-10-09 秘書アプリのタブにも**：`https://kotobuki-tent.github.io/secretary/`（別 repo `kotobuki-tent/secretary`、ローカル clone `~/dev/secretary`）の「PW」タブ＝`pw.html`。中身は PW管理.html の写しだが **鍵（BOSS_KEY・DK）はファイルに無く localStorage（`sec_bk`・`sec_dk`）から読む**。鍵は一度だけ `?bk=…&dk=…` 付きの URL で開いて覚えさせる（保存後に URL から消す）。鍵が無い端末は案内だけ出して GAS を呼ばない。PW管理.html を直したら pw.html にも同じ直しを（KEY/DK の行だけ違う）。
 
-**給料（2026-10-09、Code.gs v111）**：`dept=pw` に `vault` パラメータ（GET query／POST body）。`pay` → シート `pay_vault`、無指定 → `pw_vault`（`PW_VAULTS`）。秘書の経営タブ `boss.html` の「給料」カードが使う：給与台帳 xlsx（🍅給与・考課/2_毎年の考課/寿テント_給与台帳.xlsx）の「社員マスター」を SheetJS（cdnjs）でブラウザ読み → AES-GCM（PW と同じ `DK`）で暗号 → `vault=pay` に保存。表示は 氏名・職位・区分・級・号・基本給／時給・役職手当・資格手当・月額（区分 退職は除く）。台帳を直したらもう一度放り込む（上書き）。
+**給料台帳（2026-10-09、Code.gs v111）**：`dept=pw` に `vault` パラメータ（GET query／POST body）。`pay` → シート `pay_vault`、無指定 → `pw_vault`（`PW_VAULTS`）。秘書の経営タブ `boss.html` の「給料台帳」が使う：1 人 1 行をその場で編集（級・号→基本給は **ページが持つ新給料表** から自動＝1級1号 `cfg.entry` 176,000・刻み 500/1,000/1,500/2,000/2,500・各級 51 号、パート `cfg.partEntry` 1,090・1〜10 号 10 円／11〜30 号 20 円。役員・執行役員は `fixed`）。最低賃金割れは `cfg.minWage × cfg.hours(161.33)` で赤。データは `{v:3,cfg,people:[{name,kind,pos,grade,step,fixed,post,qual,note,hist:[{at,what}]}],at}` を AES-GCM（PW と同じ `DK`）で暗号にして `vault=pay` に保存。「読み込む」「書き出す」は JSON。初期データは iller の Desktop `給料台帳_初期.json`（役員 5 人の額は空欄）。給料の正はこの台帳＝xlsx（新給料表_案・寿テント_給与台帳）は設計時の資料。
 
 ### 経営者ページ（local file, 2026-09-17）
 
