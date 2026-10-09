@@ -3371,10 +3371,10 @@ table.jobs tr:last-child td{border-bottom:none}
     <h2>この 1 か月の記録</h2>
     <div id="fk_hist"><div class="empty">読み込み中...</div></div>
     <div class="divider"></div>
-    <h2>📤 月次CSV出力（保存用）</h2>
+    <h2>📤 月次の記録（Excel）</h2>
     <div class="csvbar">
       <div class="field"><label>対象月</label><input type="month" id="fk_f_month"></div>
-      <button class="btn" onclick="Fork.exportCsv()">CSV出力</button>
+      <button class="btn" onclick="Fork.exportCsv()">Excel出力</button>
     </div>
     <p class="note">点検者・機体・判定・否の項目・内容を含みます。記録は保存してください。</p>
   </div>
@@ -3433,7 +3433,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-09 16:47';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-09 18:11';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9063,30 +9063,21 @@ function delRecord(){
 
 /* ===== CSV ===== */
 async function exportCsv(){
-  // 日付×機体の横並び（画面の「この 1 か月の記録」と同じ形、10/9 iller「見にくい CSV」）。その月の全日を出し、平日の未点検は「未点検」
-  const ym=$('fk_f_month').value;if(!ym){toast('対象月を選んでください',false);return;}
+  const ym=$('f_month').value;
+  if(!ym){toast('対象月を選んでください',false);return;}
   toast('集計中...');
-  let data=[];try{const r=await apiGet({action:'month',ym});data=r.data||[];}catch(e){toast('取得に失敗しました',false);return;}
-  const ids=MACHINES.map(m=>m.id), by={};
-  data.forEach(r=>{by[String(r.date).slice(0,10)+'|'+r.machine]=r;});
-  const [y,m]=ym.split('-').map(Number), last=new Date(y,m,0).getDate();
-  const head=['日付','曜'];ids.forEach(id=>{const n=id.replace('フォークリフト','');head.push(n+' 判定',n+' 点検者',n+' 否の項目・備考');});
-  const rows=[];
-  for(let dd=1;dd<=last;dd++){
-    const x=new Date(y,m-1,dd), ds=fmt(x), off=x.getDay()===0||x.getDay()===6, row=[ds,'日月火水木金土'[x.getDay()]];
-    ids.forEach(id=>{const r=by[ds+'|'+id];
-      if(!r){row.push(off?'':'未点検','','');return;}
-      let ng=[];try{ng=JSON.parse(r.ng||'[]');}catch(e){}
-      const ngStr=ng.map(q=>q.label+(q.memo?'('+q.memo+')':'')).join('；');
-      row.push(r.status||'',r.inspector||'',[ngStr,r.note||''].filter(Boolean).join(' / '));});
-    rows.push(row);
-  }
+  let data=[];
+  try{const r=await apiGet({action:'month',ym});data=r.data||[];}catch(e){toast('取得に失敗しました',false);return;}
+  if(!data.length){toast('この月の記録はありません',false);return;}
+  data.sort((a,b)=>String(a.date+a.time).localeCompare(String(b.date+b.time)));
+  const head=['日付','運転者','車両','区分','時刻','確認者','検知器の使用','確認方法','対面以外の方法','酒気帯びの有無','測定値(mg/L)','指示事項','その他'];
+  const rows=data.map(r=>[r.date,r.driver,r.vehicle,r.phase,fmtTime(r.time),r.checker,r.detector_used,r.face,r.method,r.alcohol,r.value,r.instruction,r.note]);
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
-  const csv='\ufeff'+[head,...rows].map(row=>row.map(q).join(',')).join('\r\n');
+  const csv='﻿'+[head,...rows].map(row=>row.map(q).join(',')).join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='フォークリフト点検_'+ym+'.csv';
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='アルコールチェック_'+ym+'.csv';
   document.body.appendChild(a);a.click();a.remove();
-  toast('CSVを出力しました（記録 '+data.length+'件）');
+  toast('CSVを出力しました（'+data.length+'件）');
 }
 
 function reloadAll(){boot();toast('更新しました');}
@@ -9320,23 +9311,52 @@ function delById(id){
   setTimeout(()=>loadDay($('fk_f_date').value,true),3000);
 }
 
+let _xlsxP=null;
+function loadXlsx(){ if(window.XLSX)return Promise.resolve(); return _xlsxP||(_xlsxP=new Promise((ok,ng)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';sc.onload=ok;sc.onerror=()=>{_xlsxP=null;ng(new Error('lib'))};document.head.appendChild(sc);})); }
 async function exportCsv(){
+  // Excel（日×機体、画面の「この 1 か月の記録」と同じ見た目）。10/9 iller「見にくい」→ CSV をやめて xlsx に
   const ym=$('fk_f_month').value;if(!ym){toast('対象月を選んでください',false);return;}
   toast('集計中...');
-  let data=[];try{const r=await apiGet({action:'month',ym});data=r.data||[];}catch(e){toast('取得に失敗しました',false);return;}
-  if(!data.length){toast('この月の記録はありません',false);return;}
-  data.sort((a,b)=>String(a.date+a.machine).localeCompare(String(b.date+b.machine)));
-  const head=['日付','機体','点検者','判定','否の項目','備考'];
-  const rows=data.map(r=>{let ng=[];try{ng=JSON.parse(r.ng||'[]');}catch(e){}
-    const ngStr=ng.map(x=>x.label+(x.memo?'('+x.memo+')':'')).join('；');
-    return [r.date,r.machine,r.inspector,r.status,ngStr,r.note];});
-  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
-  const csv='﻿'+[head,...rows].map(row=>row.map(q).join(',')).join('\r\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='フォークリフト点検_'+ym+'.csv';
-  document.body.appendChild(a);a.click();a.remove();
-  toast('CSVを出力しました（'+data.length+'件）');
+  let data=[];try{const [r]=await Promise.all([apiGet({action:'month',ym}),loadXlsx()]);data=r.data||[];}catch(e){toast(e&&e.message==='lib'?'Excel の部品が読めません':'取得に失敗しました',false);return;}
+  const ids=MACHINES.map(m=>m.id), names=ids.map(id=>id.replace('フォークリフト','')), by={};
+  data.forEach(r=>{by[String(r.date).slice(0,10)+'|'+r.machine]=r;});
+  const [y,m]=ym.split('-').map(Number), last=new Date(y,m,0).getDate();
+  const B='D1D5DB', bd={top:{style:'thin',color:{rgb:B}},bottom:{style:'thin',color:{rgb:B}},left:{style:'thin',color:{rgb:B}},right:{style:'thin',color:{rgb:B}}};
+  const F=(fill,color,bold,h)=>({fill:fill?{fgColor:{rgb:fill}}:undefined,font:{name:'Meiryo UI',sz:10,bold:!!bold,color:color?{rgb:color}:undefined},alignment:{horizontal:h||'left',vertical:'center',wrapText:true},border:bd});
+  const aoa=[[`フォークリフト点検　${y}年${m}月`],['日付']];
+  names.forEach(n=>aoa[1].push(n+' 判定',n+' 点検者',n+' 否の項目・備考'));
+  const cnt={};ids.forEach(id=>cnt[id]=0);let wd=0;
+  for(let dd=1;dd<=last;dd++){
+    const x=new Date(y,m-1,dd), ds=fmt(x), off=x.getDay()===0||x.getDay()===6; if(!off)wd++;
+    const row=[`${m}/${dd}（${'日月火水木金土'[x.getDay()]}）`];
+    ids.forEach(id=>{const r=by[ds+'|'+id];
+      if(!r){row.push(off?'':'未点検','','');return;}
+      cnt[id]++;let ng=[];try{ng=JSON.parse(r.ng||'[]');}catch(e){}
+      const ngStr=ng.map(q=>q.label+(q.memo?'（'+q.memo+'）':'')).join('、');
+      row.push(r.status||'',r.inspector||'',[ngStr,r.note||''].filter(Boolean).join(' / '));});
+    aoa.push(row);
+  }
+  const sum=['記録数'];ids.forEach(id=>sum.push(`${cnt[id]} / 平日 ${wd} 日`,'',''));aoa.push(sum);
+  const ws=XLSX.utils.aoa_to_sheet(aoa), nc=aoa[1].length, nr=aoa.length;
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:nc-1}}];
+  ws['!cols']=[{wch:12}];names.forEach(()=>ws['!cols'].push({wch:7},{wch:9},{wch:30}));
+  ws['!rows']=[{hpt:22},{hpt:20}];
+  for(let r=0;r<nr;r++)for(let c=0;c<nc;c++){
+    const ref=XLSX.utils.encode_cell({r,c});if(!ws[ref])ws[ref]={t:'s',v:''};
+    const v=String(ws[ref].v||'');
+    if(r===0){ws[ref].s=F(null,null,true);continue;}
+    if(r===1){ws[ref].s=F('E5E7EB',null,true,'center');continue;}
+    if(r===nr-1){ws[ref].s=F('F3F4F6','6B7280',false,c?'center':'left');continue;}
+    const dd=r-1, x=new Date(y,m-1,dd), off=x.getDay()===0||x.getDay()===6, kind=c===0?'d':((c-1)%3===0?'j':'t');
+    let st=F(off?'F3F4F6':null, off?'9CA3AF':null, false, kind==='j'?'center':'left');
+    if(kind==='j'){ if(v==='否')st=F('FEE2E2','B91C1C',true,'center'); else if(v==='未点検')st=F(null,'DC2626',true,'center'); else if(v==='良')st=F(null,'15803D',true,'center'); }
+    ws[ref].s=st;
+  }
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,`${y}年${m}月`);
+  XLSX.writeFile(wb,'フォークリフト点検_'+ym+'.xlsx');
+  toast('Excel を出力しました（記録 '+data.length+'件）');
 }
+
 
 function reloadAll(){boot();toast('更新しました');}
   function setMemo(n,v){ if(itemState[n]) itemState[n].memo=v; }
