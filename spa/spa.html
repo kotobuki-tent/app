@@ -1487,10 +1487,11 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-cal table{width:100%;border-collapse:collapse;font-size:14px}
 #view-cal td{padding:7px 10px;border-top:1px solid var(--border-light);vertical-align:top;line-height:1.7}
 #view-cal tr:first-child td{border-top:none}
-#view-cal tr.none td{padding:5px 10px;line-height:1.5}
+#view-cal tr.none td{padding:8px 10px}
 #view-cal td.n{white-space:nowrap;width:1%;font-weight:600;padding-right:18px}
 #view-cal tr.none td.n{font-weight:500;color:var(--text-dim)}
-#view-cal td.d{color:var(--border)}
+#view-cal td.d{color:var(--text-faint);line-height:1.9}
+#view-cal tr.none td{background:var(--surface2)}
 #view-cal .pc-chip{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:2px 9px;margin:2px 6px 2px 0}
 #view-cal .pc-chip b{font-weight:700;color:var(--accent);margin-right:6px;font-variant-numeric:tabular-nums}
 #view-cal .pc-chip.all{background:var(--accent-dim);border-color:transparent}
@@ -3417,7 +3418,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-09 15:08';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-09 15:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8150,12 +8151,13 @@ const Cal = (function(){
       <div class="cal-nav"><button class="cal-btn" onclick="Cal.move(-7)" title="前の 7 日">◀</button><div class="cal-week">${chips}</div><button class="cal-btn" onclick="Cal.move(7)" title="次の 7 日">▶</button><button class="cal-btn cal-today" onclick="Cal.today()"${isToday?' disabled':''}>今日に戻る</button></div>
     </div>`;
     if(!cal){ el.innerHTML=hd+(calErr?'<div class="pc-msg">予定を取れませんでした</div>':''); return; }
-    const rows=cal.people.map(p=>{
-      const its=p.items||[];
-      const cs=its.map(it=>{ const t=it.allDay?'終日':(it.s||'')+(it.e?'–'+it.e:''); return `<span class="pc-chip${it.off?' off':it.allDay?' all':''}"><b>${esc(t)}</b>${esc(it.t)}</span>`; }).join('');
-      return `<tr class="${its.length?'has':'none'}"><td class="n">${esc(p.name)}</td><td class="${cs?'c':'d'}">${cs||'—'}</td></tr>`;
-    }).join('');
-    el.innerHTML=hd+`<div class="cal-card"><table>${rows}</table></div>`;
+    // 予定のある人を並び順のまま、無い人は末尾に一行でまとめる（iller 10/9）
+    const has=cal.people.filter(p=>p.items&&p.items.length), none=cal.people.filter(p=>!(p.items&&p.items.length));
+    const rows=has.map(p=>{
+      const cs=p.items.map(it=>{ const t=it.allDay?'終日':(it.s||'')+(it.e?'–'+it.e:''); return `<span class="pc-chip${it.off?' off':it.allDay?' all':''}"><b>${esc(t)}</b>${esc(it.t)}</span>`; }).join('');
+      return `<tr class="has"><td class="n">${esc(p.name)}</td><td class="c">${cs}</td></tr>`;
+    }).join('')+(none.length?`<tr class="none"><td class="n">予定なし</td><td class="d">${none.map(p=>esc(p.name)).join('　')}</td></tr>`:'');
+    el.innerHTML=hd+`<div class="cal-card"><table>${rows||'<tr class="none"><td class="n">—</td><td class="d">予定のある人はいません</td></tr>'}</table></div>`;
   }
   function init(){}
   return { loadAll, render, init, move, today, go };
