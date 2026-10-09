@@ -1466,6 +1466,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-cal .cal-nav{display:flex;align-items:center;gap:6px}
 #view-cal .cal-btn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:5px 11px;font-size:14px;cursor:pointer;line-height:1;color:var(--text)}
 #view-cal .cal-today{font-size:13px;padding:6px 10px}
+#view-cal .cal-right{display:flex;align-items:center;gap:10px}
 #view-cal .cal-hd small{color:var(--text-faint);font-size:12px}
 #view-cal table{width:100%;border-collapse:collapse;font-size:14px;background:var(--surface);border:1px solid var(--border-light);border-radius:10px;overflow:hidden}
 #view-cal td{padding:6px 8px;border-top:1px solid var(--border-light);vertical-align:top;line-height:1.7}
@@ -3395,7 +3396,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-09 14:27';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-09 14:29';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8115,7 +8116,7 @@ const Cal = (function(){
   function render(){
     const el=document.getElementById('calBody'); if(!el)return;
     const d=new Date(date+'T00:00:00'), dow='日月火水木金土'[d.getDay()], isToday=date===fmtD(new Date());
-    const hd=`<div class="cal-hd"><div class="cal-nav"><button class="cal-btn" onclick="Cal.move(-1)">◀</button><h2>${d.getMonth()+1}/${d.getDate()}（${dow}）</h2><button class="cal-btn" onclick="Cal.move(1)">▶</button><button class="cal-btn cal-today" onclick="Cal.today()"${isToday?' disabled':''}>今日</button></div><small>${cal?esc(cal.updated||'')+' 時点':(calErr?'':'読み込み中…')}</small></div>`;
+    const hd=`<div class="cal-hd"><div class="cal-nav"><button class="cal-btn" onclick="Cal.move(-1)">◀</button><h2>${d.getMonth()+1}/${d.getDate()}（${dow}）</h2><button class="cal-btn" onclick="Cal.move(1)">▶</button></div><div class="cal-right"><small>${cal?esc(cal.updated||'')+' 時点':(calErr?'':'読み込み中…')}</small><button class="cal-btn cal-today" onclick="Cal.today()"${isToday?' disabled':''}>今日に戻る</button></div></div>`;
     if(!cal){ el.innerHTML=hd+(calErr?'<div class="pc-msg">予定を取れませんでした</div>':''); return; }
     const rows=(cal.people||[]).map(p=>{
       const chips=(p.items||[]).map(it=>{ const t=it.allDay?'終日':(it.s||'')+(it.e?'-'+it.e:''); return `<span class="pc-chip${it.off?' off':''}"><b>${esc(t)}</b>${esc(it.t)}</span>`; }).join('');
