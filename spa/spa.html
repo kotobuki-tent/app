@@ -9063,21 +9063,30 @@ function delRecord(){
 
 /* ===== CSV ===== */
 async function exportCsv(){
-  const ym=$('f_month').value;
-  if(!ym){toast('対象月を選んでください',false);return;}
+  // 日付×機体の横並び（画面の「この 1 か月の記録」と同じ形、10/9 iller「見にくい CSV」）。その月の全日を出し、平日の未点検は「未点検」
+  const ym=$('fk_f_month').value;if(!ym){toast('対象月を選んでください',false);return;}
   toast('集計中...');
-  let data=[];
-  try{const r=await apiGet({action:'month',ym});data=r.data||[];}catch(e){toast('取得に失敗しました',false);return;}
-  if(!data.length){toast('この月の記録はありません',false);return;}
-  data.sort((a,b)=>String(a.date+a.time).localeCompare(String(b.date+b.time)));
-  const head=['日付','運転者','車両','区分','時刻','確認者','検知器の使用','確認方法','対面以外の方法','酒気帯びの有無','測定値(mg/L)','指示事項','その他'];
-  const rows=data.map(r=>[r.date,r.driver,r.vehicle,r.phase,fmtTime(r.time),r.checker,r.detector_used,r.face,r.method,r.alcohol,r.value,r.instruction,r.note]);
+  let data=[];try{const r=await apiGet({action:'month',ym});data=r.data||[];}catch(e){toast('取得に失敗しました',false);return;}
+  const ids=MACHINES.map(m=>m.id), by={};
+  data.forEach(r=>{by[String(r.date).slice(0,10)+'|'+r.machine]=r;});
+  const [y,m]=ym.split('-').map(Number), last=new Date(y,m,0).getDate();
+  const head=['日付','曜'];ids.forEach(id=>{const n=id.replace('フォークリフト','');head.push(n+' 判定',n+' 点検者',n+' 否の項目・備考');});
+  const rows=[];
+  for(let dd=1;dd<=last;dd++){
+    const x=new Date(y,m-1,dd), ds=fmt(x), off=x.getDay()===0||x.getDay()===6, row=[ds,'日月火水木金土'[x.getDay()]];
+    ids.forEach(id=>{const r=by[ds+'|'+id];
+      if(!r){row.push(off?'':'未点検','','');return;}
+      let ng=[];try{ng=JSON.parse(r.ng||'[]');}catch(e){}
+      const ngStr=ng.map(q=>q.label+(q.memo?'('+q.memo+')':'')).join('；');
+      row.push(r.status||'',r.inspector||'',[ngStr,r.note||''].filter(Boolean).join(' / '));});
+    rows.push(row);
+  }
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
-  const csv='﻿'+[head,...rows].map(row=>row.map(q).join(',')).join('\r\n');
+  const csv='\ufeff'+[head,...rows].map(row=>row.map(q).join(',')).join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='アルコールチェック_'+ym+'.csv';
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='フォークリフト点検_'+ym+'.csv';
   document.body.appendChild(a);a.click();a.remove();
-  toast('CSVを出力しました（'+data.length+'件）');
+  toast('CSVを出力しました（記録 '+data.length+'件）');
 }
 
 function reloadAll(){boot();toast('更新しました');}
