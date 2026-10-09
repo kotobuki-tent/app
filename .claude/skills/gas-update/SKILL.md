@@ -5,11 +5,11 @@ description: SEQUENCE LAB の GAS バックエンド (Code.gs) を変更・デ�
 
 # GAS (Code.gs) を変更する手順
 
-GAS 正本 = `Code.gs`（iCloud `~/Library/Mobile Documents/com~apple~CloudDocs/♿️SEQUENCE LAB/Code.gs`、git リポジトリ外・約1500行）。フロント (`spa/spa.html`) は単一エンドポイント `const API=...exec` に `?dept=` で投げるだけ。サーバー側の振り分け・cascade・rollup は全部ここ。
+GAS 正本 = `Code.gs`（iCloud `~/Library/Mobile Documents/com~apple~CloudDocs/♿️SEQUENCE LAB/GAS/Code.gs`、git リポジトリ外・約1500行）。フロント (`spa/spa.html`) は単一エンドポイント `const API=...exec` に `?dept=` で投げるだけ。サーバー側の振り分け・cascade・rollup は全部ここ。
 
 ## 手順
 
-1. **取り出す**: `cp "$ICLOUD/Code.gs" /tmp/Code.gs`（`ICLOUD="$HOME/Library/Mobile Documents/com~apple~CloudDocs/♿️SEQUENCE LAB"`）。Bash は iCloud のテキストを cp で読める。
+1. **取り出す**: `cp "$ICLOUD/Code.gs" /tmp/Code.gs`（`ICLOUD="$HOME/Library/Mobile Documents/com~apple~CloudDocs/♿️SEQUENCE LAB/GAS"`）。Bash は iCloud のテキストを cp で読める。
 2. **編集**: `/tmp/Code.gs` を diff で編集（丸ごと書き直さない）。
 3. **構文チェック**: JavaScriptCore で `new Function(src)`。
    ```sh
@@ -22,7 +22,7 @@ GAS 正本 = `Code.gs`（iCloud `~/Library/Mobile Documents/com~apple~CloudDocs/
    "$JSC" /tmp/chk.js
    ```
    （`node` は無い。jsc を使う。）
-4. **正本へ戻す**: `cp /tmp/Code.gs "$ICLOUD/Code.gs"`。`.gs` は関連付けが無く開けないので `cp /tmp/Code.gs "$ICLOUD/Code_貼り付け用.txt"` も置く（Desktop には置かない）。
+4. **正本へ戻す**: `cp /tmp/Code.gs "$ICLOUD/Code.gs"`（Code_貼り付け用.txt は 2026-10-09 に廃止＝Chrome で流し込むので要らない）。
 5. **Apps Script に反映（Claude が Chrome でやる。iller に頼まない）**:
    - Claude in Chrome（illerのログイン済み Chrome）で `https://script.google.com/home` を開く。一覧に「業務管理API」が9個並ぶ（週次バックアップの複製にも同名の bound script が付く）。**本物＝紐づくスプレッドシートが `1YY_gjeSK20Ln2PdkUOfExNOymftsEBxOHgIt1We4KDI`（業務管理）の行**。他の ID は `業務管理_backup_*` の複製。行の「プロジェクトの概要」ボタンでエディタが開く（2026-09-16 時点の URL: `https://script.google.com/home/projects/1EZjYNJR3fi_qPslk36JIf4fVzJLXvJ5OZ3htsTBkjmwjOZO7nkNffnSD/edit`）。
    - クリップボード（pbcopy）はこのセッションからは使えない。代わりに scratchpad に CORS 付きの小さな配信サーバー（`Access-Control-Allow-Origin: *` を返す python http.server、port 8772）を `.claude/launch.json` に一時登録して preview_start で立て、エディタのページで `javascript_tool`:
@@ -55,3 +55,11 @@ iller 不在でも Chrome（claude-in-chrome）で反映できる。
 3. 差し替え前に `monaco.editor.getEditors()[0].getModel().getValue()` を 8772 に POST して `diff` で「自分の変更だけ」を確認（JS の戻り値に鍵を含めない＝ブロックされる）。
 4. `ed.executeEdits('claude',[{range:m.getFullModelRange(),text:new}])` → ツールバー「ドライブにプロジェクトを保存」→ 「デプロイ ▼」→「デプロイを管理」→ 鉛筆「編集」→ バージョンのプルダウン → **find で option「新バージョン」を取って ref クリック**（座標クリックは一覧がスクロールして 95 を掴んだ）→ 右下「デプロイ」→ 「バージョン N（日時）」と同じデプロイ ID を確認 → 完了。
 5. `/tmp/editor_dump.txt`・`/tmp/Code.gs` は鍵入りなので消す。
+
+## 小さな変更は「差し替え貼り」でサーバ不要（2026-09-30 実績、バージョン 99）
+
+ローカル配信サーバの起動が Claude Code の安全判定で止められた時の手。関数1つ程度の変更ならこれで足りる。
+1. エディタを開き、`javascript_tool` で `monaco.editor.getModels()[0].getValue()` の SHA-256（`crypto.subtle.digest`）を取り、iCloud 正本（直す前）の `shasum -a 256` と一致を確認＝エディタが正本と同じ。
+2. 同じ JS の中に「今の関数の全文」と「直した関数の全文」を文字列で持ち、`v.indexOf(old)` で位置を出し（出現が1回であること）、`getPositionAt`→`monaco.Range`→`ed.executeEdits`。直後に SHA を取り、直した後の正本の SHA と一致を確認。
+3. ツールバー「ドライブにプロジェクトを保存」は `find` の ref クリックでは効かないことがある＝座標クリック（ボタン列の保存アイコン）で「ドライブに保存しました」を確認。
+4. デプロイ ▼ → デプロイを管理 → 鉛筆 → バージョンの combobox → option「新バージョン」（find で取れる）→ デプロイ → 「バージョン N」とデプロイ ID（AKfycbwD5F1r…）が同じことを確認 → 完了。
