@@ -3324,6 +3324,18 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-forklift .btn{padding:14px 18px;border:none;border-radius:10px;font:800 15px/1 'Noto Sans JP';cursor:pointer;background:var(--accent);color:#fff;white-space:nowrap}
 #view-forklift .note{font-size:12px;color:var(--text-faint);margin-top:10px;line-height:1.6}
 #view-forklift .empty{text-align:center;padding:24px;color:var(--text-faint);font-size:14px}
+/* この 1 か月の記録（10/9 iller「画面に記録を残せ」）：日×機体の表。空欄＝未点検 */
+#view-forklift .fk-sum{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-dim);margin:0 0 8px}
+#view-forklift .fk-sum b{color:var(--text)}
+#view-forklift .fk-hist{width:100%;border-collapse:collapse;font-size:12px}
+#view-forklift .fk-hist th{background:var(--surface3);color:var(--text-dim);font-weight:600;padding:5px 6px;text-align:left;border-bottom:1px solid var(--border-light)}
+#view-forklift .fk-hist td{padding:4px 6px;border-bottom:1px solid var(--border-light);white-space:nowrap}
+#view-forklift .fk-hist td.d{color:var(--text-dim);width:1%}
+#view-forklift .fk-hist tr.off td{color:var(--text-faint);background:var(--surface2)}
+#view-forklift .fk-hist td.ok{color:#15803d}
+#view-forklift .fk-hist td.ng{color:var(--red);font-weight:700}
+#view-forklift .fk-hist td.no{color:var(--red);background:var(--red-dim)}
+#view-forklift .fk-hist tr.off td.no{color:var(--text-faint);background:transparent}
 #view-forklift .hide{display:none!important}
 #view-forklift .toast{position:fixed;top:50%;left:50%;bottom:auto;right:auto;width:auto;transform:translate(-50%,-50%) scale(.92);padding:26px 42px;border-radius:16px;font:800 25px/1.45 'Noto Sans JP';z-index:9999;opacity:0;transition:.18s;pointer-events:none;box-shadow:0 16px 48px rgba(0,0,0,.3);text-align:center;max-width:84vw}
 #view-forklift .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
@@ -3355,6 +3367,9 @@ table.jobs tr:last-child td{border-bottom:none}
     <h2>本日の点検 <span class="daydate" id="fkDayLabel"></span></h2>
     <input type="hidden" id="fk_f_date">
     <div id="fk_dayList"><div class="empty">読み込み中...</div></div>
+    <div class="divider"></div>
+    <h2>この 1 か月の記録</h2>
+    <div id="fk_hist"><div class="empty">読み込み中...</div></div>
     <div class="divider"></div>
     <h2>📤 月次CSV出力（保存用）</h2>
     <div class="csvbar">
@@ -3418,7 +3433,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-09 16:24';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-09 16:47';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9144,7 +9159,32 @@ async function boot(){
     try{localStorage.setItem('fk_boot',JSON.stringify(inspectors));}catch(e){}
   }catch(e){}
   await loadDay($('fk_f_date').value);
+  loadHistory();
 }
+
+// この 1 か月の記録：今月と先月を取り、今日から 30 日前までを日×機体で並べる（空欄＝未点検、土日は薄く）
+let hist=[];
+async function loadHistory(){
+  const d=new Date(), p=new Date(d.getFullYear(),d.getMonth()-1,1);
+  const ym0=p.getFullYear()+'-'+pad(p.getMonth()+1), ym1=monthStr();
+  try{const [a,b]=await Promise.all([apiGet({action:'month',ym:ym0}),apiGet({action:'month',ym:ym1})]);hist=[...((a&&a.data)||[]),...((b&&b.data)||[])];}catch(e){hist=[];}
+  renderHistory();
+}
+function renderHistory(){
+  const el=$('fk_hist');if(!el)return;
+  const ids=MACHINES.map(m=>m.id);
+  const by={};hist.forEach(r=>{by[String(r.date).slice(0,10)+'|'+r.machine]=r;});
+  const days=[];const d=new Date();d.setHours(0,0,0,0);
+  for(let i=0;i<31;i++){const x=new Date(d);x.setDate(d.getDate()-i);days.push(x);}
+  const cnt={},wd=days.filter(x=>x.getDay()!==0&&x.getDay()!==6).length;
+  ids.forEach(id=>{cnt[id]=days.filter(x=>by[fmt(x)+'|'+id]).length;});
+  const fmtD=x=>fmt(x);
+  const rows=days.map(x=>{const ds=fmtD(x),off=x.getDay()===0||x.getDay()===6;
+    const cells=ids.map(id=>{const r=by[ds+'|'+id];if(!r)return `<td class="${off?'':'no'}">${off?'':'未点検'}</td>`;const ng=r.status==='否';return `<td class="${ng?'ng':'ok'}">${ng?'否':'良'} <span style="color:var(--text-dim);font-weight:400">${esc(r.inspector||'')}</span></td>`;}).join('');
+    return `<tr class="${off?'off':''}"><td class="d">${x.getMonth()+1}/${x.getDate()}（${'日月火水木金土'[x.getDay()]}）</td>${cells}</tr>`;}).join('');
+  el.innerHTML=`<div class="fk-sum">${ids.map(id=>`<span>${esc(id.replace('フォークリフト',''))}：<b>${cnt[id]}</b> / 平日 ${wd} 日</span>`).join('')}</div><table class="fk-hist"><thead><tr><th>日付</th>${ids.map(id=>`<th>${esc(id.replace('フォークリフト',''))}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+function fmt(x){return x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate());}
 
 function renderMachines(){
   $('fk_machineGrid').innerHTML=MACHINES.map(m=>{
