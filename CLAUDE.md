@@ -80,6 +80,8 @@ iller と社長専用のパスワード台帳。**ローカルの HTML 1枚**（
 
 **2026-10-09 秘書アプリのタブにも**：`https://kotobuki-tent.github.io/secretary/`（別 repo `kotobuki-tent/secretary`、ローカル clone `~/dev/secretary`）の「PW」タブ＝`pw.html`。中身は PW管理.html の写しだが **鍵（BOSS_KEY・DK）はファイルに無く localStorage（`sec_bk`・`sec_dk`）から読む**。鍵は一度だけ `?bk=…&dk=…` 付きの URL で開いて覚えさせる（保存後に URL から消す）。鍵が無い端末は案内だけ出して GAS を呼ばない。PW管理.html を直したら pw.html にも同じ直しを（KEY/DK の行だけ違う）。
 
+**給料（2026-10-09、Code.gs v111）**：`dept=pw` に `vault` パラメータ（GET query／POST body）。`pay` → シート `pay_vault`、無指定 → `pw_vault`（`PW_VAULTS`）。秘書の経営タブ `boss.html` の「給料」カードが使う：給与台帳 xlsx（🍅給与・考課/2_毎年の考課/寿テント_給与台帳.xlsx）の「社員マスター」を SheetJS（cdnjs）でブラウザ読み → AES-GCM（PW と同じ `DK`）で暗号 → `vault=pay` に保存。表示は 氏名・職位・区分・級・号・基本給／時給・役職手当・資格手当・月額（区分 退職は除く）。台帳を直したらもう一度放り込む（上書き）。
+
 ### 経営者ページ（local file, 2026-09-17）
 
 Boss-only features were **removed from the SPA** (日報「記入状況」ranking, 人事考課 link, the whole `?boss=` / `BOSS_KEY` / `bossTap` / crown-badge machinery). They now live in **one local HTML file outside this repo**: iCloud `♿️SEQUENCE LAB/経営/寿テント_経営.html`（2026-10-09 整理で 経営/ へ） (double-click to open). The file embeds the API passphrase and the 人事考課 master key, calls this same GAS endpoint (`staff_for_daily`, `daily read`, `read_absence` range, `dept=auth&action=log`) and computes the ranking client-side (`cid=boss-local`). **Never copy it into the repo or any public place.** If `API_KEY` is rotated, update the `KEY` line in that file. The ¥合計 badge stays in the SPA (it is for staff). A short-lived GAS version (「寿テント 経営」) was trashed the same day; its source is gone (the 経営/ folder now holds the local pages). The legacy `dept=hr` handler was deleted from `Code.gs`; 人事考課 is its own project (`人事考課データ`, owner kcdtaipei).
