@@ -35,15 +35,15 @@
   --orange-light:rgba(245,158,11,.14);
 }
 html{font-size:15px;scrollbar-gutter:stable;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;overscroll-behavior-y:none}
+body{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:48px;overscroll-behavior-y:none}
 .empty-msg{text-align:center;padding:40px 20px;color:var(--text-faint);font-size:13px}
 
 /* ===== サブタブ行（共通） ===== */
 .sub-tabs{display:flex;gap:3px;padding:14px 6px;background:#f5f6fa;align-items:center;overflow-x:auto;scrollbar-width:none}
 .sub-tabs::-webkit-scrollbar{display:none}
 .subtab-date{display:inline-flex;align-items:center;height:29px;font-size:14px;line-height:1;color:var(--text-dim);font-weight:500;margin-right:10px;white-space:nowrap}
-.subtab-search{margin-left:auto;padding:7px 14px;border:1px solid var(--border);border-radius:999px;font:400 13px/1 'Noto Sans JP',sans-serif;width:140px;appearance:none;-webkit-appearance:none;background:var(--surface);flex-shrink:0}
-.sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 12px;border-radius:999px;cursor:pointer;transition:.15s;min-width:60px;text-align:center;white-space:nowrap}
+.subtab-search{margin-left:auto;padding:7px 14px;border:1px solid var(--border);border-radius:999px;font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;width:140px;appearance:none;-webkit-appearance:none;background:var(--surface);flex-shrink:0}
+.sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:8px 12px;border-radius:999px;cursor:pointer;transition:.15s;min-width:60px;text-align:center;white-space:nowrap}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#dbeafe;color:#1e40af}
 @media(max-width:480px),(orientation:portrait){
@@ -68,7 +68,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .mo-bg.show{display:flex}
 .mo{background:var(--surface);border-radius:14px;padding:28px;width:100%;max-width:580px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
 .mo h2{font-size:18px;font-weight:900;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.del-link{background:transparent;border:none;color:var(--red);font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;padding:4px 10px;border-radius:6px}
+.del-link{background:transparent;border:none;color:var(--red);font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;padding:4px 10px;border-radius:6px}
 .del-link:hover{background:var(--red-dim)}
 .mo-row{display:flex;gap:14px;margin-bottom:14px}
 .mo-row.full{display:block;margin-bottom:14px}
@@ -78,11 +78,11 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .mo-row.pair .mo-field{min-width:0}
 .mo-field.f7{flex:7}.mo-field.f3{flex:3}
 .mo-field label{font-size:12px;font-weight:600;color:var(--text-dim)}
-.mo-field input,.mo-field select,.mo-field textarea{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.4 'Noto Sans JP',sans-serif;background:var(--surface2);width:100%}
+.mo-field input,.mo-field select,.mo-field textarea{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.4 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);width:100%}
 .mo-field textarea{min-height:70px;resize:vertical}
 .mo-field input:focus,.mo-field select:focus,.mo-field textarea:focus{outline:none;border-color:var(--accent)}
 .mo-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
-.mo-foot button{padding:10px 22px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:1px solid var(--border)}
+.mo-foot button{padding:10px 22px;border-radius:8px;font:600 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;border:1px solid var(--border)}
 .mo-foot .cancel{background:var(--surface);color:var(--text-dim)}
 .mo-foot .save{background:var(--accent);color:#fff;border-color:var(--accent)}
 .mo-foot .save:hover{opacity:.85}
@@ -113,7 +113,7 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .toast.show{opacity:1}
 .toast.err{background:#dc2626}
 /* 中央トースト（キオスクの日報用・気づきやすく画面中央に） */
-.center-toast{position:fixed;top:50%;left:50%;bottom:auto;right:auto;width:auto;transform:translate(-50%,-50%) scale(.92);padding:26px 42px;border-radius:16px;font:800 25px/1.45 'Noto Sans JP',sans-serif;color:#fff;background:#1a1d27;box-shadow:0 16px 48px rgba(0,0,0,.3);z-index:9999;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;text-align:center;max-width:84vw}
+.center-toast{position:fixed;top:50%;left:50%;bottom:auto;right:auto;width:auto;transform:translate(-50%,-50%) scale(.92);padding:26px 42px;border-radius:16px;font:800 25px/1.45 'Hiragino Sans','Noto Sans JP',sans-serif;color:#fff;background:#1a1d27;box-shadow:0 16px 48px rgba(0,0,0,.3);z-index:9999;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;text-align:center;max-width:84vw}
 .center-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .center-toast.ok{background:var(--green)}
 .center-toast.err{background:var(--red)}
@@ -129,7 +129,7 @@ html.in-woff #view-alcohol .kiosk, html.in-woff #view-forklift .kiosk{height:aut
 html.in-woff .portal-logo, html.in-woff .portal-sub, html.in-woff .portal-modeswitch, html.in-woff .portal-footer{display:none}
 html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-height:0}
 @media(max-width:480px){.mny-btn{display:none!important}}
-.nav-link{background:transparent;border:none;color:var(--text-dim);font:500 13px/1 'Noto Sans JP',sans-serif;padding:0 13px;border-radius:8px 8px 0 0;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;margin-bottom:0;position:relative;white-space:nowrap}
+.nav-link{background:transparent;border:none;color:var(--text-dim);font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:0 13px;border-radius:8px 8px 0 0;cursor:pointer;transition:background .15s,color .15s;text-decoration:none;display:inline-flex;align-items:center;margin-bottom:0;position:relative;white-space:nowrap}
 .nav-link:hover{color:var(--text);background:var(--surface3)}
 .nav-link.on{background:transparent;color:var(--text);font-weight:700}
 .nav-link.on::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2.5px;border-radius:2px;background:var(--accent)}
@@ -137,12 +137,12 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .nav-div{flex:0 0 auto;align-self:center;width:1px;height:18px;background:var(--border);margin:0 6px}
 #authGate{position:fixed;inset:0;z-index:1000;background:rgba(20,22,30,.96);display:flex;align-items:center;justify-content:center;padding:24px}
 #authGate .ag-box{max-width:520px;width:100%;background:#fff;border-radius:16px;padding:28px 26px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
-#authGate .ag-ttl{font:800 20px/1.4 'Noto Sans JP',sans-serif;color:#1a1d27;margin-bottom:12px}
-#authGate .ag-msg{font:500 15px/1.8 'Noto Sans JP',sans-serif;color:#333;white-space:pre-line;margin-bottom:18px}
-#authGate button{font:700 14px/1 'Noto Sans JP',sans-serif;padding:12px 22px;border:none;border-radius:999px;background:var(--accent);color:#fff;cursor:pointer}
-#dataStale{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:150;font:500 11px/1 'Noto Sans JP',sans-serif;color:#fff;background:rgba(40,44,52,.82);padding:6px 12px;border-radius:999px;pointer-events:none;user-select:none}   /* 前回のデータを表示中（2026-10-05） */
-#appVer{position:fixed;right:6px;bottom:4px;z-index:150;font:500 10px/1 'Noto Sans JP',sans-serif;color:var(--text-faint);opacity:.7;pointer-events:none;user-select:none}   /* 版の表示（2026-09-17 iller「最新版かどこかで分かれば」） */
-.hdr-btn{background:var(--surface2);border:1px solid var(--border-light);color:var(--text-dim);padding:0 14px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
+#authGate .ag-ttl{font:800 20px/1.4 'Hiragino Sans','Noto Sans JP',sans-serif;color:#1a1d27;margin-bottom:12px}
+#authGate .ag-msg{font:500 15px/1.8 'Hiragino Sans','Noto Sans JP',sans-serif;color:#333;white-space:pre-line;margin-bottom:18px}
+#authGate button{font:700 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:12px 22px;border:none;border-radius:999px;background:var(--accent);color:#fff;cursor:pointer}
+#dataStale{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:150;font:500 11px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:#fff;background:rgba(40,44,52,.82);padding:6px 12px;border-radius:999px;pointer-events:none;user-select:none}   /* 前回のデータを表示中（2026-10-05） */
+#appVer{position:fixed;right:6px;bottom:4px;z-index:150;font:500 10px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-faint);opacity:.7;pointer-events:none;user-select:none}   /* 版の表示（2026-09-17 iller「最新版かどこかで分かれば」） */
+.hdr-btn{background:var(--surface2);border:1px solid var(--border-light);color:var(--text-dim);padding:0 14px;border-radius:6px;font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:32px;align-self:center;margin-left:4px}
 .hdr-btn:hover{color:var(--text);border-color:var(--border)}
 .hdr-btn:hover{color:#4a0e1f;border-color:rgba(255,255,255,.5)}
 #refreshBtn{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}   /* 2026-09-17 iller「リロードのボタンを色で目立たせて」 */
@@ -211,12 +211,12 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .av-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 /* 管理タブ フィルター（全アプリ統一） */
 .adm-filter{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
-.adm-filter .ft{background:#f0f1f5;border:1px solid transparent;color:var(--text-dim);font:600 12px/1 'Noto Sans JP',sans-serif;padding:7px 13px;border-radius:999px;cursor:pointer;transition:.15s}
+.adm-filter .ft{background:#f0f1f5;border:1px solid transparent;color:var(--text-dim);font:600 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:7px 13px;border-radius:999px;cursor:pointer;transition:.15s}
 .adm-filter .ft:hover{color:var(--text);background:#e2e5f0}
 .adm-filter .ft.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent)}
-.av-add{background:var(--accent);color:#fff;border:none;padding:9px 18px;border-radius:8px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+.av-add{background:var(--accent);color:#fff;border:none;padding:9px 18px;border-radius:8px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
 .av-add:hover{opacity:.85}
-.av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;width:220px;appearance:none;-webkit-appearance:none;background:var(--surface)}
+.av-search{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;width:220px;appearance:none;-webkit-appearance:none;background:var(--surface)}
 
 .files-section{margin-top:20px;border-top:2px solid var(--surface3);padding-top:16px}
 .files-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
@@ -238,12 +238,12 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .st-change{margin-top:18px;padding-top:16px;border-top:2px solid var(--surface3)}
 .st-change-label{font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:10px}
 .st-change-btns{display:flex;gap:8px;flex-wrap:wrap}
-.st-btn{padding:10px 20px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
+.st-btn{padding:10px 20px;border-radius:8px;font:600 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
 .st-btn:hover{border-color:var(--accent);color:var(--accent)}
 .st-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);cursor:default}
 
 /* 折りたたみ式ステータス変更（誤タップ防止） */
-.st-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 16px;border-radius:10px;border:2px solid var(--border);background:var(--surface);cursor:pointer;font:600 14px/1 'Noto Sans JP',sans-serif;color:var(--text);transition:.15s}
+.st-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 16px;border-radius:10px;border:2px solid var(--border);background:var(--surface);cursor:pointer;font:600 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);transition:.15s}
 .st-toggle:hover{border-color:var(--accent)}
 .st-toggle .st-cur{display:flex;align-items:center;gap:8px}
 .st-toggle .st-cur-badge{display:inline-block;padding:3px 12px;border-radius:6px;font-size:13px;font-weight:700;background:var(--accent);color:#fff}
@@ -252,12 +252,12 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .st-toggle.open .st-arrow{transform:rotate(180deg)}
 .st-opts{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .st-opts.open{display:grid}
-.st-opt{padding:13px 16px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
+.st-opt{padding:13px 16px;border-radius:8px;font:600 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--border);background:var(--surface);color:var(--text-dim);transition:.15s}
 .st-opt:hover{border-color:var(--accent);color:var(--accent)}
 .st-opt.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 
 /* ステータスログボタン */
-.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap;flex-shrink:0}
+.slog-btn{background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;position:relative;transition:.15s;white-space:nowrap;flex-shrink:0}
 /* 企画はSTAFFボタンが無いので、slogボタンを右寄せ起点に（生産は#prodTabsで無影響） */
 /* 右寄せ起点：生産はstaff-btnが起点（既定）。STAFFボタンを持たないアプリ（企画/在庫/今後追加分）は
    各slogボタンを margin-left:auto で起点にし、slog＋検索バーを右端に寄せる */
@@ -277,17 +277,17 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .slog-item .sl-st{font-weight:700;color:var(--accent);margin:0 2px}
 
 /* STAFFボタンと出勤モーダル */
-.staff-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
+.staff-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
 .staff-btn+.slog-btn{margin-left:8px}
 .slog-btn+.subtab-search{margin-left:8px}
 .staff-btn:hover{border-color:var(--accent);color:var(--accent)}
 .staff-btn .count{font-weight:700;color:var(--text);margin-left:4px}
 /* ¥合計ボタン（金額の積み上げ）。staff-btnと同外観だがモバイルでも隠さない */
-.mny-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
+.mny-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
 .mny-btn:hover{border-color:var(--accent);color:var(--accent)}
 .mny-btn+.staff-btn,.mny-btn+#projSlogBtn,.mny-btn+#salesSlogBtn,.mny-btn+#casesSlogBtn{margin-left:8px}
 .staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:4px}
-.staff-cell{padding:14px 10px;border:2px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-dim);font:500 14px/1.3 'Noto Sans JP',sans-serif;cursor:pointer;text-align:center;transition:.1s;user-select:none;position:relative}
+.staff-cell{padding:14px 10px;border:2px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-dim);font:500 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;text-align:center;transition:.1s;user-select:none;position:relative}
 .staff-cell:hover{border-color:var(--accent)}
 .staff-cell.f1{background:#aed581;color:#1b5e20;border-color:#8bc34a;font-weight:700}
 .staff-cell.f2{background:#81d4fa;color:#01579b;border-color:#4fc3f7;font-weight:700}
@@ -308,7 +308,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 
   /* サマリー：文字ピル化（管理タブのフィルターと統一） */
   .fv-sum{display:none !important}
-  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .fv-si{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;min-width:0;border-radius:999px;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
   .fv-si .n{font-size:13px;font-weight:700;line-height:1;margin:0;order:2}
   .fv-si .l{font-size:12px;font-weight:600;line-height:1;margin:0;color:inherit;order:1}
@@ -432,9 +432,9 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .gantt-section-hd:first-of-type{border-top:none;margin-top:0;padding-top:4px}
 .gantt-section-hd .count{font-weight:500;color:var(--text-faint);margin-left:6px}
 .gantt-controls{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
-.gantt-controls select{padding:7px 10px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface)}
+.gantt-controls select{padding:7px 10px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface)}
 .gantt-nav{display:flex;gap:4px}
-.gantt-nav button{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+.gantt-nav button{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
 .gantt-nav button:hover{border-color:var(--accent);color:var(--accent)}
 .gantt-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
 .gantt{min-width:800px}
@@ -498,11 +498,11 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .date-phase-label{font-size:12px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px}
 .date-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
 .date-item{display:flex;align-items:center;gap:4px}
-.date-item input[type="date"]{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:400 13px/1.4 'Noto Sans JP',sans-serif;background:var(--surface2)}
+.date-item input[type="date"]{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:400 13px/1.4 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2)}
 .date-item input[type="date"]:focus{outline:none;border-color:var(--accent)}
 .date-rm{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
 .date-rm:hover{opacity:.7}
-.date-add-btn{background:none;border:1px dashed var(--border);color:var(--text-dim);font:500 12px/1 'Noto Sans JP',sans-serif;padding:6px 12px;border-radius:6px;cursor:pointer}
+.date-add-btn{background:none;border:1px dashed var(--border);color:var(--text-dim);font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:6px 12px;border-radius:6px;cursor:pointer}
 .date-add-btn:hover{border-color:var(--accent);color:var(--accent)}
 .phase-hd{font-size:12px;font-weight:700;color:var(--text-dim);margin:14px 0 8px;padding-top:8px;border-top:1px solid var(--surface3)}
 .view-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--border-light);font-size:13px}
@@ -514,19 +514,19 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .rental-add-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--border-light)}
 .rblock .rb-h{font-size:12px;font-weight:700;color:var(--text-dim);margin:14px 0 6px}
 .rblock .rb-h:first-child{margin-top:0}
-.rblock .rb-legacy{width:100%;min-height:72px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:400 13px/1.5 'Noto Sans JP',sans-serif;background:var(--surface2);box-sizing:border-box;resize:vertical}
+.rblock .rb-legacy{width:100%;min-height:72px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:400 13px/1.5 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);box-sizing:border-box;resize:vertical}
 .rental-add-section h3{font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px}
 .rental-add-row{display:flex;gap:6px;margin-bottom:6px;align-items:flex-end;flex-wrap:wrap}
-.rental-add-row select,.rental-add-row input{padding:7px 8px;border:1px solid var(--border);border-radius:6px;font:400 12px/1.3 'Noto Sans JP',sans-serif;background:var(--surface2)}
+.rental-add-row select,.rental-add-row input{padding:7px 8px;border:1px solid var(--border);border-radius:6px;font:400 12px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2)}
 .rental-add-row select:focus,.rental-add-row input:focus{outline:none;border-color:var(--accent)}
 .rental-add-row .ra-cat{width:100px}
 .rental-add-row .ra-item{width:120px}
 .rental-add-row .ra-qty{width:55px}
 .rental-add-row .ra-date{width:120px}
 .rental-add-row .ra-rm{background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:4px}
-.rental-add-btn{background:none;border:1px dashed var(--border);color:var(--text-dim);font:500 11px/1 'Noto Sans JP',sans-serif;padding:5px 12px;border-radius:6px;cursor:pointer;margin-top:4px}
+.rental-add-btn{background:none;border:1px dashed var(--border);color:var(--text-dim);font:500 11px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:5px 12px;border-radius:6px;cursor:pointer;margin-top:4px}
 .rental-add-btn:hover{border-color:var(--accent);color:var(--accent)}
-.rental-save-btn{background:var(--accent);color:#fff;border:none;padding:7px 16px;border-radius:6px;font:600 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;margin-top:8px}
+.rental-save-btn{background:var(--accent);color:#fff;border:none;padding:7px 16px;border-radius:6px;font:600 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;margin-top:8px}
 .rental-save-btn:hover{opacity:.85}
 .rental-existing{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;border-bottom:1px solid var(--surface3)}
 .rental-existing:last-child{border-bottom:none}
@@ -693,7 +693,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 @media(max-width:480px),(orientation:portrait){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
-  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
   .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
   .fv-si .l{font-size:12px !important;font-weight:600;line-height:1;margin:0 !important;color:inherit;order:1}
@@ -714,7 +714,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .fv-sum{display:none !important}
-  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .fv-si{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;min-width:0;border-radius:999px;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
   .fv-si .n{font-size:13px;font-weight:700;line-height:1;margin:0;order:2}
   .fv-si .l{font-size:12px;font-weight:600;line-height:1;margin:0;color:inherit;order:1}
@@ -737,9 +737,9 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 /* ===== 在庫ガント（試作 lab/gantt.html を移植。帯＝予定、品名の下＝未返却、数字＝残） ===== */
 #v_gantt .gt-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 10px}
 #v_gantt .gt-controls label{font-size:12px;color:var(--text-dim);display:inline-flex;align-items:center;gap:6px}
-#v_gantt .gt-controls input,#v_gantt .gt-controls select{font:500 13px/1 'Noto Sans JP',sans-serif;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text)}
+#v_gantt .gt-controls input,#v_gantt .gt-controls select{font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text)}
 #v_gantt .gt-nav{display:inline-flex;gap:4px;margin-left:4px}
-#v_gantt .gt-nav button{font:600 13px/1 'Noto Sans JP',sans-serif;padding:8px 12px;border:none;border-radius:999px;background:var(--surface3);color:var(--text-dim);cursor:pointer;white-space:nowrap}
+#v_gantt .gt-nav button{font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:8px 12px;border:none;border-radius:999px;background:var(--surface3);color:var(--text-dim);cursor:pointer;white-space:nowrap}
 #v_gantt .gt-nav button:hover{background:#e2e5f0;color:var(--text)}
 #view-inv th.rs-th{cursor:pointer;white-space:nowrap}
 #v_gantt .gt-wrap{overflow-x:auto}
@@ -789,7 +789,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
 #v_gantt .gt-empty{color:var(--text-faint);padding:24px;text-align:center;font-size:13px}
 #v_gantt .gt-legend{position:sticky;bottom:0;display:flex;gap:16px;font-size:12px;color:var(--text-dim);flex-wrap:wrap;align-items:center;background:var(--surface);border-top:1px solid var(--border);padding:8px 12px;margin:12px -14px -32px}
 #v_gantt .gt-legend i{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:middle;margin-right:5px;box-sizing:border-box}
-.filter-bar select,.filter-bar input{padding:7px 12px;background:#fff;border1px solid var(--border);border-radius:6px;color:var(--text);font:400 13px/1 'Noto Sans JP',sans-serif;outline:none}
+.filter-bar select,.filter-bar input{padding:7px 12px;background:#fff;border1px solid var(--border);border-radius:6px;color:var(--text);font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;outline:none}
 .filter-bar select:focus,.filter-bar input:focus{border-color:#6366f1}
 .section{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
 .section h2{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
@@ -833,7 +833,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .fv-sum{display:none !important}
-  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .summary-bar{display:none !important}
   .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none !important;text-align:left}
   .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
@@ -930,13 +930,13 @@ html.in-woff #v_gantt .gt .hd{top:0}
 .maint-add{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:10px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
 .maint-add .ma-field{display:flex;flex-direction:column;gap:3px}
 .maint-add .ma-field label{font-size:10px;font-weight:600;color:var(--text-dim)}
-.maint-add .ma-field input,.maint-add .ma-field select{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font:400 12px/1 'Noto Sans JP',sans-serif}
-.maint-add button{padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font:600 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;height:32px}
+.maint-add .ma-field input,.maint-add .ma-field select{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font:400 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif}
+.maint-add button{padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font:600 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;height:32px}
 .setting-group{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:12px}
 .setting-group h3{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px}
 .setting-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 .setting-row label{font-size:13px;min-width:160px;color:var(--text-dim)}
-.setting-row input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;width:100px;text-align:center}
+.setting-row input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;width:100px;text-align:center}
 .setting-row span{font-size:12px;color:var(--text-faint)}
 @media(max-width:480px),(orientation:portrait){
   .av-search{display:none}
@@ -992,7 +992,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
 .badge.s-入荷済{color:var(--green);background:var(--green-dim)}
 .badge.s-納品済{color:var(--accent);background:var(--accent-dim)}
 @keyframes spin{to{transform:rotate(360deg)}}
-.st-mini{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer}
+.st-mini{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);cursor:pointer}
 @media(max-width:480px),(orientation:portrait){
   .mobile-date{display:none!important}
   .subtab-date{display:none!important}
@@ -1075,7 +1075,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
 @media(max-width:480px),(orientation:portrait){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
-  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
   .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
   .fv-si .l{font-size:12px !important;font-weight:600;line-height:1;margin:0 !important;color:inherit;order:1}
@@ -1098,7 +1098,7 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 
 .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.toolbar select{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface)}
+.toolbar select{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface)}
 .toolbar .count{font-size:12px;color:var(--text-dim);margin-left:auto}
 .st-badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -1160,7 +1160,7 @@ table.jobs tr:last-child td{border-bottom:none}
 @media(max-width:480px),(orientation:portrait){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
-  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
+  .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
   .fv-si{display:inline-flex !important;align-items:center;gap:5px;padding:7px 13px !important;min-width:0 !important;border-radius:999px !important;background:#f0f1f5;border:1px solid transparent;box-shadow:none;text-align:left}
   .fv-si .n{font-size:13px !important;font-weight:700;line-height:1;margin:0 !important;order:2}
   .fv-si .l{font-size:12px !important;font-weight:600;line-height:1;margin:0 !important;color:inherit;order:1}
@@ -1202,28 +1202,28 @@ table.jobs tr:last-child td{border-bottom:none}
 .row.full{display:block}
 .field{flex:1;min-width:200px;display:flex;flex-direction:column;gap:5px}
 .field label{font-size:12px;font-weight:600;color:var(--text-dim)}
-.field input,.field select,.field textarea{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.4 'Noto Sans JP',sans-serif;background:var(--surface2);width:100%}
+.field input,.field select,.field textarea{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.4 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);width:100%}
 .field textarea{min-height:60px;resize:vertical}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
 .today-hint{font-size:12px;color:var(--text-dim);margin-top:2px}
 .entry-row{display:grid;grid-template-columns:2fr 2fr 1fr auto;gap:10px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;align-items:start}
 .entry-row .entry-field{display:flex;flex-direction:column;gap:4px}
 .entry-row .entry-field label{font-size:10px;color:var(--text-faint);font-weight:600}
-.entry-row .entry-field select,.entry-row .entry-field input{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font:400 13px/1.3 'Noto Sans JP',sans-serif;background:#fff}
+.entry-row .entry-field select,.entry-row .entry-field input{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font:400 13px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff}
 .entry-row .entry-rm{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:4px 8px;align-self:center}
 .entry-row .entry-rm:hover{opacity:.7}
-.entry-add-btn{background:var(--surface2);border:1px dashed var(--border);color:var(--text-dim);font:500 13px/1 'Noto Sans JP',sans-serif;padding:14px;border-radius:8px;cursor:pointer;width:100%;margin-top:4px}
+.entry-add-btn{background:var(--surface2);border:1px dashed var(--border);color:var(--text-dim);font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:14px;border-radius:8px;cursor:pointer;width:100%;margin-top:4px}
 .entry-add-btn:hover{border-color:var(--accent);color:var(--accent)}
 .add-form.hidden{display:none}
 .af-field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
 .af-field label{font-size:11px;color:var(--text-faint);font-weight:600}
-.af-field input,.af-field select{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Noto Sans JP',sans-serif;background:#fff;width:100%}
+.af-field input,.af-field select{padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;width:100%}
 .af-field input:focus,.af-field select:focus{outline:none;border-color:var(--accent)}
 .af-row{display:flex;gap:10px}
 .af-row .af-field{flex:1;margin-bottom:10px}
 .af-btns{display:flex;gap:8px;margin-top:6px}
-.af-cancel{flex:1;background:#fff;border:1px solid var(--border);color:var(--text-dim);padding:11px;border-radius:8px;font:500 14px/1 'Noto Sans JP',sans-serif;cursor:pointer}
-.af-save{flex:2;background:var(--accent);color:#fff;border:none;padding:11px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+.af-cancel{flex:1;background:#fff;border:1px solid var(--border);color:var(--text-dim);padding:11px;border-radius:8px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
+.af-save{flex:2;background:var(--accent);color:#fff;border:none;padding:11px;border-radius:8px;font:600 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
 .af-save:hover{opacity:.9}
 .saved-entries h3{font-size:13px;font-weight:700;color:var(--text-dim);margin-bottom:10px}
 .saved-entry{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--surface2);border:1px solid var(--border-light);border-radius:10px;margin-bottom:8px;gap:10px}
@@ -1235,18 +1235,18 @@ table.jobs tr:last-child td{border-bottom:none}
 .saved-entry .se-del{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:4px 10px;border-radius:4px;white-space:nowrap;line-height:1}
 .saved-entry .se-del:hover{background:var(--red-dim)}
 .saved-entry .se-actions{display:flex;gap:6px;flex-shrink:0}
-.saved-entry .act-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap}
+.saved-entry .act-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap}
 .saved-entry .act-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 .saved-entry .act-btn.del{color:var(--red)}
 .saved-entry .act-btn.del:hover{background:var(--red);color:#fff;border-color:var(--red)}
 
-.save-btn{background:var(--accent);color:#fff;border:none;padding:11px 24px;border-radius:8px;font:600 14px/1 'Noto Sans JP',sans-serif;cursor:pointer;margin-top:8px}
+.save-btn{background:var(--accent);color:#fff;border:none;padding:11px 24px;border-radius:8px;font:600 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;margin-top:8px}
 .save-btn:hover{opacity:.9}
 .save-btn:disabled{background:var(--border);cursor:not-allowed}
-.date-nav button{background:var(--surface);border:1px solid var(--border);padding:8px 14px;border-radius:8px;font:500 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+.date-nav button{background:var(--surface);border:1px solid var(--border);padding:8px 14px;border-radius:8px;font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
 .date-nav button:hover{border-color:var(--accent)}
 .date-nav .date-label{font-size:16px;font-weight:700;margin:0 6px}
-.date-nav input[type="date"]{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface)}
+.date-nav input[type="date"]{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface)}
 
 .member-group{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden}
 .status-section{padding:14px 16px;margin-bottom:10px}
@@ -1306,56 +1306,56 @@ table.jobs tr:last-child td{border-bottom:none}
 @media(max-width:480px),(orientation:portrait){
   }
 .week-bar{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
-.week-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:var(--radius);font:500 13px/1 'Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
+.week-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:var(--radius);font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
 .week-btn:hover{background:var(--surface3)}
-.week-label{font:700 14px/1 'Noto Sans JP',sans-serif;flex:1;text-align:center}
-.request-banner{margin:12px 16px;padding:14px 18px;background:var(--orange-light);border:1px solid #fed7aa;border-radius:var(--radius);font:500 13px/1.6 'Noto Sans JP',sans-serif;color:#9a3412}
+.week-label{font:700 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;flex:1;text-align:center}
+.request-banner{margin:12px 16px;padding:14px 18px;background:var(--orange-light);border:1px solid #fed7aa;border-radius:var(--radius);font:500 13px/1.6 'Hiragino Sans','Noto Sans JP',sans-serif;color:#9a3412}
 .request-banner strong{font-weight:700}
 .staff-section{padding:16px}
 .staff-select-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
-.staff-chip{padding:8px 16px;border-radius:20px;font:600 13px/1 'Noto Sans JP',sans-serif;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;transition:.15s}
+.staff-chip{padding:8px 16px;border-radius:20px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;transition:.15s}
 .staff-chip:hover{border-color:var(--accent);color:var(--accent)}
 .staff-chip.selected{background:var(--accent);color:#fff;border-color:var(--accent)}
 .day-grid{display:flex;flex-direction:column;gap:8px}
 .day-row{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow)}
 .day-row.holiday-row{background:#fffbeb;border:1px solid #fde68a}
-.day-label{font:700 13px/1 'Noto Sans JP',sans-serif;width:80px;flex-shrink:0}
-.day-label .date{font:400 11px/1 'Noto Sans JP',sans-serif;color:var(--text-faint);margin-top:2px}
-.day-label .holiday-name{font:400 10px/1 'Noto Sans JP',sans-serif;color:var(--red);margin-top:2px}
+.day-label{font:700 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;width:80px;flex-shrink:0}
+.day-label .date{font:400 11px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-faint);margin-top:2px}
+.day-label .holiday-name{font:400 10px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--red);margin-top:2px}
 .day-label.today{color:var(--accent)}
 .day-label.sat{color:var(--accent)}
 .day-label.sun,.day-label.holiday{color:var(--red)}
 .time-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
-.time-chip{padding:6px 12px;border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;transition:.15s;min-width:56px;text-align:center}
+.time-chip{padding:6px 12px;border-radius:6px;font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;transition:.15s;min-width:56px;text-align:center}
 .time-chip:hover{border-color:var(--accent);color:var(--accent)}
 .time-chip.selected{background:var(--green);color:#fff;border-color:var(--green)}
 .time-chip.holiday-chip{border-color:#fbbf24;min-width:64px}
 .time-chip.holiday-chip:hover{border-color:var(--orange);color:var(--orange)}
 .time-chip.holiday-chip.selected{background:var(--orange);color:#fff;border-color:var(--orange)}
-.day-clear{font:500 11px/1 'Noto Sans JP',sans-serif;color:var(--red);background:none;border:none;cursor:pointer;padding:4px 8px}
+.day-clear{font:500 11px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--red);background:none;border:none;cursor:pointer;padding:4px 8px}
 .day-clear:hover{text-decoration:underline}
 .admin-section{padding:16px}
 .admin-tools{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.ov-header{display:grid;grid-template-columns:100px repeat(var(--cols),1fr);background:#1e293b;color:#fff;font:700 12px/1 'Noto Sans JP',sans-serif}
+.ov-header{display:grid;grid-template-columns:100px repeat(var(--cols),1fr);background:#1e293b;color:#fff;font:700 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif}
 .ov-header .ov-cell{padding:10px 8px;text-align:center}
 .ov-header .ov-cell.today-col{background:#334155}
 .ov-header .ov-cell.holiday-col{background:#92400e}
 .ov-row{display:grid;grid-template-columns:100px repeat(var(--cols),1fr);border-bottom:1px solid var(--border)}
 .ov-row:last-child{border-bottom:none}
 .ov-row:nth-child(even){background:#f8f9fb}
-.ov-cell{padding:8px;font:500 12px/1.4 'Noto Sans JP',sans-serif;text-align:center}
+.ov-cell{padding:8px;font:500 12px/1.4 'Hiragino Sans','Noto Sans JP',sans-serif;text-align:center}
 .ov-cell.name-cell{text-align:left;font-weight:700;color:var(--text)}
 .ov-cell.today-col{background:var(--accent-light)}
 .ov-cell.holiday-col{background:#fffbeb}
 .ov-cell .ot-time{display:inline-block;padding:3px 8px;border-radius:4px;background:var(--green-light);color:var(--green);font-weight:600;font-size:11px}
 .ov-cell .ot-holiday{display:inline-block;padding:3px 8px;border-radius:4px;background:var(--orange-light);color:var(--orange);font-weight:600;font-size:11px}
 .ov-cell .ot-none{color:var(--text-faint);font-size:11px}
-.ov-summary{display:grid;grid-template-columns:100px repeat(var(--cols),1fr);background:var(--accent-light);font:700 12px/1 'Noto Sans JP',sans-serif;color:var(--accent);border-top:2px solid var(--accent)}
+.ov-summary{display:grid;grid-template-columns:100px repeat(var(--cols),1fr);background:var(--accent-light);font:700 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--accent);border-top:2px solid var(--accent)}
 .ov-summary .ov-cell{padding:10px 8px}
 .staff-list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border)}
 .staff-list-item:last-child{border-bottom:none}
-.staff-list-item span{font:500 14px/1 'Noto Sans JP',sans-serif}
-.staff-del{background:none;border:none;color:var(--red);font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;padding:4px 8px}
+.staff-list-item span{font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif}
+.staff-del{background:none;border:none;color:var(--red);font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;padding:4px 8px}
 .staff-del:hover{text-decoration:underline}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:480px),(orientation:portrait){
@@ -1453,7 +1453,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-card{background:transparent;border:none;box-shadow:none;padding:0;text-decoration:none;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:9px;transition:transform .12s}
 .portal-card:hover{transform:translateY(-3px)}
 .portal-card:active{transform:scale(.94)}
-.portal-card-icon{width:84px;height:84px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:40px;font-family:'Noto Sans JP',sans-serif;background:#44474f;color:#f3f5f8;box-shadow:0 2px 6px rgba(0,0,0,.14);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.portal-card-icon{width:84px;height:84px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:40px;font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:#44474f;color:#f3f5f8;box-shadow:0 2px 6px rgba(0,0,0,.14);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .portal-card-body{text-align:center}
 .portal-card-title{font-size:13px;font-weight:600;color:var(--text)}
 .portal-modeswitch{display:flex;align-items:center;gap:8px;justify-content:center;font-size:12px;color:var(--text-dim);margin:0 0 20px}
@@ -1500,7 +1500,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-cal .pc-chip.off b{color:var(--text-faint)}
 #view-cal .pc-msg{font-size:13px;color:var(--text-faint);padding:8px}
 @media(max-width:480px),(orientation:portrait){#view-cal{padding:12px 10px 120px}#view-cal .cal-hd{gap:10px}#view-cal .cal-big{font-size:36px}#view-cal .cal-day{width:36px;padding:4px 0 3px}#view-cal .cal-day .d{font-size:14px}#view-cal .cal-btn{padding:8px 6px}#view-cal .cal-today{display:none}#view-cal td{display:block;border-top:none}#view-cal td.n{padding:8px 10px 0;border-top:1px solid var(--border-light)}#view-cal tr:first-child td.n{border-top:none}#view-cal td.d,#view-cal td.c{padding:0 10px 8px}#view-cal tr.none td.n{padding:6px 10px 0}#view-cal tr.none td.d{padding:0 10px 6px}}
-.pm-btn{padding:6px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font:600 12px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+.pm-btn{padding:6px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font:600 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
 .pm-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
 @media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:repeat(5,1fr);gap:16px 6px}.portal-card-icon{width:60px;height:60px;border-radius:15px}.portal-card-icon svg{width:34px;height:34px}.portal-card-title{font-size:11px}}
@@ -1516,14 +1516,14 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:0 22px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .card-pane .cp-title{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;padding:18px 0 14px;margin-bottom:18px;border-bottom:1px solid var(--border-light);position:sticky;top:0;background:var(--surface);z-index:5}
 .card-pane .cp-acts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-.card-pane .cp-btn{height:130px;border:none;border-radius:18px;font:800 30px/1 'Noto Sans JP',sans-serif;background:var(--accent);color:#fff;cursor:pointer;letter-spacing:.04em}
+.card-pane .cp-btn{height:130px;border:none;border-radius:18px;font:800 30px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--accent);color:#fff;cursor:pointer;letter-spacing:.04em}
 .card-pane .cp-btn:active{transform:scale(.98)}
 .card-pane .cp-btn.ret{background:var(--green)}
 .card-pane .wknav{display:flex;align-items:center;gap:6px;margin-bottom:14px}
 .card-pane .wknav .wk-btn{width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
 .card-pane .wknav .wk-btn:active{transform:scale(.95)}
 .card-pane .wknav .wk-label{flex:1;text-align:center;font-size:15px;font-weight:700;color:var(--text)}
-.card-pane .wknav .wk-today{height:46px;padding:0 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font:600 14px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+.card-pane .wknav .wk-today{height:46px;padding:0 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font:600 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
 .cp-tbl{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:15px}
 .cp-tbl th{color:var(--text-faint);font-size:12px;font-weight:800;letter-spacing:.05em;padding:0 14px 4px;text-align:left;white-space:nowrap}
 .cp-tbl td{padding:14px;background:var(--surface2);border-top:1px solid var(--border-light);border-bottom:1px solid var(--border-light);text-align:left;white-space:nowrap}
@@ -1546,13 +1546,13 @@ table.jobs tr:last-child td{border-bottom:none}
 .loan-card .lc-v.ret{color:var(--green)}
 .loan-card .lc-now{font-size:13px;font-weight:800;color:var(--orange);background:#fff;padding:5px 12px;border-radius:999px}
 .loan-card .lc-date{font-size:13px;color:var(--text-dim);font-weight:600;margin-top:10px}
-.card-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);padding:30px 48px;border-radius:18px;font:800 30px/1.4 'Noto Sans JP',sans-serif;color:#fff;background:var(--red);box-shadow:0 16px 48px rgba(0,0,0,.32);z-index:9999;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;text-align:center;max-width:84vw}
+.card-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);padding:30px 48px;border-radius:18px;font:800 30px/1.4 'Hiragino Sans','Noto Sans JP',sans-serif;color:#fff;background:var(--red);box-shadow:0 16px 48px rgba(0,0,0,.32);z-index:9999;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;text-align:center;max-width:84vw}
 .card-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .card-toast.ok{background:var(--accent)}
 .card-toast.wide{width:600px;font-size:26px;line-height:1.6;background:var(--surface);color:var(--text);border:2px solid var(--accent);box-shadow:0 16px 48px rgba(0,0,0,.22)}
 .card-toast .ct-h{display:inline-block;color:var(--accent);font-size:1.12em;margin-bottom:4px}
 .card-pane .cp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:12px}
-.card-pane .cp-nbtn{display:flex;align-items:center;justify-content:center;padding:20px 8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 16px/1.25 'Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;text-align:center}
+.card-pane .cp-nbtn{display:flex;align-items:center;justify-content:center;padding:20px 8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 16px/1.25 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;text-align:center}
 .card-pane .cp-nbtn:hover{border-color:var(--accent);background:var(--accent-dim)}
 .card-pane .cp-nbtn.sel{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(59,130,246,.3)}
 .card-pane .cp-nbtn:active{transform:scale(.96)}
@@ -1827,8 +1827,8 @@ table.jobs tr:last-child td{border-bottom:none}
   #qualMoBody .mrow .rm{background:none;border:none;color:#c0392b;font-size:15px;cursor:pointer;padding:2px 8px}
   #qualMoBody .mempty{padding:14px 4px;color:var(--text-dim);font-size:13px}
   #qualMoBody .madd{margin-top:14px}
-  #qualMoBody .madd select{width:100%;padding:10px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:600 14px/1.3 'Noto Sans JP',sans-serif}
-  #qualMoPerson{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:400 14px/1.3 'Noto Sans JP',sans-serif;margin-bottom:6px}
+  #qualMoBody .madd select{width:100%;padding:10px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:600 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif}
+  #qualMoPerson{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;margin-bottom:6px}
 </style>
   <div class="sub-tabs" id="qualTabs">
     <span class="subtab-date" id="qualPcDate"></span>
@@ -1854,15 +1854,15 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cases-head{font-size:18px;font-weight:800;color:var(--text);margin:4px 2px 16px}
   #view-cases .cases-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
   #view-cases .cases-sec-hd{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px}
-  #view-cases .cases-add{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 13px;font:600 13px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+  #view-cases .cases-add{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 13px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
   #view-cases .cases-add:active{transform:scale(.97)}
   #view-cases .cf-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-  #view-cases .cf-row input,#view-cases .cf-row select{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);min-width:0}
+  #view-cases .cf-row input,#view-cases .cf-row select{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);min-width:0}
   #view-cases .cf-row input:focus,#view-cases .cf-row select:focus{outline:none;border-color:var(--accent)}
   #view-cases .cf-del{flex:0 0 auto;background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;line-height:1}
   #view-cases .cf-empty{color:var(--text-dim);font-size:13px;padding:4px 2px}
   #view-cases .cases-foot{display:flex;justify-content:flex-end;margin:6px 0 12px}
-  #view-cases .cases-foot .save{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px 30px;font:700 15px/1 'Noto Sans JP',sans-serif;cursor:pointer}
+  #view-cases .cases-foot .save{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px 30px;font:700 15px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
   #view-cases .cases-foot .save:active{transform:scale(.98)}
   #view-cases .cf-hide{display:none}
   #view-cases .cf-toggle{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--text);cursor:pointer;user-select:none}
@@ -1875,31 +1875,31 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-cases .cf-prod-item{border:1px solid var(--border);border-radius:10px;padding:14px 14px 2px;margin-bottom:10px;background:var(--surface2)}
   #view-cases .cf-item-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;font-weight:700;color:var(--text-dim)}
   #view-cases .cf-typeseg{display:flex;gap:8px;margin-bottom:16px}
-  #view-cases .cf-typeseg button{flex:1;padding:11px 0;border:1.5px solid var(--border);border-radius:9px;background:var(--surface2);font:700 14px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+  #view-cases .cf-typeseg button{flex:1;padding:11px 0;border:1.5px solid var(--border);border-radius:9px;background:var(--surface2);font:700 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
   #view-cases .cf-typeseg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
-  #view-cases select.cf-delsel{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);max-width:300px;width:100%}
+  #view-cases select.cf-delsel{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);max-width:300px;width:100%}
   /* 案件タブ・一覧・管理 */
   #view-cases #casesPane{padding:16px 14px}
   #view-cases .sub-tab.cases-new{background:var(--accent);color:#fff;font-weight:700}
   #view-cases .sub-tab.cases-new.on{background:var(--accent);color:#fff}
   #view-cases .cases-tabs{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap}
-  #view-cases .ctab{padding:9px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface2);font:700 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+  #view-cases .ctab{padding:9px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface2);font:700 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
   #view-cases .ctab.on{background:var(--accent);border-color:var(--accent);color:#fff}
   #view-cases .ctab.new{margin-left:auto;background:transparent;border-style:dashed;color:var(--accent)}
   #view-cases .ctab.new.on{background:var(--accent);border-style:solid;color:#fff}
   #view-cases .cases-empty,#view-cases .cases-loading{color:var(--text-dim);font-size:14px;text-align:center;padding:40px 0}
-  #view-cases .case-st-sel{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);cursor:pointer}
+  #view-cases .case-st-sel{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);cursor:pointer}
   #view-cases #casesPane table th{cursor:default}
   #view-cases #casesPane table th:hover{color:var(--text-dim)}
   #view-cases .cases-card,#view-cases .cases-hint,#view-cases .cases-foot{max-width:760px}
   #view-cases .cases-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-  #view-cases .cases-search{flex:0 0 auto;width:300px;max-width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1 'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
+  #view-cases .cases-search{flex:0 0 auto;width:300px;max-width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
   #view-cases .cases-search:focus{outline:none;border-color:var(--accent)}
   #view-cases .cases-chips{display:flex;gap:6px;flex-wrap:wrap}
-  #view-cases .cf-chip{padding:6px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface2);font:600 12px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+  #view-cases .cf-chip{padding:6px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface2);font:600 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
   #view-cases .cf-chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
   #view-cases .cf-chip b{font-weight:800;margin-right:2px}
-  #view-cases .cases-slogbtn{margin-left:auto;flex:0 0 auto;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;font:600 12px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+  #view-cases .cases-slogbtn{margin-left:auto;flex:0 0 auto;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;font:600 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
   #view-cases .slog-row{display:flex;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--surface3);font-size:13px}
   #view-cases .slog-nm{flex:1;min-width:0;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #view-cases .slog-ch{flex:0 0 auto;color:var(--accent);font-weight:700}
@@ -2607,11 +2607,11 @@ table.jobs tr:last-child td{border-bottom:none}
           <div class="dr-date" style="flex:1">
             <div class="today-hint" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
               <span style="white-space:nowrap">日付：</span>
-              <input type="date" id="writeDate" onchange="Daily.onWriteDateChange()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:500 13px/1 'Noto Sans JP',sans-serif;min-width:0">
-              <button onclick="Daily.setWriteDateToday()" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font:500 12px/1 'Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0">今日</button>
+              <input type="date" id="writeDate" onchange="Daily.onWriteDateChange()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;min-width:0">
+              <button onclick="Daily.setWriteDateToday()" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0">今日</button>
             </div>
           </div>
-          <label class="dr-who" style="flex:1;min-width:0;font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px">自分を選択（50音順）：<select id="whoSelect" onchange="Daily.onWhoChange()" style="flex:1;min-width:0;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 'Noto Sans JP',sans-serif;background:var(--surface)"></select></label>
+          <label class="dr-who" style="flex:1;min-width:0;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px">自分を選択（50音順）：<select id="whoSelect" onchange="Daily.onWhoChange()" style="flex:1;min-width:0;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface)"></select></label>
         </div>
         <div class="saved-entries" id="savedEntries"></div>
         <!-- 入力フォーム -->
@@ -2710,7 +2710,7 @@ table.jobs tr:last-child td{border-bottom:none}
   <div class="mo-bg" id="reqModalBg">
     <div class="mo">
       <h3>時間外募集を出す</h3>
-      <p style="font:400 13px/1.6 'Noto Sans JP',sans-serif;color:var(--text-dim);margin-bottom:12px">この週に時間外募集のメッセージを表示します。従業員側に表示されます。</p>
+      <p style="font:400 13px/1.6 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);margin-bottom:12px">この週に時間外募集のメッセージを表示します。従業員側に表示されます。</p>
       <div class="mo-row full"><div class="mo-field">
         <label>メッセージ</label>
         <textarea id="reqMessage" placeholder="例：今週納期が厳しいので、少しでも残れる方はご協力お願いします"></textarea>
@@ -2940,13 +2940,13 @@ table.jobs tr:last-child td{border-bottom:none}
 <style>
 #view-alcohol *{margin:0;padding:0;box-sizing:border-box}
 #view-alcohol{font-size:16px;scrollbar-gutter:stable}
-#view-alcohol{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+#view-alcohol{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 #view-alcohol .kiosk{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;max-width:1820px;margin:0 auto;padding:20px;align-items:start}
 #view-alcohol .dnav{display:flex;align-items:center;gap:6px}
 #view-alcohol .dnav input[type=date]{flex:1}
 #view-alcohol .dnav-btn{flex:0 0 auto;width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
 #view-alcohol .dnav-btn:active{transform:scale(.95)}
-#view-alcohol .dnav-today{flex:0 0 auto;height:46px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+#view-alcohol .dnav-today{flex:0 0 auto;height:46px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
 #view-alcohol .pane{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:0 22px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 #view-alcohol .pane h2{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;padding:18px 0 14px;margin-bottom:18px;border-bottom:1px solid var(--border-light);position:sticky;top:0;background:var(--surface);z-index:5}
 #view-alcohol .selbar{position:relative;display:flex;align-items:center;justify-content:center;padding:18px 20px;border-radius:14px;background:var(--accent-dim);border:1.5px solid var(--accent);margin-bottom:18px;height:76px}
@@ -3240,13 +3240,13 @@ table.jobs tr:last-child td{border-bottom:none}
 <style>
 #view-forklift *{margin:0;padding:0;box-sizing:border-box}
 #view-forklift{font-size:16px;scrollbar-gutter:stable}
-#view-forklift{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+#view-forklift{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 #view-forklift .kiosk{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;max-width:1820px;margin:0 auto;padding:20px;align-items:start}
 #view-forklift .dnav{display:flex;align-items:center;gap:6px}
 #view-forklift .dnav input[type=date]{flex:1}
 #view-forklift .dnav-btn{flex:0 0 auto;width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
 #view-forklift .dnav-btn:active{transform:scale(.95)}
-#view-forklift .dnav-today{flex:0 0 auto;height:46px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font:600 13px/1 'Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
+#view-forklift .dnav-today{flex:0 0 auto;height:46px;padding:0 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
 #view-forklift .pane{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:0 22px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 #view-forklift .pane h2{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;padding:18px 0 14px;margin-bottom:16px;border-bottom:1px solid var(--border-light);position:sticky;top:0;background:var(--surface);z-index:5}
 #view-forklift .gl{font-size:12px;font-weight:800;color:var(--text-faint);letter-spacing:.08em;margin:14px 2px 11px}
@@ -3418,7 +3418,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-09 15:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-09 16:24';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -5071,7 +5071,7 @@ const Proj = (function(){
     const rows=[...map.values()].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name,'ja'));
     const t=new Date(),ds=t.getFullYear()+'/'+(t.getMonth()+1)+'/'+t.getDate();
     const body=rows.length?rows.map((r,i)=>'<tr><td class="c">□</td><td>'+esc(r.name)+'</td><td class="n">'+r.count+'</td><td class="s">'+r.sites.map(esc).join('<br>')+(r.count>r.sites.length?'<br>ほか'+(r.count-r.sites.length)+'件':'')+'</td><td></td></tr>').join(''):'<tr><td colspan="5" style="text-align:center;padding:24px;color:#888">まだありません（現場の「台帳にない物（1行に1品）」に入れた品がここに出ます）</td></tr>';
-    const html='<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>台帳に載せるリスト '+ds+'</title><style>body{font-family:"Noto Sans JP","Hiragino Sans",sans-serif;margin:24px;color:#222}h1{font-size:18px;margin:0 0 4px}.meta{font-size:12px;color:#666;margin-bottom:12px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #999;padding:6px 8px;vertical-align:top}th{background:#eee}.c{width:28px;text-align:center}.n{width:48px;text-align:right}.s{font-size:11px;color:#444;width:38%}th:last-child{width:90px}.bar{margin-bottom:12px}@media print{.bar{display:none}body{margin:10mm}}</style></head><body><div class="bar"><button onclick="window.print()" style="font-size:14px;padding:8px 18px">印刷</button></div><h1>台帳に載せるリスト</h1><div class="meta">'+ds+' 作成　'+rows.length+'品　（現場の「台帳にない物」から集計。台帳と同じ名前の'+skipped+'件は除外）</div><table><thead><tr><th class="c">済</th><th>品名</th><th class="n">回数</th><th>使った現場（数量）</th><th>保有数</th></tr></thead><tbody>'+body+'</tbody></table></body></html>';
+    const html='<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>台帳に載せるリスト '+ds+'</title><style>body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;margin:24px;color:#222}h1{font-size:18px;margin:0 0 4px}.meta{font-size:12px;color:#666;margin-bottom:12px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #999;padding:6px 8px;vertical-align:top}th{background:#eee}.c{width:28px;text-align:center}.n{width:48px;text-align:right}.s{font-size:11px;color:#444;width:38%}th:last-child{width:90px}.bar{margin-bottom:12px}@media print{.bar{display:none}body{margin:10mm}}</style></head><body><div class="bar"><button onclick="window.print()" style="font-size:14px;padding:8px 18px">印刷</button></div><h1>台帳に載せるリスト</h1><div class="meta">'+ds+' 作成　'+rows.length+'品　（現場の「台帳にない物」から集計。台帳と同じ名前の'+skipped+'件は除外）</div><table><thead><tr><th class="c">済</th><th>品名</th><th class="n">回数</th><th>使った現場（数量）</th><th>保有数</th></tr></thead><tbody>'+body+'</tbody></table></body></html>';
     w.document.open();w.document.write(html);w.document.close();
   }
   function projRentalsText(id){const d=projData.find(x=>String(x.id)===String(id));return d?String(d.rentals||''):null}
