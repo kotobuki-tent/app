@@ -3402,7 +3402,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-09 14:32';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-09 15:02';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8115,15 +8115,17 @@ const Cal = (function(){
     catch(e){ if(want!==date)return; calErr='net'; }
     render(); prefetch();
   }
-  function prefetch(){ const w0=new Date(date+'T00:00:00'); w0.setDate(w0.getDate()-((w0.getDay()+6)%7)); const ds=[fmtD(w0)]; for(let i=1;i<7;i++){ const x=new Date(w0); x.setDate(w0.getDate()+i); ds.push(fmtD(x)); } ds.forEach(d=>{ if(d!==date&&!mem[d]) fetchDay(d).catch(()=>{}); }); }   // 帯に出ている週は先に取っておく（GAS 側は前後 3 日を控えているので軽い）
+  // 帯の先頭＝今日を基準に 7 日刻みで、選んだ日を含む窓の先頭（今日より前なら昨日までの 7 日、…）
+  function winStart(d){ const t=new Date(fmtD(new Date())+'T00:00:00'), x=new Date(d+'T00:00:00'); const k=Math.floor((x-t)/86400000/7); t.setDate(t.getDate()+k*7); return t; }
+  function prefetch(){ const w0=winStart(date); const ds=[fmtD(w0)]; for(let i=1;i<7;i++){ const x=new Date(w0); x.setDate(w0.getDate()+i); ds.push(fmtD(x)); } ds.forEach(d=>{ if(d!==date&&!mem[d]) fetchDay(d).catch(()=>{}); }); }   // 帯に出ている週は先に取っておく（GAS 側は前後 3 日を控えているので軽い）
   function go(d){ date=d; calErr=''; cal=mem[date]||null; render(); loadAll(); }
   function move(n){ go(shift(date,n)); }
   function today(){ go(fmtD(new Date())); }
   function render(){
     const el=document.getElementById('calBody'); if(!el)return;
     const todayS=fmtD(new Date()), isToday=date===todayS;
-    // 週の帯：選んだ日を含む月〜日の 7 日をチップで並べる。◀ ▶ は週送り。今日は枠、選んだ日は塗り
-    const w0=new Date(date+'T00:00:00'); w0.setDate(w0.getDate()-((w0.getDay()+6)%7));
+    // 日付の帯：今日から 7 日（過去はほぼ要らない＝iller 10/9）。◀ ▶ で 7 日ずつ送る。今日は枠、選んだ日は塗り
+    const w0=winStart(date);
     const chips=[0,1,2,3,4,5,6].map(i=>{ const x=new Date(w0); x.setDate(w0.getDate()+i); const ds=fmtD(x), dw=x.getDay();
       return `<button class="cal-day${ds===date?' sel':''}${ds===todayS?' today':''}${dw===6?' sat':dw===0?' sun':''}" onclick="Cal.go('${ds}')"><span class="d">${x.getMonth()+1}/${x.getDate()}</span><span class="w">${'日月火水木金土'[dw]}</span></button>`; }).join('');
     const hd=`<div class="cal-hd"><div class="cal-week"><button class="cal-btn" onclick="Cal.move(-7)" title="前の週">◀</button>${chips}<button class="cal-btn" onclick="Cal.move(7)" title="次の週">▶</button></div><div class="cal-right"><small>${cal?esc(cal.updated||'')+' 時点':(calErr?'':'読み込み中…')}</small><button class="cal-btn cal-today" onclick="Cal.today()"${isToday?' disabled':''}>今日に戻る</button></div></div>`;
