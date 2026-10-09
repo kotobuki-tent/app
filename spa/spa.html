@@ -3394,7 +3394,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-08 18:56';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-09 13:17';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8095,17 +8095,22 @@ const Portal = (function(){
 // 全員の今日の LINE WORKS カレンダーを GAS（dept=cal）が読んで返す。人を縦、その人の予定を横にチップで。
 // loadAll は App.nav の初回と softRefresh（90秒）で呼ばれる。GAS 側で5分控えているので端末が多くても軽い。
 const Cal = (function(){
-  // 日付は ◀ ▶ で前後に動かせる（10/8 iller）。GAS は date= を受けて日ごとに 5 分控える。softRefresh は選んだ日のまま取り直す。
-  let cal=null, calErr='', date=fmtD(new Date());
+  // 日付は ◀ ▶ で前後に動かせる（10/8 iller）。GAS は date= を受けて前後 3 日分をまとめて読み、日ごとに 5 分控える。
+  // 端末側は一度見た日を mem に持ち、前後 1 日を先読みする＝◀ ▶ は即表示、裏で取り直し（10/9 iller「動かすと遅い」）。softRefresh は選んだ日のまま取り直す。
+  let cal=null, calErr='', date=fmtD(new Date()), mem={};
   function fmtD(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function shift(d,n){ const x=new Date(d+'T00:00:00'); x.setDate(x.getDate()+n); return fmtD(x); }
+  async function fetchDay(d){ const r=await fetch(API+'?dept=cal&action=today&date='+d); const j=await r.json(); if(j&&j.success) mem[d]=j; return j; }
   async function loadAll(){
     const want=date;
-    try{ const r=await fetch(API+'?dept=cal&action=today&date='+want); const j=await r.json(); if(want!==date)return; if(j&&j.success){ cal=j; calErr=''; } else calErr=(j&&j.error)||'err'; }
+    try{ const j=await fetchDay(want); if(want!==date)return; if(j&&j.success){ cal=j; calErr=''; } else calErr=(j&&j.error)||'err'; }
     catch(e){ if(want!==date)return; calErr='net'; }
-    render();
+    render(); prefetch();
   }
-  function move(n){ const d=new Date(date+'T00:00:00'); d.setDate(d.getDate()+n); date=fmtD(d); cal=null; calErr=''; render(); loadAll(); }
-  function today(){ date=fmtD(new Date()); cal=null; calErr=''; render(); loadAll(); }
+  function prefetch(){ [-1,1].forEach(n=>{ const d=shift(date,n); if(!mem[d]) fetchDay(d).catch(()=>{}); }); }
+  function go(d){ date=d; calErr=''; cal=mem[date]||null; render(); loadAll(); }
+  function move(n){ go(shift(date,n)); }
+  function today(){ go(fmtD(new Date())); }
   function render(){
     const el=document.getElementById('calBody'); if(!el)return;
     const d=new Date(date+'T00:00:00'), dow='日月火水木金土'[d.getDay()], isToday=date===fmtD(new Date());
