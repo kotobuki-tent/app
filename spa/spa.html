@@ -3433,7 +3433,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-09 18:11';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-14 19:10';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -7246,7 +7246,9 @@ const Daily = (function(){
     const prodGroup=()=>{let s='<optgroup label="生産部">';sortByStAndDate(prodProjects,PROD_ST_ORDER,p=>parseD(p.deadline)).forEach(p=>{s+=`<option value="prod:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});return s+'</optgroup>'};
     const projGroup=()=>{let s='<optgroup label="企画制作部">';sortByStAndDate(projProjects,PROJ_ST_ORDER,getProjNearestDate).forEach(p=>{s+=`<option value="proj:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});return s+'</optgroup>'};
     if(myDept==='企画制作部')h+=projGroup()+prodGroup();else h+=prodGroup()+projGroup();
+    const cur=sel.value;   // 裏の取り直し（App.softRefresh→loadAll→render）で一覧を作り直しても、選んでいる案件を消さない（2026-10-14 生産部「選んだ案件が消える」）
     sel.innerHTML=h;
+    if(cur&&Array.from(sel.options).some(o=>o.value===cur))sel.value=cur;
   }
   function buildAfWorkOptions(projType){
     const sel=$('afWork');
@@ -9667,7 +9669,7 @@ const Ver=(function(){
       setTimeout(()=>{primed=true;},8000);   // 裏取得が終わる頃合いを待つ。お知らせのバナーは出さない（iller 09-18「混乱の元」）＝放置10分で黙って読み直すだけ
     }catch(e){}finally{checking=false}
   }
-  function busy(){ const ae=document.activeElement; return !!(document.querySelector('.mo-bg.show')||(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&ae.type!=='button')); }
+  function busy(){ const ae=document.activeElement; const af=document.querySelector('#addForm:not(.hidden) #afProj'); return !!(document.querySelector('.mo-bg.show')||(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&ae.type!=='button')||(af&&af.value)); }   // 日報で案件を選んだままの端末も「入力中」（2026-10-14）
   setInterval(()=>{ if(newVer&&primed&&Date.now()-lastAct>10*60*1000&&!busy()) location.reload(); },60*1000);   // 放置中は自分で読み直す
   setInterval(check,10*60*1000);
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') check(); });
