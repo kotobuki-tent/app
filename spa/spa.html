@@ -1755,6 +1755,139 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-daily .card-head .dr-date{order:2}
 }
 
+
+/* ===== Apple 風の土台（2026-10-15、iller「Excel で頑張って作りましたみたいな見た目」→ iOS の設定画面の作法に寄せる）
+   方針：色・字・角丸・余白を :root の変数で全画面共有。罫線をやめて余白と白いかたまりで区切る。強調色は青 1 色。
+   表→リストは携帯と縦画面だけ、PC と横画面は表のまま薄くする。最初はポータルと日報の 2 画面、揃ったら残りへ。 ===== */
+:root{
+  --bg:#f2f2f7;--surface:#fff;--surface2:#f9f9fb;--surface3:#e9e9ee;
+  --border:#d1d1d6;--border-light:#e5e5ea;
+  --text:#1c1c1e;--text-dim:#6e6e73;--text-faint:#8e8e93;
+  --accent:#0a84ff;--accent-dim:rgba(10,132,255,.12);--accent-light:rgba(10,132,255,.10);
+  --hdr:rgba(255,255,255,.88);
+  --red:#d70015;--red-dim:rgba(215,0,21,.10);
+  --orange:#c93400;--orange-dim:rgba(201,52,0,.10);--orange-light:rgba(255,149,0,.16);
+  --green:#248a3d;--green-dim:rgba(36,138,61,.10);--green-light:rgba(52,199,89,.14);
+  --purple:#8944ab;--purple-dim:rgba(137,68,171,.10);
+  --cyan:#0071a4;--cyan-dim:rgba(0,113,164,.10);
+  --radius:12px;--shadow:none;
+}
+html{font-size:15px}
+body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+/* 上のナビ：白をうっすら透かす帯、選んだ画面は灰のピル（下線は無し） */
+.hdr{background:var(--hdr);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-bottom:0.5px solid var(--border-light)}
+.hdr-inner{padding:7px 10px;gap:2px;align-items:center}
+.nav-link{font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);padding:0 11px;height:30px;border-radius:8px;position:relative}
+.nav-link:hover{color:var(--text);background:var(--surface3)}
+.nav-link.on{background:var(--surface3);color:var(--text);font-weight:600}
+.nav-link.on::after{display:none}
+.nav-div{height:16px;background:var(--border-light);margin:0 4px}
+.hdr-btn{height:30px;border-radius:8px;border:0.5px solid var(--border);font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface);color:var(--text)}
+#refreshBtn{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+#refreshBtn:hover{background:#0071e3;border-color:#0071e3}
+@media(max-width:480px),(orientation:portrait){.hdr::after{background:linear-gradient(to right,transparent,rgba(255,255,255,.95))}}
+/* 画面内のタブ（サブタブ）：灰のチップ、選んだ物は黒 */
+.sub-tabs{background:transparent;padding:14px 16px 6px;gap:6px}
+.sub-tab{background:var(--surface3);color:var(--text);font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:8px 13px;border-radius:8px}
+.sub-tab:hover{background:#dededf;color:var(--text)}
+.sub-tab.on{background:var(--text);color:#fff}
+.subtab-search{background:var(--surface3);border:none;border-radius:9px;padding:8px 12px;font-size:13px;width:200px}
+.subtab-search:focus{outline:none;background:#fff;box-shadow:0 0 0 3px var(--accent-dim)}
+/* 共通の部品：かたまり・表・入力欄・ボタン・モーダル */
+.card{border:none;border-radius:14px;padding:18px 20px;box-shadow:none}
+.card h2{font-size:17px;font-weight:600}
+.tbl-wrap{border:none;border-radius:12px}
+table{font-size:14px}
+th{background:transparent;font-size:12px;font-weight:500;color:var(--text-faint);padding:10px 16px;border-bottom:0.5px solid var(--border-light)}
+th:hover{color:var(--accent)}
+td{padding:13px 16px;border-top:0.5px solid #f0f0f3}
+tr:hover td{background:rgba(10,132,255,.04)}
+.field input,.field select,.field textarea,.mo-field input,.mo-field select,.mo-field textarea{border:0.5px solid var(--border);border-radius:10px;padding:11px 12px;font-size:15px;background:#fff}
+.field input:focus,.field select:focus,.field textarea:focus,.mo-field input:focus,.mo-field select:focus,.mo-field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.field label,.mo-field label{font-size:12px;font-weight:500;color:var(--text-faint)}
+.mo{border-radius:18px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.22)}
+.mo h2{font-size:17px;font-weight:600}
+.mo-foot button{border-radius:10px;padding:11px 20px;font-weight:600;border:0.5px solid var(--border)}
+.mo-foot .cancel{background:var(--surface3);color:var(--text);border-color:transparent}
+.mo-foot .save{background:var(--accent);border-color:var(--accent)}
+.toast{border-radius:12px;background:rgba(28,28,30,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.loading-overlay{inset:48px 0 0 0;background:rgba(242,242,247,.75)}
+#dataStale{background:rgba(28,28,30,.82)}
+/* ポータル：iOS のホーム画面。アイコンは色の角丸、札は下に小さく */
+.portal-wrap{padding:36px 20px 60px}
+.portal-sub{color:var(--text-faint);margin-bottom:34px}
+.portal-grid{gap:26px 12px}
+.portal-card-icon{width:76px;height:76px;border-radius:19px;background:var(--accent);color:#fff;box-shadow:none}
+.portal-card-icon svg{width:38px;height:38px}
+.portal-card[data-app="daily"] .portal-card-icon,.portal-card[data-app="ot"] .portal-card-icon,.portal-card[data-app="cal"] .portal-card-icon,.portal-card[data-app="wb"] .portal-card-icon{background:#34c759}
+.portal-card[data-app="alcohol"] .portal-card-icon,.portal-card[data-app="forklift"] .portal-card-icon,.portal-card[data-app="card"] .portal-card-icon,.portal-card[data-app="veh"] .portal-card-icon{background:#ff9500}
+.portal-card[data-app="qual"] .portal-card-icon{background:#8944ab}
+.portal-card-title{font-size:12px;font-weight:500;color:var(--text)}
+.portal-card:hover{transform:none}
+.portal-card:hover .portal-card-icon{filter:brightness(1.06)}
+.portal-modeswitch{margin-bottom:26px}
+.pm-btn{background:var(--surface3);border:none;color:var(--text);border-radius:8px;padding:6px 12px;font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif}
+.pm-btn.on{background:var(--text);color:#fff}
+.portal-footer{color:var(--text-faint)}
+/* 日報「自分で書く」：白いかたまいを 3 つ（日付と名前／今日の記録／追加する）。行は 1 行 1 項目、札は左・値は右 */
+#view-daily .app{padding:10px 16px 60px}
+#view-daily #writeView{max-width:640px}
+#view-daily .card{background:transparent;border:none;border-radius:0;padding:0;box-shadow:none;margin:0}
+#view-daily .card-head{background:var(--surface);border-radius:12px;margin:0 0 18px;padding:0;gap:0;flex-direction:column;align-items:stretch;overflow:hidden}
+#view-daily .dr-date,#view-daily .dr-who{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;min-height:48px;font:400 15px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);margin:0}
+#view-daily .dr-date{border-bottom:0.5px solid var(--border-light)}
+#view-daily .today-hint{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;font-size:15px;color:var(--text);margin:0}
+#view-daily .today-hint>span{flex:0 0 auto}
+#view-daily #writeDate{margin-left:auto;border:none;background:transparent;font:400 15px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--accent);padding:4px 0;min-width:0;text-align:right}
+#view-daily .dr-today{background:var(--surface3);border:none;border-radius:8px;padding:6px 11px;font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);cursor:pointer}
+#view-daily #whoSelect{flex:1;min-width:0;border:none;background:transparent;font:400 15px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--accent);text-align:right;direction:rtl;padding:4px 0;appearance:none;-webkit-appearance:none}
+#view-daily #whoSelect option{direction:ltr}
+#view-daily .saved-entries{background:var(--surface);border-radius:12px;overflow:hidden;margin:0 0 18px}
+#view-daily .saved-entries:empty{display:none}
+#view-daily .saved-entries h3{font-size:12px;font-weight:500;color:var(--text-faint);padding:10px 16px 6px;margin:0;display:flex;align-items:baseline;flex-wrap:wrap;gap:4px}
+#view-daily .saved-entries .empty-msg{padding:14px 16px 18px;font-size:14px;color:var(--text-faint);text-align:left}
+#view-daily .saved-entry{background:transparent;border:none;border-top:0.5px solid var(--border-light);border-radius:0;box-shadow:none;margin:0;padding:12px 16px;transition:none}
+#view-daily .saved-entry:hover{box-shadow:none;transform:none}
+#view-daily .saved-entry .se-proj{font-size:15px;font-weight:500;margin-bottom:2px}
+#view-daily .saved-entry .se-action{font-size:13px;color:var(--text-dim);font-weight:400}
+#view-daily .saved-entry .act-btn{border:none;background:transparent;color:var(--accent);font-size:14px;padding:4px 6px}
+#view-daily .saved-entry .act-btn:hover{background:transparent;color:#0071e3}
+#view-daily .saved-entry .act-btn.del{color:var(--red)}
+#view-daily .saved-entry .act-btn.del:hover{background:transparent;color:var(--red)}
+#view-daily .add-form{background:var(--surface);border-radius:12px;overflow:hidden;margin:0 0 14px}
+#view-daily .af-field{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;min-height:48px;margin:0;border-top:0.5px solid var(--border-light)}
+#view-daily .af-field:first-child{border-top:none}
+#view-daily .af-field label{font-size:15px;color:var(--text);font-weight:400;letter-spacing:0;flex:0 0 auto}
+#view-daily .af-field input,#view-daily .af-field select{flex:1;min-width:0;width:auto;border:none;background:transparent;padding:12px 0;font-size:15px;text-align:right;color:var(--accent);appearance:none;-webkit-appearance:none}
+#view-daily .af-field select{direction:rtl;padding-right:0}
+#view-daily .af-field select option{direction:ltr}
+#view-daily .af-field input::placeholder{color:var(--text-faint)}
+#view-daily .af-field input:focus,#view-daily .af-field select:focus{outline:none;box-shadow:none}
+#view-daily .af-row{display:block}
+#view-daily .af-row .af-field{flex:none;margin:0}
+#view-daily .af-btns{display:flex;gap:10px;padding:12px 16px 14px;border-top:0.5px solid var(--border-light);margin:0}
+#view-daily .af-cancel{background:var(--surface3);border:none;color:var(--text);border-radius:10px;font-weight:500}
+#view-daily .af-save{border-radius:10px;font-weight:600;font-size:15px}
+#view-daily .entry-add-btn{background:var(--accent);border:none;color:#fff;border-radius:12px;padding:14px;font:600 15px/1 'Hiragino Sans','Noto Sans JP',sans-serif;margin:0}
+#view-daily .entry-add-btn:hover{background:#0071e3;color:#fff}
+/* 日報「みんなの日報」：人別の箱も白いかたまいに */
+#view-daily .member-group{border:none;border-radius:12px;box-shadow:none}
+#view-daily .member-group h3{background:transparent;border-left:none;border-bottom:0.5px solid var(--border-light)}
+#view-daily .dv-tbl{border:none;border-radius:12px}
+#view-daily .dv-tbl thead th{background:transparent;font-weight:500;color:var(--text-faint);border-bottom:0.5px solid var(--border-light)}
+#view-daily .date-nav button{background:var(--surface3);border:none;border-radius:8px;padding:8px 12px;font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);cursor:pointer}
+
+#view-daily .dr-who{order:-1;border-bottom:0.5px solid var(--border-light)}
+#view-daily .dr-date{border-bottom:none}
+@media(max-width:480px),(orientation:portrait){
+  .portal-grid{grid-template-columns:repeat(4,1fr);gap:20px 8px;max-width:420px}
+  .portal-card-icon{width:64px;height:64px;border-radius:16px}
+  .portal-card-icon svg{width:32px;height:32px}
+  .portal-card-title{font-size:11px}
+  .portal-logo-mark{width:88px}
+  .portal-wrap{padding:26px 16px 50px}
+}
+
 </style>
 </head>
 <body>
@@ -2604,21 +2737,21 @@ table.jobs tr:last-child td{border-bottom:none}
     <div id="writeView" class="hidden">
       <div class="card">
         <div class="card-head">
-          <div class="dr-date" style="flex:1">
-            <div class="today-hint" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-              <span style="white-space:nowrap">日付：</span>
-              <input type="date" id="writeDate" onchange="Daily.onWriteDateChange()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;min-width:0">
-              <button onclick="Daily.setWriteDateToday()" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0">今日</button>
+          <div class="dr-date">
+            <div class="today-hint">
+              <span>日付</span>
+              <input type="date" id="writeDate" onchange="Daily.onWriteDateChange()">
+              <button onclick="Daily.setWriteDateToday()" class="dr-today">今日</button>
             </div>
           </div>
-          <label class="dr-who" style="flex:1;min-width:0;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px">自分を選択（50音順）：<select id="whoSelect" onchange="Daily.onWhoChange()" style="flex:1;min-width:0;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface)"></select></label>
+          <label class="dr-who">名前<select id="whoSelect" onchange="Daily.onWhoChange()"></select></label>
         </div>
         <div class="saved-entries" id="savedEntries"></div>
         <!-- 入力フォーム -->
         <div id="addForm" class="add-form hidden">
           <div class="af-field">
             <label>案件</label>
-            <select id="afProj" onchange="Daily.onAfProjChange()"><option value="">-- 案件を選ぶ --</option></select>
+            <select id="afProj" onchange="Daily.onAfProjChange()"><option value="">選ぶ</option></select>
           </div>
           <div class="af-field hidden" id="afProjCustomWrap">
             <label>案件名（自由記述）</label>
@@ -2627,7 +2760,7 @@ table.jobs tr:last-child td{border-bottom:none}
           <div class="af-row">
             <div class="af-field" style="flex:2">
               <label>作業内容</label>
-              <select id="afWork" onchange="Daily.onAfWorkChange()"><option value="">-- 作業を選ぶ --</option></select>
+              <select id="afWork" onchange="Daily.onAfWorkChange()"><option value="">選ぶ</option></select>
             </div>
             <div class="af-field" style="flex:1">
               <label>時間（分）</label>
@@ -3433,7 +3566,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-14 19:10';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-15 08:38';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -7183,7 +7316,7 @@ const Daily = (function(){
 
   function initWhoSelect(){
     const sel=$('whoSelect');if(!sel)return;
-    let h='<option value="">-- 氏名を選んでください --</option>';
+    let h='<option value="">選ぶ</option>';
     staffList.forEach(s=>{h+=`<option value="${esc(s.employee_no)}">${esc(s.name)}</option>`});
     sel.innerHTML=h;
     const saved=localStorage.getItem('daily_who');
@@ -7216,7 +7349,7 @@ const Daily = (function(){
   function setWriteDateToday(){writeDate=new Date();writeDate.setHours(0,0,0,0);renderWrite()}
   function buildAfProjOptions(){
     const sel=$('afProj');if(!sel)return;
-    let h='<option value="">-- 案件を選ぶ --</option><option value="other">その他(自由記述)</option>';
+    let h='<option value="">選ぶ</option><option value="other">その他（自由記述）</option>';
     const w=getWho();const me=staffList.find(s=>String(s.employee_no)===String(w));const myDept=me?me.dept:'';
     const PROD_ST_ORDER={'製作中':0,'完成':1,'受注':2,'見積中':3};
     const PROJ_ST_ORDER={'進行中':0,'現場中':0,'レンタル中':1,'メンテ中':1.5,'準備中':2,'受注':3,'見積中':4};   // 古い言葉は日報の案件一覧（GAS が返す生の値）用に残す
@@ -7252,9 +7385,9 @@ const Daily = (function(){
   }
   function buildAfWorkOptions(projType){
     const sel=$('afWork');
-    if(!projType){sel.innerHTML='<option value="">-- まず案件を選んでください --</option>';sel.disabled=true;return}
+    if(!projType){sel.innerHTML='<option value="">先に案件を選ぶ</option>';sel.disabled=true;return}
     sel.disabled=false;
-    let h='<option value="">-- 作業を選ぶ --</option><option value="__other__">その他（自由記述）</option>';
+    let h='<option value="">選ぶ</option><option value="__other__">その他（自由記述）</option>';
     const og=(label,arr)=>{let s='<optgroup label="'+label+'">';arr.forEach(w=>s+=`<option value="${esc(w)}">${esc(w)}</option>`);return s+'</optgroup>'};
     if(projType==='prod')h+=og('生産部作業',WORK_PRODUCTION)+og('共通',WORK_COMMON)+og('企画制作部作業',WORK_PROJECT);
     else if(projType==='proj')h+=og('企画制作部作業',WORK_PROJECT)+og('共通',WORK_COMMON)+og('生産部作業',WORK_PRODUCTION);
