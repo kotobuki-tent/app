@@ -1934,6 +1934,20 @@ html.in-woff .portal-wrap{padding:12px 0 40px}
 .portal-mark{display:block;width:26px;height:auto;margin:6px auto 22px;opacity:.22;filter:grayscale(1);pointer-events:none;user-select:none}
 html.in-woff .portal-mark{display:none}
 
+
+/* 携帯はスクロールが長いので、組の中を 2 列の白いタイルに（10/15 iller「スクロールが多くなる」） */
+@media(max-width:480px),(orientation:portrait){
+  .portal-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:transparent;border-radius:0;overflow:visible;margin:0 16px 18px}
+  .portal-card{background:var(--surface);border-radius:12px;border-top:none;min-height:46px;padding:0 12px;gap:10px}
+  .portal-card::after{display:none}
+  .portal-card-title{font-size:14px}
+  .portal-cap{padding-left:20px;margin-top:2px}
+  .portal-mark{margin:4px auto 14px}
+  .portal-logo{margin:0 0 10px}
+  .portal-modeswitch{margin-bottom:16px}
+  .portal-footer{margin-top:30px}
+}
+
 </style>
 </head>
 <body>
@@ -3573,7 +3587,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 09:43';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-15 09:44';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
