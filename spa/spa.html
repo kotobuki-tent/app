@@ -1929,6 +1929,11 @@ html.in-woff .portal-wrap{padding:12px 0 40px}
 /* 足元に名前をうっすら（AIR RINGO の流儀、10/15 iller） */
 .portal-footer{font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;letter-spacing:.42em;color:#c7c7cc;text-align:center;margin-top:56px;padding-left:.42em;user-select:none}
 
+
+/* 頭の真ん中に 寿 の印をうっすら（AIR RINGO の林檎の位置、10/15 iller「ロゴか社名を」） */
+.portal-mark{display:block;width:26px;height:auto;margin:6px auto 22px;opacity:.22;filter:grayscale(1);pointer-events:none;user-select:none}
+html.in-woff .portal-mark{display:none}
+
 </style>
 </head>
 <body>
@@ -2900,6 +2905,7 @@ html.in-woff .portal-wrap{padding:12px 0 40px}
 <!-- ===== ポータル section（入口・リンク集） ===== -->
 <section id="view-portal">
   <div class="portal-wrap">
+    <img class="portal-mark" src="../icons/logo-mark.png" alt="">
     <div class="portal-logo">業務管理</div>
     <div class="portal-modeswitch">
       <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
@@ -3567,7 +3573,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 09:42';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-15 09:43';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
