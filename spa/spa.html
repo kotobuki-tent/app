@@ -2058,6 +2058,7 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 #view-cal .cal-big{font-weight:700}
 .card-pane{border:none;box-shadow:none;border-radius:14px}
 .card-pane .cp-title{font-weight:600;border-bottom:0.5px solid var(--border-light)}
+.card-pane .cp-title .cp-sub{margin-left:auto;font-size:12px;font-weight:400;color:var(--text-faint)}
 .card-pane .wknav .wk-btn,.card-pane .wknav .wk-today{border:none;background:var(--surface3);border-radius:8px;color:var(--text)}
 .card-pane .cp-nbtn{border:none;background:var(--surface3);font-weight:500;border-radius:12px}
 .card-pane .cp-nbtn:hover{background:#dededf}
@@ -3962,8 +3963,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 14:31';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1089;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 14:36';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1090;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8223,10 +8224,9 @@ const Card = (function(){
   function thisWeek(){ _wk=monday(new Date()); render(); }
   function render(){
     const el=document.getElementById('cardBody'); if(!el)return;
-    const wkEnd=addDays(_wk,6), s=ymd(_wk), e=ymd(wkEnd);
-    // その週の記録を日付ごとにまとめる（日付：新しい順、日内：新しい順）
-    const inWk=loans.filter(l=>{ const p=parseTs(l.out_at); return p && p.date>=s && p.date<=e; })
-      .sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at)));
+    // 週で区切らず直近 50 件（新しい順）。週送りはやめた（10/15 iller「今週だけじゃなくて 50 件とか残るようにして」）
+    const RECENT=50;
+    const inWk=loans.filter(l=>parseTs(l.out_at)).sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at))).slice(0,RECENT);
     let h='';
     h+='<div class="card-panes">';
     h+='<div class="card-pane"><div class="cp-title">カードの持ち出し</div>';
@@ -8240,8 +8240,7 @@ const Card = (function(){
     }
     h+=`<div class="cp-acts"><button class="cp-btn take" onclick="Card.out()">持ち出し</button><button class="cp-btn ret" onclick="Card.ret()">返却</button></div>`;
     h+='</div>';
-    h+='<div class="card-pane"><div class="cp-title">持ち出し記録</div>';
-    h+=`<div class="wknav"><button class="wk-btn" onclick="Card.prevWeek()">◀</button><span class="wk-label">${lbl(_wk)} 〜 ${lbl(wkEnd)}</span><button class="wk-btn" onclick="Card.nextWeek()">▶</button><button class="wk-today" onclick="Card.thisWeek()">今週</button></div>`;
+    h+=`<div class="card-pane"><div class="cp-title">持ち出し記録<span class="cp-sub">直近 ${RECENT} 件</span></div>`;
     if(inWk.length){
       h+='<div class="loan-grid">';
       inWk.forEach(l=>{
@@ -8258,7 +8257,7 @@ const Card = (function(){
       });
       h+='</div>';
     }else{
-      h+='<div class="cp-empty">この週の記録はありません</div>';
+      h+='<div class="cp-empty">記録はありません</div>';
     }
     h+='</div></div>';
     el.innerHTML=h;
