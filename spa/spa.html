@@ -1817,14 +1817,11 @@ tr:hover td{background:rgba(10,132,255,.04)}
 .portal-wrap{padding:36px 20px 60px}
 .portal-sub{color:var(--text-faint);margin-bottom:34px}
 .portal-grid{gap:26px 12px}
-.portal-card-icon{width:76px;height:76px;border-radius:19px;background:var(--accent);color:#fff;box-shadow:none}
-.portal-card-icon svg{width:38px;height:38px}
-.portal-card[data-app="daily"] .portal-card-icon,.portal-card[data-app="ot"] .portal-card-icon,.portal-card[data-app="cal"] .portal-card-icon,.portal-card[data-app="wb"] .portal-card-icon{background:#34c759}
-.portal-card[data-app="alcohol"] .portal-card-icon,.portal-card[data-app="forklift"] .portal-card-icon,.portal-card[data-app="card"] .portal-card-icon,.portal-card[data-app="veh"] .portal-card-icon{background:#ff9500}
-.portal-card[data-app="qual"] .portal-card-icon{background:#8944ab}
+.portal-card-icon{width:76px;height:76px;border-radius:19px;background:var(--surface);color:var(--text);box-shadow:none}   /* 色は付けない（10/15 iller「そこだけやたらうるさい」）＝白い角丸に黒い線 */
+.portal-card-icon svg{width:36px;height:36px;stroke-width:1.8}
 .portal-card-title{font-size:12px;font-weight:500;color:var(--text)}
 .portal-card:hover{transform:none}
-.portal-card:hover .portal-card-icon{filter:brightness(1.06)}
+.portal-card:hover .portal-card-icon{background:#fafafa}
 .portal-modeswitch{margin-bottom:26px}
 .pm-btn{background:var(--surface3);border:none;color:var(--text);border-radius:8px;padding:6px 12px;font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif}
 .pm-btn.on{background:var(--text);color:#fff}
@@ -3566,7 +3563,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 08:38';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-15 09:16';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
