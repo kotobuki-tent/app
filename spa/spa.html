@@ -1854,6 +1854,54 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .fv-card .assignee{margin:0;font-size:12px}
 .fv-card .tag.person{background:var(--surface3);color:var(--text);border-radius:6px}
 .fv-card .sub-info{margin:0}
+.fv-card .tag.tp-rental{background:#e1f5ee;color:#0f6e56}
+.fv-card .tag.tp-make{background:#eeedfe;color:#534ab7}
+/* 企画制作のスケジュール（見本 企画スケジュール_2026-10-15）：白いかたまり、縦線は髪の毛、週末は薄灰、今日は青の丸。帯の色は 現場＝青の濃淡／レンタル＝緑／製作＝紫 */
+.proj-view{padding:6px 16px 24px}
+.gantt-controls{margin-bottom:14px}
+.gantt-nav button,.gantt-controls select{background:var(--surface3);border:none;border-radius:8px;padding:7px 12px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text)}
+.gantt-nav button:hover{background:#dededf;color:var(--text)}
+.gantt-section-hd{font-size:13px;font-weight:600;color:var(--text);padding:12px 4px 8px;margin-top:4px;border-top:none}
+.gantt-section-hd .count{font-weight:400;color:var(--text-faint)}
+.gantt-wrap{border:none;border-radius:12px}
+.gantt-header{background:transparent;border-bottom:0.5px solid var(--border-light)}
+.gantt-label-hd{font-weight:400;font-size:12px;color:var(--text-faint);border-right:0.5px solid var(--border-light)}
+.gantt-date-cell{border-right:0.5px solid #f0f0f3;padding:7px 2px 5px;color:var(--text-faint)}
+.gantt-date-cell .dm{font-size:13px;font-weight:600;color:var(--text);display:inline-block;padding:1px 6px;border-radius:999px}
+.gantt-date-cell .dow{font-size:10px;margin-bottom:1px}
+.gantt-date-cell.sat,.gantt-date-cell.holiday{background:#fafafa}
+.gantt-date-cell.sat .dm{color:var(--text-faint)}
+.gantt-date-cell.holiday{color:var(--red)}
+.gantt-date-cell.holiday .dm{color:var(--red)}
+.gantt-date-cell.today{background:transparent;color:var(--accent)}
+.gantt-date-cell.today .dm{background:var(--accent);color:#fff}
+.gantt-row{border-bottom:0.5px solid #f0f0f3;min-height:56px}
+.gantt-row:last-child{border-bottom:none}
+.gantt-row:hover{background:rgba(10,132,255,.04)}
+.gantt-row-label{border-right:0.5px solid var(--border-light);padding:9px 14px}
+.gantt-row-label .prj-name{font-size:14px;font-weight:600}
+.gantt-bar-cell{border-right:0.5px solid #f0f0f3;min-height:56px}
+.gantt-bar-cell.today{background:rgba(10,132,255,.06)}
+.gantt-bar{top:16px;bottom:16px;border-radius:6px}
+.gantt-bar.load_in{background:#9ec5f0}
+.gantt-bar.setup{background:#5aa0e6}
+.gantt-bar.event{background:#1f6fd0}
+.gantt-bar.teardown{background:#8fa9c4}
+.gantt-bar.rental_out{background:#1d9e75}
+.gantt-bar.rental_return{background:#6cc3a6}
+.gantt-bar.rental_period{background:#1d9e75;opacity:.3}
+.gantt-bar.make{background:#7f77dd}
+.gantt-bar.make_period{background:#7f77dd;opacity:.35}
+.gantt-legend{margin-top:10px;color:var(--text-faint)}
+.gantt-legend .dot{width:10px;height:10px;border-radius:3px}
+.vehicle-summary{margin-top:18px}
+/* 携帯のスケジュール＝白いカード（縁取り無し） */
+.prj-card{border-left:none;box-shadow:none;padding:14px 16px;margin-bottom:8px}
+.prj-card .pc-name{font-weight:600}
+.prj-card .pc-person{background:var(--surface3);color:var(--text);border-radius:6px;font-weight:500}
+.prj-card .pc-eno{color:var(--text-dim);font-weight:400}
+.prj-card .pc-date{font-weight:500;color:var(--text)}
+.prj-cards .prj-group-label{font-size:13px;font-weight:600;color:var(--text);border-bottom:none;margin:14px 4px 8px;padding:0}
 @media(max-width:480px),(orientation:portrait){
   .scr-head{padding:14px 16px 0;gap:10px}
   .scr-head h1{font-size:26px}
@@ -2414,18 +2462,17 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
 
 <!-- ===== 企画制作 section（中身は移植フェーズで流し込む） ===== -->
 <section id="view-proj" class="hidden">
+  <div class="scr-head"><h1>企画制作</h1><span class="scr-sub" id="projPcDate"></span><input class="scr-search" id="projPcSearch" placeholder="物件名・客先・受注番号で探す"></div>
   <div class="sub-tabs" id="projTabs">
-    <span class="subtab-date" id="projPcDate"></span>
     <button class="sub-tab on" data-view="gantt">スケジュール</button>
     <button class="sub-tab" data-view="board">ボード</button>
     <button class="sub-tab" data-view="projDone">終了</button>
     <button class="mny-btn" onclick="Proj.moneySum()">¥ 合計</button>
     <button class="slog-btn" id="projSlogBtn" onclick="Proj.openSlog()">ステータスログ<span class="dot"></span></button>
-    <input class="subtab-search" id="projPcSearch" placeholder="検索...">
   </div>
   <div class="app">
     <div id="projGantt" class="proj-view"></div>
-    <div id="projBoard" class="proj-view hidden"></div>
+    <div id="projBoard" class="proj-view factory-view hidden"></div>
     <div id="projDoneView" class="proj-admin hidden"></div>
     <div id="projArchivedView" class="proj-admin hidden"></div>
   </div>
@@ -3702,8 +3749,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 11:49';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1078;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 11:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1079;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4782,36 +4829,33 @@ const Proj = (function(){
     const pastN=items.filter(d=>d._urgN===888).length;
     if(pastN)h+=si('past',pastN,'日程超過','var(--red)');
     h+='</div>';
+    // 段の見出し＝色の点、カード＝生産の工場ボードと同じ作法（次の予定は左・残り日数は右で太く。2026-10-15）
     const groups=[
-      {label:'日程が過ぎている（未終了）',items:filtered.filter(d=>d._urgN===888)},
-      {label:'今日',items:filtered.filter(d=>d._urgN===0)},
-      {label:'3日以内',items:filtered.filter(d=>d._urgN===1)},
-      {label:'1週間以内',items:filtered.filter(d=>d._urgN===2)},
-      {label:'それ以降',items:filtered.filter(d=>d._urgN===3)},
-      {label:'日程未定',items:filtered.filter(d=>d._urgN===999)}
+      {label:'日程が過ぎている（未終了）',dot:'r',items:filtered.filter(d=>d._urgN===888)},
+      {label:'今日',dot:'r',items:filtered.filter(d=>d._urgN===0)},
+      {label:'3日以内',dot:'o',items:filtered.filter(d=>d._urgN===1)},
+      {label:'1週間以内',dot:'b',items:filtered.filter(d=>d._urgN===2)},
+      {label:'それ以降',dot:'g',items:filtered.filter(d=>d._urgN===3)},
+      {label:'日程未定',dot:'g',items:filtered.filter(d=>d._urgN===999)}
     ];
     groups.forEach(g=>{if(!g.items.length)return;
-      h+=`<div class="fv-grp"><div class="fv-grp-hd">${g.label}　${g.items.length}件</div><div class="fv-cards">`;
+      h+=`<div class="fv-grp"><div class="fv-grp-hd"><span class="dot ${g.dot}"></span><b>${g.label}</b><span>${g.items.length} 件</span></div><div class="fv-cards">`;
       g.items.forEach(d=>{
         const cls=d._urgN===0||d._urgN===888?'urgent':d._urgN===1?'thisweek':'twoweeks';
-        let badge='';
-        if(d._urgN===0)badge='<span class="badge urgent">今日</span>';
-        else if(d._urgN===888)badge='<span class="badge urgent">日程超過</span>';
-        else if(d._urgN===1)badge=`<span class="badge thisweek">あと${d._nd}日</span>`;
         const tmpBadge=String(d.id||'').startsWith('tmp_')?'<span class="tmp-badge">保存中…</span>':'';
         const sc=STC[d.status]||['var(--text-faint)','var(--surface3)'];
-        h+=`<div class="fv-card ${cls}" data-id="${d.id}"><div class="top"><span class="pname">${esc(d.project)}${tmpBadge}</span>${badge}${staleBadge(d,'project')}${QuoteAge.forChild(d)}</div>`;
-        if(d.our_person)h+=`<div class="assignee">担当: <span class="tag person">${esc(d.our_person)}</span></div>`;
+        h+=`<div class="fv-card ${cls}" data-id="${d.id}"><div class="top"><span class="pname">${esc(d.project)}${tmpBadge}</span>${staleBadge(d,'project')}${QuoteAge.forChild(d)}</div>`;
         h+=`<div class="meta">${esc(d.client||'')}`;
         if(d.order_no)h+=` <span class="tag eno">${esc(d.order_no)}</span>`;
         if(d.venue)h+=` <span class="tag loc">${esc(d.venue)}</span>`;
-        if(d.type==='レンタル')h+=` <span class="tag" style="color:var(--cyan);background:var(--cyan-dim)">レンタル</span>`;
-        else if(d.type==='製作')h+=` <span class="tag" style="color:#5d4037;background:#efebe9">製作</span>`;
+        if(d.type==='レンタル')h+=` <span class="tag tp-rental">レンタル</span>`;
+        else if(d.type==='製作')h+=` <span class="tag tp-make">製作</span>`;
         h+=` <span class="tag st" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span></div>`;
-        if(d._next){const nd=d._next.dt;h+=`<div class="dl">次: ${d._next.l} ${nd.getMonth()+1}/${nd.getDate()}（${dow[nd.getDay()]}）${d._nd===0?'今日':'あと'+d._nd+'日'}</div>`}
-        else if(d._urgN===888){const last=d._evs[d._evs.length-1].dt;h+=`<div class="dl">全日程終了: ${last.getMonth()+1}/${last.getDate()}（${dow[last.getDay()]}）</div>`}
-        else h+='<div class="dl">日程未定</div>';
-        if(d._evs.length){const f0=d._evs[0].dt,f1=d._evs[d._evs.length-1].dt;h+=`<div style="font-size:11.5px;color:var(--text-dim);margin-top:2px">期間 ${f0.getMonth()+1}/${f0.getDate()}〜${f1.getMonth()+1}/${f1.getDate()}</div>`}
+        if(d._next){const nd=d._next.dt;h+=`<div class="dl"><span class="d">次 ${d._next.l} ${nd.getMonth()+1}/${nd.getDate()}（${dow[nd.getDay()]}）</span><span class="w">${d._nd===0?'今日':'あと '+d._nd+' 日'}</span></div>`}
+        else if(d._urgN===888){const last=d._evs[d._evs.length-1].dt;h+=`<div class="dl"><span class="d">全日程終了 ${last.getMonth()+1}/${last.getDate()}（${dow[last.getDay()]}）</span><span class="w">超過</span></div>`}
+        else h+='<div class="dl"><span class="d">日程未定</span><span class="w">—</span></div>';
+        if(d._evs.length){const f0=d._evs[0].dt,f1=d._evs[d._evs.length-1].dt;h+=`<div class="meta">期間 ${f0.getMonth()+1}/${f0.getDate()}〜${f1.getMonth()+1}/${f1.getDate()}</div>`}
+        if(d.our_person)h+=`<div class="assignee"><span class="tag person">${esc(d.our_person)}</span></div>`;
         h+='</div>';
       });
       h+='</div></div>';
@@ -4858,7 +4902,7 @@ const Proj = (function(){
     // レンタルセクション
     h+=`<div class="gantt-section-hd">レンタル<span class="count">${rentalItems.length}件</span></div>`;
     h+=buildGanttTable(rentalItems,dates,'レンタル案件はありません','レンタル');
-    h+='<div class="gantt-legend"><span><span class="dot" style="background:#64b5f6"></span>搬入</span><span><span class="dot" style="background:#81c784"></span>設営</span><span><span class="dot" style="background:#ffb74d"></span>本番</span><span><span class="dot" style="background:#e57373"></span>撤去</span><span><span class="dot" style="background:#ab47bc"></span>貸出</span><span><span class="dot" style="background:#78909c"></span>返却</span><span><span class="dot" style="background:#ce93d8;opacity:.5"></span>貸出中</span></div>';
+    h+='<div class="gantt-legend"><span><span class="dot" style="background:#9ec5f0"></span>搬入</span><span><span class="dot" style="background:#5aa0e6"></span>設営</span><span><span class="dot" style="background:#1f6fd0"></span>本番</span><span><span class="dot" style="background:#8fa9c4"></span>撤去</span><span><span class="dot" style="background:#1d9e75"></span>貸出</span><span><span class="dot" style="background:#6cc3a6"></span>返却</span><span><span class="dot" style="background:#1d9e75;opacity:.3"></span>貸出中</span><span><span class="dot" style="background:#7f77dd"></span>製作</span></div>';
     // 車両バッティング
     const allForVh=[...siteItems,...rentalItems];
     const usage={};VEHICLES.forEach(v=>usage[v]={});
