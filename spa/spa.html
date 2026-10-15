@@ -3994,8 +3994,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 16:58';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1116;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 17:00';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1117;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4117,7 +4117,10 @@ const QuoteAge={
 };
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 // 表示名＝「得意先／案件名」（2026-10-15 iller）。名前に「／」が既にあれば（昔の入力）そのまま。データは触らない
-function dispName(client,name){const n=String(name||''),c=String(client||'').trim();return (/[／/]/.test(n)||!c)?n:c+'／'+n;}   // 区切りは全角「／」も半角「/」も（10/15 「TSP太陽/園芸博」が二重になった）
+function dispName(client,name){const n=String(name||'');let c=String(client||'').trim();
+  // 見出しでは法人格を落とす（株式会社・有限会社・合同会社・㈱・㈲・(株)・(有)、前後どちらでも）。データは正式名のまま（10/15 iller「株式会社とか付けない方がいい」→表示で外す）
+  c=c.replace(/^(株式会社|有限会社|合同会社|㈱|㈲|\(株\)|（株）|\(有\)|（有）)\s*/,'').replace(/\s*(株式会社|有限会社|合同会社|㈱|㈲|\(株\)|（株）|\(有\)|（有）)$/,'').trim();
+  return (/[／/]/.test(n)||!c)?n:c+'／'+n;}   // 区切りは全角「／」も半角「/」も
 const vr=(label,val)=>`<div class="view-row"><div class="view-label">${label}</div><div class="view-val">${esc(val||'')}</div></div>`;
 const $=id=>document.getElementById(id);
 function _getCache(key){
