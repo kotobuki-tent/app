@@ -1807,13 +1807,14 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 /* PC・横画面では見出しとサブタブを 1 行に畳む（4 段も頭があると一覧の始まりが遅い。iller 2026-10-15「スタートが遅れるのが嫌」）。
    .scr-head を display:contents でほどき、親を flex にして 見出し・日付・サブタブ・検索 を並べ、中身（.app／#casesPane）は次の行に */
 @media(min-width:481px) and (orientation:landscape){
-  #view-prod,#view-proj,#view-sales,#view-labor,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
-  #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#casesBody>.scr-head{display:contents}
-  #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head,#view-labor>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
-  #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head,#view-labor>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
-  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
-  #view-prod>.scr-head .scr-search,#view-proj>.scr-head .scr-search,#view-sales>.scr-head,#view-labor>.scr-head .scr-search,#casesBody>.scr-head .scr-search{order:3;margin:12px 16px 0 0;width:200px}
-  #view-prod>.app,#view-proj>.app,#view-sales>.app,#view-labor>.app,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
+  /* 畳む画面の一覧（画面を足したらここに。中身の入れ物は .app か .main か #casesPane） */
+  #view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
+  #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#view-inv>.scr-head,#casesBody>.scr-head{display:contents}
+  #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head h1,#view-labor>.scr-head h1,#view-inv>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
+  #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head .scr-sub,#view-labor>.scr-head .scr-sub,#view-inv>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
+  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#view-inv>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
+  #view-prod>.scr-head .scr-search,#view-proj>.scr-head .scr-search,#view-sales>.scr-head .scr-search,#view-labor>.scr-head .scr-search,#view-inv>.scr-head .scr-search,#casesBody>.scr-head .scr-search{order:3;margin:12px 16px 0 0;width:200px}
+  #view-prod>.app,#view-proj>.app,#view-sales>.app,#view-labor>.app,#view-inv>.main,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
   #view-cases .sub-tabs{padding-top:12px}
   .gantt-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .gantt-top .fv-sum{margin-bottom:0}
@@ -1931,6 +1932,44 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 .job-card .jc-foot .jc-ppl{font-weight:500}
 .mb-total{background:var(--surface2);border-radius:12px}
 .mb-total .tt-val{color:var(--text);font-weight:600}
+/* 在庫：日程表は白いかたまい・縦線は髪の毛・週末は薄灰・今日は青の丸、帯は塗りで縁取り無し（仮押さえだけ点線）、状態は丸いピル */
+#view-inv .main{padding:6px 16px 24px}
+#v_gantt .gt-controls input,#v_gantt .gt-controls select{border:none;background:var(--surface3);border-radius:8px;padding:7px 10px}
+#v_gantt .gt-nav button{color:var(--text);border-radius:8px}
+#v_gantt .gt{border:none;border-radius:12px;box-shadow:none}
+#v_gantt .gt .hd{background:var(--surface);border-bottom:0.5px solid var(--border-light)}
+#v_gantt .gt .hd.name{font-weight:500;color:var(--text-faint)}
+#v_gantt .gt .hd.name b{font-weight:500;color:var(--text-faint)}
+#v_gantt .gt .name{border-right:0.5px solid var(--border-light);border-bottom:0.5px solid #f0f0f3;padding:8px 14px}
+#v_gantt .gt .name b{font-weight:600}
+#v_gantt .gt .cat{background:var(--surface2);font-weight:600;color:var(--text);border-bottom:0.5px solid var(--border-light);padding:6px 14px}
+#v_gantt .tl{border-bottom:0.5px solid #f0f0f3}
+#v_gantt .days>div,#v_gantt .bg>div{border-right:0.5px solid #f0f0f3}
+#v_gantt .days>div{color:var(--text-faint)}
+#v_gantt .days .dm{font-weight:600;color:var(--text)}
+#v_gantt .days>div.sat .dm{color:var(--text-faint)}
+#v_gantt .days>div.sun .dm,#v_gantt .days>div.hol .dm{color:var(--red)}
+#v_gantt .days>div.hol{background:#fafafa}
+#v_gantt .days>div.today{background:transparent;color:var(--accent)}
+#v_gantt .days>div.today .dm{display:inline-block;background:var(--accent);color:#fff;border-radius:999px;padding:0 6px;line-height:1.4}
+#v_gantt .bg>div.sat,#v_gantt .bg>div.sun,#v_gantt .bg>div.hol{background:#fafafa}
+#v_gantt .bg>div.today{background:rgba(10,132,255,.06)}
+#v_gantt .bar{border:none;border-radius:6px;font-weight:500;line-height:18px}
+#v_gantt .bar.est{background:#e6f1fb;color:#185fa5;border:1px dashed #185fa5;line-height:16px}
+#v_gantt .bar.res{background:#e6f1fb;color:#185fa5}
+#v_gantt .bar.out{background:#e1f5ee;color:#0f6e56}
+#v_gantt .bar.mnt{background:#faeeda;color:#854f0b}
+#v_gantt .bar.dsp{background:#f1efe8;color:#5f5e5a}
+#v_gantt .bar.oth{background:#f1efe8;color:#5f5e5a}
+#v_gantt .gt-legend{position:static;background:transparent;border-top:none;padding:6px 0 0;margin:10px 0 0;color:var(--text-faint)}
+#v_gantt .gt-legend i.lg{width:10px;height:10px;border-radius:3px;border:none}
+#v_gantt .gt-legend i.lg.est{background:#e6f1fb;border:1px dashed #185fa5}
+#v_gantt .gt-legend i.lg.res{background:#378add}
+#v_gantt .gt-legend i.lg.out{background:#1d9e75}
+#v_gantt .gt-legend i.lg.mnt{background:#ef9f27}
+#v_gantt .gt-legend i.lg.dsp{background:#b4b2a9}
+#view-inv .st{border-radius:999px;font-weight:500;padding:3px 10px}
+@media(max-width:899px){#v_gantt .gt .hd{top:0}}   /* 横スクロール枠の中では縦に固定されないので 48px の下駄は要らない（先頭の行に重なっていた） */
 /* 携帯のスケジュール＝白いカード（縁取り無し） */
 .prj-card{border-left:none;box-shadow:none;padding:14px 16px;margin-bottom:8px}
 .prj-card .pc-name{font-weight:600}
@@ -2590,8 +2629,8 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
 
 <!-- ===== 在庫 section ===== -->
 <section id="view-inv" class="hidden">
+  <div class="scr-head"><h1>在庫</h1><span class="scr-sub" id="invPcDate"></span><input class="scr-search" id="invPcSearch" placeholder="品名・現場で探す"></div>
   <div class="sub-tabs" id="invTabs">
-    <span class="subtab-date" id="invPcDate"></span>
     <button class="sub-tab on" data-tab="gantt" onclick="Inv.switchTab('gantt')">在庫</button>
     <button class="sub-tab" data-tab="rentals" onclick="Inv.switchTab('rentals')">貸出/予約</button>
     <button class="sub-tab" data-tab="maint" onclick="Inv.switchTab('maint')">メンテ</button>
@@ -2599,7 +2638,6 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
     <button class="sub-tab" data-tab="items" onclick="Inv.switchTab('items')">商品台帳</button>
     <button class="slog-btn" onclick="Proj.printLedgerCandidates()">台帳に載せるリスト</button>
     <button class="slog-btn" id="invSlogBtn" onclick="Inv.openSlog()">ステータスログ<span class="dot"></span></button>
-    <input class="subtab-search" id="invPcSearch" placeholder="検索...">
   </div>
 
   <div class="main">
@@ -2659,7 +2697,7 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
         <span class="gt-nav"><button type="button" onclick="Inv.ganttMove(-7)">← 1週</button><button type="button" onclick="Inv.ganttToday()">今日</button><button type="button" onclick="Inv.ganttMove(7)">1週 →</button></span>
       </div>
       <div id="ganttOut" class="gt-wrap"></div>
-      <div class="gt-legend"><span><i style="background:#dbeafe;border:1px dashed #60a5fa"></i>仮押さえ</span><span><i style="background:#dbeafe;border:1px solid #60a5fa"></i>予約</span><span><i style="background:#dcfce7;border:1px solid #4ade80"></i>貸出中</span><span><i style="background:#ffedd5;border:1px solid #fb923c"></i>メンテ中</span><span><i style="background:#e5e7eb;border:1px solid #9ca3af"></i>廃棄予定</span></div>
+      <div class="gt-legend"><span><i class="lg est"></i>仮押さえ</span><span><i class="lg res"></i>予約</span><span><i class="lg out"></i>貸出中</span><span><i class="lg mnt"></i>メンテ中</span><span><i class="lg dsp"></i>廃棄予定</span></div>
     </div>
   </div>
 
@@ -3783,8 +3821,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 13:36';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1082;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 13:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1083;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
