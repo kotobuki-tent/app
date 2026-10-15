@@ -2049,6 +2049,8 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 #view-ot .ov-cell.today-col{background:rgba(10,132,255,.06)}
 #view-ot .ov-cell.holiday-col{background:#fafafa}
 #view-ot .ov-cell .ot-time,#view-ot .ov-cell .ot-holiday{border-radius:999px;font-weight:500;padding:3px 9px}
+#view-ot .week-label{white-space:nowrap}
+@media(max-width:480px),(orientation:portrait){#view-ot>.scr-head .scr-search{display:none}#view-ot .week-bar{gap:8px}#view-ot .week-btn{padding:7px 10px;font-size:12px}}   /* 携帯の時間外に検索は要らない（名前は下で選ぶ） */
 /* 今日・いないカード：かたまいの縁と影を外す、ボタンは灰のチップ、名前のタイルは灰（選ぶと青） */
 #view-cal .cal-card{border:none;box-shadow:none;border-radius:12px}
 #view-cal .cal-card.loading{opacity:.35;transition:opacity .2s}
@@ -3963,8 +3965,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 14:36';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1090;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 14:38';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1091;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8069,7 +8071,7 @@ const Ot = (function(){
   }
   function changeWeek(delta){const d=new Date(currentWeekStart);d.setDate(d.getDate()+7*delta);currentWeekStart=d;entries=[];render();loadAll()}
   function goThisWeek(){currentWeekStart=getMonday(new Date());entries=[];render();loadAll()}
-  function renderWeekLabel(){const dates=getWeekDates(currentWeekStart);const s=dates[0],e=dates[6];$('weekLabel').textContent=`${s.getMonth()+1}/${s.getDate()} (月) 〜 ${e.getMonth()+1}/${e.getDate()} (日)`}
+  function renderWeekLabel(){const dates=getWeekDates(currentWeekStart);const s=dates[0],e=dates[6];const narrow=window.innerWidth<=480;$('weekLabel').textContent=narrow?`${s.getMonth()+1}/${s.getDate()}〜${e.getMonth()+1}/${e.getDate()}`:`${s.getMonth()+1}/${s.getDate()} (月) 〜 ${e.getMonth()+1}/${e.getDate()} (日)`}   // 携帯は曜日を省いて 1 行に（10/15 折り返していた）
 
   function switchTab(tab){
     currentTab=tab;
