@@ -1860,7 +1860,7 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .factory-view .fv-card.s-完成{background:#eaf3de}
 .factory-view .fv-card.s-完成 .tag.st{background:#fff;color:#3b6d11}
 .factory-view .fv-card.s-完成 .tag.person,.factory-view .fv-card.s-完成 .tag.eno{background:rgba(255,255,255,.7)}
-.fv-card .dl{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;color:var(--text-faint);margin:0}
+.fv-card .dl{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;color:var(--text);margin:0}   /* 10/15 iller「納期がもっと濃く、もうちょっとだけ大きく」13→14・灰→黒 */
 .fv-card .dl .w{font-weight:600;color:var(--text)}
 .fv-card.urgent .dl .w{color:var(--red)}
 .fv-card.thisweek .dl .w{color:var(--orange)}
@@ -3996,8 +3996,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 17:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1121;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 17:13';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1122;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4607,11 +4607,11 @@ const Prod = (function(){
       // 見出しは「得意先／物件名」（iller 10/15「TSP太陽／ぼうさい国体 こう見たい」）。名前に「／」が既にあればそのまま、無ければ得意先を頭に付けて表示（データは触らない）
       const title=dispName(d.client,d.project);
       h+=`<div class="fv-card ${cls} s-${esc(d.status)}" data-id="${d.id}"><div class="top"><span class="pname">${esc(title)}${tmpBadge}</span>${dupBadge}${staleBadge(d,'production')}</div>`;
-      h+=`<div class="meta">`;   // 得意先は見出しに入ったので出さない（10/15 iller）
+      h+=`<div class="meta">`;   // 得意先は見出しに入ったので出さない（10/15 iller）。担当者は受注番号の前
+      if(d.our_person)h+=`<span class="tag person">${esc(d.our_person)}</span> `;
       if(d.order_no)h+=`<span class="tag eno">${esc(d.order_no)}</span>`;
       if(d.section)h+=` <span class="tag loc">${esc(d.section)}</span>`;
       h+=` <span class="tag st st-${esc(d.status)}">${esc(d.status)}</span></div><div class="dl"><span class="d">${dlStr}</span><span class="w">${left}</span></div>`;
-      if(d.our_person)h+=`<div class="assignee"><span class="tag person">${esc(d.our_person)}</span></div>`;
       if(d.subcontractor)h+=`<div class="sub-info">外注先: ${esc(d.subcontractor)}</div>`;
       h+='</div>'});
       h+='</div></div>'});
@@ -5100,7 +5100,8 @@ const Proj = (function(){
         const tmpBadge=String(d.id||'').startsWith('tmp_')?'<span class="tmp-badge">保存中…</span>':'';
         const sc=STC[d.status]||['var(--text-faint)','var(--surface3)'];
         h+=`<div class="fv-card ${cls}" data-id="${d.id}"><div class="top"><span class="pname">${esc(dispName(d.client,d.project))}${tmpBadge}</span>${staleBadge(d,'project')}${QuoteAge.forChild(d)}</div>`;
-        h+=`<div class="meta">`;   // 得意先は見出しに入ったので出さない
+        h+=`<div class="meta">`;   // 得意先は見出しに入ったので出さない。担当者は受注番号の前
+        if(d.our_person)h+=`<span class="tag person">${esc(d.our_person)}</span> `;
         if(d.order_no)h+=`<span class="tag eno">${esc(d.order_no)}</span>`;
         if(d.venue)h+=` <span class="tag loc">${esc(d.venue)}</span>`;
         if(d.type==='レンタル')h+=` <span class="tag tp-rental">レンタル</span>`;
@@ -5110,7 +5111,6 @@ const Proj = (function(){
         else if(d._urgN===888){const last=d._evs[d._evs.length-1].dt;h+=`<div class="dl"><span class="d">全日程終了 ${last.getMonth()+1}/${last.getDate()}（${dow[last.getDay()]}）</span><span class="w">超過</span></div>`}
         else h+='<div class="dl"><span class="d">日程未定</span><span class="w">—</span></div>';
         if(d._evs.length){const f0=d._evs[0].dt,f1=d._evs[d._evs.length-1].dt;h+=`<div class="meta">期間 ${f0.getMonth()+1}/${f0.getDate()}〜${f1.getMonth()+1}/${f1.getDate()}</div>`}
-        if(d.our_person)h+=`<div class="assignee"><span class="tag person">${esc(d.our_person)}</span></div>`;
         h+='</div>';
       });
       h+='</div></div>';
@@ -7219,14 +7219,14 @@ const Sales = (function(){
     h+=staleBadge(d,'sales');
     h+=QuoteAge.forChild(d);
     h+='</div>';
-    h+=`<div class="meta">`;   // 得意先は見出しに入ったので出さない
+    h+=`<div class="meta">`;   // 得意先は見出しに入ったので出さない。担当者は受注番号の前
+    if(d.our_person)h+=`<span class="tag person">${esc(d.our_person)}</span> `;
     if(d.order_no)h+=`<span class="tag eno">${esc(d.order_no)}</span>`;
     if(d.supplier)h+=` <span class="tag loc">${esc(d.supplier)}</span>`;
     if(d.created_at)h+=` <span>受付 ${fmtDateJP(d.created_at)}</span>`;
     h+='</div>';
     const amt=(d.amount!==''&&d.amount!=null&&!isNaN(Number(d.amount))&&Number(d.amount)>0)?fmtAmount(d.amount):'';
     h+=`<div class="dl"><span class="d">${d.deadline?'納期 '+fmtDateJP(d.deadline):'納期 未定'}</span><span class="w">${amt}</span></div>`;
-    if(d.our_person)h+=`<div class="assignee"><span class="tag person">${esc(d.our_person)}</span></div>`;
     h+='</div>';
     return h;
   }
