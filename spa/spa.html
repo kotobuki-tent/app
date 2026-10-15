@@ -4000,8 +4000,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 17:26';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1128;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 17:27';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1129;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8972,10 +8972,8 @@ const Cases = (function(){
   function render(){
     const _tc=todoCount();
     const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['cal','カレンダー'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
-    // 大見出し（見本 PC_2026-10-15）：名前・状態ごとの数・検索。日付の表示はやめた（2026-10-15）
-    const live=_cases.filter(c=>!_arch(c.archived));
-    const sub=CASE_ST.map(st=>{const n=live.filter(c=>c.status===st).length; return n?st+' '+n:'';}).filter(Boolean).join('・');
-    const head=`<div class="scr-head"><h1>案件</h1><span class="scr-sub">${sub}</span>`
+    // 大見出し：名前・日付・検索（右の字は他の画面と同じ日付に。10/15 揃え 3）
+    const head=`<div class="scr-head"><h1>案件</h1><span class="scr-sub">${dateJP(today)}</span>`
       +`<input class="scr-search" id="casesSearch" placeholder="案件名・客先・担当で探す" value="${esc(_q)}" oninput="Cases.search(this.value)">`
       +`</div>`;
     const bar=`<div class="sub-tabs">`
