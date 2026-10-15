@@ -2059,7 +2059,7 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 #view-cal .cal-hd{flex-direction:column;align-items:flex-start;gap:10px}   /* 帯は常に見出しの下（読み込み中だけ横に並んで、読み終わると下に落ちる段差があった。10/15 iller） */
 #view-cal .cal-nav{flex:0 0 auto}
 #view-cal .cal-sub .st{min-height:1.2em}
-#view-cal .cal-card.loading{opacity:.35;transition:opacity .2s}
+#view-cal .cal-card.is-loading{opacity:.35;transition:opacity .2s}   /* .loading だと共通の「読み込み中…」（中央寄せ・余白）とかち合う */
 #view-cal .cal-btn{border:none;background:var(--surface3);border-radius:8px}
 #view-cal .cal-week{background:var(--surface3)}
 #view-cal .cal-day.sel{box-shadow:none}
@@ -4003,8 +4003,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 17:34';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1131;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 17:35';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1132;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8764,7 +8764,7 @@ const Cal = (function(){
       const cs=p.items.map(it=>{ const t=it.allDay?'終日':(it.s||'')+(it.e?'–'+it.e:''); return `<span class="pc-chip${it.off?' off':it.allDay?' all':''}"><b>${esc(t)}</b>${esc(it.t)}</span>`; }).join('');
       return `<tr class="has"><td class="n">${esc(p.name)}</td><td class="c">${cs}</td></tr>`;
     }).join('')+(none.length?`<tr class="none"><td class="n">予定なし</td><td class="d">${none.map(p=>esc(p.name)).join('　')}</td></tr>`:'');
-    el.innerHTML=hd+`<div class="cal-card${cal?'':' loading'}"><table>${rows||'<tr class="none"><td class="n">—</td><td class="d">予定のある人はいません</td></tr>'}</table></div>`;
+    el.innerHTML=hd+`<div class="cal-card${cal?'':' is-loading'}"><table>${rows||'<tr class="none"><td class="n">—</td><td class="d">予定のある人はいません</td></tr>'}</table></div>`;
   }
   function init(){}
   return { loadAll, render, init, move, today, go };
