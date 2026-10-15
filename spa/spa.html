@@ -1807,13 +1807,13 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 /* PC・横画面では見出しとサブタブを 1 行に畳む（4 段も頭があると一覧の始まりが遅い。iller 2026-10-15「スタートが遅れるのが嫌」）。
    .scr-head を display:contents でほどき、親を flex にして 見出し・日付・サブタブ・検索 を並べ、中身（.app／#casesPane）は次の行に */
 @media(min-width:481px) and (orientation:landscape){
-  #view-prod,#view-proj,#view-sales,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
-  #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#casesBody>.scr-head{display:contents}
-  #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
-  #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
-  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
-  #view-prod>.scr-head .scr-search,#view-proj>.scr-head .scr-search,#view-sales>.scr-head .scr-search,#casesBody>.scr-head .scr-search{order:3;margin:12px 16px 0 0;width:200px}
-  #view-prod>.app,#view-proj>.app,#view-sales>.app,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
+  #view-prod,#view-proj,#view-sales,#view-labor,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
+  #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#casesBody>.scr-head{display:contents}
+  #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head,#view-labor>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
+  #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head,#view-labor>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
+  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
+  #view-prod>.scr-head .scr-search,#view-proj>.scr-head .scr-search,#view-sales>.scr-head,#view-labor>.scr-head .scr-search,#casesBody>.scr-head .scr-search{order:3;margin:12px 16px 0 0;width:200px}
+  #view-prod>.app,#view-proj>.app,#view-sales>.app,#view-labor>.app,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
   #view-cases .sub-tabs{padding-top:12px}
   .gantt-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .gantt-top .fv-sum{margin-bottom:0}
@@ -1911,6 +1911,26 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .gantt-legend{margin-top:10px;color:var(--text-faint)}
 .gantt-legend .dot{width:10px;height:10px;border-radius:3px}
 .vehicle-summary{margin-top:18px}
+/* 工数：表は土台のまま（白いかたまり・縦線なし）、状態は灰のピル、携帯のカードは縁取り無し */
+#view-labor .app{padding:6px 16px 24px;overflow-x:visible}
+table.jobs{border:none;border-radius:0}
+table.jobs th{background:transparent;font-weight:500;color:var(--text-faint);border-bottom:0.5px solid var(--border-light);padding:10px 16px}
+table.jobs td{padding:13px 16px;border-bottom:none;border-top:0.5px solid #f0f0f3}
+table.jobs tr:hover td{background:rgba(10,132,255,.04)}
+.st-badge{border-radius:999px;font-weight:500;padding:3px 10px;font-size:12px;background:#f1efe8;color:#5f5e5a}
+.st-badge.st-製作中{background:#eaf3de;color:#3b6d11}
+.st-badge.st-完成{background:#e6f1fb;color:#185fa5}
+@media(max-width:480px),(orientation:portrait){#laborContent .tbl-wrap{display:none}}
+.job-card{border-left:none;box-shadow:none;margin-bottom:8px}
+.job-card .jc-name{font-weight:600}
+.job-card .jc-tag{border-radius:999px;font-weight:500;background:#f1efe8;color:#5f5e5a}
+.job-card .jc-tag.eno{background:#f1efe8;color:#5f5e5a}
+.job-card .jc-tag.dl{background:var(--surface3);color:var(--text)}
+.job-card .jc-foot{border-top:0.5px solid var(--border-light)}
+.job-card .jc-foot .jc-mins{color:var(--text);font-weight:600}
+.job-card .jc-foot .jc-ppl{font-weight:500}
+.mb-total{background:var(--surface2);border-radius:12px}
+.mb-total .tt-val{color:var(--text);font-weight:600}
 /* 携帯のスケジュール＝白いカード（縁取り無し） */
 .prj-card{border-left:none;box-shadow:none;padding:14px 16px;margin-bottom:8px}
 .prj-card .pc-name{font-weight:600}
@@ -2924,13 +2944,12 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
 
 <!-- ===== 工数 section ===== -->
 <section id="view-labor" class="hidden">
+  <div class="scr-head"><h1>工数</h1><span class="scr-sub" id="laborPcDate"></span><input class="scr-search" id="laborPcSearch" placeholder="案件名・番号で探す"></div>
   <div class="sub-tabs" id="laborTabs">
-    <span class="subtab-date" id="laborPcDate"></span>
     <button class="sub-tab on" data-view="active">工場ボード</button>
     <button class="sub-tab" data-view="archive">出荷済</button>
     <button class="sub-tab" data-view="archived">アーカイブ</button>
     <button class="slog-btn" id="laborSlogBtn" onclick="Labor.openSlog()">ステータスログ<span class="dot"></span></button>
-    <input class="subtab-search" id="laborPcSearch" placeholder="検索...">
   </div>
 
   <div class="app">
@@ -3764,8 +3783,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 13:33';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1081;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 13:36';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1082;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -7381,7 +7400,7 @@ const Labor = (function(){
       chipHtml+='</div>';
     }
     if(!list.length){$('laborContent').innerHTML=chipHtml+'<div class="empty-msg">該当する案件がありません</div>';return}
-    let h=chipHtml+'<div style="overflow-x:auto"><table class="jobs"><thead><tr>';
+    let h=chipHtml+'<div class="tbl-wrap"><table class="jobs"><thead><tr>';
     h+='<th>見積番号</th><th>受注番号</th><th>案件名</th><th>ステータス</th><th>納期</th><th class="num">延べ工数</th><th class="num">人数</th>'+((isArchive||isLaborArc)?'<th>操作</th>':'');
     h+='</tr></thead><tbody>';
     list.forEach(j=>{
@@ -7396,7 +7415,7 @@ const Labor = (function(){
         ${(isArchive||isLaborArc)?`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="event.stopPropagation();Labor.setArchive('${esc(j.id)}',${isLaborArc?'false':'true'})">${isLaborArc?'アーカイブ解除':'アーカイブへ'}</button></td>`:''}
       </tr>`;
     });
-    h+='</tbody></table></div>';
+    h+=`</tbody></table><div class="tbl-foot"><span>${list.length} 件</span></div></div>`;
     h+='<div class="job-cards">';
     list.forEach(j=>{
       const no=j.order_no||j.estimate_no||'';
