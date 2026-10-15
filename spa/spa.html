@@ -2051,6 +2051,7 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 #view-ot .ov-cell .ot-time,#view-ot .ov-cell .ot-holiday{border-radius:999px;font-weight:500;padding:3px 9px}
 /* 今日・いないカード：かたまいの縁と影を外す、ボタンは灰のチップ、名前のタイルは灰（選ぶと青） */
 #view-cal .cal-card{border:none;box-shadow:none;border-radius:12px}
+#view-cal .cal-card.loading{opacity:.35;transition:opacity .2s}
 #view-cal .cal-btn{border:none;background:var(--surface3);border-radius:8px}
 #view-cal .cal-week{background:var(--surface3)}
 #view-cal .cal-day.sel{box-shadow:none}
@@ -3961,8 +3962,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 14:06';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1088;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 14:31';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1089;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8681,7 +8682,7 @@ const Portal = (function(){
 const Cal = (function(){
   // 日付は ◀ ▶ で前後に動かせる（10/8 iller）。GAS は date= を受けて前後 3 日分をまとめて読み、日ごとに 5 分控える。
   // 端末側は一度見た日を mem に持ち、前後 1 日を先読みする＝◀ ▶ は即表示、裏で取り直し（10/9 iller「動かすと遅い」）。softRefresh は選んだ日のまま取り直す。
-  let cal=null, calErr='', date=fmtD(new Date()), mem={};
+  let cal=null, calErr='', date=fmtD(new Date()), mem={}, lastCal=null;   // lastCal＝直前に出していた日（読み込み中はこれを薄く出して、押したのが伝わるように）
   function fmtD(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
   function shift(d,n){ const x=new Date(d+'T00:00:00'); x.setDate(x.getDate()+n); return fmtD(x); }
   async function fetchDay(d){ const r=await fetch(API+'?dept=cal&action=today&date='+d); const j=await r.json(); if(j&&j.success) mem[d]=j; return j; }
@@ -8693,8 +8694,11 @@ const Cal = (function(){
   }
   // 帯の先頭＝今日を基準に 7 日刻みで、選んだ日を含む窓の先頭（今日より前なら昨日までの 7 日、…）
   function winStart(d){ const t=new Date(fmtD(new Date())+'T00:00:00'), x=new Date(d+'T00:00:00'); const k=Math.floor((x-t)/86400000/7); t.setDate(t.getDate()+k*7); return t; }
-  function prefetch(){ const w0=winStart(date); const ds=[fmtD(w0)]; for(let i=1;i<7;i++){ const x=new Date(w0); x.setDate(w0.getDate()+i); ds.push(fmtD(x)); } ds.forEach(d=>{ if(d!==date&&!mem[d]) fetchDay(d).catch(()=>{}); }); }   // 帯に出ている週は先に取っておく（GAS 側は前後 3 日を控えているので軽い）
-  function go(d){ date=d; calErr=''; cal=mem[date]||null; render(); loadAll(); }
+  // 帯に出ている週を先に取り、その後で次の週・前の週も取っておく＝▶ ◀ を押した瞬間に出る（10/15 iller「読み込んでる間に日付が先へ行く」＝待てずに何度も押していた）
+  function prefetch(){ const w0=winStart(date); const days=k=>{ const a=[]; for(let i=0;i<7;i++){ const x=new Date(w0); x.setDate(w0.getDate()+k+i); a.push(fmtD(x)); } return a; };
+    const get=ds=>Promise.all(ds.map(d=>(d!==date&&!mem[d])?fetchDay(d).catch(()=>{}):Promise.resolve()));
+    get(days(0)).then(()=>get(days(7))).then(()=>get(days(-7))); }
+  function go(d){ if(cal)lastCal=cal; date=d; calErr=''; cal=mem[date]||null; render(); loadAll(); }
   function move(n){ go(shift(date,n)); }
   function today(){ go(fmtD(new Date())); }
   function render(){
@@ -8710,14 +8714,16 @@ const Cal = (function(){
       <div class="cal-title"><div class="cal-big">${d.getMonth()+1}<span class="sl">/</span>${d.getDate()}</div><div class="cal-sub"><div class="dw${d.getDay()===6?' sat':d.getDay()===0?' sun':''}">${DOW[d.getDay()]}${isToday?'<span class="cal-now">今日</span>':''}</div><div class="st">${cal?`予定のある人 ${n} / ${all}　・　${esc(cal.updated||'')} 時点`:(calErr?'取れませんでした':'読み込み中…')}</div></div></div>
       <div class="cal-nav"><button class="cal-btn" onclick="Cal.move(-7)" title="前の 7 日">◀</button><div class="cal-week">${chips}</div><button class="cal-btn" onclick="Cal.move(7)" title="次の 7 日">▶</button><button class="cal-btn cal-today" onclick="Cal.today()"${isToday?' disabled':''}>今日に戻る</button></div>
     </div>`;
-    if(!cal){ el.innerHTML=hd+(calErr?'<div class="pc-msg">予定を取れませんでした</div>':''); return; }
+    if(!cal&&calErr){ el.innerHTML=hd+'<div class="pc-msg">予定を取れませんでした</div>'; return; }
+    const src=cal||lastCal;   // 読み込み中は直前の日を薄く
+    if(!src){ el.innerHTML=hd; return; }
     // 予定のある人を並び順のまま、無い人は末尾に一行でまとめる（iller 10/9）
-    const has=cal.people.filter(p=>p.items&&p.items.length), none=cal.people.filter(p=>!(p.items&&p.items.length));
+    const has=src.people.filter(p=>p.items&&p.items.length), none=src.people.filter(p=>!(p.items&&p.items.length));
     const rows=has.map(p=>{
       const cs=p.items.map(it=>{ const t=it.allDay?'終日':(it.s||'')+(it.e?'–'+it.e:''); return `<span class="pc-chip${it.off?' off':it.allDay?' all':''}"><b>${esc(t)}</b>${esc(it.t)}</span>`; }).join('');
       return `<tr class="has"><td class="n">${esc(p.name)}</td><td class="c">${cs}</td></tr>`;
     }).join('')+(none.length?`<tr class="none"><td class="n">予定なし</td><td class="d">${none.map(p=>esc(p.name)).join('　')}</td></tr>`:'');
-    el.innerHTML=hd+`<div class="cal-card"><table>${rows||'<tr class="none"><td class="n">—</td><td class="d">予定のある人はいません</td></tr>'}</table></div>`;
+    el.innerHTML=hd+`<div class="cal-card${cal?'':' loading'}"><table>${rows||'<tr class="none"><td class="n">—</td><td class="d">予定のある人はいません</td></tr>'}</table></div>`;
   }
   function init(){}
   return { loadAll, render, init, move, today, go };
