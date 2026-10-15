@@ -1911,6 +1911,23 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .gantt-bar.rental_period{background:#1d9e75;opacity:.3}
 .gantt-bar.make{background:#7f77dd}
 .gantt-bar.make_period{background:#7f77dd;opacity:.35}
+.gantt-label-hd,.gantt-row-label{min-width:260px;max-width:260px}
+.gantt-row-label .prj-sub{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-faint);white-space:nowrap;overflow:hidden;margin-top:2px}
+.gantt-row-label .prj-sub b{font-weight:500;color:var(--text);flex:0 0 auto}
+.gantt-row-label .prj-sub .prj-cl{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.gantt-row-label .prj-status{font-size:10px;padding:1px 7px;border-radius:999px;margin:0;flex:0 0 auto}
+.gantt-span{position:absolute;top:16px;height:24px;border-radius:7px;font-size:12px;line-height:24px;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:2px;font-weight:500;color:#fff;z-index:2;cursor:pointer}
+.gantt-span.b{background:#378add}
+.gantt-span.t{background:#1d9e75}
+.gantt-span.p{background:#7f77dd}
+.gantt-span.st-見積中{opacity:.45}
+.gantt-span.cut-l{border-top-left-radius:0;border-bottom-left-radius:0;margin-left:0}
+.gantt-span.cut-r{border-top-right-radius:0;border-bottom-right-radius:0}
+.gantt-span .gb-ev{position:absolute;top:0;bottom:0;background:rgba(0,0,0,.22)}
+.gantt-span span{position:relative;z-index:1}
+.gantt-span.narrow{overflow:visible;text-overflow:clip}
+.gantt-span.narrow span{position:absolute;left:100%;top:0;margin-left:6px;color:var(--text);font-size:12px;white-space:nowrap}
+.gantt-span.narrow.st-見積中 span{color:var(--text-faint)}
 .gantt-legend{margin-top:10px;color:var(--text-faint)}
 .gantt-legend .dot{width:10px;height:10px;border-radius:3px}
 .vehicle-summary{margin-top:18px}
@@ -3944,8 +3961,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 13:49';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1087;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 14:06';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1088;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -5097,7 +5114,7 @@ const Proj = (function(){
     // レンタルセクション
     h+=`<div class="gantt-section-hd">レンタル<span class="count">${rentalItems.length}件</span></div>`;
     h+=buildGanttTable(rentalItems,dates,'レンタル案件はありません','レンタル');
-    h+='<div class="gantt-legend"><span><span class="dot" style="background:#9ec5f0"></span>搬入</span><span><span class="dot" style="background:#5aa0e6"></span>設営</span><span><span class="dot" style="background:#1f6fd0"></span>本番</span><span><span class="dot" style="background:#8fa9c4"></span>撤去</span><span><span class="dot" style="background:#1d9e75"></span>貸出</span><span><span class="dot" style="background:#6cc3a6"></span>返却</span><span><span class="dot" style="background:#1d9e75;opacity:.3"></span>貸出中</span><span><span class="dot" style="background:#7f77dd"></span>製作</span></div>';
+    h+='<div class="gantt-legend"><span><span class="dot" style="background:#378add"></span>現場</span><span><span class="dot" style="background:#1f5f9e"></span>本番の日</span><span><span class="dot" style="background:#1d9e75"></span>レンタル</span><span><span class="dot" style="background:#7f77dd"></span>製作</span><span><span class="dot" style="background:#378add;opacity:.45"></span>見積中</span></div>';
     // 車両バッティング
     const allForVh=[...siteItems,...rentalItems];
     const usage={};VEHICLES.forEach(v=>usage[v]={});
@@ -5137,19 +5154,28 @@ const Proj = (function(){
       const sc=stColors[d.status]||['var(--text-faint)','var(--surface3)'];
       const allDates=[].concat(parseDates(d.date_load_in),parseDates(d.date_setup),parseDates(d.date_event),parseDates(d.date_teardown),parseDates(d.date_rental_out),parseDates(d.date_rental_return),parseDates(d.date_delivery),parseDates(d.date_make_start),parseDates(d.date_make_end)).filter(Boolean).sort((a,b)=>a-b);
       const dateRange=allDates.length?`${allDates[0].getMonth()+1}/${allDates[0].getDate()}〜${allDates[allDates.length-1].getMonth()+1}/${allDates[allDates.length-1].getDate()}`:'日程未定';
+      // 左の札は 名前＋1 行（担当・客先・番号・状態）＋日付の 3 行に詰める（4〜5 行だと行が高くて帯が見にくい。2026-10-15）
       h+=`<div class="gantt-row" data-id="${d.id}"><div class="gantt-row-label"><span class="prj-name">${esc(d.project)}</span>`;
-      if(d.our_person)h+=`<span class="prj-assignee">担当: <span style="color:var(--green);background:rgba(42,157,90,.1);font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px">${esc(d.our_person)}</span></span>`;
-      h+=`<span class="prj-meta">${esc(d.client||'')}${d.order_no?' <span style="color:var(--accent);font-weight:600">'+esc(d.order_no)+'</span>':''}</span><span style="font-size:10px;color:var(--text-dim);margin-top:1px">${dateRange}</span><span class="prj-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span>${staleBadge(d,'project')}${QuoteAge.forChild(d)}</div><div class="gantt-bars">`;
-      dates.forEach((dt,i)=>{
-        const ds=dateStr(dt);const isT=ds===dateStr(today);const hits=[];
-        [{key:'load_in',f:'date_load_in'},{key:'setup',f:'date_setup'},{key:'event',f:'date_event'},{key:'teardown',f:'date_teardown'},{key:'rental_out',f:'date_rental_out'},{key:'rental_out',f:'date_delivery'},{key:'rental_return',f:'date_rental_return'},{key:'make',f:'date_make_start'},{key:'make',f:'date_make_end'}].forEach(p=>{const dates_p=parseDates(d[p.f]);if(dates_p.some(pd=>dateStr(pd)===ds)&&!hits.includes(p.key))hits.push(p.key)});
-        if(d.type==='製作'&&!hits.includes('make')){const mS=parseDates(d.date_make_start),mE=parseDates(d.date_make_end);if(mS.length&&mE.length){const a=new Date(Math.min(...mS)),b=new Date(Math.max(...mE));if(dt>=a&&dt<=b)hits.push('make_period')}}
-        if(!hits.includes('rental_out')&&!hits.includes('rental_return')){const rOut=parseDates(d.date_rental_out);const rRet=parseDates(d.date_rental_return);if(rOut.length&&rRet.length){const minOut=new Date(Math.min(...rOut));const maxRet=new Date(Math.max(...rRet));if(dt>=minOut&&dt<=maxRet)hits.push('rental_period')}}
-        h+=`<div class="gantt-bar-cell${isT?' today':''}${hits.length>1?' multi':''}">`;
-        if(hits.length===1)h+=`<div class="gantt-bar ${hits[0]}"></div>`;
-        else if(hits.length>1)hits.forEach((k,idx)=>{const pct=100/hits.length;h+=`<div class="gantt-bar ${k}" style="top:calc(${pct*idx}% + 1px);height:calc(${pct}% - 2px);bottom:auto;border-radius:3px"></div>`});
-        h+='</div>';
-      });
+      h+=`<span class="prj-sub">${d.our_person?`<b>${esc(d.our_person)}</b>`:''}<span class="prj-cl">${esc(d.client||'')}${d.order_no?' '+esc(d.order_no):''}</span><span class="prj-status" style="color:${sc[0]};background:${sc[1]}">${esc(d.status)}</span>${staleBadge(d,'project')}${QuoteAge.forChild(d)}</span>`;
+      h+=`<span class="prj-sub">${dateRange}</span></div><div class="gantt-bars">`;
+      // 1 案件＝1 本の帯（最初の日〜最後の日）。色は 現場＝青／レンタル＝緑／製作＝紫、現場の本番日だけ帯の中を濃く。
+      // 工程ごとの細切れは 10/15 iller「やたら青くて縦長の資格がぽんぽん並んでるだけで見にくい」でやめた（見本 企画スケジュール_2026-10-15 の形に）
+      dates.forEach(dt=>{const isT=dateStr(dt)===dateStr(today);h+=`<div class="gantt-bar-cell${isT?' today':''}"></div>`});
+      if(allDates.length){
+        const N=dates.length, day0=dates[0];
+        const idx=x=>Math.round((new Date(x.getFullYear(),x.getMonth(),x.getDate())-new Date(day0.getFullYear(),day0.getMonth(),day0.getDate()))/864e5);
+        const a0=idx(allDates[0]), b0=idx(allDates[allDates.length-1]);
+        const a=Math.max(0,a0), b=Math.min(N-1,b0);
+        if(b>=0&&a<=N-1){
+          const typ=d.type==='レンタル'?'t':d.type==='製作'?'p':'b';
+          const span=b-a+1;
+          let ev='';
+          if(typ==='b')parseDates(d.date_event).forEach(ed=>{const k=idx(ed);if(k>=a&&k<=b)ev+=`<i class="gb-ev" style="left:${(k-a)/span*100}%;width:${100/span}%"></i>`});
+          const PH=[['date_load_in','搬入'],['date_setup','設営'],['date_event','本番'],['date_teardown','撤去'],['date_rental_out','貸出'],['date_delivery','発送'],['date_rental_return','返却'],['date_make_start','作業開始'],['date_make_end','完成']];
+          const tip=PH.map(([f,l])=>{const ds=parseDates(d[f]);return ds.length?l+' '+ds.map(x=>(x.getMonth()+1)+'/'+x.getDate()).join(','):''}).filter(Boolean).join('　');
+          h+=`<div class="gantt-span ${typ}${a0<0?' cut-l':''}${b0>N-1?' cut-r':''}${span<=2?' narrow':''} st-${esc(d.status)}" style="left:${a/N*100}%;width:calc(${span/N*100}% - 4px)" title="${esc(tip)}">${ev}<span>${esc(d.project)}</span></div>`;
+        }
+      }
       h+='</div></div>';
     });
     h+='</div></div>';
