@@ -3280,11 +3280,7 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   <div class="portal-wrap">
     <div class="portal-head">
       <div class="portal-logo">業務管理</div>
-      <div class="portal-modeswitch">
-        <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
-        <button class="pm-btn" data-m="floor" onclick="App.setMode('floor')">現場</button>
-        <button class="pm-btn" data-m="kiosk" onclick="App.setMode('kiosk')">点検</button>
-      </div>
+      <!-- フル／現場／点検の切替は 10/15 に外した（端末ごとに一度の設定＝URL の ?mode=floor|kiosk|full で行う。設定済みの端末は localStorage に残る） -->
     </div>
     <div class="portal-list">
       <div class="portal-grp"><div class="portal-cap">毎日の記録</div><div class="portal-rows">
@@ -3995,7 +3991,7 @@ async function woffBoot(){
   }
 }
 const APP_VER='2026-10-15 14:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1097;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_BUILD=1098;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
