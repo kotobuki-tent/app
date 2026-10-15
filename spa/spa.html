@@ -1808,13 +1808,14 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
    .scr-head を display:contents でほどき、親を flex にして 見出し・日付・サブタブ・検索 を並べ、中身（.app／#casesPane）は次の行に */
 @media(min-width:481px) and (orientation:landscape){
   /* 畳む画面の一覧（画面を足したらここに。中身の入れ物は .app か .main か #casesPane） */
-  #view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
-  #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#view-inv>.scr-head,#view-veh>.scr-head,#casesBody>.scr-head{display:contents}
-  #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head h1,#view-labor>.scr-head h1,#view-inv>.scr-head h1,#view-veh>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
-  #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head .scr-sub,#view-labor>.scr-head .scr-sub,#view-inv>.scr-head .scr-sub,#view-veh>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
-  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#view-inv>.sub-tabs,#view-veh>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
-  #view-prod>.scr-head .scr-search,#view-proj>.scr-head .scr-search,#view-sales>.scr-head .scr-search,#view-labor>.scr-head .scr-search,#view-inv>.scr-head .scr-search,#view-veh>.scr-head .scr-search,#casesBody>.scr-head .scr-search{order:3;margin:12px 16px 0 0;width:200px}
-  #view-prod>.app,#view-proj>.app,#view-sales>.app,#view-labor>.app,#view-inv>.main,#view-veh>.app,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
+  #view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
+  #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#view-inv>.scr-head,#view-veh>.scr-head,#view-qual>.scr-head,#casesBody>.scr-head{display:contents}
+  #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head h1,#view-labor>.scr-head h1,#view-inv>.scr-head h1,#view-veh>.scr-head h1,#view-qual>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
+  #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head .scr-sub,#view-labor>.scr-head .scr-sub,#view-inv>.scr-head .scr-sub,#view-veh>.scr-head .scr-sub,#view-qual>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
+  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#view-inv>.sub-tabs,#view-veh>.sub-tabs,#view-qual>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
+  #view-prod>.scr-head .scr-search,#view-proj>.scr-head .scr-search,#view-sales>.scr-head .scr-search,#view-labor>.scr-head .scr-search,#view-inv>.scr-head .scr-search,#view-veh>.scr-head .scr-search,#view-qual>.scr-head .scr-search,#casesBody>.scr-head .scr-search{order:3;margin:12px 16px 0 0;width:200px}
+  #view-prod>.app,#view-proj>.app,#view-sales>.app,#view-labor>.app,#view-inv>.main,#view-veh>.app,#view-qual>#qualBody,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
+  #view-qual>.scr-head .scr-search{margin-left:auto}   /* 資格にはサブタブが無いので検索を右端へ */
   #view-cases .sub-tabs{padding-top:12px}
   .gantt-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .gantt-top .fv-sum{margin-bottom:0}
@@ -2220,12 +2221,12 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
 <!-- ===== 資格（免許・技能講習の台帳 dept=qual） ===== -->
 <section id="view-qual" class="hidden">
 <style>
-  #view-qual{padding:0 24px 40px;box-sizing:border-box}
+  #view-qual{padding:0;box-sizing:border-box}
+  #qualBody{padding:6px 16px 24px}
   #view-qual .qual-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;max-width:1360px}
-  @media(max-width:768px){#view-qual{padding:0 12px 32px}}
-  #view-qual .qual-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-  #view-qual .qual-card:hover{border-color:var(--accent)}
-  #view-qual .qual-card .nm{font-size:16px;font-weight:800;color:var(--text)}
+  #view-qual .qual-card{background:var(--surface);border:none;border-radius:12px;padding:14px 16px;cursor:pointer;transition:.15s;box-shadow:none}
+  #view-qual .qual-card:hover{box-shadow:0 0 0 2px var(--border-light)}
+  #view-qual .qual-card .nm{font-size:16px;font-weight:600;color:var(--text)}
   #view-qual .qual-card .sub{font-size:11.5px;color:var(--text-dim);margin:2px 0 10px}
   #view-qual .qual-card .chips{display:flex;flex-wrap:wrap;gap:5px}
   #view-qual .qual-card .qc{font-size:12px;border:none;border-radius:99px;padding:3px 10px 3px 8px;font-weight:500;line-height:1.5;background:var(--surface3);color:var(--text)}
@@ -2239,7 +2240,7 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   #view-qual .qual-card .qc.more{background:none;border:1px dashed var(--border);color:var(--text-dim);font-weight:400}
   #view-qual .qual-card .cnt{display:inline-block;min-width:20px;text-align:center;font-size:11.5px;font-weight:800;color:var(--accent);background:var(--accent-dim);border-radius:99px;padding:2px 7px;margin-left:6px}
   #view-qual .qual-card .lic{display:inline-block;font-size:10.5px;font-weight:600;color:var(--text-dim);background:var(--surface3);border-radius:5px;padding:2px 6px;margin-left:5px;vertical-align:2px}
-  #view-qual .qual-card.addp{display:flex;align-items:center;justify-content:center;border-style:dashed;color:var(--text-dim);font-weight:700;min-height:90px}
+  #view-qual .qual-card.addp{display:flex;align-items:center;justify-content:center;background:transparent;border:1px dashed var(--border);color:var(--text-dim);font-weight:500;min-height:90px}
   #view-qual .qual-hint{font-size:12px;color:var(--text-dim);margin-top:12px}
   #qualMoBody .mrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 4px;border-bottom:1px solid var(--border);font-size:14px;color:var(--text)}
   #qualMoBody .mrow .cat{font-size:10.5px;margin-left:8px;border-radius:99px;padding:2px 8px;font-weight:600;background:var(--surface3);color:var(--text-dim)}
@@ -2249,10 +2250,7 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   #qualMoBody .madd select{width:100%;padding:10px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:600 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif}
   #qualMoPerson{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;margin-bottom:6px}
 </style>
-  <div class="sub-tabs" id="qualTabs">
-    <span class="subtab-date" id="qualPcDate"></span>
-    <input class="subtab-search" id="qualSearch" placeholder="名前で検索...">
-  </div>
+  <div class="scr-head"><h1>資格</h1><span class="scr-sub" id="qualPcDate"></span><input class="scr-search" id="qualSearch" placeholder="名前で探す"></div>
   <div id="qualBody"><div style="padding:40px;text-align:center;color:var(--text-dim)">読み込み中...</div></div>
 
   <!-- 保有資格モーダル -->
@@ -3850,8 +3848,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 13:42';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1084;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 13:44';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1085;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
