@@ -1932,19 +1932,18 @@ html.in-woff .portal-wrap{padding:12px 0 40px}
 
 /* 頭の真ん中に 寿 の印をうっすら（AIR RINGO の林檎の位置、10/15 iller「ロゴか社名を」） */
 .portal-mark{display:block;width:26px;height:auto;margin:6px auto 22px;opacity:.22;filter:grayscale(1);pointer-events:none;user-select:none}
-html.in-woff .portal-mark{display:none}
+html.in-woff .portal-head{display:none}
 
 
-/* 携帯はスクロールが長いので、組の中を 2 列の白いタイルに（10/15 iller「スクロールが多くなる」） */
+/* 携帯は縦 1 列のまま（2 列は 10/15 iller「ださい」）。頭を詰めて、一覧がすぐ始まるように：見出しとモード切替を 1 行に */
+.portal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;max-width:1040px;margin:0 auto 14px;padding:0 16px}
+.portal-head .portal-logo{margin:0;padding:0;max-width:none;width:auto}
+.portal-head .portal-modeswitch{margin:0;padding:0;width:auto}
 @media(max-width:480px),(orientation:portrait){
-  .portal-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:transparent;border-radius:0;overflow:visible;margin:0 16px 18px}
-  .portal-card{background:var(--surface);border-radius:12px;border-top:none;min-height:46px;padding:0 12px;gap:10px}
-  .portal-card::after{display:none}
-  .portal-card-title{font-size:14px}
-  .portal-cap{padding-left:20px;margin-top:2px}
-  .portal-mark{margin:4px auto 14px}
-  .portal-logo{margin:0 0 10px}
-  .portal-modeswitch{margin-bottom:16px}
+  .portal-wrap{padding:14px 0 50px}
+  .portal-head{margin-bottom:10px}
+  .portal-logo{font-size:24px}
+  .portal-cap{padding-left:32px}
   .portal-footer{margin-top:30px}
 }
 
@@ -2924,12 +2923,13 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
 <!-- ===== ポータル section（入口・リンク集） ===== -->
 <section id="view-portal">
   <div class="portal-wrap">
-    <img class="portal-mark" src="../icons/logo-mark.png" alt="">
-    <div class="portal-logo">業務管理</div>
-    <div class="portal-modeswitch">
-      <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
-      <button class="pm-btn" data-m="floor" onclick="App.setMode('floor')">現場</button>
-      <button class="pm-btn" data-m="kiosk" onclick="App.setMode('kiosk')">点検</button>
+    <div class="portal-head">
+      <div class="portal-logo">業務管理</div>
+      <div class="portal-modeswitch">
+        <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
+        <button class="pm-btn" data-m="floor" onclick="App.setMode('floor')">現場</button>
+        <button class="pm-btn" data-m="kiosk" onclick="App.setMode('kiosk')">点検</button>
+      </div>
     </div>
     <div class="portal-list">
       <div class="portal-grp"><div class="portal-cap">毎日の記録</div><div class="portal-rows">
@@ -3592,8 +3592,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 09:48';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1072;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 09:51';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1073;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
