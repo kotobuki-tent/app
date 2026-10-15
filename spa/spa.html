@@ -2399,11 +2399,11 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   #view-cases .sub-tabs{padding-top:10px}
   /* 子（生・企・販）の札：灰のピルに色の文字 1 つ。状態は選べる札（色は状態ごと、見本 PC_2026-10-15） */
   /* 部門の札＝工数の状態札と同じ形（色の四角と縁取りはやめた。10/15 iller「ダセエ」）：灰＝見積中・受注、緑＝進行中、青＝終端 */
-  #view-cases .cchip{background:#f1efe8;border:none;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;color:#5f5e5a;gap:5px}
-  #view-cases .cchip .cl{width:auto;height:auto;line-height:inherit;background:transparent;color:inherit;opacity:.75;font-size:11px;font-weight:500;border-radius:0}
+  #view-cases .cchip{display:inline-flex;align-items:center;gap:5px;margin:1px 4px 1px 0;white-space:nowrap;vertical-align:middle;background:#f1efe8;border:none;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;color:#5f5e5a}
+  #view-cases .cchip .cl{display:inline-block;background:transparent;color:inherit;opacity:.75;font-size:11px;font-weight:500}
   #view-cases .cchip.is-active{background:#eaf3de;color:#3b6d11}
   #view-cases .cchip.is-done{background:#e6f1fb;color:#185fa5}
-  #view-cases .cchip.is-kill{background:#f1efe8;color:#9a9890}
+  #view-cases .cchip.is-kill{background:#f1efe8;color:#9a9890;text-decoration:line-through}
   #view-cases .case-st-sel{appearance:none;-webkit-appearance:none;border:none;border-radius:999px;padding:4px 22px 4px 10px;font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface3) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236e6e73' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 8px center;color:var(--text)}
   #view-cases .case-st-sel[data-st="見積中"]{background-color:#faeeda;color:#854f0b}
   #view-cases .case-st-sel[data-st="受注"]{background-color:#e6f1fb;color:#185fa5}
@@ -2496,13 +2496,8 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   #view-cases .cdept-project{background:#5a9e3a}
   #view-cases .cdept-sales{background:#c763b0}
   #view-cases .cdept-none{color:var(--text-faint)}
-  #view-cases .cchip{display:inline-flex;align-items:center;gap:4px;padding:2px 7px 2px 3px;border-radius:7px;font-size:11px;font-weight:600;margin:1px 4px 1px 0;background:#f4f4f5;border:1px solid var(--border);white-space:nowrap;vertical-align:middle}
-  #view-cases .cchip .cl{display:inline-block;width:16px;height:16px;line-height:16px;text-align:center;border-radius:4px;color:#fff;font-weight:700;font-size:10px}
   #view-cases .fv-si.cl-tgl{border-left:3px solid #999}
   #view-cases .fv-si.cl-tgl.off{opacity:.4;text-decoration:line-through}
-  #view-cases .cchip.is-done{background:#eaf7ea;border-color:#bcdfbc;color:#2e7d32}
-  #view-cases .cchip.is-active{background:#fff6e3;border-color:#eecf8e;color:#9a6a00}
-  #view-cases .cchip.is-kill{opacity:.5;text-decoration:line-through}
   #view-cases .child-flt{margin-left:auto;align-self:center;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;color:var(--text);cursor:pointer;max-width:300px}
   #view-cases .child-flt:focus{outline:none;border-color:var(--accent)}
   #view-cases .sub-tab.has-todo{color:#c0392b;font-weight:700}
@@ -4000,7 +3995,7 @@ async function woffBoot(){
   }
 }
 const APP_VER='2026-10-15 15:31';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1108;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_BUILD=1109;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
