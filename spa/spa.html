@@ -1913,6 +1913,18 @@ tr:hover td{background:rgba(10,132,255,.04)}
 }
 html.in-woff .portal-wrap{padding:12px 0 40px}
 
+
+/* ポータルの頭はロゴも社名も出さず、大見出し「業務管理」だけ（10/15 iller「ロゴや社名がガチャガチャうるさい」） */
+.portal-wrap{align-items:stretch}
+.portal-logo{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;font-size:30px;font-weight:700;letter-spacing:-.3px;align-items:flex-start;margin:4px 0 14px;width:100%;max-width:1040px;margin-left:auto;margin-right:auto;padding:0 16px;cursor:default}
+.portal-modeswitch{justify-content:flex-start;width:100%;max-width:1040px;margin:0 auto 22px;padding:0 16px}
+.portal-list{margin:0 auto}
+.portal-footer{text-align:center}
+@media(max-width:480px),(orientation:portrait){
+  .portal-logo{font-size:28px;padding:0 16px;margin:6px 0 12px}
+  .portal-modeswitch{padding:0 16px}
+}
+
 </style>
 </head>
 <body>
@@ -2884,8 +2896,7 @@ html.in-woff .portal-wrap{padding:12px 0 40px}
 <!-- ===== ポータル section（入口・リンク集） ===== -->
 <section id="view-portal">
   <div class="portal-wrap">
-    <div class="portal-logo"><img class="portal-logo-mark" src="../icons/logo-mark.png" alt="">寿テント</div>
-    <div class="portal-sub">業務管理システム</div>
+    <div class="portal-logo">業務管理</div>
     <div class="portal-modeswitch">
       <button class="pm-btn" data-m="full" onclick="App.setMode('full')">フル</button>
       <button class="pm-btn" data-m="floor" onclick="App.setMode('floor')">現場</button>
@@ -3552,7 +3563,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 09:36';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-15 09:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
