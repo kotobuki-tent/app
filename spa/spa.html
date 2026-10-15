@@ -107,6 +107,10 @@ tr:hover td{background:rgba(59,111,216,.03)}
 .view-row{display:flex;gap:16px;margin-bottom:10px;font-size:13px}
 .view-row .view-label{font-weight:600;color:var(--text-dim);min-width:80px;flex-shrink:0}
 .view-row .view-val{color:var(--text)}
+.view-val.pv-dl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pv-date{border:0.5px solid var(--border);border-radius:8px;padding:5px 8px;font:400 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;color:var(--text)}
+.pv-date:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.pv-dl-note{font-size:13px;color:var(--text-dim)}
 
 /* ===== トースト（共通・1個） ===== */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:.3s;pointer-events:none}
@@ -3694,8 +3698,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 11:34';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1076;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 11:45';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1077;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4413,7 +4417,7 @@ const Prod = (function(){
   }
 
   // ===== 案件詳細 =====
-  function viewProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;currentViewId=id;const dl=parseD(d.deadline);const diff=dl?diffDays(dl,today):null;const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?' ⚠ '+Math.abs(diff)+'日超過':' あと'+diff+'日'):''}`:'未定';const st=parseD(d.start_date);const stStr=st?`${st.getMonth()+1}/${st.getDate()}（${dow[st.getDay()]}）`:'';let h='';h+=vr('物件名',d.project);if(d.our_person)h+=vr('担当者',d.our_person);if(d.estimate_no)h+=vr('見積番号',d.estimate_no);if(d.order_no)h+=vr('受注番号',d.order_no);h+=vr('得意先',d.client);h+=vr('窓口',d.person);h+=vr('作業場所',d.section);if(d.subcontractor)h+=vr('外注先',d.subcontractor);if(stStr)h+=vr('作業開始',stStr);h+=vr('納期',dlStr);if(d.notes)h+=vr('備考',d.notes);
+  function viewProd(id){const d=prodData.find(x=>String(x.id)===String(id));if(!d)return;currentViewId=id;const dl=parseD(d.deadline);const diff=dl?diffDays(dl,today):null;const dlStr=dl?`${dl.getMonth()+1}/${dl.getDate()}（${dow[dl.getDay()]}）${diff!==null?(diff<0?' ⚠ '+Math.abs(diff)+'日超過':' あと'+diff+'日'):''}`:'未定';const st=parseD(d.start_date);const stStr=st?`${st.getMonth()+1}/${st.getDate()}（${dow[st.getDay()]}）`:'';let h='';h+=vr('物件名',d.project);if(d.our_person)h+=vr('担当者',d.our_person);if(d.estimate_no)h+=vr('見積番号',d.estimate_no);if(d.order_no)h+=vr('受注番号',d.order_no);h+=vr('得意先',d.client);h+=vr('窓口',d.person);h+=vr('作業場所',d.section);if(d.subcontractor)h+=vr('外注先',d.subcontractor);if(stStr)h+=vr('作業開始',stStr);h+=`<div class="view-row"><div class="view-label">納期</div><div class="view-val pv-dl"><input type="date" class="pv-date" id="pvDeadline" value="${esc(d.deadline||'')}" onchange="Prod.setDeadline(this.value)"><span class="pv-dl-note">${esc(dl?(diff<0?Math.abs(diff)+'日超過':diff===0?'今日':'あと'+diff+'日'):'未定')}</span></div></div>`;if(d.notes)h+=vr('備考',d.notes);
     h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
     h+=`<button class="st-toggle" id="stToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
     h+='<div class="st-opts" id="stOpts">';
@@ -4425,6 +4429,18 @@ const Prod = (function(){
     $('prodViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){tgl.classList.remove('open');opts.classList.remove('open');return}_changingStatus=true;d.status=newSt;fireAndForget({dept:'production',action:'save',id:d.id,status:newSt});setTimeout(moneyFetch,8000);toast(newSt+'に変更しました');setTimeout(()=>{_changingStatus=false},1500);viewProd(id);render()}});
     renderLinkedFiles(d);$('prodViewBg').classList.add('show');
 requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
+
+  // 案件詳細の納期をその場で変える（2026-10-15 iller）。部分保存＝ステータス変更と同じ action:save
+  let _changingDl=false;
+  function setDeadline(v){
+    const d=prodData.find(x=>String(x.id)===String(currentViewId)); if(!d||_changingDl)return;
+    v=String(v||'').slice(0,10); if(v===String(d.deadline||'').slice(0,10))return;
+    _changingDl=true; d.deadline=v;
+    fireAndForget({dept:'production',action:'save',id:d.id,deadline:v});
+    toast(v?'納期を '+v.slice(5).replace('-','/')+' に変更しました':'納期を未定にしました');
+    setTimeout(()=>{_changingDl=false},1500);
+    viewProd(currentViewId); render();
+  }
 
   // ===== 製作図ファイル =====
   function getLinkedFileIds(d){if(!d.files)return[];return String(d.files).split(',').map(s=>s.trim()).filter(Boolean)}
@@ -4565,7 +4581,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
     openProdMo, closeProdMo, editProd, saveProd, delProd, addToCase, moneySum,
     changeStatus, toggleInvoiced,
     archiveProd, unarchiveProd,
-    viewProd, openFilePicker, closeFilePicker, linkFile, unlinkFile,
+    viewProd, setDeadline, openFilePicker, closeFilePicker, linkFile, unlinkFile,
     unifiedSearch
   };
 })();
