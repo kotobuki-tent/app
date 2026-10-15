@@ -59,7 +59,7 @@ Single endpoint `API` (`script.google.com/.../exec`, search `const API=`). Every
 
 - **Double-tap guard**: all write actions (save/delete/伝票check/status change — ~32 sites) set a 1.5s flag to prevent duplicate submissions. Match this when adding write buttons.
 - **Error handling**: `apiGet` wraps `try/catch` and returns `null`/`[]` on GAS hiccups so the UI never freezes.
-- **Mobile**: every screen has `max-width:768px` media queries; tables convert to cards via `:nth-of-type` + `::before` pseudo-elements. iOS pull-to-refresh suppressed via `overscroll-behavior-y:none`. The mobile blocks (`@media(max-width:480px){`) also fire on `(orientation:portrait)` — so a wide **portrait** screen (1F's 27" vertical tablet) gets the card layout (no horizontal-scroll tables); landscape (2F / office PC) stays tabular.
+- **Mobile**: every screen has `max-width:768px` media queries; tables convert to cards via `:nth-of-type` + `::before` pseudo-elements. iOS pull-to-refresh suppressed via `overscroll-behavior-y:none`. The mobile blocks (`@media(max-width:480px){`) also fire on `(orientation:portrait) and (pointer:coarse)` — so a wide **portrait touch** screen (1F's 27" vertical tablet) gets the card layout (no horizontal-scroll tables); landscape (2F) and any PC window (fine pointer, however narrow — iller keeps the app in a narrow window on the Mac, 2026-10-15) stay tabular. The PC fold rule is `(min-width:481px) and (pointer:fine),(min-width:481px) and (orientation:landscape)`. Under 1100px on PC the header nav scrolls horizontally and the 案件 table lets 案件名/得意先 wrap.
 - **Search** is DOM-filter style (hides rows, keeps input focus), not a re-render.
 
 ## Rules & procedures (separate files)

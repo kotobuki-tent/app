@@ -46,7 +46,7 @@ body{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);
 .sub-tab{background:#f0f1f5;border:none;color:var(--text-dim);font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:8px 12px;border-radius:999px;cursor:pointer;transition:.15s;min-width:60px;text-align:center;white-space:nowrap}
 .sub-tab:hover{color:var(--text);background:#e2e5f0}
 .sub-tab.on{background:#dbeafe;color:#1e40af}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
@@ -153,7 +153,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 #refreshBtn:hover{background:#2563eb;color:#fff;border-color:#2563eb}
 .nav-spacer{flex:1}
 .nav-right{display:contents}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .nav-spacer{flex:1}
   .nav-right{display:contents}
   .hdr-inner{padding:6px 8px 0 8px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -162,7 +162,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
   .hdr-btn{flex-shrink:0;font-size:11px;padding:0 11px;margin-left:8px}
   .hdr::after{content:'';position:absolute;top:0;right:0;width:22px;height:48px;background:linear-gradient(to right,transparent,#fb7185);pointer-events:none;z-index:1}
 }
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   html{font-size:14px}
 }
 
@@ -180,7 +180,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .qa-badge.qa-2w{color:#8a6d00;background:#fff8d6;border:1px solid #f0dc8a}
 .qa-badge.qa-3w{color:#9a5a00;background:#ffedd5;border:1px solid #f5c58a}
 .qa-badge.qa-exp{color:#c0392b;background:#fdeaea;border:1px solid #f1b9b3}
-@media(max-width:480px),(orientation:portrait){.fv-sum .av-add{display:none !important}}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){.fv-sum .av-add{display:none !important}}
 .fv-si{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 12px;min-width:0;text-align:left;cursor:pointer;transition:.15s;box-shadow:none;white-space:nowrap}
 .fv-si:hover{border-color:var(--accent)}
 .fv-si.on{border-color:var(--accent);background:var(--accent-dim)}
@@ -299,7 +299,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .staff-cell .pos{display:block;font-size:10px;font-weight:400;margin-top:3px;opacity:.75}
 
 /* ===== 生産固有CSS モバイル（#prodArchive カード化等） ===== */
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   html{font-size:14px}
   /* ヘッダー：タイトル縮小、ナビ横スクロール */
 
@@ -414,7 +414,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 
 /* ===== 企画制作 固有CSS（ガント/レンタル/日付入力/車両/詳細） ===== */
 .mobile-date{display:none}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .mobile-date{display:none!important}
   .subtab-date{display:none}
   .subtab-search{display:none}
@@ -424,7 +424,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   }
 @keyframes spin{to{transform:rotate(360deg)}}
 .type-toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px}
@@ -539,7 +539,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .rental-existing .re-del:hover{text-decoration:underline}
 .nav-menu-btn{background:rgba(255,255,255,.08);border:none;color:#4a0e1f;font-size:20px;line-height:1;padding:0 12px;border-radius:6px;cursor:pointer;height:32px;align-self:center;display:none}
 .nav-menu-btn:hover{background:rgba(255,255,255,.18)}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .nav-spacer{flex:1}
   .nav-right{display:contents}
   .nav-menu-btn{display:none}
@@ -551,7 +551,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 }
 
 
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   html{font-size:14px}
 
   /* ヘッダー：横スクロール */
@@ -694,7 +694,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 
 
 
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
   .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
@@ -708,7 +708,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 /* ===== 在庫 固有CSS（在庫バー/ステータスバッジ/テーブルアクション） ===== */
 .main{padding:16px 16px 40px}
 .cat-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#f0f1f5;color:var(--text-dim)}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .mobile-date{display:none!important}
   .subtab-date{display:none}
   .subtab-search{display:none}
@@ -725,7 +725,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
   .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   }
 .tbl-actions{display:flex;gap:6px}
 .tbl-actions a{font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
@@ -800,7 +800,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
 .section p.desc{font-size:12px;color:#999;margin-bottom:16px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .overdue-badge{font-size:10px;font-weight:600;color:#dc2626;background:#fee2e2;padding:2px 6px;border-radius:4px;margin-left:4px}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .nav-spacer{flex:1}
   .nav-right{display:contents}
   .nav-menu-btn{display:none}
@@ -828,7 +828,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
 .vlist{padding:16px}
 .summary-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
 .settings-view{padding:16px;max-width:600px}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .mobile-date{display:none!important}
   .subtab-date{display:none}
   .subtab-search{display:none}
@@ -845,7 +845,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
   .fv-si.on{background:var(--accent-dim);border-color:var(--accent)}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   }
 @keyframes spin{to{transform:rotate(360deg)}}
 .dash-date{display:none}
@@ -920,7 +920,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
 .mo-field .vcard-box{display:flex;flex-direction:column;gap:2px}
 .mo-field .vcard-box span{font-size:11px;font-weight:600;color:var(--text-faint)}
 .mo-field .vcard-box input{width:100%;min-width:0}
-@media(max-width:480px),(orientation:portrait){.mo-field .vcard-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){.mo-field .vcard-row{grid-template-columns:repeat(2,1fr)}}
 .maint-section{margin-top:20px;border-top:2px solid var(--surface3);padding-top:16px}
 .maint-section h3{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .maint-section h3 button{font-size:12px;background:var(--accent);color:#fff;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-weight:600}
@@ -942,7 +942,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
 .setting-row label{font-size:13px;min-width:160px;color:var(--text-dim)}
 .setting-row input{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;width:100px;text-align:center}
 .setting-row span{font-size:12px;color:var(--text-faint)}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .av-search{display:none}
   .nav-spacer{flex:1}
   .nav-right{display:contents}
@@ -997,7 +997,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
 .badge.s-納品済{color:var(--accent);background:var(--accent-dim)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .st-mini{padding:4px 10px;border:none;border-radius:999px;font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface3);cursor:pointer}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .mobile-date{display:none!important}
   .subtab-date{display:none!important}
   .subtab-search{display:none}
@@ -1012,7 +1012,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
   .hdr::after{content:'';position:absolute;top:0;right:0;width:22px;height:48px;background:linear-gradient(to right,transparent,#fb7185);pointer-events:none;z-index:1}
 }
 
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .factory-view,.admin-view{padding:0 0 12px}
   .fv-cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
   .fv-card{padding:14px 13px}
@@ -1033,13 +1033,13 @@ html.in-woff #v_gantt .gt .hd{top:0}
   .st-change-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .st-btn{padding:12px 8px;font-size:13px;min-height:46px}
 }
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   /* === テーブル→カード化（管理・完了ビュー） === */
   #adminView .tbl-wrap,#archiveView,#salesArchivedView .tbl-wrap{border:none;background:transparent;overflow:visible}
   #adminView table,#adminView thead,#adminView tbody,#adminView tr,#adminView td,
@@ -1076,7 +1076,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
   #adminView td[colspan]::before,#archiveView,#salesArchivedView td[colspan]::before{display:none}
 }
 
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
   .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
@@ -1095,7 +1095,7 @@ table.jobs tr:hover td{background:var(--accent-dim)}
 table.jobs tr:last-child td{border-bottom:none}
 .job-cards{display:none}
 #view-labor .app{padding:16px;overflow-x:hidden}
-@media(max-width:480px),(orientation:portrait){#view-labor .app{padding:14px 10px}}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){#view-labor .app{padding:14px 10px}}
 @media(min-width:481px) and (max-width:1100px){
   table.jobs th{padding:8px 6px;font-size:11px}
   table.jobs td{padding:8px 6px;font-size:12px}
@@ -1130,7 +1130,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .mb-row .mb-name{font-weight:600;color:var(--text)}
 .mb-row .mb-mins{font-variant-numeric:tabular-nums;color:var(--text-dim)}
 .mb-row .mb-mins strong{color:var(--text);font-weight:700}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .mobile-date{display:none!important}
   .subtab-date{display:none!important}
   .subtab-search{display:none}
@@ -1146,13 +1146,13 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 
 
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .app{padding:14px 10px}
   .av-search{display:none}
   table.jobs{display:none}
   .job-cards{display:block}
 }
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .sub-tabs{padding:10px 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap}
   .sub-tabs::-webkit-scrollbar{display:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
@@ -1161,7 +1161,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
 
 
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   /* フィルター文字ピル化（管理タブと統一・PCはカードのまま） */
   .fv-sum{display:none !important}
   .fv-flt-mb{display:block;width:100%;padding:10px 12px;margin-bottom:14px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);box-sizing:border-box;-webkit-appearance:menulist;appearance:menulist}
@@ -1184,8 +1184,8 @@ table.jobs tr:last-child td{border-bottom:none}
 #dailyViewContent>.member-group{margin-bottom:0}
 #dailyViewContent>.dv-tblwrap{grid-column:1/-1}
 /* 記入状況ランキング */
-@media(max-width:480px),(orientation:portrait){#view-daily .app{padding:14px 10px}}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){#view-daily .app{padding:14px 10px}}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .mobile-date{display:none!important}
   .subtab-date{display:none}
   .subtab-search{display:none}
@@ -1194,7 +1194,7 @@ table.jobs tr:last-child td{border-bottom:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   }
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -1269,7 +1269,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .member-entry .me-proj{flex:2;font-weight:600;color:var(--text)}
 .member-entry .me-action{flex:1;color:var(--accent);font-weight:600}
 .member-entry .me-note{flex:2;color:var(--text-dim);font-size:12px;font-style:italic}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .nav-spacer{flex:1}
   .nav-right{display:contents}
   .nav-menu-btn{display:none}
@@ -1281,7 +1281,7 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 
 
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   html{font-size:14px}
   .app{padding:14px 10px}
   .card{padding:14px;border-radius:10px}
@@ -1298,7 +1298,7 @@ table.jobs tr:last-child td{border-bottom:none}
 
 /* ===== 時間外 固有CSS ===== */
 .overview-grid{display:flex;flex-direction:column;gap:2px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .mobile-date{display:none!important}
   .subtab-date{display:none}
   .subtab-search{display:none}
@@ -1307,7 +1307,7 @@ table.jobs tr:last-child td{border-bottom:none}
   .sub-tab{flex-shrink:0;padding:7px 14px;font-size:12px}
   .toast{bottom:16px;width:calc(100% - 32px);max-width:400px;font-size:12px;padding:11px 18px}
 }
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   }
 .week-bar{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border)}
 .week-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:var(--radius);font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;transition:.15s}
@@ -1362,7 +1362,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .staff-del{background:none;border:none;color:var(--red);font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;padding:4px 8px}
 .staff-del:hover{text-decoration:underline}
 @keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .nav-spacer{flex:1}
   .nav-right{display:contents}
   .nav-menu-btn{display:none}
@@ -1374,7 +1374,7 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 
 
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   html{font-size:14px}
   body{padding-bottom:40px}
 
@@ -1503,11 +1503,11 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-cal .pc-chip.off{color:var(--text-faint);background:transparent;border:1px dashed var(--border)}
 #view-cal .pc-chip.off b{color:var(--text-faint)}
 #view-cal .pc-msg{font-size:13px;color:var(--text-faint);padding:8px}
-@media(max-width:480px),(orientation:portrait){#view-cal{padding:12px 10px 120px}#view-cal .cal-hd{gap:10px}#view-cal .cal-big{font-size:36px}#view-cal .cal-day{width:36px;padding:4px 0 3px}#view-cal .cal-day .d{font-size:14px}#view-cal .cal-btn{padding:8px 6px}#view-cal .cal-today{display:none}#view-cal td{display:block;border-top:none}#view-cal td.n{padding:8px 10px 0;border-top:1px solid var(--border-light)}#view-cal tr:first-child td.n{border-top:none}#view-cal td.d,#view-cal td.c{padding:0 10px 8px}#view-cal tr.none td.n{padding:6px 10px 0}#view-cal tr.none td.d{padding:0 10px 6px}}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){#view-cal{padding:12px 10px 120px}#view-cal .cal-hd{gap:10px}#view-cal .cal-big{font-size:36px}#view-cal .cal-day{width:36px;padding:4px 0 3px}#view-cal .cal-day .d{font-size:14px}#view-cal .cal-btn{padding:8px 6px}#view-cal .cal-today{display:none}#view-cal td{display:block;border-top:none}#view-cal td.n{padding:8px 10px 0;border-top:1px solid var(--border-light)}#view-cal tr:first-child td.n{border-top:none}#view-cal td.d,#view-cal td.c{padding:0 10px 8px}#view-cal tr.none td.n{padding:6px 10px 0}#view-cal tr.none td.d{padding:0 10px 6px}}
 .pm-btn{padding:6px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font:600 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
 .pm-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
-@media(max-width:480px),(orientation:portrait){.portal-grid{grid-template-columns:repeat(5,1fr);gap:16px 6px}.portal-card-icon{width:60px;height:60px;border-radius:15px}.portal-card-icon svg{width:34px;height:34px}.portal-card-title{font-size:11px}}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){.portal-grid{grid-template-columns:repeat(5,1fr);gap:16px 6px}.portal-card-icon{width:60px;height:60px;border-radius:15px}.portal-card-icon svg{width:34px;height:34px}.portal-card-title{font-size:11px}}
 /* 現場モードのみ：現場アイコンを使用頻度順（日報→時間外→生産→企画）に。fullのDOM順は不変 */
 .portal-grid.mode-floor .portal-card[data-app="daily"]{order:1}
 .portal-grid.mode-floor .portal-card[data-app="ot"]{order:2}
@@ -1568,12 +1568,12 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane .cp-selbar.none .cp-sel-lab{color:var(--text-faint)}
 .card-pane .cp-sel-who{font-size:32px;font-weight:900;color:var(--accent);letter-spacing:.04em}
 .card-pane .cp-selbar.none .cp-sel-who{font-size:17px;font-weight:600;color:var(--text-faint)}
-@media(max-width:840px),(orientation:portrait){.card-panes{grid-template-columns:1fr}}
+@media(max-width:840px),(orientation:portrait) and (pointer:coarse){.card-panes{grid-template-columns:1fr}}
 
 /* キオスク（27インチ横・広幅）：左右ペインを画面いっぱいの等高にし、各ペイン内部スクロール
    → 右ペインが記録で伸びない／左右の高さが揃う。リフトは記録ボタンを上部に移したので埋もれない。
    縦・狭幅は従来フロー（ページスクロール） */
-@media (min-width:1000px) and (orientation:landscape){
+@media(min-width:1000px) and (pointer:fine),(min-width:1000px) and (orientation:landscape){
   html #view-alcohol, html #view-forklift{min-height:0}
   #view-alcohol .kiosk, #view-forklift .kiosk{height:calc(100dvh - 48px);grid-template-rows:minmax(0,1fr);align-items:stretch}
   #view-alcohol .pane, #view-forklift .pane{height:100%;min-height:0;overflow-y:auto}
@@ -1582,7 +1582,7 @@ table.jobs tr:last-child td{border-bottom:none}
   #view-card .card-pane{min-height:0;overflow-y:auto}
 }
 /* 縦画面キオスク（事務所前タブレット 1080×1920）：省スペース優先。余白・高さを詰めて記録を上に出す */
-@media (orientation:portrait) and (min-width:900px){
+@media (orientation:portrait) and (pointer:coarse) and (min-width:900px){
   html #view-alcohol .kiosk, html #view-forklift .kiosk{gap:14px;padding:16px}
   html .card-wrap{padding:16px}
   html .card-panes{gap:14px}
@@ -1629,7 +1629,7 @@ table.jobs tr:last-child td{border-bottom:none}
 /* ===== モバイル時：admin/archive/archived テーブルをカード化 工場ボード風コンパクト =====
    行クリックで編集モーダル開く方式。操作列・伝票列・ステータスselect列は隠す。
 ========================================================================== */
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   /* 対象セレクタ：3アプリ × 3ビュー = 9セレクタ */
   #prodArchive tr, #prodArchived tr,
   #projDoneView tr, #projArchivedView tr,
@@ -1728,7 +1728,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-daily .dv-actc{text-align:right;white-space:nowrap;width:1%}
 #view-daily .dv-edit{padding:4px 10px;font-size:12px}
 #view-daily .dv-row:hover td{background:var(--surface2)}
-@media(orientation:portrait){
+@media(orientation:portrait) and (pointer:coarse){
   #view-daily .dv-tblwrap{overflow-x:visible}
   #view-daily .dv-tbl{border:none;background:transparent}
   #view-daily .dv-tbl thead{display:none}
@@ -1753,7 +1753,7 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-ot .overview-grid{border:1px solid var(--border-light)}
 #view-ot .ov-header{background:linear-gradient(180deg,#243044,#1e293b)}
 /* 日報モバイル：氏名を上・日付＋今日を下に縦積み */
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   #view-daily .card-head{flex-direction:column;align-items:stretch;gap:12px}
   #view-daily .card-head .dr-who{order:1}
   #view-daily .card-head .dr-date{order:2}
@@ -1786,10 +1786,18 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .nav-link.on{background:var(--surface3);color:var(--text);font-weight:600}
 .nav-link.on::after{display:none}
 .nav-div{height:16px;background:var(--border-light);margin:0 4px}
+/* 細い PC の窓（10/15 iller「Mac の画面を占領したくない」）：ナビは詰めて横に流す。右で切れないように */
+@media(min-width:481px) and (max-width:1100px) and (pointer:fine){
+  .hdr-inner{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+  .hdr-inner::-webkit-scrollbar{display:none}
+  .nav-link{flex-shrink:0;padding:0 8px}
+  .nav-div{margin:0 3px}
+  .hdr-btn{flex-shrink:0;padding:0 10px}
+}
 .hdr-btn{height:30px;border-radius:8px;border:0.5px solid var(--border);font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface);color:var(--text)}
 #refreshBtn{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 #refreshBtn:hover{background:#0071e3;border-color:#0071e3}
-@media(max-width:480px),(orientation:portrait){.hdr::after{background:linear-gradient(to right,transparent,rgba(255,255,255,.95))}}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){.hdr::after{background:linear-gradient(to right,transparent,rgba(255,255,255,.95))}}
 /* 画面内のタブ（サブタブ）：灰のチップ、選んだ物は黒 */
 .sub-tabs{background:transparent;padding:14px 16px 6px;gap:6px}
 .sub-tab{background:var(--surface3);color:var(--text);font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:8px 13px;border-radius:8px}
@@ -1806,7 +1814,7 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .scr-head .scr-search::placeholder{color:var(--text-faint)}
 /* PC・横画面では見出しとサブタブを 1 行に畳む（4 段も頭があると一覧の始まりが遅い。iller 2026-10-15「スタートが遅れるのが嫌」）。
    .scr-head を display:contents でほどき、親を flex にして 見出し・日付・サブタブ・検索 を並べ、中身（.app／#casesPane）は次の行に */
-@media(min-width:481px) and (orientation:landscape){
+@media(min-width:481px) and (pointer:fine),(min-width:481px) and (orientation:landscape){
   /* 畳む画面の一覧（画面を足したらここに。中身の入れ物は .app か .main か #casesPane） */
   #view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
   #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#view-inv>.scr-head,#view-veh>.scr-head,#view-qual>.scr-head,#view-ot>.scr-head,#view-wb>.scr-head,#casesBody>.scr-head{display:contents}
@@ -1934,13 +1942,14 @@ table.jobs{border:none;border-radius:0}
 table.jobs th{background:transparent;font-weight:500;color:var(--text-faint);border-bottom:0.5px solid var(--border-light);padding:10px 16px}
 table.jobs td{padding:13px 16px;border-bottom:none;border-top:0.5px solid #f0f0f3}
 table.jobs .ct-main{font-size:14px;color:var(--text)}
+table.jobs td:first-child{white-space:normal;min-width:160px}   /* 細い窓では案件名を折り返す（10/15） */
 table.jobs .ct-sub{font-size:12px;color:var(--text-faint);margin-top:2px;font-variant-numeric:tabular-nums}
 table.jobs .ct-no .ct-main{font-variant-numeric:tabular-nums}
 table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 .st-badge{border-radius:999px;font-weight:500;padding:3px 10px;font-size:12px;background:#f1efe8;color:#5f5e5a}
 .st-badge.st-製作中{background:#eaf3de;color:#3b6d11}
 .st-badge.st-完成{background:#e6f1fb;color:#185fa5}
-@media(max-width:480px),(orientation:portrait){#laborContent .tbl-wrap{display:none}}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){#laborContent .tbl-wrap{display:none}}
 .job-card{border-left:none;box-shadow:none;margin-bottom:8px}
 .job-card .jc-name{font-weight:600}
 .job-card .jc-tag{border-radius:999px;font-weight:500;background:#f1efe8;color:#5f5e5a}
@@ -2055,7 +2064,7 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 #view-ot .ov-cell.holiday-col{background:#fafafa}
 #view-ot .ov-cell .ot-time,#view-ot .ov-cell .ot-holiday{border-radius:999px;font-weight:500;padding:3px 9px}
 #view-ot .week-label{white-space:nowrap}
-@media(max-width:480px),(orientation:portrait){#view-ot>.scr-head .scr-search{display:none}#view-ot .week-bar{gap:8px}#view-ot .week-btn{padding:7px 10px;font-size:12px}}   /* 携帯の時間外に検索は要らない（名前は下で選ぶ） */
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){#view-ot>.scr-head .scr-search{display:none}#view-ot .week-bar{gap:8px}#view-ot .week-btn{padding:7px 10px;font-size:12px}}   /* 携帯の時間外に検索は要らない（名前は下で選ぶ） */
 /* 今日・いないカード：かたまいの縁と影を外す、ボタンは灰のチップ、名前のタイルは灰（選ぶと青） */
 #view-cal .cal-card{border:none;box-shadow:none;border-radius:12px}
 #view-cal .cal-hd{flex-direction:column;align-items:flex-start;gap:10px}   /* 帯は常に見出しの下（読み込み中だけ横に並んで、読み終わると下に落ちる段差があった。10/15 iller） */
@@ -2095,7 +2104,7 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 .prj-card .pc-eno{color:var(--text-dim);font-weight:400}
 .prj-card .pc-date{font-weight:500;color:var(--text)}
 .prj-cards .prj-group-label{font-size:13px;font-weight:600;color:var(--text);border-bottom:none;margin:14px 4px 8px;padding:0}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .scr-head{padding:14px 16px 0;gap:10px}
   .scr-head h1{font-size:26px}
   .scr-head .scr-search{display:block;flex:1 1 100%;width:100%;margin:6px 0 0}
@@ -2184,7 +2193,7 @@ tr:hover td{background:rgba(10,132,255,.04)}
 
 #view-daily .dr-who{order:-1;border-bottom:0.5px solid var(--border-light)}
 #view-daily .dr-date{border-bottom:none}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .portal-grid{grid-template-columns:repeat(4,1fr);gap:20px 8px;max-width:420px}
   .portal-card-icon{width:64px;height:64px;border-radius:16px}
   .portal-card-icon svg{width:32px;height:32px}
@@ -2213,7 +2222,7 @@ tr:hover td{background:rgba(10,132,255,.04)}
 .portal-card-body{flex:1;text-align:left}
 .portal-card-title{font-size:15px;font-weight:400;color:var(--text)}
 .portal-card::after{content:'›';color:#c7c7cc;font-size:20px;line-height:1;margin-right:-2px}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .portal-list{grid-template-columns:1fr;max-width:none}
   .portal-wrap{padding:22px 0 50px}
   .portal-cap{padding-left:32px}
@@ -2228,7 +2237,7 @@ html.in-woff .portal-wrap{padding:12px 0 40px}
 .portal-modeswitch{justify-content:flex-start;width:100%;max-width:1040px;margin:0 auto 22px;padding:0 16px}
 .portal-list{margin:0 auto}
 .portal-footer{text-align:center}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .portal-logo{font-size:28px;padding:0 16px;margin:6px 0 12px}
   .portal-modeswitch{padding:0 16px}
 }
@@ -2247,7 +2256,7 @@ html.in-woff .portal-head{display:none}
 .portal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;max-width:1040px;margin:0 auto 14px;padding:0 16px}
 .portal-head .portal-logo{margin:0;padding:0;max-width:none;width:auto}
 .portal-head .portal-modeswitch{margin:0;padding:0;width:auto}
-@media(max-width:480px),(orientation:portrait){
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .portal-wrap{padding:14px 0 50px}
   .portal-head{margin-bottom:10px}
   .portal-logo{font-size:24px}
@@ -2258,7 +2267,7 @@ html.in-woff .portal-head{display:none}
 
 /* PC・横画面はアイコンの並び（10/15 iller「PC はこれじゃさみしすぎる」「アイコンだ」）。携帯はリストのまま。
    アイコン＝白い角丸 76px に黒い線、札は下に小さく。グループの見出しはそのまま、1 行に 6 個 */
-@media(min-width:481px) and (orientation:landscape){
+@media(min-width:481px) and (pointer:fine),(min-width:481px) and (orientation:landscape){
   /* 3 列 × 5 段（10/15 iller「3x5」）。記録 6・仕事 6・管理 3 はどれも 3 の倍数なので、グループの切れ目と段がそろう */
   .portal-list{display:block;width:480px;max-width:none;margin-top:80px}   /* 見出しから一段下げる（10/15 iller「もうひとこえ」で 48→80） */
   .portal-grp{margin-bottom:20px}
@@ -2422,7 +2431,10 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   #view-cases .ct-main{font-size:14px;color:var(--text)}
   #view-cases .ct-sub{font-size:12px;color:var(--text-faint);margin-top:2px;font-variant-numeric:tabular-nums}
   #view-cases .ct-no .ct-main{font-variant-numeric:tabular-nums}
-  #view-cases .ct-st{white-space:nowrap}
+  #view-cases .ct-st,#view-cases .ct-dept{white-space:nowrap}
+  /* 細い窓（Mac で画面を占領しない 10/15）：案件名と得意先は折り返す。番号・金額・状態はそのまま */
+  #view-cases #casesPane td:nth-of-type(1),#view-cases #casesPane td:nth-of-type(3){white-space:normal;min-width:160px}
+  @media(max-width:1100px){#view-cases #casesPane td{padding:10px 8px}#view-cases #casesPane td.ct-dept{white-space:normal;width:1%}#view-cases #casesPane td:nth-of-type(1){width:30%}#view-cases #casesPane td:nth-of-type(3){min-width:120px}}
   #view-cases .ct-inv{display:inline-flex;align-items:center;gap:4px;margin-left:10px;font-size:12px;color:var(--text-faint);cursor:pointer;vertical-align:middle}
   #view-cases .ct-inv input{width:16px;height:16px;cursor:pointer;margin:0}
   #view-cases .ct-more{font-size:18px;line-height:1;padding:0 8px;color:var(--text-faint)}
@@ -2430,7 +2442,7 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   #view-cases .child-flt{border:none;background:var(--surface3);border-radius:8px;padding:7px 12px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text)}
   #view-cases .child-flt:focus{box-shadow:0 0 0 3px var(--accent-dim)}
   /* 携帯・縦画面：表をやめて 1 件 1 枚のリストに（名前と状態／子の札／客先・担当・金額／伝票・操作）。PC と横画面は表のまま */
-  @media(max-width:480px),(orientation:portrait){
+  @media(max-width:480px),(orientation:portrait) and (pointer:coarse){
     #view-cases .sub-tabs{padding:10px 16px 6px}
     #view-cases #casesPane{padding:4px 16px 24px}
     #view-cases .child-flt{display:none}
@@ -3619,7 +3631,7 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
 #view-alcohol .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 #view-alcohol .toast.ok{background:var(--accent);color:#fff}
 #view-alcohol .toast.err{background:var(--red);color:#fff}
-@media(max-width:840px),(orientation:portrait){#view-alcohol .kiosk{grid-template-columns:1fr}}
+@media(max-width:840px),(orientation:portrait) and (pointer:coarse){#view-alcohol .kiosk{grid-template-columns:1fr}}
 /* スマホ（幅480px以下）だけ：運転者のボタン一覧を日報と同じセレクト式にしてコンパクトに。PC・事務所前タブレット（縦置き27インチ＝幅は480pxより広い）は従来のボタン一覧のまま */
 #view-alcohol .drvsel{display:none}
 @media(max-width:480px){
@@ -3904,7 +3916,7 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
 #view-forklift .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 #view-forklift .toast.ok{background:var(--accent);color:#fff}
 #view-forklift .toast.err{background:var(--red);color:#fff}
-@media(max-width:860px),(orientation:portrait){#view-forklift .kiosk{grid-template-columns:1fr}#view-forklift .ckwrap{grid-template-columns:1fr}}
+@media(max-width:860px),(orientation:portrait) and (pointer:coarse){#view-forklift .kiosk{grid-template-columns:1fr}#view-forklift .ckwrap{grid-template-columns:1fr}}
 /* 2026-10-15 Apple 風（この画面の style は土台より後なので上書きはここ） */
 #view-forklift .pane{border:none;box-shadow:none;border-radius:14px}
 #view-forklift .pane h2{font-weight:600;border-bottom:0.5px solid var(--border-light)}
@@ -4003,8 +4015,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 17:48';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1136;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 18:11';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1137;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9081,7 +9093,7 @@ const Cases = (function(){
         : '<span class="cdept-none">—</span>';
       h+=`<tr${archd?' class="arch"':''} onclick="Cases.openEdit('${id}')" style="cursor:pointer">`
         +`<td><div class="ct-main">${esc(dispName(c.client,c.name))}${QuoteAge.forCase(c)}</div><div class="ct-sub">${fmtD(c.created_at)}</div></td>`
-        +`<td style="white-space:nowrap">${badges}</td>`
+        +`<td class="ct-dept">${badges}</td>`
         +`<td><div class="ct-main">${esc(c.client||'')}</div>${c.our_person?`<div class="ct-sub">${esc(c.our_person)}</div>`:''}</td>`
         +`<td class="ct-no"><div class="ct-main">${esc(c.order_no||'')}</div><div class="ct-sub">${esc(c.estimate_no||'')}</div></td>`
         +`<td style="text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap">${(c.amount&&Number(c.amount)>0)?'¥'+Number(c.amount).toLocaleString():''}</td>`
