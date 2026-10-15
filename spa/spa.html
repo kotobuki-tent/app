@@ -1793,6 +1793,23 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .sub-tab.on{background:var(--text);color:#fff}
 .subtab-search{background:var(--surface3);border:none;border-radius:9px;padding:8px 12px;font-size:13px;width:200px}
 .subtab-search:focus{outline:none;background:#fff;box-shadow:0 0 0 3px var(--accent-dim)}
+/* 画面の大見出し（見本 PC_2026-10-15）：左に名前、横に薄い数、右に検索 */
+.scr-head{display:flex;align-items:flex-end;gap:14px;padding:18px 16px 0;flex-wrap:wrap}
+.scr-head h1{font-size:28px;font-weight:700;letter-spacing:-.4px;margin:0;line-height:1.1}
+.scr-head .scr-sub{color:var(--text-faint);font-size:13px;padding-bottom:4px}
+.scr-head .scr-search{margin-left:auto;background:var(--surface3);border:none;border-radius:9px;padding:8px 12px;font:400 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;width:240px;appearance:none;-webkit-appearance:none;color:var(--text)}
+.scr-head .scr-search:focus{outline:none;background:#fff;box-shadow:0 0 0 3px var(--accent-dim)}
+.scr-head .scr-search::placeholder{color:var(--text-faint)}
+/* 絞り込みのチップ：灰のピル、選んだ物は黒（サブタブと同じ作法） */
+.fv-sum{gap:8px;margin-bottom:14px}
+.fv-si{background:var(--surface3);border:1px solid transparent;color:var(--text);padding:6px 12px;box-shadow:none}
+.fv-si:hover{border-color:transparent;background:#dededf}
+.fv-si.on{background:var(--text);border-color:var(--text);color:#fff}
+.fv-si .n{font-size:13px;font-weight:600}
+.fv-si .l{font-size:13px;font-weight:500;color:inherit}
+.fv-si.on .l,.fv-si.on .n{color:#fff}
+/* 表の足元：件数 */
+.tbl-foot{display:flex;justify-content:space-between;padding:10px 16px;color:var(--text-faint);font-size:12px;border-top:0.5px solid var(--border-light)}
 /* 共通の部品：かたまり・表・入力欄・ボタン・モーダル */
 .card{border:none;border-radius:14px;padding:18px 20px;box-shadow:none}
 .card h2{font-size:17px;font-weight:600}
@@ -2076,7 +2093,53 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   #view-cases .cf-typeseg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
   #view-cases select.cf-delsel{padding:9px 11px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);max-width:300px;width:100%}
   /* 案件タブ・一覧・管理 */
-  #view-cases #casesPane{padding:16px 14px}
+  #view-cases #casesPane{padding:6px 16px 20px}
+  #view-cases .scr-head{padding-bottom:4px}
+  #view-cases .sub-tabs{padding-top:10px}
+  /* 子（生・企・販）の札：灰のピルに色の文字 1 つ。状態は選べる札（色は状態ごと、見本 PC_2026-10-15） */
+  #view-cases .cchip{background:var(--surface3);border:none;border-radius:999px;padding:3px 9px 3px 4px;font-weight:500;color:var(--text)}
+  #view-cases .cchip.is-done{background:var(--green-dim);color:var(--green)}
+  #view-cases .cchip.is-active{background:var(--orange-light);color:var(--orange)}
+  #view-cases .case-st-sel{appearance:none;-webkit-appearance:none;border:none;border-radius:999px;padding:4px 22px 4px 10px;font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface3) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236e6e73' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 8px center;color:var(--text)}
+  #view-cases .case-st-sel[data-st="見積中"]{background-color:#faeeda;color:#854f0b}
+  #view-cases .case-st-sel[data-st="受注"]{background-color:#e6f1fb;color:#185fa5}
+  #view-cases .case-st-sel[data-st="完了"]{background-color:#eaf3de;color:#3b6d11}
+  #view-cases .case-st-sel[data-st="見送り"]{background-color:#f1efe8;color:#5f5e5a}
+  #view-cases .tbl-wrap td{color:var(--text)}
+  #view-cases .child-flt{border:none;background:var(--surface3);border-radius:8px;padding:7px 12px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text)}
+  #view-cases .child-flt:focus{box-shadow:0 0 0 3px var(--accent-dim)}
+  /* 携帯・縦画面：表をやめて 1 件 1 枚のリストに（名前と状態／子の札／客先・担当・金額／伝票・操作）。PC と横画面は表のまま */
+  @media(max-width:480px),(orientation:portrait){
+    #view-cases .scr-head{padding:14px 16px 0;gap:10px}
+    #view-cases .scr-head h1{font-size:26px}
+    #view-cases .scr-head .scr-search{display:block;flex:1 1 100%;width:100%;margin:6px 0 0}
+    #view-cases .sub-tabs{padding:10px 16px 6px}
+    #view-cases #casesPane{padding:4px 16px 24px}
+    #view-cases .fv-flt-mb{background:var(--surface3);border:none;border-radius:9px;font-weight:500;padding:10px 12px;margin-bottom:12px}
+    #view-cases .child-flt{display:none}
+    #view-cases .tbl-wrap{overflow:visible;background:transparent;border-radius:0}
+    #view-cases .tbl-wrap table,#view-cases .tbl-wrap tbody{display:block;width:100%}
+    #view-cases .tbl-wrap thead{display:none}
+    #view-cases .tbl-wrap tr{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+    #view-cases .tbl-wrap tr:hover td{background:transparent}
+    #view-cases .tbl-wrap td{display:block;padding:0;border:none;white-space:normal}
+    #view-cases .tbl-wrap td:nth-of-type(1){flex:1 1 0;min-width:0;font-size:15px;font-weight:500;order:1}
+    #view-cases .tbl-wrap td:nth-of-type(8){order:2;flex:0 0 auto}
+    #view-cases .tbl-wrap td:nth-of-type(2){order:3;flex:1 1 100%;white-space:normal!important}
+    #view-cases .tbl-wrap td:nth-of-type(2):empty,#view-cases .tbl-wrap td:nth-of-type(2):has(> .cdept-none:only-child){display:none}
+    #view-cases .tbl-wrap td:nth-of-type(3),#view-cases .tbl-wrap td:nth-of-type(6),#view-cases .tbl-wrap td:nth-of-type(7){order:4;font-size:13px;color:var(--text-dim);flex:0 0 auto}
+    #view-cases .tbl-wrap td:nth-of-type(3){flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    #view-cases .tbl-wrap td:nth-of-type(7){text-align:left!important;color:var(--text)}
+    #view-cases .tbl-wrap td:nth-of-type(7):empty{display:none}
+    #view-cases .tbl-wrap td:nth-of-type(4),#view-cases .tbl-wrap td:nth-of-type(5),#view-cases .tbl-wrap td:nth-of-type(10){display:none}
+    #view-cases .tbl-wrap td:nth-of-type(9){order:5;flex:1 1 100%;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-faint);text-align:left!important;margin-top:2px}
+    #view-cases .tbl-wrap td:nth-of-type(9)::before{content:'伝票'}
+    #view-cases .tbl-wrap td:nth-of-type(9) input{width:16px!important;height:16px!important}
+    #view-cases .tbl-wrap td:nth-of-type(11){order:6;margin-left:auto;margin-top:-26px}
+    #view-cases .tbl-wrap td:nth-of-type(11) .act-btn{font-size:12px;padding:4px 8px;background:var(--surface3);border-radius:7px;color:var(--text)}
+    #view-cases .tbl-foot{border:none;padding:8px 2px}
+  }
+  #view-cases td .cdept-none{color:var(--text-faint)}
   #view-cases .sub-tab.cases-new{background:var(--accent);color:#fff;font-weight:700}
   #view-cases .sub-tab.cases-new.on{background:var(--accent);color:#fff}
   #view-cases .cases-tabs{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap}
@@ -3592,8 +3655,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 09:52';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1074;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 11:29';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1075;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8543,15 +8606,19 @@ const Cases = (function(){
   function render(){
     const _tc=todoCount();
     const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['cal','カレンダー'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
+    // 大見出し（見本 PC_2026-10-15）：名前・状態ごとの数・検索。日付の表示はやめた（2026-10-15）
+    const live=_cases.filter(c=>!_arch(c.archived));
+    const sub=CASE_ST.map(st=>{const n=live.filter(c=>c.status===st).length; return n?st+' '+n:'';}).filter(Boolean).join('・');
+    const head=`<div class="scr-head"><h1>案件</h1><span class="scr-sub">${sub}</span>`
+      +`<input class="scr-search" id="casesSearch" placeholder="案件名・客先・担当で探す" value="${esc(_q)}" oninput="Cases.search(this.value)">`
+      +`</div>`;
     const bar=`<div class="sub-tabs">`
-      +`<span class="subtab-date">${dateJP(today)}</span>`
       +tabs.map(([k,l])=>`<button class="sub-tab${_tab===k?' on':''}${k==='todo'&&_tc?' has-todo':''}" onclick="Cases.tab('${k}')">${l}</button>`).join('')
       +`<button class="sub-tab cases-new${_tab==='form'?' on':''}" onclick="Cases.tab('form')">＋ 新規登録</button>`
       +`<button class="mny-btn" onclick="Cases.moneySum()">${moneyShort(_moneyTotal)}</button>`
       +`<button class="slog-btn" id="casesSlogBtn" onclick="Cases.openSlog()">ステータスログ</button>`
-      +`<input class="subtab-search" id="casesSearch" placeholder="検索..." value="${esc(_q)}" oninput="Cases.search(this.value)">`
       +`</div>`;
-    $('casesBody').innerHTML=bar+`<div id="casesPane"></div>`;
+    $('casesBody').innerHTML=head+bar+`<div id="casesPane"></div>`;
     if(_tab==='form') renderForm();
     else renderCaseList(_tab);
   }
@@ -8650,13 +8717,13 @@ const Cases = (function(){
         +`<td>${esc(c.estimate_no||'')}</td>`
         +`<td>${esc(c.our_person||'')}</td>`
         +`<td style="text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap">${(c.amount&&Number(c.amount)>0)?'¥'+Number(c.amount).toLocaleString():''}</td>`
-        +`<td${stop}><select class="case-st-sel" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select></td>`
+        +`<td${stop}><select class="case-st-sel" data-st="${esc(c.status||'')}" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select></td>`
         +`<td style="text-align:center"${stop}><input type="checkbox" ${_inv(c.invoiced)?'checked':''} onchange="Cases.toggleInv('${id}')" style="width:18px;height:18px;cursor:pointer"></td>`
         +`<td>${fmtD(c.created_at)}</td>`
         +`<td style="white-space:nowrap"${stop}>${archd?`<button class="act-btn" onclick="Cases.unarchive('${id}')">アーカイブ解除</button>`:`<button class="act-btn" onclick="Cases.archive('${id}')">アーカイブへ</button>`}${manage?` <button class="act-btn" style="color:#c0392b" onclick="Cases.del('${id}')">削除</button>`:''}</td>`
         +`</tr>`;
     });
-    h+='</tbody></table></div>';
+    h+=`</tbody></table><div class="tbl-foot"><span>${rows.length} 件</span></div></div>`;
     return h;
   }
 
