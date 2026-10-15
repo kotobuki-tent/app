@@ -1948,6 +1948,11 @@ html.in-woff .portal-mark{display:none}
   .portal-footer{margin-top:30px}
 }
 
+
+/* ポータルの足元は版の表示。ポータルを出している間は右下の小さな版は重ねない */
+.portal-footer{letter-spacing:.12em;padding-left:.12em;font-variant-numeric:tabular-nums}
+body:has(#view-portal:not(.hidden)) #appVer{display:none}
+
 </style>
 </head>
 <body>
@@ -2949,7 +2954,7 @@ html.in-woff .portal-mark{display:none}
         <a class="portal-card" data-app="wb" onclick="App.nav('wb')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M3 9h18M9 9v8M15 9v8"/><path d="M8 21l4-4 4 4"/></svg></div><div class="portal-card-body"><div class="portal-card-title">ホワイトボード</div></div></a>
       </div></div>
     </div>
-    <div class="portal-footer">寿テント</div>
+    <div class="portal-footer" id="portalVer"></div>
   </div>
 </section>
 
@@ -3587,8 +3592,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 09:44';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; }); }catch(e){}
+const APP_VER='2026-10-15 09:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+try{ document.addEventListener('DOMContentLoaded',()=>{ const v=document.getElementById('appVer'); if(v) v.textContent='版 '+APP_VER; const pv=document.getElementById('portalVer'); if(pv) pv.textContent='版 '+APP_VER; }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
    API の読み取り（GET）の返事を端末の IndexedDB に控える。画面を最初に開く時（App.nav の初回ロード）だけ、控えがあればそれを返して
