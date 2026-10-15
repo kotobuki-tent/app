@@ -2032,6 +2032,23 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 #view-ot .ov-cell.today-col{background:rgba(10,132,255,.06)}
 #view-ot .ov-cell.holiday-col{background:#fafafa}
 #view-ot .ov-cell .ot-time,#view-ot .ov-cell .ot-holiday{border-radius:999px;font-weight:500;padding:3px 9px}
+/* 今日・いないカード：かたまいの縁と影を外す、ボタンは灰のチップ、名前のタイルは灰（選ぶと青） */
+#view-cal .cal-card{border:none;box-shadow:none;border-radius:12px}
+#view-cal .cal-btn{border:none;background:var(--surface3);border-radius:8px}
+#view-cal .cal-week{background:var(--surface3)}
+#view-cal .cal-day.sel{box-shadow:none}
+#view-cal .cal-big{font-weight:700}
+.card-pane{border:none;box-shadow:none;border-radius:14px}
+.card-pane .cp-title{font-weight:600;border-bottom:0.5px solid var(--border-light)}
+.card-pane .wknav .wk-btn,.card-pane .wknav .wk-today{border:none;background:var(--surface3);border-radius:8px;color:var(--text)}
+.card-pane .cp-nbtn{border:none;background:var(--surface3);font-weight:500;border-radius:12px}
+.card-pane .cp-nbtn:hover{background:#dededf}
+.card-pane .cp-nbtn.sel{background:var(--accent);box-shadow:none}
+.card-pane .cp-btn{border-radius:14px;font-weight:600}
+.loan-card{border:none;background:var(--surface2);border-radius:12px}
+.loan-card.out{background:#faeeda}
+.loan-card .lc-name{font-weight:600}
+.loan-card .lc-v{font-weight:600}
 /* 携帯のスケジュール＝白いカード（縁取り無し） */
 .prj-card{border-left:none;box-shadow:none;padding:14px 16px;margin-bottom:8px}
 .prj-card .pc-name{font-weight:600}
@@ -3570,6 +3587,13 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   /* 月次CSV出力はスマホでは不要（PC/タブレットのみ） */
   html #view-alcohol .csvsec{display:none}
 }
+/* 2026-10-15 Apple 風（この画面の style は土台より後なので上書きはここ） */
+#view-alcohol .pane{border:none;box-shadow:none;border-radius:14px}
+#view-alcohol .pane h2{font-weight:600;border-bottom:0.5px solid var(--border-light)}
+#view-alcohol .dnav-btn,#view-alcohol .dnav-today{border:none;background:var(--surface3);border-radius:8px;color:var(--text)}
+#view-alcohol .namebtn{border:none;background:var(--surface3);font-weight:500;border-radius:12px}
+#view-alcohol .namebtn:hover{background:#dededf}
+#view-alcohol .namebtn.sel{background:var(--accent);box-shadow:none}
 </style>
 <div class="kiosk">
 
@@ -3822,6 +3846,13 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
 #view-forklift .toast.ok{background:var(--accent);color:#fff}
 #view-forklift .toast.err{background:var(--red);color:#fff}
 @media(max-width:860px),(orientation:portrait){#view-forklift .kiosk{grid-template-columns:1fr}#view-forklift .ckwrap{grid-template-columns:1fr}}
+/* 2026-10-15 Apple 風（この画面の style は土台より後なので上書きはここ） */
+#view-forklift .pane{border:none;box-shadow:none;border-radius:14px}
+#view-forklift .pane h2{font-weight:600;border-bottom:0.5px solid var(--border-light)}
+#view-forklift .dnav-btn,#view-forklift .dnav-today{border:none;background:var(--surface3);border-radius:8px;color:var(--text)}
+#view-forklift .namebtn{border:none;background:var(--surface3);font-weight:500;border-radius:12px}
+#view-forklift .namebtn:hover{background:#dededf}
+#view-forklift .namebtn.sel{background:var(--accent);box-shadow:none}
 </style>
 <div class="kiosk">
   <!-- 左：点検 -->
@@ -3913,8 +3944,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 13:48';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1086;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 13:49';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1087;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
