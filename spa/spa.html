@@ -2067,6 +2067,16 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 .card-pane .cp-nbtn.sel{background:var(--accent);box-shadow:none}
 .card-pane .cp-btn{border-radius:14px;font-weight:600}
 .loan-card{border:none;background:var(--surface2);border-radius:12px}
+.loan-list{display:flex;flex-direction:column}
+.loan-row{display:flex;align-items:center;gap:14px;min-height:46px;padding:0 6px;border-top:0.5px solid var(--border-light);font-size:15px;font-variant-numeric:tabular-nums}
+.loan-row:first-child{border-top:none}
+.loan-row.out{background:#faeeda;border-radius:8px;border-top-color:transparent}
+.loan-row .lr-date{flex:0 0 96px;color:var(--text-faint);font-size:13px}
+.loan-row .lr-name{flex:1 1 auto;min-width:0;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.loan-row .lr-out{flex:0 0 auto;font-weight:600}
+.loan-row .lr-arrow{flex:0 0 auto;color:var(--text-faint)}
+.loan-row .lr-ret{flex:0 0 52px;text-align:right;font-weight:600;color:var(--green)}
+.loan-row .lr-now{flex:0 0 auto;font-size:12px;font-weight:600;color:var(--orange);background:#fff;padding:4px 10px;border-radius:999px}
 .loan-card.out{background:#faeeda}
 .loan-card .lc-name{font-weight:600}
 .loan-card .lc-v{font-weight:600}
@@ -2240,6 +2250,24 @@ html.in-woff .portal-head{display:none}
 }
 
 
+/* PC・横画面はアイコンの並び（10/15 iller「PC はこれじゃさみしすぎる」「アイコンだ」）。携帯はリストのまま。
+   アイコン＝白い角丸 76px に黒い線、札は下に小さく。グループの見出しはそのまま、1 行に 6 個 */
+@media(min-width:481px) and (orientation:landscape){
+  .portal-list{display:grid;grid-template-columns:repeat(3,auto);justify-content:space-between;gap:0 40px;max-width:1040px}
+  .portal-grp{margin-bottom:26px}
+  .portal-cap{font-size:13px;color:var(--text-faint);padding:0 0 12px 4px}
+  .portal-rows{display:grid;grid-template-columns:repeat(3,100px);gap:22px 16px;background:transparent;border-radius:0;overflow:visible;margin:0}
+  .portal-card{flex-direction:column;align-items:center;gap:9px;padding:0;min-height:0;border-top:none;background:transparent}
+  .portal-card:hover,.portal-card:active{background:transparent}
+  .portal-card:hover .portal-card-icon{background:#fafafa;box-shadow:0 0 0 2px var(--border-light)}
+  .portal-card:active .portal-card-icon{transform:scale(.96)}
+  .portal-card-icon{width:76px;height:76px;border-radius:19px;background:var(--surface);color:var(--text);box-shadow:none;transition:.12s}
+  .portal-card-icon svg{width:34px;height:34px;stroke-width:1.7}
+  .portal-card-body{flex:none;text-align:center}
+  .portal-card-title{font-size:12.5px;font-weight:500;color:var(--text);white-space:normal;line-height:1.3;text-align:center}
+  .portal-card::after{content:none}
+  .portal-footer{margin-top:40px}
+}
 /* ポータルの足元は版の表示。ポータルを出している間は右下の小さな版は重ねない */
 .portal-footer{letter-spacing:.12em;padding-left:.12em;font-variant-numeric:tabular-nums}
 body:has(#view-portal:not(.hidden)) #appVer{display:none}
@@ -3965,8 +3993,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-15 14:38';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1091;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-15 14:41';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1092;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8244,18 +8272,13 @@ const Card = (function(){
     h+='</div>';
     h+=`<div class="card-pane"><div class="cp-title">持ち出し記録<span class="cp-sub">直近 ${RECENT} 件</span></div>`;
     if(inWk.length){
-      h+='<div class="loan-grid">';
+      // 1 行 1 件を新しい順に積む（日付・名前・持ち出し→返却）。3 列のカードは時系列が読めない（10/15 iller）
+      h+='<div class="loan-list">';
       inWk.forEach(l=>{
         const op=parseTs(l.out_at), rp=l.return_at?parseTs(l.return_at):null;
         const dd=new Date(op.date+'T00:00:00');
-        const out=!rp;
-        const ret=rp?`<span class="lc-v ret">${rp.hm}</span>`:'<span class="lc-now">持ち出し中</span>';
-        h+=`<div class="loan-card${out?' out':''}">`
-          +`<div class="lc-name">${esc(l.name||'')}</div>`
-          +`<div class="lc-rows"><div class="lc-row"><span class="lc-k">持ち出し</span><span class="lc-v">${op?op.hm:''}</span></div>`
-          +`<div class="lc-row"><span class="lc-k">返却</span>${ret}</div></div>`
-          +`<div class="lc-date">${lbl(dd)}</div>`
-          +`</div>`;
+        const ret=rp?`<span class="lr-ret">${rp.hm}</span>`:'<span class="lr-now">持ち出し中</span>';
+        h+=`<div class="loan-row${rp?'':' out'}"><span class="lr-date">${lbl(dd)}</span><span class="lr-name">${esc(l.name||'')}</span><span class="lr-out">${op?op.hm:''}</span><span class="lr-arrow">→</span>${ret}</div>`;
       });
       h+='</div>';
     }else{
