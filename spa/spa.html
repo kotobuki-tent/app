@@ -2319,13 +2319,16 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
 .dv .pv-dl{display:flex;align-items:center;gap:8px;justify-content:flex-end}
 .dv .view-row:has(> .view-val:empty){display:none}   /* 中身の無い行（窓口が空など）は出さない */
 .dv .mo-foot{margin-top:4px}
-/* 入力の画面（見本：生産の案件登録・編集、10/16）：詳細と同じ灰の地、入力欄は白 */
-.fm .mo{background:#f2f2f7}
-.fm h2{font-size:19px;font-weight:700}
+/* 窓（モーダル）の土台（10/16、全部の .mo-bg）：灰の地に白い入力欄・白いかたまり、見出し 19px。携帯は下からのシート */
+.mo-bg .mo{background:#f2f2f7}
+.mo-bg .mo>h2{font-size:19px;font-weight:700}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){
-  .fm.mo-bg{align-items:flex-end;padding:0}
-  .fm .mo{max-width:none!important;border-radius:16px 16px 0 0;max-height:92dvh;overflow-y:auto;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
+  .mo-bg{align-items:flex-end;padding:0}
+  .mo-bg .mo{max-width:none!important;border-radius:16px 16px 0 0;max-height:92dvh;overflow-y:auto;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
 }
+.dv .vr-label{font-weight:400;color:var(--text-dim);font-size:14px;min-width:0;flex-shrink:0}
+.dv .vr-value{text-align:right;color:var(--text);font-size:14px;min-width:0;overflow-wrap:anywhere}
+.dv .maint-section{background:#fff;border:none;border-radius:12px;padding:12px 14px;margin:0 0 14px}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   .dv.mo-bg{align-items:flex-end;padding:0}
   .dv .mo{max-width:none!important;border-radius:16px 16px 0 0;max-height:92dvh;overflow-y:auto;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
@@ -2337,9 +2340,9 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
 .sec-in{animation:secIn .15s ease-out}
 .mo-bg.mo-in{animation:secIn .15s ease-out}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){
-  .dv.mo-bg.mo-in .mo,.fm.mo-bg.mo-in .mo{animation:sheetUp .22s cubic-bezier(.2,.8,.2,1)}
+  .mo-bg.mo-in .mo{animation:sheetUp .22s cubic-bezier(.2,.8,.2,1)}
 }
-@media(prefers-reduced-motion:reduce){.sec-in,.mo-bg.mo-in,.dv.mo-bg.mo-in .mo,.fm.mo-bg.mo-in .mo{animation:none}}
+@media(prefers-reduced-motion:reduce){.sec-in,.mo-bg.mo-in,.mo-bg.mo-in .mo{animation:none}}
 </style>
 </head>
 <body>
@@ -3058,7 +3061,7 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   </div>
 
   <!-- 車両詳細 モーダル -->
-  <div class="mo-bg" id="vViewBg">
+  <div class="mo-bg dv" id="vViewBg">
   <div class="mo" style="max-width:700px">
     <h2 id="vViewTitle">車両詳細</h2>
     <div id="vViewContent"></div>
@@ -4078,8 +4081,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-16 11:47';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1153;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-16 12:00';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1154;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -6904,7 +6907,7 @@ const Veh = (function(){
       h+=vr('名前',esc(v.name));
       CARD_KEYS.forEach(k=>{h+=vr(CARD_LABEL[k],v[k]?esc(String(v[k])):'')});
       if(v.notes)h+=vr('備考',esc(v.notes));
-      $('vViewContent').innerHTML=h;
+      $('vViewContent').innerHTML='<div class="pv-list">'+h+'</div>';
       document.querySelector('#vViewBg .maint-section').classList.add('hidden');
       $('vViewBg').classList.add('show');
       return;
@@ -6932,7 +6935,7 @@ const Veh = (function(){
     h+=dateFmt('任意保険満了',v.hoken_date,th.hoken);
     CARD_KEYS.forEach(k=>{if(v[k])h+=vr(CARD_LABEL[k],esc(String(v[k])))});
     if(v.notes)h+=vr('備考',esc(v.notes));
-    $('vViewContent').innerHTML=h;
+    $('vViewContent').innerHTML='<div class="pv-list">'+h+'</div>';
     renderMaintList(v);
     $('maintAddArea').classList.add('hidden');
     $('ma_date').value=new Date().toISOString().slice(0,10);
