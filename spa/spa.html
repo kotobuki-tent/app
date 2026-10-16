@@ -1788,8 +1788,9 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .nav-link.on{background:var(--surface3);color:var(--text);font-weight:600}
 .nav-link.on::after{display:none}
 .nav-div{height:16px;background:var(--border-light);margin:0 4px}
+.nav-link .nav-ic{width:15px;height:15px;margin-right:5px;flex-shrink:0}
 /* 細い PC の窓（10/15 iller「Mac の画面を占領したくない」）：ナビは詰めて横に流す。右で切れないように */
-@media(min-width:481px) and (max-width:1100px) and (pointer:fine){
+@media(min-width:481px) and (max-width:1400px) and (pointer:fine){
   .hdr-inner{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
   .hdr-inner::-webkit-scrollbar{display:none}
   .nav-link{flex-shrink:0;padding:0 8px}
@@ -4077,8 +4078,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-16 11:39';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1152;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-16 11:47';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1153;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10233,6 +10234,8 @@ const App = {
     {key:'portal',ns:()=>Portal,section:'view-portal',nav:'navHome'},
   ],
   /* REGのzone/kioskをナビとポータルカードにdata属性として注入（起動時1回）。HTML側の手書き属性を廃止し二重管理をなくす */
+  // 上のナビにポータルと同じアイコンを付ける（10/16 iller。アイコンの正本はポータルのカード＝ここから写す）
+  injectNavIcons(){ this.REG.forEach(r=>{ const nv=$(r.nav), sv=document.querySelector('.portal-card[data-app="'+r.key+'"] svg'); if(!nv||!sv||nv.querySelector('.nav-ic'))return; const c=sv.cloneNode(true); c.setAttribute('width','15'); c.setAttribute('height','15'); c.classList.add('nav-ic'); nv.insertBefore(c,nv.firstChild); }); },
   injectZones(){ this.REG.forEach(r=>{ const z=r.dispZone||r.zone; if(!z)return; [$(r.nav), document.querySelector('.portal-card[data-app="'+r.key+'"]')].forEach(el=>{ if(!el)return; el.setAttribute('data-zone',z); if(r.kiosk)el.setAttribute('data-kiosk',''); }); }); },
   mode:'full',   // 端末モードは 2026-10-15 に廃止（iller「要らない」）。全端末フル固定。以前の localStorage spa_mode は読まない
   allowedZones(){ return this.mode==='floor' ? ['field','shared'] : ['field','shared','office']; },
@@ -10362,6 +10365,7 @@ window.addEventListener('load', async ()=>{
   if(document.documentElement.classList.contains('in-woff')) App.mode='full';
   App.setWoffDenied();   // WOFF の本人名で、案件を見られない人を決める
   App.injectZones();
+  App.injectNavIcons();
   App.applyMode();
   App.current=null;
   App.nav((_deepGo && App.reg(_deepGo)) ? _deepGo : 'portal');
