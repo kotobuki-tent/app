@@ -4093,8 +4093,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-16 12:07';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1156;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-16 13:23';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1157;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -5789,7 +5789,7 @@ const Proj = (function(){
     let h='<div class="rblock" id="rblock'+pfx+'" data-pid="'+(live?esc(String(d.id)):'')+'" data-live="'+(live?1:0)+'" data-addfn="'+esc(opt.addLedger||'')+'" oninput="Proj.blockTouched(\''+pfx+'\')">';
     h+='<div class="rb-h">台帳のレンタル品</div>';
     if(live){const list=rentalsData.filter(r=>r.client_name===d.project);
-      if(list.length)list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span style="font-size:11px;padding:2px 6px;border-radius:4px;background:var(--purple-dim);color:var(--purple)">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'});
+      if(list.length)list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span class="st-'+esc(r.status)+'" style="font-size:11px;padding:2px 8px;border-radius:999px">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'});
       else h+='<div style="font-size:12px;color:var(--text-faint);margin-bottom:6px">まだ登録されていません</div>';}
     h+='<div id="rentalAddRows'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="'+esc(addFn)+'">＋ 台帳から追加</button>';
     h+='<div class="rb-h">台帳にない物（1行に1品）</div><div id="rbExtras'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="Proj.blockAddExtra(\''+pfx+'\')">＋ 台帳にない物を追加</button>';
@@ -5917,7 +5917,7 @@ const Proj = (function(){
     const list=rentalsData.filter(r=>r.client_name===projectName);
     const md=v=>{if(!v)return'';const t=new Date(v+'T00:00:00');return (t.getMonth()+1)+'/'+t.getDate()};
     let h='';
-    if(list.length){list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span style="font-size:11px;padding:2px 6px;border-radius:4px;background:var(--purple-dim);color:var(--purple)">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'})}
+    if(list.length){list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span class="st-'+esc(r.status)+'" style="font-size:11px;padding:2px 8px;border-radius:999px">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'})}
     else h+='<div style="font-size:12px;color:var(--text-faint);margin-bottom:6px">まだ登録されていません</div>';
     h+='<div id="rentalAddRows'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="Proj.addRentalRow(\''+esc(q)+'\',\''+pfx+'\')">＋ レンタル品を追加</button>';
     h+='<div id="rentalSaveBtnWrap'+pfx+'" class="hidden"><button type="button" class="rental-save-btn" onclick="Proj.saveProjectRentals(\''+esc(q)+'\',\''+pfx+'\')">まとめて登録</button></div>';
