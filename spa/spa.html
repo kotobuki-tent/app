@@ -733,11 +733,12 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .tbl-actions .edit-link:hover{text-decoration:underline}
 .tbl-actions .del-link{color:#e53e3e}
 .tbl-actions .del-link:hover{text-decoration:underline}
-.st-予約{background:#ede9fe;color:#7c3aed}
-.st-貸出中{background:#dbeafe;color:#2563eb}
-.st-返却済{background:#d1fae5;color:#059669}
-.st-メンテ中{background:#fee2e2;color:#dc2626}
-.st-廃棄予定{background:#e5e7eb;color:#374151}
+/* 在庫の状態も 1 本の色分けに（10/16）：灰＝まだ（予約）／緑＝動いている（貸出中）／青＝終わった（返却済）。手入れ待ちは橙、廃棄は赤 */
+.st-予約{background:#f1efe8;color:#5f5e5a}
+.st-貸出中{background:#eaf3de;color:#3b6d11}
+.st-返却済{background:#e6f1fb;color:#185fa5}
+.st-メンテ中{background:#faeeda;color:#854f0b}
+.st-廃棄予定{background:#fcebeb;color:#a32d2d}
 /* ===== 在庫ガント（試作 lab/gantt.html を移植。帯＝予定、品名の下＝未返却、数字＝残） ===== */
 #v_gantt .gt-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 10px}
 #v_gantt .gt-controls label{font-size:12px;color:var(--text-dim);display:inline-flex;align-items:center;gap:6px}
@@ -2039,6 +2040,7 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 /* 時間外：週の帯は透明、ボタンは灰のチップ、日の行は白い角丸、時刻のチップは灰（選ぶと緑）、管理の表は白地に灰の見出し */
 #view-ot .app{padding:6px 16px 24px}
 #view-ot .week-bar{background:transparent;border:none;box-shadow:none;padding:4px 0 12px;max-width:760px;margin:0 auto}   /* 中身が短いのに画面いっぱいだった（10/15 iller「長くね？」）。中央に */
+#view-ot .app:has(#staffView[style*="none"]) .week-bar,#view-ot .app:has(#staffView[style*="none"]) .request-banner{max-width:none}   /* 管理タブは表が幅いっぱいなので、週の帯も幅いっぱいに（10/16） */
 #view-ot .staff-section{max-width:760px;margin:0 auto}
 #view-ot .request-banner{max-width:760px;margin-left:auto;margin-right:auto}
 #view-ot .week-btn{background:var(--surface3);border:none;border-radius:8px;padding:7px 12px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text)}
@@ -4031,8 +4033,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-16 09:37';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1142;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-16 09:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1143;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
