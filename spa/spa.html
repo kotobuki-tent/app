@@ -2302,22 +2302,25 @@ html.in-woff .portal-head{display:none}
 body:has(#view-portal:not(.hidden)) #appVer{display:none}
 
 
-/* ===== 詳細の画面（見本：生産の案件詳細、10/16）：iPhone の設定画面の並び。灰の地に白いかたまり、名前は左・値は右。携帯は下からのシート ===== */
-#prodViewBg .mo{background:#f2f2f7}
-#prodViewBg h2{font-size:19px;font-weight:700;line-height:1.35;margin:0 0 14px;padding:0 2px}
-#prodViewBg .pv-list{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:14px}
-#prodViewBg .pv-list .view-row{display:flex;flex-direction:row;justify-content:space-between;align-items:center;gap:16px;margin:0;padding:11px 14px;font-size:14px;border-bottom:0.5px solid var(--border-light)}
-#prodViewBg .pv-list .view-row:last-child{border-bottom:none}
-#prodViewBg .pv-list .view-label{font-weight:400;color:var(--text-dim);font-size:14px;min-width:0;flex-shrink:0}
-#prodViewBg .pv-list .view-val{text-align:right;color:var(--text);font-size:14px;min-width:0;overflow-wrap:anywhere}
-#prodViewBg .pv-list .view-row.pv-notes{flex-direction:column;align-items:stretch;gap:4px}
-#prodViewBg .pv-list .pv-notes .view-val{text-align:left;white-space:pre-wrap}
-#prodViewBg .pv-list .pv-dl{display:flex;align-items:center;gap:8px;justify-content:flex-end}
-#prodViewBg .st-change,#prodViewBg .files-section{background:#fff;border:none;border-radius:12px;padding:12px 14px;margin:0 0 14px}
-#prodViewBg .mo-foot{margin-top:4px}
+/* ===== 詳細の画面（生産・企画制作・販売、10/16）：iPhone の設定画面の並び。灰の地に白いかたまり、名前は左・値は右。携帯は下からのシート。モーダルに class="dv" ===== */
+.dv .mo{background:#f2f2f7}
+.dv h2{font-size:19px;font-weight:700;line-height:1.35;margin:0 0 14px;padding:0 2px}
+.dv .pv-list,.dv .view-section,.dv .st-change,.dv .files-section,.dv .rental-add-section{background:#fff;border:none;border-radius:12px;overflow:hidden;margin:0 0 14px}
+.dv .st-change,.dv .files-section,.dv .rental-add-section{padding:12px 14px}
+.dv .view-section h3,.dv .rental-add-section h3{font-size:12px;font-weight:600;color:var(--text-dim);margin:0;padding:12px 14px 2px;border:none}
+.dv .rental-add-section h3{padding:0 0 8px}
+.dv .view-row{display:flex;flex-direction:row;justify-content:space-between;align-items:center;gap:16px;margin:0;padding:11px 14px;font-size:14px;border-bottom:0.5px solid var(--border-light)}
+.dv .view-row:last-child{border-bottom:none}
+.dv .view-label{font-weight:400;color:var(--text-dim);font-size:14px;min-width:0;flex-shrink:0}
+.dv .view-val{text-align:right;color:var(--text);font-size:14px;min-width:0;overflow-wrap:anywhere}
+.dv .view-row.pv-notes{flex-direction:column;align-items:stretch;gap:4px}
+.dv .pv-notes .view-val,.dv .view-row:not(:has(.view-label)) .view-val{text-align:left;white-space:pre-wrap;flex:1}
+.dv .pv-dl{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.dv .view-row:has(> .view-val:empty){display:none}   /* 中身の無い行（窓口が空など）は出さない */
+.dv .mo-foot{margin-top:4px}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){
-  #prodViewBg{align-items:flex-end;padding:0}
-  #prodViewBg .mo{max-width:none!important;border-radius:16px 16px 0 0;max-height:92dvh;overflow-y:auto;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
+  .dv.mo-bg{align-items:flex-end;padding:0}
+  .dv .mo{max-width:none!important;border-radius:16px 16px 0 0;max-height:92dvh;overflow-y:auto;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
 }
 </style>
 </head>
@@ -2674,7 +2677,7 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   </div>
   </div>
   <!-- 案件詳細モーダル -->
-  <div class="mo-bg" id="prodViewBg">
+  <div class="mo-bg dv" id="prodViewBg">
   <div class="mo" style="max-width:640px">
     <h2 id="prodViewTitle">案件詳細</h2>
     <div id="prodViewContent"></div>
@@ -2789,9 +2792,9 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   </div>
   </div>
   <!-- 現場詳細モーダル -->
-  <div class="mo-bg" id="projViewBg">
-  <div class="mo" style="max-width:540px">
-    <h2>現場詳細</h2>
+  <div class="mo-bg dv" id="projViewBg">
+  <div class="mo" style="max-width:640px">
+    <h2 id="projViewTitle">現場詳細</h2>
     <div id="projViewContent"></div>
     <div class="mo-foot"><button class="cancel" onclick="$('projViewBg').classList.remove('show')">閉じる</button></div>
   </div>
@@ -3140,9 +3143,9 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   <datalist id="salesSupplierList"></datalist>
 
   <!-- 案件詳細モーダル -->
-  <div class="mo-bg" id="viewBg">
+  <div class="mo-bg dv" id="viewBg">
     <div class="mo" style="max-width:640px">
-      <h2>案件詳細</h2>
+      <h2 id="salesViewTitle">案件詳細</h2>
       <div id="viewContent"></div>
       <div class="mo-foot"><button class="cancel" onclick="Sales.closeView()">閉じる</button></div>
     </div>
@@ -4057,8 +4060,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-16 10:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1148;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-16 10:49';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1149;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -5429,8 +5432,7 @@ const Proj = (function(){
     const fmtDates=s=>{if(!s)return'';
     return String(s).split(',').map(x=>{const dd=parseD(x.trim());
     return dd?`${dd.getMonth()+1}/${dd.getDate()}（${dow[dd.getDay()]}）`:''}).filter(Boolean).join('、')};
-    let h='';
-    h+=vr('物件名',d.project);
+    let h='<div class="pv-list">';
     if(d.our_person)h+=vr('担当者',d.our_person);
     if(d.estimate_no)h+=vr('見積番号',d.estimate_no);
     if(d.order_no)h+=vr('受注番号',d.order_no);
@@ -5438,7 +5440,7 @@ const Proj = (function(){
     h+=vr('窓口',d.person);
     if(d.venue)h+=vr('会場',d.venue);
     if(d.address)h+=vr('住所',d.address);
-    h+='<div class="view-section"><h3>日程</h3>';
+    h+='</div><div class="view-section"><h3>日程</h3>';
     if(d.date_load_in)h+=vr('搬入',fmtDates(d.date_load_in));
     if(d.date_setup)h+=vr('設営',fmtDates(d.date_setup));
     if(d.date_event)h+=vr('本番',fmtDates(d.date_event));
@@ -5478,7 +5480,7 @@ const Proj = (function(){
     const ptgl=$('projStToggle'),popts=$('projStOpts');
     if(ptgl&&popts)ptgl.onclick=()=>{ptgl.classList.toggle('open');popts.classList.toggle('open')};
     $('projViewContent').querySelectorAll('.st-opt').forEach(btn=>{btn.onclick=()=>{if(_changingStatus)return;const newSt=btn.dataset.st;if(d.status===newSt){ptgl.classList.remove('open');popts.classList.remove('open');return}applyProjStatus(d,id,newSt)}});
-    $('projViewBg').classList.add('show');
+    {const _t=$('projViewTitle');if(_t)_t.textContent=dispName(d.client,d.project)||'現場詳細';}$('projViewBg').classList.add('show');
 
     requestAnimationFrame(()=>{$('projViewBg').scrollTop=0;const _mo=$('projViewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;})}
 
@@ -7462,8 +7464,7 @@ const Sales = (function(){
   function vr(label,val){return`<div class="view-row"><div class="view-label">${label}</div><div class="view-val">${esc(val||'')}</div></div>`}
   function openView(id){
     const d=allEntries.find(x=>String(x.id)===String(id));if(!d)return;
-    let h='';
-    h+=vr('物件名',d.project);
+    let h='<div class="pv-list">';
     if(d.our_person)h+=vr('担当者',d.our_person);
     if(d.estimate_no)h+=vr('見積番号',d.estimate_no);
     if(d.order_no)h+=vr('受注番号',d.order_no);
@@ -7473,7 +7474,8 @@ const Sales = (function(){
     if(d.amount!==''&&d.amount!=null&&!isNaN(Number(d.amount))&&Number(d.amount)>0)h+=vr('金額',fmtAmount(d.amount));
     h+=vr('受付日',fmtDateJP(d.created_at)||'―');
     if(d.deadline)h+=vr('納期',fmtDateJP(d.deadline));
-    if(d.notes)h+=vr('備考',d.notes);
+    if(d.notes)h+=`<div class="view-row pv-notes"><div class="view-label">備考</div><div class="view-val">${esc(d.notes)}</div></div>`;
+    h+='</div>';
     h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
     h+=`<button class="st-toggle" id="salesStToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
     h+='<div class="st-opts" id="salesStOpts">';
@@ -7485,6 +7487,7 @@ const Sales = (function(){
     $('viewContent').querySelectorAll('.st-opt').forEach(btn=>{
       btn.onclick=()=>{const newSt=btn.dataset.st;if(d.status===newSt){stgl.classList.remove('open');sopts.classList.remove('open');return}changeStatus(id,newSt);openView(id)};
     });
+    {const _t=$('salesViewTitle');if(_t)_t.textContent=dispName(d.client,d.project)||'案件詳細';}
     $('viewBg').classList.add('show');
 
     requestAnimationFrame(()=>{$('viewBg').scrollTop=0;const _mo=$('viewBg').querySelector('.mo');if(_mo)_mo.scrollTop=0;});
