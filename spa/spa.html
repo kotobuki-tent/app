@@ -2329,6 +2329,16 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   .dv.mo-bg{align-items:flex-end;padding:0}
   .dv .mo{max-width:none!important;border-radius:16px 16px 0 0;max-height:92dvh;overflow-y:auto;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
 }
+
+/* ===== 動き（10/16）：画面の切り替えとモーダルは 0.15 秒の薄いフェード、携帯のシートは下からせり上がる。動きを減らす設定の端末では出さない ===== */
+@keyframes secIn{from{opacity:0}to{opacity:1}}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+.sec-in{animation:secIn .15s ease-out}
+.mo-bg.mo-in{animation:secIn .15s ease-out}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){
+  .dv.mo-bg.mo-in .mo,.fm.mo-bg.mo-in .mo{animation:sheetUp .22s cubic-bezier(.2,.8,.2,1)}
+}
+@media(prefers-reduced-motion:reduce){.sec-in,.mo-bg.mo-in,.dv.mo-bg.mo-in .mo,.fm.mo-bg.mo-in .mo{animation:none}}
 </style>
 </head>
 <body>
@@ -4067,8 +4077,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-16 10:56';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1151;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-16 11:39';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1152;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4154,6 +4164,8 @@ const today=new Date();today.setHours(0,0,0,0);
 const pad=n=>String(n).padStart(2,'0');
 const dateStr=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const dateJP=d=>`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${dow[d.getDay()]}）`;
+// モーダルを開いた時の薄いフェード（10/16）：.mo-bg に show が付いた瞬間だけ mo-in を付けて 0.3 秒で外す（動きが止まる端末でも透明のまま残らない）
+(function(){const f=()=>{try{const ob=new MutationObserver(ms=>ms.forEach(m=>{const el=m.target;const was=String(m.oldValue||'').split(/\s+/).includes('show');if(!was&&el.classList.contains('show')){el.classList.add('mo-in');clearTimeout(el._moT);el._moT=setTimeout(()=>el.classList.remove('mo-in'),300)}}));document.querySelectorAll('.mo-bg').forEach(el=>ob.observe(el,{attributes:true,attributeFilter:['class'],attributeOldValue:true}))}catch(e){}};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',f);else f();})();
 // 見出しの横の今日の日付（点呼・リフト・カード。data-today を付けた所に入れる）
 (function(){const f=()=>document.querySelectorAll('[data-today]').forEach(e=>e.textContent=dateJP(new Date()));if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',f);else f();})();
 const parseD=s=>{if(!s)return null;const d=new Date(s+'T00:00:00');return isNaN(d)?null:d};
@@ -10244,6 +10256,7 @@ const App = {
       const nv=$(r.nav); if(nv) nv.classList.toggle('on', r.key===name);
     });
     this.current=name;
+    { const _s=$(this.reg(name).section); if(_s){ _s.classList.remove('sec-in'); void _s.offsetWidth; _s.classList.add('sec-in'); clearTimeout(_s._secT); _s._secT=setTimeout(()=>_s.classList.remove('sec-in'),260); } }   // 切り替えは 0.15 秒の薄いフェード（10/16）。動きが止まる端末でも 0.26 秒で必ず外す＝透明のまま残らない
     this.staleNote();
     centerActiveNav();
 
