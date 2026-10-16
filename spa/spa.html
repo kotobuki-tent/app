@@ -2745,11 +2745,12 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   </div>
 
   <!-- 現場登録/編集モーダル -->
-  <div class="mo-bg" id="projMoBg">
+  <div class="mo-bg fm" id="projMoBg">
   <div class="mo" style="max-width:640px">
     <h2 id="projMoTitle"><span id="projMoTitleText">現場登録</span><button class="del-link hidden" id="xfDel" onclick="Proj.delProj($('xf_id').value)">削除</button></h2>
     <input type="hidden" id="xf_id">
-    <div class="mo-row full"><div class="mo-field"><label>物件名 *</label><input id="xf_project" placeholder="例: 鳥取砂丘音楽フェス2026"></div></div>
+    <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="xf_client" placeholder="例: 鳥取県観光局"></div><div class="mo-field f3"><label>窓口</label><input id="xf_person" placeholder="例: 纐纈"></div></div>
+    <div class="mo-row full"><div class="mo-field"><label>案件名 *</label><input id="xf_project"></div></div>
     <div class="type-toggle">
       <input type="checkbox" id="xf_is_rental" onclick="Proj.toggleProjType()">
       <label>レンタル（貸出・返却のみ）</label>
@@ -2757,7 +2758,6 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
     </div>
     <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="xf_our_person" placeholder="自社の担当者"></div></div>
     <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="xf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="xf_order_no"></div></div>
-    <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="xf_client" placeholder="例: 鳥取県観光局"></div><div class="mo-field f3"><label>窓口</label><input id="xf_person" placeholder="例: 纐纈"></div></div>
     <div class="mo-row"><div class="mo-field not-make"><label>会場名</label><input id="xf_venue" placeholder="例: 鳥取砂丘特設会場"></div><div class="mo-field"><label>ステータス</label><select id="xf_status"><option>受注</option><option>進行中</option><option>終了</option></select></div></div>
     <div class="mo-row full"><div class="mo-field"><label>金額（円）</label><input type="number" id="xf_amount" min="0" step="1" placeholder="空欄可"></div></div>
     <div class="mo-row full not-make"><div class="mo-field"><label>住所</label><input id="xf_address" placeholder="例: 鳥取県鳥取市福部町"></div></div>
@@ -3105,19 +3105,19 @@ body:has(#view-portal:not(.hidden)) #appVer{display:none}
   </div>
 
   <!-- 案件登録/編集モーダル -->
-  <div class="mo-bg" id="moBg">
+  <div class="mo-bg fm" id="moBg">
     <div class="mo" style="max-width:640px">
       <h2 id="moTitle"><span id="moTitleText">案件登録</span><button class="del-link hidden" id="fDel" onclick="Sales.delEntry($('f_id').value)">削除</button></h2>
       <input type="hidden" id="f_id">
-      <div class="mo-row full"><div class="mo-field"><label>物件名 *</label><input id="f_project" placeholder="例：かんたんてんと 販売"></div></div>
+      <div class="mo-row pair">
+        <div class="mo-field f7"><label>得意先</label><input id="f_client" list="salesCustomerList" placeholder="例: ㈱○○ / 現金客 / ○○さん"></div>
+        <div class="mo-field f3"><label>窓口</label><input id="f_person"></div>
+      </div>
+      <div class="mo-row full"><div class="mo-field"><label>案件名 *</label><input id="f_project"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="f_our_person" placeholder="自社の担当者"></div></div>
       <div class="mo-row pair">
         <div class="mo-field"><label>見積番号</label><input id="f_estimate_no"></div>
         <div class="mo-field"><label>受注番号</label><input id="f_order_no"></div>
-      </div>
-      <div class="mo-row pair">
-        <div class="mo-field f7"><label>得意先</label><input id="f_client" list="salesCustomerList" placeholder="例: ㈱○○ / 現金客 / ○○さん"></div>
-        <div class="mo-field f3"><label>窓口</label><input id="f_person"></div>
       </div>
       <div class="mo-row">
         <div class="mo-field"><label>仕入先</label><input id="f_supplier" list="salesSupplierList"></div>
@@ -4067,8 +4067,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-16 10:54';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1150;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-16 10:56';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1151;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4715,7 +4715,7 @@ const Prod = (function(){
       if(archiveSort.col==='deadline'){const da=parseD(va),db=parseD(vb);if(da&&db)return archiveSort.asc?da-db:db-da;if(!da)return 1;if(!db)return-1}
       va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0
     });
-    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'deadline',label:'納期'}];
+    const cols=[{key:'project',label:'案件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'deadline',label:'納期'}];
     let h='<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">出荷済の案件（'+items.length+'件）</span></div>';
     h+='<div class="tbl-wrap"><table><thead><tr>';
     cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}" style="cursor:pointer">${c.label}<span class="arrow">${a}</span></th>`});
@@ -4738,7 +4738,7 @@ const Prod = (function(){
       if(archiveSort.col==='deadline'){const da=parseD(va),db=parseD(vb);if(da&&db)return archiveSort.asc?da-db:db-da;if(!da)return 1;if(!db)return-1}
       va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0
     });
-    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'deadline',label:'納期'}];
+    const cols=[{key:'project',label:'案件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'deadline',label:'納期'}];
     let h='<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">アーカイブ済み案件（'+items.length+'件）</span></div>';
     h+='<div class="tbl-wrap"><table><thead><tr>';
     cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}" style="cursor:pointer">${c.label}<span class="arrow">${a}</span></th>`});
@@ -5346,7 +5346,7 @@ const Proj = (function(){
       if(ea&&eb)return 0;if(ea)return 1;if(eb)return-1;
       va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(projDoneSort.asc?-1:1):va>vb?(projDoneSort.asc?1:-1):0
     });
-    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'_endDate',label:'完了日'}];
+    const cols=[{key:'project',label:'案件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'_endDate',label:'完了日'}];
     let h='<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">終了した現場（'+items.length+'件）</span></div>';
     h+='<div class="tbl-wrap"><table><thead><tr>';
     cols.forEach(c=>{const a=projDoneSort.col===c.key?(projDoneSort.asc?'▲':'▼'):'';h+='<th data-dcol="'+c.key+'" style="cursor:pointer">'+c.label+'<span class="arrow">'+a+'</span></th>'});
@@ -5369,7 +5369,7 @@ const Proj = (function(){
       if(ea&&eb)return 0;if(ea)return 1;if(eb)return-1;
       va=String(va).toLowerCase();vb=String(vb).toLowerCase();return va<vb?(projDoneSort.asc?-1:1):va>vb?(projDoneSort.asc?1:-1):0
     });
-    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'_endDate',label:'完了日'}];
+    const cols=[{key:'project',label:'案件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'_endDate',label:'完了日'}];
     let h='<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">アーカイブ済み現場（'+items.length+'件）</span></div>';
     h+='<div class="tbl-wrap"><table><thead><tr>';
     cols.forEach(c=>{const a=projDoneSort.col===c.key?(projDoneSort.asc?'▲':'▼'):'';h+='<th data-dcol="'+c.key+'" style="cursor:pointer">'+c.label+'<span class="arrow">'+a+'</span></th>'});
@@ -5565,7 +5565,7 @@ const Proj = (function(){
   function saveProj(){
     if(_savingProj) return;
     const name=$('xf_project').value.trim();
-    if(!name){toast('物件名を入力してください',true);return}
+    if(!name){toast('案件名を入力してください',true);return}
     const editId=$('xf_id').value;
     const _rPfx=editId?'_xf':'_xfn', _rRows=pendingRentalRows(_rPfx);
     // 日程の前後逆（返却日が貸出日より前・撤去日が搬入日より前）は保存させない＝レンタル品にそのまま写るので
@@ -7333,7 +7333,7 @@ const Sales = (function(){
       va=String(va).toLowerCase();vb=String(vb).toLowerCase();
       return va<vb?(adminSort.asc?-1:1):va>vb?(adminSort.asc?1:-1):0;
     });
-    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'supplier',label:'仕入先'},{key:'amount',label:'金額'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
+    const cols=[{key:'project',label:'案件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'supplier',label:'仕入先'},{key:'amount',label:'金額'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
     const ftBtn=(label,val)=>{const on=adminStatusFilter===val?' on':'';const cnt=val?stCnt[val]||0:allEntries.filter(e=>!ARCHIVE_ST.includes(e.status)).length;return`<div class="fv-si${on}" data-st="${val||''}"><div class="n">${cnt}</div><div class="l">${label}</div></div>`};
     let h=`<div class="fv-sum">${ftBtn('すべて',null)}`;
     ACTIVE_ST.forEach(s=>{h+=ftBtn(s,s)});
@@ -7377,7 +7377,7 @@ const Sales = (function(){
       va=String(va).toLowerCase();vb=String(vb).toLowerCase();
       return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0;
     });
-    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'supplier',label:'仕入先'},{key:'amount',label:'金額'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
+    const cols=[{key:'project',label:'案件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'supplier',label:'仕入先'},{key:'amount',label:'金額'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
     let h=`<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">納品済・見送りの案件（${items.length}件）</span></div>`;
     h+='<div class="tbl-wrap"><table class="tbl"><thead><tr>';
     cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
@@ -7416,7 +7416,7 @@ const Sales = (function(){
       va=String(va).toLowerCase();vb=String(vb).toLowerCase();
       return va<vb?(archiveSort.asc?-1:1):va>vb?(archiveSort.asc?1:-1):0;
     });
-    const cols=[{key:'project',label:'物件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'supplier',label:'仕入先'},{key:'amount',label:'金額'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
+    const cols=[{key:'project',label:'案件名'},{key:'our_person',label:'担当者'},{key:'estimate_no',label:'見積番号'},{key:'order_no',label:'受注番号'},{key:'client',label:'得意先'},{key:'person',label:'窓口'},{key:'supplier',label:'仕入先'},{key:'amount',label:'金額'},{key:'deadline',label:'納期'},{key:'status',label:'ステータス'}];
     let h=`<div class="av-top"><span style="font-size:13px;color:var(--text-dim)">アーカイブ済み案件（${items.length}件）</span></div>`;
     h+='<div class="tbl-wrap"><table class="tbl"><thead><tr>';
     cols.forEach(c=>{const a=archiveSort.col===c.key?(archiveSort.asc?'▲':'▼'):'';h+=`<th data-acol="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
@@ -7537,7 +7537,7 @@ const Sales = (function(){
     if(_savingEntry) return;
     const id=$('f_id').value;
     const payload={project:$('f_project').value.trim(),our_person:$('f_our_person').value.trim(),estimate_no:$('f_estimate_no').value.trim(),order_no:$('f_order_no').value.trim(),client:$('f_client').value.trim(),person:$('f_person').value.trim(),supplier:$('f_supplier').value.trim(),amount:$('f_amount').value,created_at:$('f_created_at').value,deadline:$('f_deadline').value,status:$('f_status').value,notes:$('f_notes').value};
-    if(!payload.project){toast('物件名は必須');$('f_project').focus();return}
+    if(!payload.project){toast('案件名を入力してください',true);$('f_project').focus();return}
     if(!payload.created_at){toast('受付日は必須');return}
     const today=fmtDate(new Date());
     if(id){
