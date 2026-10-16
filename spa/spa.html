@@ -1962,6 +1962,7 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 .job-card .jc-tag.eno{background:#f1efe8;color:#5f5e5a}
 .job-card .jc-tag.dl{background:var(--surface3);color:var(--text)}
 .job-card .jc-foot{border-top:0.5px solid var(--border-light)}
+.job-card .st-badge{white-space:nowrap;flex-shrink:0}   /* 「完成」が縦に折れていた（10/16） */
 .job-card .jc-foot .jc-mins{color:var(--text);font-weight:600}
 .job-card .jc-foot .jc-ppl{font-weight:500}
 .mb-total{background:var(--surface2);border-radius:12px}
@@ -4033,8 +4034,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-16 09:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1143;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-16 09:42';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1144;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -5279,7 +5280,6 @@ const Proj = (function(){
           </div>
           <div class="pc-meta">
             ${d.our_person?`<span class="pc-person">${esc(d.our_person)}</span>`:''}
-            ${d.client?`<span>${esc(d.client)}</span>`:''}
             ${d.order_no?`<span class="pc-eno">${esc(d.order_no)}</span>`:''}
           </div>
           <div class="pc-date">${dateRange}</div>
@@ -7687,6 +7687,7 @@ const Labor = (function(){
     });
     h+=`</tbody></table><div class="tbl-foot"><span>${list.length} 件</span></div></div>`;
     h+='<div class="job-cards">';
+    const mdDow=v=>{const d=new Date(String(v).slice(0,10).replace(/\//g,'-')+'T00:00:00');return isNaN(d)?String(v):`${d.getMonth()+1}/${d.getDate()}（${'日月火水木金土'[d.getDay()]}）`};
     list.forEach(j=>{
       const no=j.order_no||j.estimate_no||'';
       h+=`<div class="job-card" onclick="Labor.showDetail('${esc(j.id)}')">
@@ -7695,8 +7696,8 @@ const Labor = (function(){
           <span class="st-badge st-${esc(j.status)}">${esc(j.status)}</span>
         </div>
         <div class="jc-meta">
-          ${no?`<span class="jc-tag eno">#${esc(no)}</span>`:''}
-          ${j.deadline?`<span class="jc-tag dl">納期 ${esc(j.deadline)}</span>`:''}
+          ${no?`<span class="jc-tag eno">${esc(no)}</span>`:''}
+          ${j.deadline?`<span class="jc-tag dl">納期 ${esc(mdDow(j.deadline))}</span>`:''}
         </div>
         <div class="jc-foot">
           <span class="jc-mins">${fmtMin(j.total_minutes)}<small>延べ工数</small></span>
