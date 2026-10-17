@@ -2587,6 +2587,11 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .ce-cost.total{background:var(--surface2);font-weight:700}
   #view-cases .ce-cost.total .a{font-size:14px}
   #view-cases .ce-cost.tmp{opacity:.55}
+  #view-cases .ce-hours{display:flex;align-items:baseline;gap:10px;padding:9px 12px;border-top:1px solid var(--border-light);font-size:13px;flex-wrap:wrap}
+  #view-cases .ce-hours:first-child{border-top:none}
+  #view-cases .ce-hours .k{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-dim)}
+  #view-cases .ce-hours .t{font-weight:700;font-variant-numeric:tabular-nums}
+  #view-cases .ce-hours .by{color:var(--text-dim);font-size:12px}
   #view-cases .ce-cost-add{display:grid;grid-template-columns:140px 80px 1fr;gap:8px;margin-top:8px}   /* 1 段目＝日付・区分・金額、2 段目＝仕入先・内容・追加 */
   #view-cases .ce-cost-add input,#view-cases .ce-cost-add select{min-width:0}
   @media(max-width:600px){
@@ -4127,8 +4132,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-17 10:52';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1163;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-17 11:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1165;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9251,14 +9256,21 @@ const Cases = (function(){
   function sortBy(col){ if(_sort.col===col)_sort.asc=!_sort.asc; else {_sort.col=col;_sort.asc=true;} render(); }
   function setStf(v){ _stf=(_stf===v?'':v); render(); }
   // ---- かかったお金（原価の材料・外注・経費、2026-10-17）。案件の編集モーダルで 1 行ずつ。労務費は日報の工数から別に出す
-  let _costs=[], _costBusy=false, _costFor='';
-  async function loadCosts(id){ _costFor=String(id); try{ const r=await fetch(API+'?dept=cases&action=costs&case_id='+encodeURIComponent(id)); const j=await r.json(); if(j.success && _costFor===String(id) && _editId===id){ _costs=mergeWithTmp(j.data||[], _costs, x=>String(x.date||'')+'|'+String(x.kind||'')+'|'+String(x.vendor||'')+'|'+String(x.item||'')+'|'+String(x.amount||'')); renderCosts(); } }catch(e){} }
+  let _costs=[], _costBusy=false, _costFor='', _hours=null;   // _hours＝{total:分, by:[{name,minutes}]}（日報から。GAS caseHours）
+  async function loadCosts(id){ _costFor=String(id); try{ const r=await fetch(API+'?dept=cases&action=costs&case_id='+encodeURIComponent(id)); const j=await r.json(); if(j.success && _costFor===String(id) && _editId===id){ _hours=j.hours||null; _costs=mergeWithTmp(j.data||[], _costs, x=>String(x.date||'')+'|'+String(x.kind||'')+'|'+String(x.vendor||'')+'|'+String(x.item||'')+'|'+String(x.amount||'')); renderCosts(); } }catch(e){} }
   function renderCosts(){ const el=$('ce_costs'); if(!el)return; const rows=_costs.slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
-    if(!rows.length){ el.innerHTML=''; return; }
     const fmt=n=>'¥'+Number(n||0).toLocaleString('ja-JP'); const md=d=>{const m=String(d||'').match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${+m[2]}/${+m[3]}`:'';};
+    const hm=m=>{m=Number(m)||0; const h=Math.floor(m/60), r=m%60; return h+'時間'+(r?r+'分':'');};
     const total=rows.reduce((s,x)=>s+(Number(x.amount)||0),0);
-    el.innerHTML=rows.map(x=>`<div class="ce-cost${String(x.id).startsWith('tmp_')?' tmp':''}"><span class="d">${md(x.date)}</span><span class="k">${esc(x.kind||'')}</span><span class="v">${esc(x.vendor||'')}</span><span class="i">${esc(x.item||'')}</span><span class="a">${fmt(x.amount)}</span><button type="button" class="x" onclick="Cases.delCost('${esc(String(x.id))}')" title="削除">✕</button></div>`).join('')
-      +`<div class="ce-cost total"><span class="d"></span><span class="k" style="background:none">合計</span><span class="v"></span><span class="i"></span><span class="a">${fmt(total)}</span><span></span></div>`;
+    let h='';
+    if(rows.length){
+      h=rows.map(x=>`<div class="ce-cost${String(x.id).startsWith('tmp_')?' tmp':''}"><span class="d">${md(x.date)}</span><span class="k">${esc(x.kind||'')}</span><span class="v">${esc(x.vendor||'')}</span><span class="i">${esc(x.item||'')}</span><span class="a">${fmt(x.amount)}</span><button type="button" class="x" onclick="Cases.delCost('${esc(String(x.id))}')" title="削除">✕</button></div>`).join('')
+        +`<div class="ce-cost total"><span class="d"></span><span class="k" style="background:none">合計</span><span class="v"></span><span class="i"></span><span class="a">${fmt(total)}</span><span></span></div>`;
+    }
+    // 工数（日報から）。時給はまだ決めていないので時間だけ。人別は多い順に
+    if(_hours){ const by=(_hours.by||[]).map(b=>`${esc(b.name)} ${hm(b.minutes)}`).join('、');
+      h+=`<div class="ce-hours"><span class="k">工数</span><span class="t">${hm(_hours.total)}</span><span class="by">${_hours.total?by:'日報に記録なし'}</span></div>`; }
+    el.innerHTML=h;
   }
   function addCost(){ if(_costBusy||!_editId)return; const amount=Number($('cc_amount').value); const vendor=$('cc_vendor').value.trim(), item=$('cc_item').value.trim(), kind=$('cc_kind').value, date=$('cc_date').value||dateStr(new Date());
     if(!(amount>0)){ toast('金額を入れてください',false); return; }
@@ -9275,7 +9287,7 @@ const Cases = (function(){
     if(!String(id).startsWith('tmp_')) fireAndForget({dept:'cases',action:'delete_cost',id});
   }
   function openEdit(id){ const c=_find(id); if(!c)return; _editId=id;
-    _costs=[]; renderCosts(); loadCosts(id);
+    _costs=[]; _hours=null; renderCosts(); loadCosts(id);
     $('ce_name').value=c.name||''; $('ce_client').value=c.client||''; $('ce_contact').value=c.contact||''; $('ce_our_person').value=c.our_person||'';
     $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; $('ce_status').value=CASE_ST.indexOf(c.status)>=0?c.status:'受注'; $('ce_qa').innerHTML=QuoteAge.forCase(c); $('ce_note').value=c.note||''; $('ce_target_date').value=String(c.target_date||'').slice(0,10); $('ce_amount').value=(c.amount===''||c.amount==null)?'':c.amount;
     const kids=_children[String(id)]||[];
