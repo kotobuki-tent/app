@@ -338,7 +338,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .mny-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
 .mny-btn:hover{border-color:var(--accent);color:var(--accent)}
 .mny-btn+.staff-btn,.mny-btn+#projSlogBtn,.mny-btn+#salesSlogBtn,.mny-btn+#casesSlogBtn{margin-left:8px}
-#prodTabs .staff-btn{margin-left:auto}#prodTabs .staff-btn+.mny-btn{margin-left:8px}   /* 生産は STAFF を前に（iller 2026-10-17） */
+#prodTabs .staff-btn{margin-left:auto}#prodTabs .staff-btn+.mny-btn{margin-left:22px}   /* 生産は STAFF を前に、¥合計・ログとは少し離す（iller 2026-10-17） */
 .staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:4px}
 .staff-cell{padding:14px 10px;border:2px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-dim);font:500 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;text-align:center;transition:.1s;user-select:none;position:relative}
 .staff-cell:hover{border-color:var(--accent)}
@@ -4248,8 +4248,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-17 12:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1170;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-17 12:13';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1171;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
