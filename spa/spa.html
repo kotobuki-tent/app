@@ -180,7 +180,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 #view-prod .fab-acts .btn,#view-prod .fab-in-rows + .btn{padding:9px 16px;border-radius:8px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;border:none;background:var(--accent);color:#fff;white-space:nowrap}
 #view-prod .fab-acts .btn.gray,#view-prod .fab-in-rows + .btn{background:var(--surface3);color:var(--text)}
 #view-prod .fab-list{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-#view-prod .fab-row{display:grid;grid-template-columns:1fr 110px 110px 120px 150px;gap:10px;align-items:center;padding:11px 16px;border-top:1px solid var(--border-light);font-size:13.5px;cursor:pointer}
+#view-prod .fab-row{display:grid;grid-template-columns:1fr 110px 110px 120px 150px 72px;gap:10px;align-items:center;padding:11px 16px;border-top:1px solid var(--border-light);font-size:13.5px;cursor:pointer}
 #view-prod .fab-row:first-child{border-top:none}
 #view-prod .fab-row.hd{cursor:default;font-size:11px;color:var(--text-dim);background:var(--surface2);padding:8px 16px}
 #view-prod .fab-row:not(.hd):hover{background:var(--surface2)}
@@ -188,6 +188,8 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 #view-prod .fab-row .r{text-align:right;font-variant-numeric:tabular-nums}
 #view-prod .fab-row .r.zero{color:var(--text-faint)}
 #view-prod .fab-row .d{color:var(--text-dim);font-size:12px}
+#view-prod .fab-row .cut{padding:7px 0;border-radius:8px;font:600 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;border:none;background:var(--accent);color:#fff;width:64px;justify-self:end}
+#view-prod .fab-row .cut:disabled{background:var(--surface3);color:var(--text-faint);cursor:default}
 #view-prod .fab-empty{padding:28px;text-align:center;color:var(--text-dim);font-size:13px}
 #view-prod .fab-in-rows{display:flex;flex-direction:column;gap:6px;margin:4px 0 8px}
 #view-prod .fab-in-row{display:grid;grid-template-columns:1fr 110px 120px 32px;gap:8px;align-items:center}
@@ -215,7 +217,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
   #view-prod .fab-acts{margin-left:0;width:100%}
   #view-prod .fab-acts .btn{flex:1}
   #view-prod .fab-search{width:100%}
-  #view-prod .fab-row{grid-template-columns:1fr 90px 100px;padding:10px 12px}
+  #view-prod .fab-row{grid-template-columns:1fr 80px 90px 64px;padding:10px 12px}
   #view-prod .fab-row .d,#view-prod .fab-row .avg{display:none}
   #view-prod .fab-in-row{grid-template-columns:1fr 80px 90px 28px}
   #view-prod .fab-h{grid-template-columns:52px 46px 1fr 90px 26px}
@@ -2794,7 +2796,6 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
         <div class="fab-sum" id="fabSum"></div>
         <input class="fab-search" id="fabSearch" placeholder="品番で探す" oninput="Prod.fabSearch(this.value)">
         <div class="fab-acts">
-          <button class="btn" onclick="Prod.openFabOut('裁断')">裁断</button>
           <button class="btn gray" onclick="Prod.openFabIn()">入荷</button>
           <button class="btn gray" onclick="Prod.openFabAdj()">棚卸</button>
         </div>
@@ -4249,8 +4250,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-17 12:21';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1172;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-17 12:22';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1173;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4830,8 +4831,8 @@ const Prod = (function(){
     const total=fab.reduce((s,x)=>s+(Number(x.amount)||0),0);
     $('fabSum').innerHTML=`<div class="fv-si on"><div class="n">${inStock.length}</div><div class="l">品番</div></div><div class="fv-si"><div class="n">${fabY(total)}</div><div class="l">在庫の金額</div></div>`;
     if(!rows.length){ el.innerHTML=`<div class="fab-empty">${fab.length?'該当なし':'まだ何もありません。「入荷」から品番・メートル・単価を入れてください（最初は仕入先を「期首」にして今ある分を）'}</div>`; return; }
-    el.innerHTML=`<div class="fab-row hd"><span>品番</span><span class="r">残り m</span><span class="r avg">平均単価</span><span class="r">金額</span><span class="d">最終入荷</span></div>`
-      +rows.map(x=>`<div class="fab-row" onclick="Prod.openFabHist('${esc(String(x.item))}')"><span class="n">${esc(x.item)}</span><span class="r${x.meters>0?'':' zero'}">${fabM(x.meters)}</span><span class="r avg">${fabY(x.avg)}</span><span class="r${x.meters>0?'':' zero'}">${fabY(x.amount)}</span><span class="d">${x.last_in?esc(String(x.last_in).slice(5).replace('-','/'))+(x.last_vendor?' '+esc(x.last_vendor):''):''}</span></div>`).join('');
+    el.innerHTML=`<div class="fab-row hd"><span>品番</span><span class="r">残り m</span><span class="r avg">平均単価</span><span class="r">金額</span><span class="d">最終入荷</span><span></span></div>`
+      +rows.map(x=>`<div class="fab-row" onclick="Prod.openFabHist('${esc(String(x.item))}')"><span class="n">${esc(x.item)}</span><span class="r${x.meters>0?'':' zero'}">${fabM(x.meters)}</span><span class="r avg">${fabY(x.avg)}</span><span class="r${x.meters>0?'':' zero'}">${fabY(x.amount)}</span><span class="d">${x.last_in?esc(String(x.last_in).slice(5).replace('-','/'))+(x.last_vendor?' '+esc(x.last_vendor):''):''}</span><button type="button" class="cut" ${x.meters>0?'':'disabled'} onclick="event.stopPropagation();Prod.openFabOut('裁断','${esc(String(x.item))}')">裁断</button></div>`).join('');
     const dl=$('fabItemList'); if(dl) dl.innerHTML=fab.map(x=>`<option value="${esc(x.item)}">`).join('');
   }
   function closeFabMo(id){ $(id).classList.remove('show'); }
@@ -4851,11 +4852,12 @@ const Prod = (function(){
   }
   // --- 裁断・戻し ---
   let foMode='裁断';
-  async function openFabOut(mode){ foMode=mode||'裁断'; $('foTitle').textContent=foMode; $('foSave').textContent=foMode==='裁断'?'記録':'戻す';
+  async function openFabOut(mode,item){ foMode=mode||'裁断'; $('foTitle').textContent=item?foMode+'　'+item:foMode; $('foSave').textContent=foMode==='裁断'?'記録':'戻す';
     $('fo_date').value=dateStr(new Date()); $('fo_case').value=''; $('fo_m').value=''; $('foHint').textContent='';
     const items=fab.filter(x=>foMode==='戻し'||x.meters>0);
     $('fo_item').innerHTML='<option value="">品番を選ぶ</option>'+items.map(x=>`<option value="${esc(x.item)}">${esc(x.item)}（残り ${fabM(x.meters)}m）</option>`).join('');
     $('fo_item').onchange=()=>{ const x=fab.find(f=>f.item===$('fo_item').value); $('foHint').textContent=x?`平均単価 ${fabY(x.avg)}／m`:''; };
+    if(item){ $('fo_item').value=item; $('fo_item').onchange(); setTimeout(()=>$('fo_m').focus(),80); }
     $('fabOutBg').classList.add('show');
     const [staff,cases]=await Promise.all([fabEnsureStaff(),fabEnsureCases()]);
     const ps=$('fo_person'); const keep=localStorage.getItem('fab_person')||''; ps.innerHTML='<option value="">名前を選ぶ</option>'+staff.map(n=>`<option${n===keep?' selected':''}>${esc(n)}</option>`).join('');
