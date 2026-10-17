@@ -2573,6 +2573,28 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .ce-cst{flex:0 0 auto;font-size:12px;color:var(--text-dim)}
   #view-cases .ce-cgo{flex:0 0 auto;font-size:11px;color:var(--accent);font-weight:700}
   #view-cases .ce-nochild{color:var(--text-dim);font-size:13px;padding:6px 2px}
+  /* かかったお金（2026-10-17）：1 行 1 件、下に合計。追加は 1 行の入力欄 */
+  #view-cases .ce-costs{display:flex;flex-direction:column;margin-top:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  #view-cases .ce-costs:empty{display:none}
+  #view-cases .ce-cost{display:grid;grid-template-columns:76px 42px 1fr 1fr 96px 36px;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--border-light);font-size:13px}
+  #view-cases .ce-cost:first-child{border-top:none}
+  #view-cases .ce-cost .k{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-dim);text-align:center}
+  #view-cases .ce-cost .d{color:var(--text-dim);font-variant-numeric:tabular-nums}
+  #view-cases .ce-cost .v,#view-cases .ce-cost .i{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #view-cases .ce-cost .a{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+  #view-cases .ce-cost .x{background:none;border:none;color:var(--text-faint);cursor:pointer;font:inherit;padding:2px 6px}
+  #view-cases .ce-cost .x:hover{color:#a32d2d}
+  #view-cases .ce-cost.total{background:var(--surface2);font-weight:700}
+  #view-cases .ce-cost.total .a{font-size:14px}
+  #view-cases .ce-cost.tmp{opacity:.55}
+  #view-cases .ce-cost-add{display:grid;grid-template-columns:140px 80px 1fr;gap:8px;margin-top:8px}   /* 1 段目＝日付・区分・金額、2 段目＝仕入先・内容・追加 */
+  #view-cases .ce-cost-add input,#view-cases .ce-cost-add select{min-width:0}
+  @media(max-width:600px){
+    #view-cases .ce-cost{grid-template-columns:76px 42px 1fr 96px 30px}
+    #view-cases .ce-cost .i{display:none}
+    #view-cases .ce-cost-add{grid-template-columns:1fr 1fr}
+    #view-cases .ce-cost-add #cc_amount,#view-cases .ce-cost-add .btn{grid-column:1/-1}
+  }
   #view-cases .ce-adddept{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
   #view-cases .ce-add-lbl{font-size:12px;color:var(--text-dim);margin-right:2px}
   #view-cases .ce-add-btn{padding:7px 14px;border-radius:8px;border:1px dashed var(--border);background:var(--surface);color:var(--text);font:600 13px/1 inherit;cursor:pointer}
@@ -2662,6 +2684,17 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　一案件＝一金額</label><input type="number" id="ce_amount" min="0" step="1"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
       <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div><div id="ce_adddept" class="ce-adddept"></div><div id="ce_rentals"></div></div>
+      <div class="mo-field"><label>かかったお金（材料・外注・経費）<span class="ce-target-note">請求書が来たら 1 行。労務費は日報から別に出す</span></label>
+        <div id="ce_costs" class="ce-costs"></div>
+        <div class="ce-cost-add">
+          <input type="date" id="cc_date">
+          <select id="cc_kind"><option>材料</option><option>外注</option><option>経費</option></select>
+          <input type="number" id="cc_amount" min="0" step="1" placeholder="金額（税抜）">
+          <input id="cc_vendor" placeholder="仕入先">
+          <input id="cc_item" placeholder="内容">
+          <button type="button" class="btn gray" onclick="Cases.addCost()">＋ 追加</button>
+        </div>
+      </div>
       <div class="mo-foot"><button class="cancel" onclick="Cases.closeEdit()">閉じる</button><button class="save" onclick="Cases.saveEdit()">保存</button></div>
     </div>
   </div>
@@ -4094,8 +4127,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-16 18:02';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1160;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-17 10:52';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1163;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9217,7 +9250,32 @@ const Cases = (function(){
   function search(v){ _q=v; const qq=v.trim().toLowerCase(); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||tr.textContent.toLowerCase().includes(qq))?'':'none'; }); }
   function sortBy(col){ if(_sort.col===col)_sort.asc=!_sort.asc; else {_sort.col=col;_sort.asc=true;} render(); }
   function setStf(v){ _stf=(_stf===v?'':v); render(); }
+  // ---- かかったお金（原価の材料・外注・経費、2026-10-17）。案件の編集モーダルで 1 行ずつ。労務費は日報の工数から別に出す
+  let _costs=[], _costBusy=false, _costFor='';
+  async function loadCosts(id){ _costFor=String(id); try{ const r=await fetch(API+'?dept=cases&action=costs&case_id='+encodeURIComponent(id)); const j=await r.json(); if(j.success && _costFor===String(id) && _editId===id){ _costs=mergeWithTmp(j.data||[], _costs, x=>String(x.date||'')+'|'+String(x.kind||'')+'|'+String(x.vendor||'')+'|'+String(x.item||'')+'|'+String(x.amount||'')); renderCosts(); } }catch(e){} }
+  function renderCosts(){ const el=$('ce_costs'); if(!el)return; const rows=_costs.slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+    if(!rows.length){ el.innerHTML=''; return; }
+    const fmt=n=>'¥'+Number(n||0).toLocaleString('ja-JP'); const md=d=>{const m=String(d||'').match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${+m[2]}/${+m[3]}`:'';};
+    const total=rows.reduce((s,x)=>s+(Number(x.amount)||0),0);
+    el.innerHTML=rows.map(x=>`<div class="ce-cost${String(x.id).startsWith('tmp_')?' tmp':''}"><span class="d">${md(x.date)}</span><span class="k">${esc(x.kind||'')}</span><span class="v">${esc(x.vendor||'')}</span><span class="i">${esc(x.item||'')}</span><span class="a">${fmt(x.amount)}</span><button type="button" class="x" onclick="Cases.delCost('${esc(String(x.id))}')" title="削除">✕</button></div>`).join('')
+      +`<div class="ce-cost total"><span class="d"></span><span class="k" style="background:none">合計</span><span class="v"></span><span class="i"></span><span class="a">${fmt(total)}</span><span></span></div>`;
+  }
+  function addCost(){ if(_costBusy||!_editId)return; const amount=Number($('cc_amount').value); const vendor=$('cc_vendor').value.trim(), item=$('cc_item').value.trim(), kind=$('cc_kind').value, date=$('cc_date').value||dateStr(new Date());
+    if(!(amount>0)){ toast('金額を入れてください',false); return; }
+    _costBusy=true; setTimeout(()=>{_costBusy=false},1500);
+    const row={id:'tmp_'+Date.now(),case_id:_editId,date,kind,vendor,item,amount,note:''};
+    _costs.push(row); renderCosts();
+    fireAndForget({dept:'cases',action:'save_cost',case_id:_editId,date,kind,vendor,item,amount,note:''});
+    $('cc_vendor').value=''; $('cc_item').value=''; $('cc_amount').value='';
+    const id=_editId; setTimeout(()=>{ if(_editId===id) loadCosts(id); },8000);
+  }
+  function delCost(id){ if(_costBusy)return; const x=_costs.find(r=>String(r.id)===String(id)); if(!x)return; if(!confirm('この行を消しますか？'))return;
+    _costBusy=true; setTimeout(()=>{_costBusy=false},1500);
+    _costs=_costs.filter(r=>String(r.id)!==String(id)); renderCosts();
+    if(!String(id).startsWith('tmp_')) fireAndForget({dept:'cases',action:'delete_cost',id});
+  }
   function openEdit(id){ const c=_find(id); if(!c)return; _editId=id;
+    _costs=[]; renderCosts(); loadCosts(id);
     $('ce_name').value=c.name||''; $('ce_client').value=c.client||''; $('ce_contact').value=c.contact||''; $('ce_our_person').value=c.our_person||'';
     $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; $('ce_status').value=CASE_ST.indexOf(c.status)>=0?c.status:'受注'; $('ce_qa').innerHTML=QuoteAge.forCase(c); $('ce_note').value=c.note||''; $('ce_target_date').value=String(c.target_date||'').slice(0,10); $('ce_amount').value=(c.amount===''||c.amount==null)?'':c.amount;
     const kids=_children[String(id)]||[];
@@ -9486,7 +9544,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp };
 })();
 
 const Alc=(function(){
