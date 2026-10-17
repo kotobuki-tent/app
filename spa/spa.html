@@ -2562,6 +2562,13 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .slog-nm{flex:1;min-width:0;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #view-cases .slog-ch{flex:0 0 auto;color:var(--accent);font-weight:700}
   #view-cases .slog-ts{flex:0 0 auto;color:var(--text-faint);font-size:11px}
+  /* 案件の編集：PC は 2 列（左＝基本の欄、右＝明細・レンタル品・かかったお金・工数）。縦に伸びすぎた（iller 2026-10-17）。携帯は 1 列のまま */
+  #view-cases .ce-mo{max-width:560px}
+  @media(min-width:900px){
+    #view-cases .ce-mo{max-width:1060px}
+    #view-cases .ce-cols{display:grid;grid-template-columns:1fr 1fr;column-gap:32px;align-items:start}
+    #view-cases .ce-col{min-width:0}
+  }
   #view-cases .ce-children{display:flex;flex-direction:column;gap:6px;margin-top:4px}
   #view-cases .ce-child{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);cursor:pointer;font:inherit}
   #view-cases .ce-child:hover{border-color:var(--accent)}
@@ -2679,8 +2686,9 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   <div id="casesBody" style="padding:0 0 80px"></div>
   <datalist id="caseStaffList"></datalist>
   <div class="mo-bg" id="caseEditBg">
-    <div class="mo" style="max-width:560px">
+    <div class="mo ce-mo">
       <h2>案件を編集</h2>
+      <div class="ce-cols"><div class="ce-col">
       <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="ce_client"></div><div class="mo-field f3"><label>窓口</label><input id="ce_contact"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>案件名</label><input id="ce_name"></div></div>
       <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="ce_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>状態</label><select id="ce_status"><option>見積中</option><option>受注</option><option>完了</option><option>見送り</option></select><span id="ce_qa"></span></div></div>
@@ -2688,6 +2696,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <div class="mo-row full"><div class="mo-field"><label>社内納期（目標・仮）<span class="ce-target-note">客の納期ではない／カレンダーに点線で表示</span></label><input type="date" id="ce_target_date"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　一案件＝一金額</label><input type="number" id="ce_amount" min="0" step="1"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
+      </div><div class="ce-col">
       <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div><div id="ce_adddept" class="ce-adddept"></div><div id="ce_rentals"></div></div>
       <div class="mo-field"><label>かかったお金（材料・外注・経費）<span class="ce-target-note">請求書が来たら 1 行。労務費は日報から別に出す</span></label>
         <div id="ce_costs" class="ce-costs"></div>
@@ -2700,6 +2709,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
           <button type="button" class="btn gray" onclick="Cases.addCost()">＋ 追加</button>
         </div>
       </div>
+      </div></div>
       <div class="mo-foot"><button class="cancel" onclick="Cases.closeEdit()">閉じる</button><button class="save" onclick="Cases.saveEdit()">保存</button></div>
     </div>
   </div>
@@ -4132,8 +4142,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-17 11:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1165;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-17 11:15';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1166;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
