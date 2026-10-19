@@ -2429,6 +2429,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <div class="nav-spacer"></div>
     <span class="nav-div"></span>
     <button class="nav-link" id="navCases" onclick="App.nav('cases')">案件</button>
+    <button class="nav-link" id="navPo" onclick="App.nav('po')">発注</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navProd" onclick="App.nav('prod')">生産</button>
     <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
@@ -2632,22 +2633,53 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .sz-parts small{display:block;font-size:11px;font-weight:400;color:var(--text-dim)}
   #view-cases .sz-parts .zero-miss{color:#a32d2d}   /* 0 で未確認＝赤 */
   #view-cases .sz-parts .zero-ok{color:#185fa5}     /* 0 で「なし」の確認済み＝青 */
-  #view-cases .po-head{display:flex;align-items:center;gap:14px;margin:0 0 12px;font-size:14px}
-  #view-cases .po-head .ct-sub{flex:1}
-  #view-cases .po-sub{font-size:13px;color:var(--text-dim);margin:16px 0 8px}
-  #view-cases .po-kind{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-dim)}
-  #view-cases .po-st{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;background:#faeeda;color:#854f0b;margin-right:8px;vertical-align:middle;line-height:1.3;text-align:center}
-  #view-cases .po-st.sent{background:#eaf3de;color:#3b6d11}
-  #view-cases .po-st.cancel{background:var(--surface3);color:var(--text-dim)}
-  #view-cases .po-st small{font-weight:400;font-size:11px}
-  #view-cases .po-ops{white-space:nowrap;text-align:right}
-  #view-cases .po-ops .act-btn{margin-left:6px}
-  #view-cases .po-ops .po-send{background:var(--text);color:#fff;border-color:var(--text)}
-  #view-cases .po-tbl th:nth-child(2){width:110px}
-  #view-cases .po-tbl th:nth-child(4){width:120px}
-  #view-cases .po-tbl th:nth-child(5){width:300px}
-  #view-cases .po-tbl tr{cursor:default}
-  #view-cases .po-mo-sum{background:var(--surface2);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:14px}
+  /* 発注（独立画面、2026-10-19） */
+  #view-po .po-wrap{max-width:1180px;margin:0 auto;padding:12px 16px 40px}
+  #view-po .ct-sub{font-size:12px;color:var(--text-dim);margin-top:2px;font-variant-numeric:tabular-nums}
+  #view-po .po-empty{color:var(--text-dim);font-size:14px;text-align:center;padding:30px 0}
+  #view-po .po-sec{font-size:14px;color:var(--text);margin:18px 0 8px;display:flex;align-items:center;gap:10px}
+  #view-po .po-form{background:var(--surface);border-radius:12px;margin-bottom:6px}
+  #view-po .po-form-hd{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;font-size:15px}
+  #view-po .po-form-hd .ct-sub{flex:1;margin:0}
+  #view-po .po-caret{color:var(--text-faint);font-size:12px}
+  #view-po .po-form-body{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;padding:0 16px 16px;border-top:1px solid var(--border-light);padding-top:12px}
+  #view-po .po-f{display:flex;flex-direction:column;gap:4px;min-width:0}
+  #view-po .po-f.wide{grid-column:1/-1}
+  #view-po .po-f label{font-size:12px;color:var(--text-dim)}
+  #view-po .po-f input,#view-po .po-f select{border:1px solid var(--border);border-radius:8px;padding:8px 10px;font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);min-width:0}
+  #view-po .po-inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  #view-po .po-inline input{flex:1}
+  #view-po .po-tg{border:1px solid var(--border);background:var(--surface2);border-radius:999px;padding:7px 14px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);cursor:pointer}
+  #view-po .po-tg.on{background:var(--text);border-color:var(--text);color:#fff}
+  #view-po .po-item-hd,#view-po .po-item{display:grid;grid-template-columns:1fr 90px 70px 110px 32px;gap:6px;align-items:center}
+  #view-po .po-item-hd{font-size:11px;color:var(--text-faint);padding:2px 0}
+  #view-po .po-item{padding:3px 0}
+  #view-po .po-item input.n{text-align:right}
+  #view-po .po-item-ft{display:flex;justify-content:space-between;align-items:center;padding-top:6px;font-size:14px}
+  #view-po .po-item-ft b{font-variant-numeric:tabular-nums;margin-left:8px}
+  #view-po .po-submit{border:none;border-radius:10px;background:var(--text);color:#fff;padding:11px 22px;font:700 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
+  #view-po .po-card{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.3fr) 170px 200px;gap:16px;background:var(--surface);border-radius:12px;padding:14px 16px;margin-bottom:10px;align-items:start}
+  #view-po .po-vendor{font-size:15px;font-weight:600}
+  #view-po .po-items{font-size:14px;margin:4px 0}
+  #view-po .po-step{border-left:1px solid var(--border-light);padding-left:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
+  #view-po .po-n{font-size:12px;font-weight:700;color:var(--text-dim)}
+  #view-po .po-case{width:100%;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font:400 13px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
+  #view-po .po-kind{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
+  #view-po .po-btn{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:999px;padding:8px 16px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
+  #view-po .po-btn.dark{background:var(--text);border-color:var(--text);color:#fff}
+  #view-po .po-kind-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-dim)}
+  #view-po .po-tblwrap{background:var(--surface);border-radius:12px;overflow:hidden}
+  #view-po .po-tbl{width:100%;border-collapse:collapse}
+  #view-po .po-tbl th{font-size:13px;font-weight:500;color:var(--text-dim);text-align:left;padding:9px 12px;background:var(--surface2)}
+  #view-po .po-tbl th.num{text-align:right}
+  #view-po .po-tbl td{padding:10px 12px;border-top:1px solid var(--border-light);vertical-align:middle;font-size:14px;color:var(--text)}
+  #view-po .po-tbl td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  #view-po .po-ops{white-space:nowrap;text-align:right}
+  #view-po .po-st{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;background:#faeeda;color:#854f0b;margin-right:8px;vertical-align:middle;line-height:1.3;text-align:center}
+  #view-po .po-st.sent{background:#eaf3de;color:#3b6d11}
+  #view-po .po-st.cancel{background:var(--surface3);color:var(--text-dim)}
+  #view-po .po-st small{font-weight:400;font-size:11px}
+  @media(max-width:900px){#view-po .po-card{grid-template-columns:1fr}#view-po .po-step{border-left:none;padding-left:0;border-top:1px solid var(--border-light);padding-top:10px}#view-po .po-form-body{grid-template-columns:1fr}#view-po .po-item-hd,#view-po .po-item{grid-template-columns:1fr 64px 52px 80px 28px}}
   #view-cases .sz-fin{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-dim);vertical-align:1px}
   #view-cases .sz-fin.on{background:#eaf3de;color:#3b6d11}
   #view-cases .sz-after{font-size:11px;font-weight:600;color:#854f0b;margin-top:2px}
@@ -3631,6 +3663,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       </div></div>
       <div class="portal-grp"><div class="portal-cap">仕事</div><div class="portal-rows">
         <a class="portal-card" data-app="cases" onclick="App.nav('cases')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L13 14l-4 1 1-4z"/></svg></div><div class="portal-card-body"><div class="portal-card-title">案件管理</div></div></a>
+        <a class="portal-card" data-app="po" onclick="App.nav('po')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">発注</div></div></a>
         <a class="portal-card" data-app="prod" onclick="App.nav('prod')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V11l6 3.5V11l6 3.5V8l6 4.5V21z"/><path d="M2.5 21h19"/></svg></div><div class="portal-card-body"><div class="portal-card-title">生産管理</div></div></a>
         <a class="portal-card" data-app="proj" onclick="App.nav('proj')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11l10-5 10 5"/><path d="M2 11h20"/><path d="M2.5 11v9M21.5 11v9"/></svg></div><div class="portal-card-body"><div class="portal-card-title">企画制作</div></div></a>
         <a class="portal-card" data-app="sales" onclick="App.nav('sales')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l7-7h7v7l-7 7z"/><circle cx="14.5" cy="9.5" r="1.3"/></svg></div><div class="portal-card-body"><div class="portal-card-title">販売管理</div></div></a>
@@ -3657,6 +3690,12 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   <div class="scr-head"><h1>いないカード</h1></div>
   <div class="card-wrap"><div id="cardBody"></div></div>
   <div id="cardToast" class="card-toast"></div>
+</section>
+
+<!-- ===== 発注 section（2026-10-19）：発注書を書く（事務所でも部長でも）＋未送信の処理。部長の携帯・PC 用の独立ページは hatchu.html ===== -->
+<section id="view-po" class="hidden">
+  <div class="scr-head"><h1>発注</h1></div>
+  <div class="po-wrap"><div id="poBody"><div class="po-empty">読み込み中...</div></div></div>
 </section>
 
 <!-- ===== 予定ボード（ホワイトボード） section ===== -->
@@ -4340,8 +4379,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 17:48';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1202;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 17:59';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1203;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9240,10 +9279,10 @@ const Cases = (function(){
     {k:'sales',      s:'販', n:'販売', c:'#c763b0'}
   ];
   const DEPT=Object.fromEntries(DEPTS.map((d,i)=>[d.k,{s:d.s,n:d.n,c:d.c,o:i}]));
-  const _deepTab=(function(){ try{ const t=new URLSearchParams(location.search).get('tab'); return ['list','todo','cal','saisan','po','done','kill','arch','manage'].includes(t)?t:''; }catch(e){ return ''; } })();   // ?go=cases&tab=po＝発注書の通知のリンク（2026-10-19）
+  const _deepTab=(function(){ try{ const t=new URLSearchParams(location.search).get('tab'); return ['list','todo','cal','saisan','done','kill','arch','manage'].includes(t)?t:''; }catch(e){ return ''; } })();   // ?go=cases&tab=po＝発注書の通知のリンク（2026-10-19）
   let _cases=[], _tab=_deepTab||'list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='', _qexp=false;   // _qexp＝「期限切れ」チップで絞り込み中
   let _profit={}, _profitAt=0, _szPeriod='', _szDept='';
-  let _pos=[], _posAt=0, _poBusy=false;   // 発注書（dept=po、hatchu.html から来る。事務所が発注書を出して送信済にする、2026-10-19）   // 全案件の原価 {case_id:{cost,minutes,labor}}（dept=cases&action=profit）。採算タブが使う（10/19）
+   // 全案件の原価 {case_id:{cost,minutes,labor}}（dept=cases&action=profit）。採算タブが使う（10/19）
   // 完了タブの得意先トグル（大口客を隠して残りを見やすく）。非表示中のキーをlocalStorageに保持
   // 'tsp'＝TSP太陽㈱のみ（TSP東日本・西日本・東北・プラスは含めない）。TSP太陽の商品センターは対象外＝トグルで消さない（illerの指示 09-08）
   const CL_GROUPS=[['tsp','TSP太陽',v=>/TSP\s*太陽/i.test(v)&&!v.includes('商品センター')],['taiyo','太陽工業',v=>v.includes('太陽工業')],['ceres','セレスポ',v=>v.includes('セレスポ')]];
@@ -9455,81 +9494,6 @@ const Cases = (function(){
       +`</tbody></table><div class="tbl-foot"><span>${items.length} 件</span></div></div>`;
     pane.innerHTML=h;
   }
-  // ===== 発注タブ（事務所用、2026-10-19）：hatchu.html で部長（か部下）が書いた発注書。未送信が上。発注書を開いて印刷か PDF で仕入先へ送り「送信済」に＝明細が原価明細に入る
-  async function loadPos(force){ if(!force&&_pos.length&&Date.now()-_posAt<60000) return; try{ const r=await fetch(API+'?dept=po&action=list'); const j=await r.json(); if(j&&j.success){ _pos=j.data||[]; _posAt=Date.now(); } }catch(e){} }
-  const poTotal=p=>(p.items||[]).reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0);
-  function renderPo(pane){
-    if(!_posAt){ pane.innerHTML='<div class="cases-loading">読み込み中...</div>'; loadPos(true).then(()=>{ if(_tab==='po') render(); }); return; }
-    loadPos().then(ch=>{});
-    const yen=v=>'¥'+Math.round(v).toLocaleString('ja-JP'); const d8=v=>{ const d=new Date(String(v||'')); return isNaN(d)?String(v||'').slice(5,16):`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${('0'+d.getMinutes()).slice(-2)}`; };
-    const open=_pos.filter(p=>p.status==='未送信').sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')));
-    const done=_pos.filter(p=>p.status!=='未送信').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,40);
-    const row=p=>`<tr class="po-row${p.status==='未送信'?'':' dim'}"><td><div class="ct-main">${esc(p.vendor||'')} <span class="po-kind">${esc(p.kind||'')}</span></div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):'<span style="color:#854f0b">案件がまだ（注文番号は発注書の番号になる）</span>'}</div></td>`
-      +`<td><div class="ct-main">${esc(p.person||'')}</div><div class="ct-sub">${d8(p.created_at)}</div></td>`
-      +`<td><div class="ct-main">${(p.items||[]).slice(0,3).map(it=>esc(it.name)+(it.qty?' ×'+esc(it.qty)+esc(it.unit||''):'')).join('、')}${(p.items||[]).length>3?' ほか'+((p.items||[]).length-3)+'行':''}</div><div class="ct-sub">${p.deadline?'納期 '+esc(p.deadline)+'　':''}${p.deliver_to&&p.deliver_to!=='弊社'?'納品先 '+esc(p.deliver_to):''}</div></td>`
-      +`<td class="num">${yen(poTotal(p))}</td>`
-      +`<td class="po-ops"><span class="po-st${p.status==='送信済'?' sent':p.status==='取消'?' cancel':''}">${esc(p.status)}${p.status==='送信済'&&p.sent_at?'<br><small>'+d8(p.sent_at)+(p.sent_by?' '+esc(p.sent_by):'')+'</small>':''}</span>`
-      +`<button type="button" class="act-btn" onclick="Cases.poPrint('${esc(p.id)}')">発注書</button>`
-      +(p.status==='未送信'?`<button type="button" class="act-btn po-send" onclick="Cases.poSendOpen('${esc(p.id)}')">案件・送信済</button><button type="button" class="act-btn del" onclick="Cases.poCancel('${esc(p.id)}')">取消</button>`:'')+`</td></tr>`;
-    const tbl=rows=>`<div class="sz-wrap"><table class="sz-tbl po-tbl"><thead><tr><th>宛先・案件</th><th>記入者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${rows.map(row).join('')}</tbody></table></div>`;
-    let h=`<div class="po-head"><span>未送信 <b>${open.length}</b> 件</span><span class="ct-sub">「発注書を書く」で誰でも書ける（部長も、事務所も）。届いたら案件を付けて発注書を開き、仕入先へ送って「送信済」に</span><a class="act-btn" href="../hatchu.html" target="_blank" rel="noopener">発注書を書く</a><button type="button" class="act-btn" onclick="Cases.poReload()">更新</button></div>`;
-    h+=open.length?tbl(open):'<div class="cases-empty">未送信の発注書はありません</div>';
-    if(done.length) h+='<div class="po-sub">送信済・取消（直近）</div>'+tbl(done);
-    pane.innerHTML=h;
-  }
-  function poReload(){ _posAt=0; render(); }
-  // 送信済にする：案件と区分はここで事務所が決める（iller 10/19「受け取るたびに何の案件か聞けばいい」）。案件を付けなければ在庫・共用＝原価明細に入れない
-  let _poSendId='', _poKind='材料';
-  function poSendOpen(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; _poSendId=id; _poKind=p.kind||'材料';
-    let bg=$('poSendBg'); if(!bg){ bg=document.createElement('div'); bg.id='poSendBg'; bg.className='mo-bg'; bg.innerHTML=`<div class="mo" style="max-width:520px"><h2>送信済にする<button type="button" class="act-btn" onclick="Cases.poSendClose()">閉じる</button></h2>
-      <div class="po-mo-sum" id="poSendSum"></div>
-      <div class="mo-field"><label>案件（聞いた案件。付けなければ在庫・共用）</label><input id="poSendCase" list="poSendCaseList" placeholder="案件名・得意先・受注番号で検索" autocomplete="off"><datalist id="poSendCaseList"></datalist></div>
-      <div class="mo-field" style="margin-top:10px"><label>区分</label><div class="sub-tabs" style="padding:0"><button type="button" class="sub-tab on" id="poKind材料" onclick="Cases.poSetKind('材料')">材料</button><button type="button" class="sub-tab" id="poKind外注" onclick="Cases.poSetKind('外注')">外注</button><button type="button" class="sub-tab" id="poKind経費" onclick="Cases.poSetKind('経費')">経費</button></div></div>
-      <div class="ce-target-note" style="margin-top:8px">先に案件を付けると発注書の注文番号が受注番号になる。仕入先へ送ってから「送信済」。案件を付けた送信済は明細がその案件の原価明細に入る（金額は単価 × 数量、請求書が来たら直す）</div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap"><button type="button" class="act-btn" onclick="Cases.poAssign()">案件だけ付ける</button><span style="flex:1"></span><button type="button" class="act-btn" onclick="Cases.poSendGo(false)">付けずに送信済</button><button type="button" class="act-btn po-send" onclick="Cases.poSendGo(true)">案件に付けて送信済</button></div></div>`; document.body.appendChild(bg); bg.addEventListener('click',e=>{ if(e.target===bg) poSendClose(); }); }
-    const live=_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り'); $('poSendCaseList').innerHTML=live.map(c=>`<option value="${esc((c.order_no?'#'+c.order_no+' ':'')+dispName(c.client,c.name))}">`).join('');
-    $('poSendSum').innerHTML=`<b>${esc(p.vendor||'')}</b>　${esc(p.person||'')}<br><span class="ct-sub">${(p.items||[]).map(it=>esc(it.name)+(it.qty?' ×'+esc(it.qty)+esc(it.unit||''):'')).join('、')}</span>`;
-    $('poSendCase').value=p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):''; poSetKind(_poKind); bg.querySelector('h2').firstChild.textContent=p.status==='未送信'?'案件と区分・送信済にする':'案件と区分'; bg.classList.add('show'); setTimeout(()=>$('poSendCase').focus(),50); }
-  function poPickCase(){ const v=$('poSendCase').value.trim(); if(!v) return null; const live=_cases.filter(x=>!_arch(x.archived)&&x.status!=='完了'&&x.status!=='見送り'); return live.find(x=>((x.order_no?'#'+x.order_no+' ':'')+dispName(x.client,x.name))===v)||live.find(x=>dispName(x.client,x.name)===v)||null; }
-  // 案件と区分だけ付ける（送信済にはしない）。発注書を開く前に付ければ注文番号が受注番号になる（iller 10/19「注文番号どこで編集するんだよ」）
-  function poAssign(){ if(_poBusy)return; const id=_poSendId; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; const c=poPickCase(); if($('poSendCase').value.trim()&&!c){ toast('案件を一覧から選択してください',true); return; }
-    _poBusy=true; setTimeout(()=>{_poBusy=false},1500); p.kind=_poKind; if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=''; p.order_no=''; }
-    fireAndForget({dept:'po',action:'save',id,case_id:p.case_id,case_name:p.case_name,order_no:p.order_no,kind:p.kind}); Pending.touch(); toast(c?'案件を付けました：'+p.case_name:'案件を外しました'); poSendClose(); render(); setTimeout(()=>{ _posAt=0; },8000); }
-  function poSendClose(){ const bg=$('poSendBg'); if(bg) bg.classList.remove('show'); }
-  function poSetKind(k){ _poKind=k; ['材料','外注','経費'].forEach(x=>{ const b=$('poKind'+x); if(b) b.classList.toggle('on',x===k); }); }
-  function poSendGo(attach){ if(_poBusy)return; const id=_poSendId; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return;
-    let c=null; if(attach){ c=poPickCase(); if(!c){ toast('案件を一覧から選択してください',true); return; } }
-    _poBusy=true; setTimeout(()=>{_poBusy=false},1500); const me=(window.__woffUser&&window.__woffUser.name)||'';
-    p.status='送信済'; p.sent_at=new Date().toISOString(); p.sent_by=me; p.kind=_poKind; if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=''; p.order_no=''; }
-    fireAndForget({dept:'po',action:'send',id,sent_by:me,case_id:c?c.id:'',case_name:c?p.case_name:'',order_no:c?(c.order_no||''):'',kind:_poKind}); Pending.touch(); toast(c?'送信済にしました（'+p.case_name+' の原価明細へ）':'送信済にしました（案件には付けません）'); poSendClose(); render();
-    setTimeout(()=>{ _posAt=0; _profitAt=0; if(_tab==='po') render(); },8000); }
-  function poCancel(id){ if(_poBusy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(!confirm('この発注書を取り消しますか？'))return;
-    _poBusy=true; setTimeout(()=>{_poBusy=false},1500); p.status='取消'; fireAndForget({dept:'po',action:'cancel',id}); Pending.touch(); toast('取り消しました'); render(); setTimeout(()=>{ _posAt=0; },8000); }
-  // 発注書を別窓で（A4、印刷か PDF）。紙の 発注書.pdf と同じ形
-  function poPrint(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return;
-    const w=window.open('','_blank'); if(!w){ toast('ポップアップがブロックされました。許可してもう一度押してください',true); return; }
-    const t=new Date(), ds=t.getFullYear()+' 年 '+(t.getMonth()+1)+' 月 '+t.getDate()+' 日'; const items=(p.items||[]).slice(); while(items.length<10) items.push({});
-    const yen=v=>Math.round(v).toLocaleString('ja-JP'); const dl=p.deadline==='最短'?'最短':(p.deadline?String(p.deadline).replace(/-/g,'/'):'　');
-    const rows=items.map((it,i)=>`<tr><td class="c">${i+1}</td><td>${esc(it.name||'')}</td><td class="num">${it.qty!=null&&it.qty!==''?esc(it.qty):''}</td><td class="c">${esc(it.unit||'')}</td><td class="num">${it.price!=null&&it.price!==''?yen(Number(it.price)||0):''}</td><td class="num">${it.name&&it.qty&&it.price?yen((Number(it.qty)||0)*(Number(it.price)||0)):''}</td></tr>`).join('');
-    const html=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>発注書 ${esc(p.vendor||'')}</title><style>
-@page{size:A4;margin:22mm}html{background:#fff}body{font-family:"Hiragino Mincho ProN",serif;font-size:10.5pt;line-height:1.25;color:#000;margin:0;background:#fff;color-scheme:light}
-h1{font-size:16pt;font-weight:bold;text-align:center;margin:0 0 6mm;letter-spacing:.5em}.row{display:flex;justify-content:space-between;align-items:flex-start}
-.to{font-size:13pt;border-bottom:1px solid #000;padding:0 2mm 2mm;min-width:80mm;margin-top:3mm}.meta{border-collapse:collapse;margin-right:1px}.meta td,.meta th{padding:2mm 3mm;border:1px solid #000;font-size:10pt}.meta th{background:#eee;font-weight:normal;white-space:nowrap}.meta td{min-width:42mm}
-.lead{margin:5mm 0 3mm}.case{margin-top:3mm;border:1px solid #000;padding:4mm 3mm;font-size:11pt;width:calc(100% - 1px);display:flex;justify-content:space-between}.case b{font-weight:bold}
-table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.items th{border:1px solid #000;background:#eee;font-weight:normal;font-size:10pt;padding:1.5mm 2mm}.items td{border:1px solid #000;font-size:10pt;padding:0 2mm;height:8.5mm}
-.num{text-align:right}.c{text-align:center}.cond{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.cond td,.cond th{padding:2mm 3mm;border:1px solid #000;font-size:10pt;vertical-align:top}.cond th{background:#eee;font-weight:normal;white-space:nowrap;width:22mm}
-.note{font-size:10pt;margin-top:4mm}.foot{width:100%;margin-top:8mm;border-collapse:collapse}.co{font-size:10pt;line-height:1.5}.co .n{font-size:12pt;font-weight:bold}
-.bar{position:fixed;top:0;left:0;right:0;background:#1c1c1e;color:#fff;padding:10px 16px;font:600 14px/1 -apple-system,'Hiragino Sans',sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between}.bar button{border:none;border-radius:8px;padding:8px 14px;font:600 14px/1 inherit;background:#fff;color:#1c1c1e}
-@media print{.bar{display:none}}@media screen{body{padding:60px 22mm 22mm;max-width:210mm;margin:0 auto}}
-</style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}　${esc(p.case_name||'')}</span><button onclick="window.print()">印刷／PDF</button></div>
-<h1>発注書</h1><div class="row"><div class="to">${esc(p.vendor||'')}　御中</div><table class="meta"><tr><th>注文番号</th><td>${esc(p.order_no||p.id||'')}</td></tr><tr><th>発注日</th><td>${ds}</td></tr></table></div>
-<p class="lead">下記のとおり発注します。</p><div class="case"><span><b>件名</b>　${esc(p.case_name||((p.items||[])[0]&&(p.items||[])[0].name)||'')}</span><span><b>担当</b>　${esc(p.person||'')}</span></div>
-<table class="items"><tr><th style="width:8mm">No</th><th>品名・品番・仕様</th><th style="width:16mm">数量</th><th style="width:12mm">単位</th><th style="width:24mm">単価</th><th style="width:28mm">金額（税抜）</th></tr>${rows}<tr><td colspan="5" class="num">合計（税抜）</td><td class="num">${yen(poTotal(p))} 円</td></tr></table>
-<table class="cond"><tr><th>納期</th><td style="white-space:nowrap">${esc(dl)}</td><th>納品先</th><td>${esc(p.deliver_to||'弊社')}</td></tr><tr><th>支払</th><td colspan="3">20 日締め／翌月 15 日払い</td></tr><tr><th>備考</th><td colspan="3" style="height:12mm">${esc(p.note||'')}</td></tr></table>
-<p class="note">納品書・請求書に上記の<b>注文番号</b>をご記載いただけますと幸いです。</p>
-<table class="foot"><tr><td class="co" style="vertical-align:bottom"><span class="n">有限会社寿テント</span><br>〒689-2102　鳥取県東伯郡北栄町国坂104-2<br>TEL 0858-36-2811　FAX 0858-36-2863　mail kt-info@kototen.com</td><td class="co" style="text-align:right;vertical-align:bottom;white-space:nowrap">発注者印<br><span style="display:inline-block;width:18mm;height:18mm;border:1px solid #000"></span></td></tr></table>
-</body></html>`;
-    w.document.open(); w.document.write(html); w.document.close(); }
   function setSzPeriod(v){ _szPeriod=v; render(); }
   function setSzDept(v){ _szDept=v; render(); }
   function fillProfit(){ document.querySelectorAll('#casesPane tr[data-cid]').forEach(tr=>{ const c=_find(tr.getAttribute('data-cid')); const old=tr.querySelector('.ct-cost'); if(!c||!old) return; const t=document.createElement('tr'); t.innerHTML=profitCells(c); const cells=t.querySelectorAll('td'); ['.ct-cost','.ct-gp','.ct-gpr'].forEach((k,i)=>{ const o=tr.querySelector(k); o.className=cells[i].className; o.innerHTML=cells[i].innerHTML; }); }); }
@@ -9537,7 +9501,7 @@ table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.item
   // ===== 案件タブ：登録 / 一覧 / 完了 / アーカイブ / 管理 =====
   function render(){
     const _tc=todoCount();
-    const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['cal','カレンダー'],['saisan','採算'],['po','発注'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
+    const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['cal','カレンダー'],['saisan','採算'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
     // 大見出し：名前・検索（名前はポータルと同じ。日付は出さない＝10/16 揃え）
     const head=`<div class="scr-head"><h1>案件管理</h1>`
       +`<input class="scr-search" id="casesSearch" placeholder="案件名・得意先・担当で検索" value="${esc(_q)}" oninput="Cases.search(this.value)">`
@@ -9560,7 +9524,6 @@ table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.item
     let rows=_cases.slice();
     if(t==='cal'){ renderCalendar(pane); return; }
     if(t==='saisan'){ renderSaisan(pane); return; }
-    if(t==='po'){ renderPo(pane); return; }
     if(t==='todo'){
       rows=rows.filter(c=>caseFlags(c).length>0);
       const sev=c=>{const f=caseFlags(c); return f.some(x=>x.lv==='hi')?0:f.some(x=>x.lv==='mid')?1:2;};
@@ -10017,7 +9980,131 @@ table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.item
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal, poSendOpen, poSendClose, poSetKind, poSendGo, poAssign, poCancel, poPrint, poReload };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal };
+})();
+
+// ===== 発注（2026-10-19）：発注書を書く（記入者・宛先・明細・納期・納品先・備考）→ シート purchase_orders に未送信 → ① 案件と区分 → ② 発注書を開いて送る → ③ 送信済（案件を付けていれば原価明細へ）
+// iller「案件になんでもかんでも乗っけすぎ」「あっちこっち行ったり来たり」＝案件管理から出して独立した画面に。書く欄も同じ画面に。部長の携帯・PC 用は hatchu.html（同じ GAS dept=po）
+const Po = (function(){
+  const KINDS=['材料','外注','経費'];
+  let _pos=[], _posAt=0, _cases=[], _staff=[], _busy=false, _items=[{name:'',qty:'',unit:'',price:''}], _asap=false, _deliv='弊社', _formOpen=true;
+  const $=id=>document.getElementById(id);
+  const _arch=v=>v===true||v==='true'||v==='TRUE';
+  const yen=v=>'¥'+Math.round(Number(v)||0).toLocaleString('ja-JP');
+  const d8=v=>{ const d=new Date(String(v||'')); return isNaN(d)?String(v||'').slice(5,16):`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${('0'+d.getMinutes()).slice(-2)}`; };
+  const total=p=>(p.items||[]).reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0);
+  const itemsTxt=p=>(p.items||[]).map(it=>esc(it.name)+(it.qty?' ×'+esc(it.qty)+esc(it.unit||''):'')).join('、');
+  function send(body){ Pending.touch(); fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)}); }
+  function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>{_busy=false},1500); return false; }
+  async function loadAll(){
+    try{
+      const [po,cs,st]=await Promise.all([
+        fetch(API+'?dept=po&action=list&nocache='+Date.now()).then(r=>r.json()).catch(()=>({})),   // 発注書は控えを使わない（届いたらすぐ見たい）
+        fetch(API+'?dept=cases&action=read').then(r=>r.json()).catch(()=>({})),
+        fetch(API+'?dept=daily&action=staff_for_daily').then(r=>r.json()).catch(()=>({}))]);
+      if(po&&po.success){ _pos=po.data||[]; _posAt=Date.now(); }
+      if(cs&&cs.data) _cases=cs.data;
+      if(st&&st.staff) _staff=st.staff.map(x=>x.name).filter(Boolean);
+    }catch(e){}
+    const typing=document.activeElement&&/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)&&document.activeElement.closest('#view-po');
+    if(!typing) render();
+  }
+  const liveCases=()=>_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
+  const caseLabel=c=>(c.order_no?'#'+c.order_no+' ':'')+dispName(c.client,c.name);
+  function caseOf(v){ v=String(v||'').trim(); if(!v) return null; const live=liveCases(); return live.find(x=>caseLabel(x)===v)||live.find(x=>dispName(x.client,x.name)===v)||null; }
+  function render(){
+    const el=$('poBody'); if(!el)return;
+    const open=_pos.filter(p=>p.status==='未送信').sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')));
+    const done=_pos.filter(p=>p.status!=='未送信').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,40);
+    const me=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_person')||'';
+    // 書く欄
+    const form=`<div class="po-form${_formOpen?'':' closed'}"><div class="po-form-hd" onclick="Po.toggleForm()"><b>発注書を書く</b><span class="ct-sub">宛先と品名だけで送れる。単価は分かれば。案件は下の ① で付ける</span><span class="po-caret">${_formOpen?'▲':'▼'}</span></div>
+      ${_formOpen?`<div class="po-form-body">
+      <div class="po-f"><label>記入者</label><select id="pf_person">${['<option value="">選択</option>'].concat(_staff.map(n=>`<option${n===me?' selected':''}>${esc(n)}</option>`)).join('')}${me&&!_staff.includes(me)?`<option selected>${esc(me)}</option>`:''}</select></div>
+      <div class="po-f"><label>宛先</label><input id="pf_vendor" list="poVendorList" placeholder="仕入先" autocomplete="off"><datalist id="poVendorList">${[...new Set(_pos.map(p=>p.vendor).filter(Boolean))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>
+      <div class="po-f wide"><label>明細</label><div class="po-item-hd"><span>品名・品番・仕様</span><span>数量</span><span>単位</span><span>単価</span><span></span></div>
+        ${_items.map((it,i)=>`<div class="po-item"><input placeholder="品名" value="${esc(it.name)}" oninput="Po.upd(${i},'name',this.value)"><input class="n" type="number" inputmode="decimal" placeholder="数量" value="${esc(it.qty)}" oninput="Po.upd(${i},'qty',this.value)"><input placeholder="単位" value="${esc(it.unit)}" oninput="Po.upd(${i},'unit',this.value)"><input class="n" type="number" inputmode="numeric" placeholder="単価" value="${esc(it.price)}" oninput="Po.upd(${i},'price',this.value)"><button type="button" class="act-btn del" onclick="Po.delItem(${i})">✕</button></div>`).join('')}
+        <div class="po-item-ft"><button type="button" class="act-btn" onclick="Po.addItem()">＋ 行を追加</button><span>合計（税抜）<b id="pf_total">${yen(_items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0))}</b></span></div></div>
+      <div class="po-f"><label>納期</label><div class="po-inline"><input type="date" id="pf_deadline" ${_asap?'disabled':''}><button type="button" class="po-tg${_asap?' on':''}" onclick="Po.toggleAsap()">最短</button></div></div>
+      <div class="po-f"><label>納品先</label><div class="po-inline"><button type="button" class="po-tg${_deliv==='弊社'?' on':''}" onclick="Po.setDeliv('弊社')">弊社</button><button type="button" class="po-tg${_deliv==='別途'?' on':''}" onclick="Po.setDeliv('別途')">別途</button><input id="pf_deliver_to" placeholder="納品先" style="${_deliv==='別途'?'':'display:none'}"></div></div>
+      <div class="po-f wide"><label>備考</label><input id="pf_note" placeholder="空欄可"></div>
+      <div class="po-f wide" style="text-align:right"><button type="button" class="po-submit" onclick="Po.submit()">発注書を出す</button></div>
+      </div>`:''}</div>`;
+    const caseOpts=liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('');
+    const card=p=>`<div class="po-card" data-id="${esc(p.id)}">
+      <div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${p.deadline?'納期 '+esc(p.deadline)+'　':''}${p.deliver_to&&p.deliver_to!=='弊社'?'納品先 '+esc(p.deliver_to)+'　':''}${p.note?'備考 '+esc(p.note)+'　':''}合計 ${yen(total(p))}</div></div>
+      <div class="po-step"><div class="po-n">① 案件と区分</div><input class="po-case" list="poCaseList" placeholder="案件を検索（付けないなら空）" value="${esc(p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'')}" onchange="Po.assign('${esc(p.id)}')"><select class="po-kind" onchange="Po.assign('${esc(p.id)}')">${KINDS.map(k=>`<option${(p.kind||'材料')===k?' selected':''}>${k}</option>`).join('')}</select><div class="ct-sub po-case-st">${p.case_name?'注文番号 '+esc(p.order_no||p.id):'案件なし＝在庫・共用。注文番号は '+esc(p.id)}</div></div>
+      <div class="po-step"><div class="po-n">② 発注書</div><button type="button" class="po-btn" onclick="Po.print('${esc(p.id)}')">開いて送る</button><div class="ct-sub">印刷して FAX か、PDF でメール</div></div>
+      <div class="po-step"><div class="po-n">③ 送ったら</div><button type="button" class="po-btn dark" onclick="Po.markSent('${esc(p.id)}')">送信済にする</button><button type="button" class="act-btn del" onclick="Po.cancel('${esc(p.id)}')">取消</button><div class="ct-sub po-send-st">${p.case_name?'原価明細に入る':'原価明細には入れない'}</div></div></div>`;
+    const row=p=>`<tr><td><div class="po-vendor">${esc(p.vendor||'')} <span class="po-kind-tag">${esc(p.kind||'')}</span></div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):'案件なし'}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><span class="po-st${p.status==='送信済'?' sent':' cancel'}">${esc(p.status)}${p.status==='送信済'&&p.sent_at?'<br><small>'+d8(p.sent_at)+(p.sent_by?' '+esc(p.sent_by):'')+'</small>':''}</span><button type="button" class="act-btn" onclick="Po.print('${esc(p.id)}')">発注書</button></td></tr>`;
+    let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+form;
+    h+=`<div class="po-sec"><b>未送信</b> ${open.length} 件 <button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
+    h+=open.length?open.map(card).join(''):'<div class="po-empty">未送信の発注書はありません</div>';
+    if(done.length) h+=`<div class="po-sec">送信済・取消（直近）</div><div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>宛先・案件</th><th>記入者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${done.map(row).join('')}</tbody></table></div>`;
+    el.innerHTML=h;
+  }
+  function toggleForm(){ _formOpen=!_formOpen; render(); }
+  function upd(i,k,v){ if(_items[i]) _items[i][k]=v; const t=$('pf_total'); if(t) t.textContent=yen(_items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0)); }
+  function addItem(){ _items.push({name:'',qty:'',unit:'',price:''}); keepForm(); render(); }
+  function delItem(i){ _items.splice(i,1); if(!_items.length)_items.push({name:'',qty:'',unit:'',price:''}); keepForm(); render(); }
+  let _keep={};
+  function keepForm(){ _keep={person:$('pf_person')&&$('pf_person').value,vendor:$('pf_vendor')&&$('pf_vendor').value,deadline:$('pf_deadline')&&$('pf_deadline').value,deliver_to:$('pf_deliver_to')&&$('pf_deliver_to').value,note:$('pf_note')&&$('pf_note').value}; setTimeout(()=>{ Object.keys(_keep).forEach(k=>{ const el=$('pf_'+k); if(el&&_keep[k]!=null) el.value=_keep[k]; }); },0); }
+  function toggleAsap(){ _asap=!_asap; keepForm(); render(); }
+  function setDeliv(v){ _deliv=v; keepForm(); render(); }
+  function submit(){ if(_busy)return;
+    const person=$('pf_person').value; if(!person){ toast('記入者を選択してください',true); return; }
+    const vendor=$('pf_vendor').value.trim(); if(!vendor){ toast('宛先を入力してください',true); return; }
+    const rows=_items.filter(it=>String(it.name||'').trim()); if(!rows.length){ toast('品名を入力してください',true); return; }
+    if(guard())return; try{ localStorage.setItem('po_person',person); }catch(e){}
+    const body={dept:'po',action:'save',person,vendor,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline:_asap?'最短':($('pf_deadline').value||''),deliver_to:_deliv==='別途'?$('pf_deliver_to').value.trim():'弊社',note:$('pf_note').value.trim()};
+    send(body);
+    _pos.push({id:'tmp_'+Date.now(),created_at:new Date().toISOString(),status:'未送信',person,vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,kind:'材料'});
+    _items=[{name:'',qty:'',unit:'',price:''}]; _asap=false; _deliv='弊社'; toast('発注書を出しました。下の ①→②→③ へ'); render();
+    setTimeout(loadAll,8000);
+  }
+  function assign(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(!el)return; const v=el.querySelector('.po-case').value.trim(), kind=el.querySelector('.po-kind').value; const c=caseOf(v);
+    if(v&&!c){ toast('案件は候補から選択してください',true); return; }
+    if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
+    p.kind=kind; if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=''; p.order_no=''; }
+    send({dept:'po',action:'save',id,case_id:p.case_id,case_name:p.case_name,order_no:p.order_no,kind:p.kind});
+    el.querySelector('.po-case-st').textContent=c?('注文番号 '+(p.order_no||p.id)):('案件なし＝在庫・共用。注文番号は '+p.id); el.querySelector('.po-send-st').textContent=c?'原価明細に入る':'原価明細には入れない'; }
+  function markSent(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
+    const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(el){ const v=el.querySelector('.po-case').value.trim(); if(v&&!caseOf(v)){ toast('案件は候補から選択してください',true); return; } assign(id); }
+    if(!confirm(p.case_name?`仕入先へ送りましたか？\n送信済にして、明細を ${p.case_name} の原価明細（${p.kind||'材料'}）に入れます。`:'仕入先へ送りましたか？\n案件なし（在庫・共用）なので原価明細には入れません。'))return;
+    if(guard())return; const me=(window.__woffUser&&window.__woffUser.name)||'';
+    p.status='送信済'; p.sent_at=new Date().toISOString(); p.sent_by=me;
+    send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:p.kind||'材料'}); toast(p.case_name?'送信済にしました（'+p.case_name+' の原価明細へ）':'送信済にしました（案件には付けません）'); render();
+    setTimeout(loadAll,8000); }
+  function cancel(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; } if(!confirm('この発注書を取り消しますか？'))return; if(guard())return;
+    p.status='取消'; send({dept:'po',action:'cancel',id}); toast('取り消しました'); render(); setTimeout(loadAll,8000); }
+  function reload(){ loadAll(); }
+  // 発注書を別窓で（A4、印刷か PDF）。紙の 発注書.pdf と同じ形。注文番号＝案件を付けていれば受注番号、無ければ発注書の番号
+  function print(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return;
+    const w=window.open('','_blank'); if(!w){ toast('ポップアップがブロックされました。許可してもう一度押してください',true); return; }
+    const t=new Date(), ds=t.getFullYear()+' 年 '+(t.getMonth()+1)+' 月 '+t.getDate()+' 日'; const items=(p.items||[]).slice(); while(items.length<10) items.push({});
+    const n=v=>Math.round(v).toLocaleString('ja-JP'); const dl=p.deadline==='最短'?'最短':(p.deadline?String(p.deadline).replace(/-/g,'/'):'　');
+    const rows=items.map((it,i)=>`<tr><td class="c">${i+1}</td><td>${esc(it.name||'')}</td><td class="num">${it.qty!=null&&it.qty!==''?esc(it.qty):''}</td><td class="c">${esc(it.unit||'')}</td><td class="num">${it.price!=null&&it.price!==''?n(Number(it.price)||0):''}</td><td class="num">${it.name&&it.qty&&it.price?n((Number(it.qty)||0)*(Number(it.price)||0)):''}</td></tr>`).join('');
+    const html=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>発注書 ${esc(p.vendor||'')}</title><style>
+@page{size:A4;margin:22mm}html{background:#fff}body{font-family:"Hiragino Mincho ProN",serif;font-size:10.5pt;line-height:1.25;color:#000;margin:0;background:#fff;color-scheme:light}
+h1{font-size:16pt;font-weight:bold;text-align:center;margin:0 0 6mm;letter-spacing:.5em}.row{display:flex;justify-content:space-between;align-items:flex-start}
+.to{font-size:13pt;border-bottom:1px solid #000;padding:0 2mm 2mm;min-width:80mm;margin-top:3mm}.meta{border-collapse:collapse;margin-right:1px}.meta td,.meta th{padding:2mm 3mm;border:1px solid #000;font-size:10pt}.meta th{background:#eee;font-weight:normal;white-space:nowrap}.meta td{min-width:42mm}
+.lead{margin:5mm 0 3mm}.case{margin-top:3mm;border:1px solid #000;padding:4mm 3mm;font-size:11pt;width:calc(100% - 1px);display:flex;justify-content:space-between}.case b{font-weight:bold}
+table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.items th{border:1px solid #000;background:#eee;font-weight:normal;font-size:10pt;padding:1.5mm 2mm}.items td{border:1px solid #000;font-size:10pt;padding:0 2mm;height:8.5mm}
+.num{text-align:right}.c{text-align:center}.cond{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.cond td,.cond th{padding:2mm 3mm;border:1px solid #000;font-size:10pt;vertical-align:top}.cond th{background:#eee;font-weight:normal;white-space:nowrap;width:22mm}
+.note{font-size:10pt;margin-top:4mm}.foot{width:100%;margin-top:8mm;border-collapse:collapse}.co{font-size:10pt;line-height:1.5}.co .n{font-size:12pt;font-weight:bold}
+.bar{position:fixed;top:0;left:0;right:0;background:#1c1c1e;color:#fff;padding:10px 16px;font:600 14px/1 -apple-system,'Hiragino Sans',sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between}.bar button{border:none;border-radius:8px;padding:8px 14px;font:600 14px/1 inherit;background:#fff;color:#1c1c1e}
+@media print{.bar{display:none}}@media screen{body{padding:60px 22mm 22mm;max-width:210mm;margin:0 auto}}
+</style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}　${esc(p.case_name||'')}</span><button onclick="window.print()">印刷／PDF</button></div>
+<h1>発注書</h1><div class="row"><div class="to">${esc(p.vendor||'')}　御中</div><table class="meta"><tr><th>注文番号</th><td>${esc(p.order_no||p.id||'')}</td></tr><tr><th>発注日</th><td>${ds}</td></tr></table></div>
+<p class="lead">下記のとおり発注します。</p><div class="case"><span><b>件名</b>　${esc(p.case_name||((p.items||[])[0]&&(p.items||[])[0].name)||'')}</span><span><b>担当</b>　${esc(p.person||'')}</span></div>
+<table class="items"><tr><th style="width:8mm">No</th><th>品名・品番・仕様</th><th style="width:16mm">数量</th><th style="width:12mm">単位</th><th style="width:24mm">単価</th><th style="width:28mm">金額（税抜）</th></tr>${rows}<tr><td colspan="5" class="num">合計（税抜）</td><td class="num">${n(total(p))} 円</td></tr></table>
+<table class="cond"><tr><th>納期</th><td style="white-space:nowrap">${esc(dl)}</td><th>納品先</th><td>${esc(p.deliver_to||'弊社')}</td></tr><tr><th>支払</th><td colspan="3">20 日締め／翌月 15 日払い</td></tr><tr><th>備考</th><td colspan="3" style="height:12mm">${esc(p.note||'')}</td></tr></table>
+<p class="note">納品書・請求書に上記の<b>注文番号</b>をご記載いただけますと幸いです。</p>
+<table class="foot"><tr><td class="co" style="vertical-align:bottom"><span class="n">有限会社寿テント</span><br>〒689-2102　鳥取県東伯郡北栄町国坂104-2<br>TEL 0858-36-2811　FAX 0858-36-2863　mail kt-info@kototen.com</td><td class="co" style="text-align:right;vertical-align:bottom;white-space:nowrap">発注者印<br><span style="display:inline-block;width:18mm;height:18mm;border:1px solid #000"></span></td></tr></table>
+</body></html>`;
+    w.document.open(); w.document.write(html); w.document.close(); }
+  function init(){}
+  return { loadAll, render, init, toggleForm, upd, addItem, delItem, toggleAsap, setDeliv, submit, assign, markSent, cancel, reload, print };
 })();
 
 const Alc=(function(){
@@ -10753,6 +10840,7 @@ const App = {
   // zone=アクセス判定＋表示。dispZone=表示だけ別ゾーンにしたい時（例:カードはfloorで遷移可・ナビ非表示）。kiosk:true=点検モードに出す
   REG:[
     {key:'cases',ns:()=>Cases,section:'view-cases',nav:'navCases',zone:'office'},
+    {key:'po',ns:()=>Po,section:'view-po',nav:'navPo',zone:'office'},   // 発注（2026-10-19）
     {key:'prod', ns:()=>Prod, section:'view-prod', nav:'navProd',zone:'field'},
     {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj',zone:'field'},
     {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv',zone:'office'},
