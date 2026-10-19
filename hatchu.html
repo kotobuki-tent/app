@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>発注書 – 業務管理</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='56' fill='%231c1c1e'/><text x='90' y='128' text-anchor='middle' font-family='sans-serif' font-weight='700' font-size='100' fill='%23ffffff'>発</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='10' fill='%231c1c1e'/><text x='16' y='23' text-anchor='middle' font-family='sans-serif' font-weight='700' font-size='18' fill='%23ffffff'>発</text></svg>">
+<meta name="theme-color" content="#f2f2f7">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;background:#f2f2f7;color:#1c1c1e;min-height:100vh;min-height:100dvh;-webkit-text-size-adjust:100%}
+.hdr{padding:18px 18px 6px;display:flex;align-items:baseline;justify-content:space-between}
+.hdr h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+.hdr .sub{font-size:13px;color:#6e6e73}
+.main{padding:8px 14px 120px;max-width:560px;margin:0 auto}
+.card{background:#fff;border-radius:14px;padding:4px 16px;margin-bottom:12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #e5e5ea;min-height:50px}
+.row:last-child{border-bottom:none}
+.row label{font-size:15px;color:#1c1c1e;flex:0 0 auto}
+.row input,.row select,.row textarea{flex:1;border:none;background:transparent;text-align:right;font:400 16px/1.3 -apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;color:#0a63c9;min-width:0}
+.row input::placeholder,.row textarea::placeholder{color:#aeaeb2}
+.row input:focus,.row select:focus,.row textarea:focus{outline:none}
+.row select{-webkit-appearance:none;appearance:none;direction:rtl}
+.row textarea{text-align:left;direction:ltr;min-height:44px;resize:none}
+.row.col{flex-direction:column;align-items:stretch;gap:6px}
+.row.col input,.row.col textarea{text-align:left}
+.seg{display:flex;background:#e5e5ea;border-radius:9px;padding:2px}
+.seg button{flex:1;border:none;background:transparent;border-radius:7px;padding:7px 12px;font:600 14px/1 -apple-system,'Hiragino Sans',sans-serif;color:#1c1c1e}
+.seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.hint{font-size:12px;color:#8e8e93;padding:2px 2px 10px}
+.cases{max-height:220px;overflow:auto;border-top:1px solid #e5e5ea;margin:0 -16px;padding:0 16px}
+.cases div{padding:10px 0;border-bottom:1px solid #f2f2f7;font-size:14px}
+.cases div b{font-weight:600}
+.cases div small{display:block;color:#6e6e73;font-size:12px}
+.picked{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.picked b{font-size:15px;font-weight:600}
+.picked small{color:#6e6e73;font-size:12px;display:block}
+.picked button{border:none;background:#e5e5ea;color:#1c1c1e;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:600}
+.item{display:grid;grid-template-columns:1fr 64px 52px 86px 28px;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid #f2f2f7}
+.item input{border:1px solid #e5e5ea;border-radius:8px;padding:9px 8px;font:400 15px/1.2 -apple-system,'Hiragino Sans',sans-serif;background:#fafafa;min-width:0;width:100%}
+.item input.n{text-align:right}
+.item .x{border:none;background:none;color:#aeaeb2;font-size:18px;text-align:center}
+.item-hd{display:grid;grid-template-columns:1fr 64px 52px 86px 28px;gap:6px;font-size:11px;color:#8e8e93;padding:8px 0 2px}
+.add{display:block;width:100%;border:none;background:none;color:#0a63c9;font:600 14px/1 -apple-system,'Hiragino Sans',sans-serif;padding:12px 0 10px;text-align:left}
+.total{display:flex;justify-content:space-between;padding:10px 0 12px;font-size:15px}
+.total b{font-weight:700;font-variant-numeric:tabular-nums}
+.send{position:fixed;left:14px;right:14px;bottom:18px;max-width:532px;margin:0 auto;padding:16px;border:none;border-radius:14px;background:#1c1c1e;color:#fff;font:700 16px/1 -apple-system,'Hiragino Sans',sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.send:disabled{background:#aeaeb2}
+.mine h2{font-size:13px;color:#6e6e73;font-weight:600;padding:14px 4px 6px}
+.po{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #e5e5ea;font-size:14px}
+.po:last-child{border-bottom:none}
+.po .st{flex:0 0 auto;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#faeeda;color:#854f0b}
+.po .st.sent{background:#eaf3de;color:#3b6d11}
+.po .st.cancel{background:#e5e5ea;color:#6e6e73}
+.po .t{flex:1;min-width:0}
+.po .t b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.po .t small{color:#6e6e73;font-size:12px}
+.po .a{font-variant-numeric:tabular-nums;color:#1c1c1e}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-60px);padding:12px 22px;border-radius:12px;font:600 14px/1 -apple-system,'Hiragino Sans',sans-serif;z-index:999;opacity:0;transition:.25s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.15);white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#1c1c1e;color:#fff}
+.toast.err{background:#a32d2d;color:#fff}
+.gate{position:fixed;inset:0;background:#f2f2f7;display:none;align-items:center;justify-content:center;padding:30px;text-align:center;font-size:15px;line-height:1.8;z-index:1000}
+.gate.show{display:flex}
+.empty{color:#aeaeb2;font-size:13px;padding:14px 4px}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>発注書</h1><span class="sub" id="who"></span></div>
+<div class="main">
+  <div class="card">
+    <div class="row"><label>記入者</label><select id="f_person"><option value="">選択</option></select></div>
+    <div class="row col" id="caseRow">
+      <div style="display:flex;justify-content:space-between;align-items:center"><label>案件</label><span class="hint" id="caseHint" style="padding:0"></span></div>
+      <div id="casePicked" class="picked" style="display:none"><div><b id="caseName"></b><small id="caseNo"></small></div><button type="button" onclick="clearCase()">変える</button></div>
+      <input id="f_case" placeholder="案件名・得意先・受注番号で検索" autocomplete="off" oninput="searchCases(this.value)">
+      <div class="cases" id="caseList" style="display:none"></div>
+    </div>
+    <div class="row"><label>宛先</label><input id="f_vendor" placeholder="仕入先" list="vendorList" autocomplete="off"><datalist id="vendorList"></datalist></div>
+    <div class="row"><label>区分</label><div class="seg" id="kindSeg"><button type="button" class="on" onclick="setKind('材料')">材料</button><button type="button" onclick="setKind('外注')">外注</button></div></div>
+  </div>
+
+  <div class="card">
+    <div class="item-hd"><span>品名・品番・仕様</span><span>数量</span><span>単位</span><span>単価</span><span></span></div>
+    <div id="items"></div>
+    <button type="button" class="add" onclick="addItem()">＋ 行を追加</button>
+    <div class="total"><span>合計（税抜）</span><b id="total">¥0</b></div>
+  </div>
+
+  <div class="card">
+    <div class="row"><label>納期</label><div style="display:flex;gap:8px;align-items:center;flex:1;justify-content:flex-end"><input type="date" id="f_deadline" style="flex:0 1 160px"><div class="seg" style="flex:0 0 auto"><button type="button" id="btnAsap" onclick="toggleAsap()">最短</button></div></div></div>
+    <div class="row"><label>納品先</label><div class="seg" id="delivSeg" style="flex:0 0 auto"><button type="button" class="on" onclick="setDeliv('弊社')">弊社</button><button type="button" onclick="setDeliv('別途')">別途</button></div></div>
+    <div class="row col" id="delivRow" style="display:none"><input id="f_deliver_to" placeholder="納品先の住所・現場名"></div>
+    <div class="row col"><label>備考</label><textarea id="f_note" placeholder="空欄可"></textarea></div>
+  </div>
+
+  <div class="mine"><h2>自分の発注書</h2><div class="card" id="mine"><div class="empty">読み込み中…</div></div></div>
+</div>
+<button class="send" id="btnSend" onclick="send()">事務所へ送る</button>
+<div class="toast" id="toast"></div>
+<div class="gate" id="gate">認証が切れました。<br>LINE WORKS の「業務管理」から開き直すか、<br>事務所までお知らせください。</div>
+
+<script>
+const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
+const WOFF_ID='X805S_9FuFofm2Ur6fXyIQ';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const yen=v=>'¥'+Math.round(Number(v)||0).toLocaleString('ja-JP');
+const fmtT=v=>{ const d=new Date(String(v||'')); return isNaN(d)?String(v||'').slice(5,16):`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${('0'+d.getMinutes()).slice(-2)}`; };
+function toast(msg,err){ const t=$('toast'); t.textContent=msg; t.className='toast show '+(err?'err':'ok'); setTimeout(()=>t.classList.remove('show'),2500); }
+
+/* GAS への身分証（spa.html と同じ）：?k= の合言葉を localStorage に、cid、LINE WORKS 内なら WOFF のトークン */
+(function(){
+  try{ const q=new URLSearchParams(location.search); const k=q.get('k'); if(k){ localStorage.setItem('api_key',k); q.delete('k'); const qs=q.toString(); history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')); } }catch(e){}
+  const cid=(function(){ try{ let c=localStorage.getItem('cid'); if(!c){ c=Math.random().toString(36).slice(2,8); localStorage.setItem('cid',c); } return c; }catch(e){ return ''; } })();
+  const _f=window.fetch;
+  window.fetch=function(u,o){
+    if(typeof u==='string'&&u.indexOf(API)===0){
+      const tok=window.__woffToken||''; let key=''; try{ key=localStorage.getItem('api_key')||''; }catch(e){}
+      const c=cid+'-po';
+      if(o&&o.method==='POST'&&typeof o.body==='string'){ try{ const b=JSON.parse(o.body); if(tok)b.tok=tok; if(key)b.key=key; b.cid=c; o=Object.assign({},o,{body:JSON.stringify(b)}); }catch(e){} }
+      else u+=(u.indexOf('?')<0?'?':'&')+(tok?'tok='+encodeURIComponent(tok)+'&':'')+(key?'key='+encodeURIComponent(key)+'&':'')+'cid='+encodeURIComponent(c);
+    }
+    return _f.call(this,u,o);
+  };
+})();
+async function woffBoot(){
+  await Promise.race([
+    new Promise(res=>{const el=document.createElement('script');el.src='https://static.worksmobile.net/static/wm/woff/edge/3.7.1/sdk.js';el.onload=res;el.onerror=res;document.head.appendChild(el);}),
+    new Promise(res=>setTimeout(res,3000))
+  ]);
+  if(!window.woff) return;
+  try{ await woff.init({woffId:WOFF_ID}); if(!woff.isInClient()) return; const pf=await woff.getProfile(); if(pf&&pf.displayName) window.__woffUser={name:pf.displayName}; try{ window.__woffToken=woff.getAccessToken()||''; }catch(e){} }catch(e){}
+}
+async function apiGet(q){ const r=await fetch(API+'?'+new URLSearchParams(q)); const j=await r.json(); if(j&&j.error==='auth'){ $('gate').classList.add('show'); throw new Error('auth'); } return j; }
+function apiPost(body){ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)}); }
+
+let staff=[], cases=[], picked=null, kind='材料', asap=false, deliv='弊社', items=[], busy=false;
+function setKind(k){ kind=k; [...$('kindSeg').children].forEach(b=>b.classList.toggle('on',b.textContent===k)); }
+function toggleAsap(){ asap=!asap; $('btnAsap').classList.toggle('on',asap); if(asap) $('f_deadline').value=''; }
+function setDeliv(v){ deliv=v; [...$('delivSeg').children].forEach(b=>b.classList.toggle('on',b.textContent===v)); $('delivRow').style.display=v==='別途'?'':'none'; }
+function addItem(){ items.push({name:'',qty:'',unit:'',price:''}); renderItems(); setTimeout(()=>{ const r=$('items').lastElementChild; r&&r.querySelector('input').focus(); },50); }
+function delItem(i){ items.splice(i,1); if(!items.length) items.push({name:'',qty:'',unit:'',price:''}); renderItems(); }
+function upd(i,k,v){ items[i][k]=v; renderTotal(); }
+function renderItems(){
+  $('items').innerHTML=items.map((it,i)=>`<div class="item"><input placeholder="品名" value="${esc(it.name)}" oninput="upd(${i},'name',this.value)"><input class="n" type="number" inputmode="decimal" placeholder="数量" value="${esc(it.qty)}" oninput="upd(${i},'qty',this.value)"><input placeholder="単位" value="${esc(it.unit)}" oninput="upd(${i},'unit',this.value)"><input class="n" type="number" inputmode="numeric" placeholder="単価" value="${esc(it.price)}" oninput="upd(${i},'price',this.value)"><button type="button" class="x" onclick="delItem(${i})">✕</button></div>`).join('');
+  renderTotal();
+}
+function renderTotal(){ $('total').textContent=yen(items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0)); }
+function caseLabel(c){ return (c.client?c.client+'／':'')+(c.name||''); }
+function searchCases(v){ const q=String(v||'').trim().toLowerCase(); const el=$('caseList'); if(!q){ el.style.display='none'; return; }
+  const hit=cases.filter(c=>[c.name,c.client,c.order_no,c.estimate_no].some(x=>String(x||'').toLowerCase().includes(q))).slice(0,20);
+  el.innerHTML=hit.length?hit.map(c=>`<div onclick="pickCase('${esc(c.id)}')"><b>${esc(caseLabel(c))}</b><small>${c.order_no?'受注 '+esc(c.order_no):'受注番号なし'}　${esc(c.our_person||'')}</small></div>`).join(''):'<div class="empty">該当なし</div>';
+  el.style.display='';
+}
+function pickCase(id){ picked=cases.find(c=>String(c.id)===String(id)); if(!picked)return; $('caseName').textContent=caseLabel(picked); $('caseNo').textContent=picked.order_no?'受注番号 '+picked.order_no+'（注文番号になります）':'受注番号がまだありません'; $('casePicked').style.display=''; $('f_case').style.display='none'; $('caseList').style.display='none'; }
+function clearCase(){ picked=null; $('casePicked').style.display='none'; $('f_case').style.display=''; $('f_case').value=''; }
+
+async function load(){
+  try{
+    const [st,cs,po]=await Promise.all([apiGet({dept:'daily',action:'staff_for_daily'}),apiGet({dept:'cases',action:'read'}),apiGet({dept:'po',action:'list'})]);
+    staff=(st.staff||[]).map(s=>s.name).filter(Boolean);
+    const me=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_person')||'';
+    $('f_person').innerHTML='<option value="">選択</option>'+staff.map(n=>`<option${n===me?' selected':''}>${esc(n)}</option>`).join('');
+    if(me&&!staff.includes(me)) $('f_person').insertAdjacentHTML('beforeend',`<option selected>${esc(me)}</option>`);
+    const arch=v=>v===true||v==='true'||v==='TRUE';
+    cases=(cs.data||[]).filter(c=>!arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+    $('caseHint').textContent=cases.length+' 件';
+    const vendors=[...new Set((po.data||[]).map(p=>p.vendor).filter(Boolean))]; $('vendorList').innerHTML=vendors.map(v=>`<option value="${esc(v)}">`).join('');
+    renderMine(po.data||[]);
+  }catch(e){ if(String(e.message)!=='auth') toast('読み込みに失敗しました',true); }
+}
+function renderMine(list){
+  const me=$('f_person').value; const mine=list.filter(p=>!me||p.person===me).sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,20);
+  $('mine').innerHTML=mine.length?mine.map(p=>{ const tot=(p.items||[]).reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0); const st=p.status==='送信済'?'sent':p.status==='取消'?'cancel':''; return `<div class="po"><span class="st ${st}">${esc(p.status)}</span><div class="t"><b>${esc(p.vendor)}　${esc(p.case_name)}</b><small>${fmtT(p.created_at)}　${(p.items||[]).length} 行</small></div><span class="a">${yen(tot)}</span></div>`; }).join(''):'<div class="empty">まだありません</div>';
+}
+function send(){
+  if(busy)return;
+  const person=$('f_person').value; if(!person){ toast('記入者を選択してください',true); return; }
+  if(!picked){ toast('案件を選択してください',true); return; }
+  const vendor=$('f_vendor').value.trim(); if(!vendor){ toast('宛先を入力してください',true); return; }
+  const rows=items.filter(it=>String(it.name||'').trim()); if(!rows.length){ toast('品名を入力してください',true); return; }
+  const deadline=asap?'最短':($('f_deadline').value||'');
+  const body={dept:'po',action:'save',case_id:picked.id,case_name:caseLabel(picked),order_no:picked.order_no||'',person,vendor,kind,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline,deliver_to:deliv==='別途'?$('f_deliver_to').value.trim():'弊社',note:$('f_note').value.trim()};
+  busy=true; $('btnSend').disabled=true; apiPost(body);
+  try{ localStorage.setItem('po_person',person); }catch(e){}
+  toast('事務所へ送りました');
+  $('mine').insertAdjacentHTML('afterbegin',`<div class="po" style="opacity:.6"><span class="st">未送信</span><div class="t"><b>${esc(vendor)}　${esc(caseLabel(picked))}</b><small>いま　${rows.length} 行</small></div><span class="a">${yen(rows.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0))}</span></div>`);
+  clearCase(); $('f_vendor').value=''; $('f_note').value=''; $('f_deadline').value=''; asap=false; $('btnAsap').classList.remove('on'); items=[{name:'',qty:'',unit:'',price:''}]; renderItems();
+  setTimeout(async()=>{ busy=false; $('btnSend').disabled=false; try{ const po=await apiGet({dept:'po',action:'list'}); renderMine(po.data||[]); }catch(e){} },8000);
+}
+$('f_person').addEventListener('change',()=>{ try{ localStorage.setItem('po_person',$('f_person').value); }catch(e){} apiGet({dept:'po',action:'list'}).then(po=>renderMine(po.data||[])).catch(()=>{}); });
+items=[{name:'',qty:'',unit:'',price:''}]; renderItems();
+(async()=>{ await woffBoot(); if(window.__woffUser) $('who').textContent=window.__woffUser.name; await load(); })();
+</script>
+</body>
+</html>
