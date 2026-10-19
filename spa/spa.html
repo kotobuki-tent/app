@@ -2604,35 +2604,35 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   /* 採算タブ（10/19）：期間・部門の札、合計 4 つ、粗利率の低い順の表。色は 30% 未満 赤・35% 未満 黄・それ以上 緑 */
   #view-cases .sz-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 14px}
   #view-cases .sz-sp{flex:1 1 12px}
-  #view-cases .sz-chip{border:1px solid var(--border);background:var(--surface);color:var(--text-dim);border-radius:999px;padding:5px 12px;font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
+  #view-cases .sz-chip{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 13px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
   #view-cases .sz-chip.on{background:var(--text);border-color:var(--text);color:#fff}
   #view-cases .sz-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 14px}
   #view-cases .sz-card{background:var(--surface);border-radius:12px;padding:12px 14px;min-width:0}
-  #view-cases .sz-card .k{font-size:12px;color:var(--text-dim)}
+  #view-cases .sz-card .k{font-size:13px;color:var(--text-dim)}
   #view-cases .sz-card .v{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums;white-space:nowrap}
-  #view-cases .sz-card .s{font-size:11px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #view-cases .sz-card .s{font-size:12px;color:var(--text-dim);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #view-cases .v.bad,#view-cases .sz-pct.bad,#view-cases .sz-tbl td.bad{color:#a32d2d}
   #view-cases .v.warn,#view-cases .sz-pct.warn{color:#854f0b}
   #view-cases .v.ok,#view-cases .sz-pct.ok{color:#3b6d11}
   #view-cases .sz-wrap{background:var(--surface);border-radius:12px;overflow:hidden}
   #view-cases .sz-tbl{width:100%;border-collapse:collapse}
-  #view-cases .sz-tbl th{font-size:12px;font-weight:500;color:var(--text-dim);text-align:left;padding:9px 12px;background:var(--surface2)}
+  #view-cases .sz-tbl th{font-size:13px;font-weight:500;color:var(--text-dim);text-align:left;padding:9px 12px;background:var(--surface2)}
   #view-cases .sz-tbl th:nth-child(2),#view-cases .sz-tbl th:nth-child(4){width:110px}
   #view-cases .sz-tbl th:nth-child(3){width:360px}
   #view-cases .sz-tbl th:nth-child(5){width:180px}
   #view-cases .sz-tbl th.num{text-align:right}
-  #view-cases .sz-tbl td{padding:9px 12px;border-top:1px solid var(--border-light);vertical-align:middle;font-size:13px}
+  #view-cases .sz-tbl td{padding:10px 12px;border-top:1px solid var(--border-light);vertical-align:middle;font-size:14px;color:var(--text)}
   #view-cases .sz-tbl td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   #view-cases .sz-tbl tr{cursor:pointer}
   #view-cases .sz-tbl tr:hover td{background:var(--surface2)}
   #view-cases .sz-tbl tr.dim td{color:var(--text-faint)}
-  #view-cases .sz-tbl .faint{color:var(--text-faint);font-size:12px}
-  #view-cases .sz-parts{display:grid;grid-template-columns:repeat(4,1fr);gap:0 8px;margin-top:5px;font-size:12px;color:var(--text-dim);font-weight:400;font-variant-numeric:tabular-nums;text-align:right}
-  #view-cases .sz-parts em{display:block;font-style:normal;font-size:10px;color:var(--text-faint)}
-  #view-cases .sz-parts small{display:block;font-size:10px;color:var(--text-faint)}
+  #view-cases .sz-tbl .faint{color:var(--text-dim);font-size:13px}
+  #view-cases .sz-parts{display:grid;grid-template-columns:repeat(4,1fr);gap:0 8px;margin-top:6px;font-size:13px;color:var(--text);font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
+  #view-cases .sz-parts em{display:block;font-style:normal;font-size:11px;font-weight:400;color:var(--text-dim)}
+  #view-cases .sz-parts small{display:block;font-size:11px;font-weight:400;color:var(--text-dim)}
   #view-cases .sz-parts .zero-miss{color:#a32d2d}   /* 0 で未確認＝赤 */
   #view-cases .sz-parts .zero-ok{color:#185fa5}     /* 0 で「なし」の確認済み＝青 */
-  #view-cases .sz-fin{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-faint);vertical-align:1px}
+  #view-cases .sz-fin{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-dim);vertical-align:1px}
   #view-cases .sz-fin.on{background:#eaf3de;color:#3b6d11}
   #view-cases .sz-after{font-size:11px;font-weight:600;color:#854f0b;margin-top:2px}
   #view-cases .ce-final{margin-left:auto;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:3px 12px;font:600 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
@@ -4324,8 +4324,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 16:01';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1196;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 16:09';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1197;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
