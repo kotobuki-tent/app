@@ -69,17 +69,11 @@ body{font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;backgro
 </head>
 <body>
 <div class="hdr"><h1>発注書</h1><span class="sub" id="who"></span></div>
+<div class="hint" style="padding:0 18px 6px">書いて送れば事務所が発注します。案件は事務所が聞きます。</div>
 <div class="main">
   <div class="card">
     <div class="row"><label>記入者</label><select id="f_person"><option value="">選択</option></select></div>
-    <div class="row col" id="caseRow">
-      <div style="display:flex;justify-content:space-between;align-items:center"><label>案件</label><span class="hint" id="caseHint" style="padding:0"></span></div>
-      <div id="casePicked" class="picked" style="display:none"><div><b id="caseName"></b><small id="caseNo"></small></div><button type="button" onclick="clearCase()">変える</button></div>
-      <input id="f_case" placeholder="案件名・得意先・受注番号で検索" autocomplete="off" oninput="searchCases(this.value)">
-      <div class="cases" id="caseList" style="display:none"></div>
-    </div>
     <div class="row"><label>宛先</label><input id="f_vendor" placeholder="仕入先" list="vendorList" autocomplete="off"><datalist id="vendorList"></datalist></div>
-    <div class="row"><label>区分</label><div class="seg" id="kindSeg"><button type="button" class="on" onclick="setKind('材料')">材料</button><button type="button" onclick="setKind('外注')">外注</button></div></div>
   </div>
 
   <div class="card">
@@ -137,8 +131,7 @@ async function woffBoot(){
 async function apiGet(q){ const r=await fetch(API+'?'+new URLSearchParams(q)); const j=await r.json(); if(j&&j.error==='auth'){ $('gate').classList.add('show'); throw new Error('auth'); } return j; }
 function apiPost(body){ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)}); }
 
-let staff=[], cases=[], picked=null, kind='材料', asap=false, deliv='弊社', items=[], busy=false;
-function setKind(k){ kind=k; [...$('kindSeg').children].forEach(b=>b.classList.toggle('on',b.textContent===k)); }
+let staff=[], asap=false, deliv='弊社', items=[], busy=false;
 function toggleAsap(){ asap=!asap; $('btnAsap').classList.toggle('on',asap); if(asap) $('f_deadline').value=''; }
 function setDeliv(v){ deliv=v; [...$('delivSeg').children].forEach(b=>b.classList.toggle('on',b.textContent===v)); $('delivRow').style.display=v==='別途'?'':'none'; }
 function addItem(){ items.push({name:'',qty:'',unit:'',price:''}); renderItems(); setTimeout(()=>{ const r=$('items').lastElementChild; r&&r.querySelector('input').focus(); },50); }
@@ -149,46 +142,34 @@ function renderItems(){
   renderTotal();
 }
 function renderTotal(){ $('total').textContent=yen(items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0)); }
-function caseLabel(c){ return (c.client?c.client+'／':'')+(c.name||''); }
-function searchCases(v){ const q=String(v||'').trim().toLowerCase(); const el=$('caseList'); if(!q){ el.style.display='none'; return; }
-  const hit=cases.filter(c=>[c.name,c.client,c.order_no,c.estimate_no].some(x=>String(x||'').toLowerCase().includes(q))).slice(0,20);
-  el.innerHTML=hit.length?hit.map(c=>`<div onclick="pickCase('${esc(c.id)}')"><b>${esc(caseLabel(c))}</b><small>${c.order_no?'受注 '+esc(c.order_no):'受注番号なし'}　${esc(c.our_person||'')}</small></div>`).join(''):'<div class="empty">該当なし</div>';
-  el.style.display='';
-}
-function pickCase(id){ picked=cases.find(c=>String(c.id)===String(id)); if(!picked)return; $('caseName').textContent=caseLabel(picked); $('caseNo').textContent=picked.order_no?'受注番号 '+picked.order_no+'（注文番号になります）':'受注番号がまだありません'; $('casePicked').style.display=''; $('f_case').style.display='none'; $('caseList').style.display='none'; }
-function clearCase(){ picked=null; $('casePicked').style.display='none'; $('f_case').style.display=''; $('f_case').value=''; }
 
 async function load(){
   try{
-    const [st,cs,po]=await Promise.all([apiGet({dept:'daily',action:'staff_for_daily'}),apiGet({dept:'cases',action:'read'}),apiGet({dept:'po',action:'list'})]);
+    const [st,po]=await Promise.all([apiGet({dept:'daily',action:'staff_for_daily'}),apiGet({dept:'po',action:'list'})]);
     staff=(st.staff||[]).map(s=>s.name).filter(Boolean);
     const me=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_person')||'';
     $('f_person').innerHTML='<option value="">選択</option>'+staff.map(n=>`<option${n===me?' selected':''}>${esc(n)}</option>`).join('');
     if(me&&!staff.includes(me)) $('f_person').insertAdjacentHTML('beforeend',`<option selected>${esc(me)}</option>`);
-    const arch=v=>v===true||v==='true'||v==='TRUE';
-    cases=(cs.data||[]).filter(c=>!arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
-    $('caseHint').textContent=cases.length+' 件';
     const vendors=[...new Set((po.data||[]).map(p=>p.vendor).filter(Boolean))]; $('vendorList').innerHTML=vendors.map(v=>`<option value="${esc(v)}">`).join('');
     renderMine(po.data||[]);
   }catch(e){ if(String(e.message)!=='auth') toast('読み込みに失敗しました',true); }
 }
 function renderMine(list){
   const me=$('f_person').value; const mine=list.filter(p=>!me||p.person===me).sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,20);
-  $('mine').innerHTML=mine.length?mine.map(p=>{ const tot=(p.items||[]).reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0); const st=p.status==='送信済'?'sent':p.status==='取消'?'cancel':''; return `<div class="po"><span class="st ${st}">${esc(p.status)}</span><div class="t"><b>${esc(p.vendor)}　${esc(p.case_name)}</b><small>${fmtT(p.created_at)}　${(p.items||[]).length} 行</small></div><span class="a">${yen(tot)}</span></div>`; }).join(''):'<div class="empty">まだありません</div>';
+  $('mine').innerHTML=mine.length?mine.map(p=>{ const tot=(p.items||[]).reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0); const st=p.status==='送信済'?'sent':p.status==='取消'?'cancel':''; return `<div class="po"><span class="st ${st}">${esc(p.status)}</span><div class="t"><b>${esc(p.vendor)}　${(p.items||[]).slice(0,2).map(it=>esc(it.name)).join('、')}</b><small>${fmtT(p.created_at)}　${(p.items||[]).length} 行</small></div><span class="a">${yen(tot)}</span></div>`; }).join(''):'<div class="empty">まだありません</div>';
 }
 function send(){
   if(busy)return;
   const person=$('f_person').value; if(!person){ toast('記入者を選択してください',true); return; }
-  if(!picked){ toast('案件を選択してください',true); return; }
   const vendor=$('f_vendor').value.trim(); if(!vendor){ toast('宛先を入力してください',true); return; }
   const rows=items.filter(it=>String(it.name||'').trim()); if(!rows.length){ toast('品名を入力してください',true); return; }
   const deadline=asap?'最短':($('f_deadline').value||'');
-  const body={dept:'po',action:'save',case_id:picked.id,case_name:caseLabel(picked),order_no:picked.order_no||'',person,vendor,kind,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline,deliver_to:deliv==='別途'?$('f_deliver_to').value.trim():'弊社',note:$('f_note').value.trim()};
+  const body={dept:'po',action:'save',person,vendor,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline,deliver_to:deliv==='別途'?$('f_deliver_to').value.trim():'弊社',note:$('f_note').value.trim()};
   busy=true; $('btnSend').disabled=true; apiPost(body);
   try{ localStorage.setItem('po_person',person); }catch(e){}
   toast('事務所へ送りました');
-  $('mine').insertAdjacentHTML('afterbegin',`<div class="po" style="opacity:.6"><span class="st">未送信</span><div class="t"><b>${esc(vendor)}　${esc(caseLabel(picked))}</b><small>いま　${rows.length} 行</small></div><span class="a">${yen(rows.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0))}</span></div>`);
-  clearCase(); $('f_vendor').value=''; $('f_note').value=''; $('f_deadline').value=''; asap=false; $('btnAsap').classList.remove('on'); items=[{name:'',qty:'',unit:'',price:''}]; renderItems();
+  $('mine').insertAdjacentHTML('afterbegin',`<div class="po" style="opacity:.6"><span class="st">未送信</span><div class="t"><b>${esc(vendor)}　${rows.slice(0,2).map(it=>esc(it.name)).join('、')}</b><small>いま　${rows.length} 行</small></div><span class="a">${yen(rows.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0))}</span></div>`);
+  $('f_vendor').value=''; $('f_note').value=''; $('f_deadline').value=''; asap=false; $('btnAsap').classList.remove('on'); items=[{name:'',qty:'',unit:'',price:''}]; renderItems();
   setTimeout(async()=>{ busy=false; $('btnSend').disabled=false; try{ const po=await apiGet({dept:'po',action:'list'}); renderMine(po.data||[]); }catch(e){} },8000);
 }
 $('f_person').addEventListener('change',()=>{ try{ localStorage.setItem('po_person',$('f_person').value); }catch(e){} apiGet({dept:'po',action:'list'}).then(po=>renderMine(po.data||[])).catch(()=>{}); });
