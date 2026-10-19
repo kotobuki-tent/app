@@ -4263,8 +4263,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 11:24';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1182;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 13:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1183;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8084,8 +8084,9 @@ const Daily = (function(){
   const WORK_PRODUCTION=['裁断','溶着','縫製','製作','検査','出荷','印刷','図面','修理'];
   const WORK_PROJECT=['設営','撤去','施工','メンテナンス','準備','下見','積み込み','運搬'];
   const WORK_COMMON=['事務','打ち合わせ','清掃','車両運行'];
+  const WORK_SALES=['納品・配達','検品','梱包・発送'];   // 販売の明細に付ける作業（2026-10-19）
   let curView='write';
-  let staffList=[],prodProjects=[],projProjects=[],allReports=[],absenceList=[];
+  let staffList=[],prodProjects=[],projProjects=[],salesProjects=[],allReports=[],absenceList=[];   // salesProjects＝販売の明細（配達・納品の時間を案件に付ける、2026-10-19）
   let _absenceLoadedDate=null;
   let viewingDate=new Date();
   let writeDate=new Date();
@@ -8098,7 +8099,7 @@ const Daily = (function(){
 
   // ===== データ取得 =====
   async function loadStaff(){try{const r=await fetch(API+'?dept=daily&action=staff_for_daily');const j=await r.json();if(j.success)staffList=j.staff||[]}catch(e){}}
-  async function loadProjects(){try{const r=await fetch(API+'?dept=daily&action=projects');const j=await r.json();if(j.success){prodProjects=j.production||[];projProjects=j.projects||[]}}catch(e){}}
+  async function loadProjects(){try{const r=await fetch(API+'?dept=daily&action=projects');const j=await r.json();if(j.success){prodProjects=j.production||[];projProjects=j.projects||[];salesProjects=j.sales||[]}}catch(e){}}
   async function loadReports(){try{const to=new Date();const from=new Date();from.setDate(from.getDate()-30);const r=await fetch(API+'?dept=daily&action=read&date_from='+dateStr(from)+'&date_to='+dateStr(to));const j=await r.json();if(j.success)allReports=Pending.apply('daily','',mergeWithTmp(j.data||[],allReports,r=>String(r.employee_no||'')+'|'+String(r.date||'')+'|'+String(r.project||'')+'|'+String(r.work||r.action||'')))}catch(e){}}
   async function loadAbsenceList(date){try{const r=await fetch(API+'?dept=daily&action=read_absence&date='+date);const j=await r.json();if(j.success)absenceList=j.data||[];else absenceList=[]}catch(e){absenceList=[]}}
   async function loadAll(){
@@ -8106,7 +8107,7 @@ const Daily = (function(){
     if(cached){
       try{
         staffList=cached.staff||[];allReports=cached.reports||[];
-        prodProjects=cached.prodProj||[];projProjects=cached.projProj||[];
+        prodProjects=cached.prodProj||[];projProjects=cached.projProj||[];salesProjects=cached.salesProj||[];
         absenceList=cached.absence||[];
         // viewタブの欠勤データはキャッシュ信用せず、サーバから取り直す
         // （誤って「欠勤」と一瞬出る現象を防ぐ。renderViewが「読み込み中」表示を出す）
@@ -8117,7 +8118,7 @@ const Daily = (function(){
     await Promise.all([loadStaff(),loadProjects(),loadReports(),loadAbsenceList(dateStr(viewingDate))]);
     _absenceLoadedDate=dateStr(viewingDate);
     initWhoSelect();
-    _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
+    _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,salesProj:salesProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
     render();
   }
 
@@ -8192,7 +8193,10 @@ const Daily = (function(){
     };
     const prodGroup=()=>{let s='<optgroup label="生産部">';sortByStAndDate(prodProjects,PROD_ST_ORDER,p=>parseD(p.deadline)).forEach(p=>{s+=`<option value="prod:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});return s+'</optgroup>'};
     const projGroup=()=>{let s='<optgroup label="企画制作部">';sortByStAndDate(projProjects,PROJ_ST_ORDER,getProjNearestDate).forEach(p=>{s+=`<option value="proj:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});return s+'</optgroup>'};
+    const SALES_ST_ORDER={'発注済':0,'入荷済':0,'受注':1,'見積中':2};
+    const salesGroup=()=>{if(!salesProjects.length)return '';let s='<optgroup label="販売">';sortByStAndDate(salesProjects,SALES_ST_ORDER,p=>parseD(p.deadline)).forEach(p=>{s+=`<option value="sale:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});return s+'</optgroup>'};
     if(myDept==='企画制作部')h+=projGroup()+prodGroup();else h+=prodGroup()+projGroup();
+    h+=salesGroup();
     const cur=sel.value;   // 裏の取り直し（App.softRefresh→loadAll→render）で一覧を作り直しても、選んでいる案件を消さない（2026-10-14 生産部「選んだ案件が消える」）
     sel.innerHTML=h;
     if(cur&&Array.from(sel.options).some(o=>o.value===cur))sel.value=cur;
@@ -8205,6 +8209,7 @@ const Daily = (function(){
     const og=(label,arr)=>{let s='<optgroup label="'+label+'">';arr.forEach(w=>s+=`<option value="${esc(w)}">${esc(w)}</option>`);return s+'</optgroup>'};
     if(projType==='prod')h+=og('生産部作業',WORK_PRODUCTION)+og('共通',WORK_COMMON)+og('企画制作部作業',WORK_PROJECT);
     else if(projType==='proj')h+=og('企画制作部作業',WORK_PROJECT)+og('共通',WORK_COMMON)+og('生産部作業',WORK_PRODUCTION);
+    else if(projType==='sale')h+=og('販売',WORK_SALES)+og('共通',WORK_COMMON)+og('企画制作部作業',WORK_PROJECT)+og('生産部作業',WORK_PRODUCTION);
     else [...WORK_PRODUCTION,...WORK_PROJECT,...WORK_COMMON].forEach(w=>h+=`<option value="${esc(w)}">${esc(w)}</option>`);
     sel.innerHTML=h;
   }
@@ -8236,7 +8241,7 @@ const Daily = (function(){
     $('addForm').classList.remove('hidden');$('openAddBtn').classList.add('hidden');
     const saveBtn=$('writeView').querySelector('.af-save');if(saveBtn)saveBtn.textContent='保存';
     if(entry.project_type==='other'){$('afProj').value='other';$('afProjCustomWrap').classList.remove('hidden');$('afProjCustom').value=entry.project_name||'';buildAfWorkOptions('other')}
-    else{const prefix=entry.project_type==='production'?'prod':'proj';$('afProj').value=`${prefix}:${entry.project_id}`;$('afProjCustomWrap').classList.add('hidden');$('afProjCustom').value='';buildAfWorkOptions(prefix)}
+    else{const prefix=entry.project_type==='production'?'prod':entry.project_type==='sales'?'sale':'proj';$('afProj').value=`${prefix}:${entry.project_id}`;$('afProjCustomWrap').classList.add('hidden');$('afProjCustom').value='';buildAfWorkOptions(prefix)}
     const work=entry.work||entry.action||'';const sel=$('afWork');
     const hasMatch=Array.from(sel.options).some(o=>o.value===work);
     if(hasMatch){sel.value=work;$('afWorkCustomWrap').classList.add('hidden');$('afWorkCustom').value=''}
@@ -8259,12 +8264,12 @@ const Daily = (function(){
       const customName=$('afProjCustom').value.trim();if(!customName){toast('案件名を入力してください',true);return}
       body={dept:'daily',action:'save',date:dateStr(writeDate),employee_no:w,project_type:'other',project_id:'other',project_name:customName,work:work,minutes:minutes,note:''};
     }else{
-      const [type,id]=projVal.split(':');const list=type==='prod'?prodProjects:projProjects;const pr=list.find(x=>String(x.id)===String(id));
-      body={dept:'daily',action:'save',date:dateStr(writeDate),employee_no:w,project_type:type==='prod'?'production':'project',project_id:id,project_name:pr?pr.project:'',work:work,minutes:minutes,note:''};
+      const [type,id]=projVal.split(':');const list=type==='prod'?prodProjects:type==='sale'?salesProjects:projProjects;const pr=list.find(x=>String(x.id)===String(id));
+      body={dept:'daily',action:'save',date:dateStr(writeDate),employee_no:w,project_type:type==='prod'?'production':type==='sale'?'sales':'project',project_id:id,project_name:pr?pr.project:'',work:work,minutes:minutes,note:''};
     }
     if(editingId){body.id=editingId;const idx=allReports.findIndex(e=>String(e.id)===String(editingId));if(idx>=0)allReports[idx]={...allReports[idx],...body};fireAndForget(body);toast('更新しました')}
     else{allReports.push({...body,id:'tmp_'+Date.now()});fireAndForget(body);toast('追加しました')}
-    _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
+    _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,salesProj:salesProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
     _savingAddOne=true;
     closeAddForm();renderSavedEntries();
     setTimeout(async()=>{await loadReports();renderSavedEntries();if(curView==='view')renderViewContent()},2500);
@@ -8295,7 +8300,7 @@ const Daily = (function(){
     _busyDel=true;
     allReports=allReports.filter(x=>String(x.id)!==String(id));
     fireAndForget({dept:'daily',action:'delete',id:id});
-    _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
+    _setCache('daily',{staff:staffList,reports:allReports,prodProj:prodProjects,projProj:projProjects,salesProj:salesProjects,absence:absenceList,absenceDate:_absenceLoadedDate});
     toast('削除しました');renderSavedEntries();
     setTimeout(loadAll,8000);
     setTimeout(()=>{_busyDel=false},1500);
