@@ -2423,7 +2423,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <button class="nav-link" id="navCal" onclick="App.nav('cal')">予定</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navAlcohol" onclick="App.nav('alcohol')">点呼</button>
-    <button class="nav-link" id="navForklift" onclick="App.nav('forklift')">リフト</button>
+    <button class="nav-link" id="navForklift" onclick="App.nav('forklift')">リフト点検</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navCard" onclick="App.nav('card')">カード</button>
     <div class="nav-spacer"></div>
@@ -2449,7 +2449,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 </div>
 <div id="appVer" title="この端末が読み込んでいる版（コミット日時）"></div>
 <div id="dataStale" class="hidden">前回のデータを表示中・最新を取得しています</div>
-<div id="authGate" class="hidden"><div class="ag-box"><div class="ag-ttl" id="authGateTitle"></div><div class="ag-msg" id="authGateMsg"></div><button type="button" onclick="location.reload()">開き直す</button></div></div>
+<div id="authGate" class="hidden"><div class="ag-box"><div class="ag-ttl" id="authGateTitle"></div><div class="ag-msg" id="authGateMsg"></div><button type="button" onclick="location.reload()">再読み込み</button></div></div>
 
 <!-- ===== 案件登録 section ===== -->
 <!-- ===== 資格（免許・技能講習の台帳 dept=qual） ===== -->
@@ -2484,7 +2484,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #qualMoBody .madd select{width:100%;padding:10px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:600 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif}
   #qualMoPerson{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;margin-bottom:6px}
 </style>
-  <div class="scr-head"><h1>資格台帳</h1><input class="scr-search" id="qualSearch" placeholder="名前で探す"></div>
+  <div class="scr-head"><h1>資格台帳</h1><input class="scr-search" id="qualSearch" placeholder="氏名で検索"></div>
   <div id="qualBody"><div style="padding:40px;text-align:center;color:var(--text-dim)">読み込み中...</div></div>
 
   <!-- 保有資格モーダル -->
@@ -2759,8 +2759,8 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <div class="mo-row full"><div class="mo-field"><label>案件名</label><input id="ce_name"></div></div>
       <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="ce_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>状態</label><select id="ce_status"><option>見積中</option><option>受注</option><option>完了</option><option>見送り</option></select><span id="ce_qa"></span></div></div>
       <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="ce_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="ce_order_no"></div></div>
-      <div class="mo-row full"><div class="mo-field"><label>社内納期（目標・仮）<span class="ce-target-note">客の納期ではない／カレンダーに点線で表示</span></label><input type="date" id="ce_target_date"></div></div>
-      <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　一案件＝一金額</label><input type="number" id="ce_amount" min="0" step="1"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>社内納期（目標・仮）<span class="ce-target-note">顧客の納期ではない／カレンダーに点線で表示</span></label><input type="date" id="ce_target_date"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　案件につき 1 つ</label><input type="number" id="ce_amount" min="0" step="1"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
       </div><div class="ce-col">
       <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div><div id="ce_adddept" class="ce-adddept"></div><div id="ce_rentals"></div></div>
@@ -2790,7 +2790,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <!-- ===== 生産 section（中身は移植フェーズで流し込む） ===== -->
 <section id="view-prod" class="hidden">
-  <div class="scr-head"><h1>生産管理</h1><input class="scr-search" id="prodPcSearch" placeholder="物件名・客先・受注番号で探す"></div>
+  <div class="scr-head"><h1>生産管理</h1><input class="scr-search" id="prodPcSearch" placeholder="案件名・得意先・受注番号で検索"></div>
   <div class="sub-tabs" id="prodTabs">
     <button class="sub-tab on" data-view="factory">工場ボード</button>
     <button class="sub-tab" data-view="archive">出荷済</button>
@@ -2807,7 +2807,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <div id="prodFabric" class="admin-view hidden">
       <div class="fab-bar">
         <div class="fab-sum" id="fabSum"></div>
-        <input class="fab-search" id="fabSearch" placeholder="品番で探す" oninput="Prod.fabSearch(this.value)">
+        <input class="fab-search" id="fabSearch" placeholder="品番で検索" oninput="Prod.fabSearch(this.value)">
         <div class="fab-acts">
           <button class="btn gray" onclick="Prod.openFabIn()">入荷</button>
           <button class="btn gray" onclick="Prod.openFabAdj()">棚卸</button>
@@ -2868,7 +2868,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <div class="mo-row pair"><div class="mo-field f3"><label>日付</label><input type="date" id="fi_date"></div><div class="mo-field f4"><label>仕入先</label><input id="fi_vendor" placeholder="期首なら「期首」"></div><div class="mo-field f3"><label>納品書番号</label><input id="fi_slip"></div></div>
       <div class="mo-field"><label>品番ごとに 1 行</label>
         <div class="fab-in-rows" id="fiRows"></div>
-        <button type="button" class="btn gray" onclick="Prod.addFabInRow()">＋ 行を足す</button>
+        <button type="button" class="btn gray" onclick="Prod.addFabInRow()">＋ 行を追加</button>
       </div>
       <div class="mo-foot"><button class="cancel" onclick="Prod.closeFabMo('fabInBg')">閉じる</button><button class="save" onclick="Prod.saveFabIn()">保存</button></div>
     </div>
@@ -2877,9 +2877,9 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   <div class="mo-bg" id="fabOutBg">
     <div class="mo" style="max-width:520px">
       <h2 id="foTitle">裁断</h2>
-      <div class="mo-row full"><div class="mo-field"><label>案件</label><input id="fo_case" list="fabCaseList" placeholder="得意先／案件名で探す。無ければ空のまま（在庫品・試作）"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>案件</label><input id="fo_case" list="fabCaseList" placeholder="得意先／案件名で検索。無ければ空のまま（在庫品・試作）"></div></div>
       <div class="mo-row pair"><div class="mo-field f7"><label>品番</label><select id="fo_item"></select></div><div class="mo-field f3"><label>メートル</label><input type="number" id="fo_m" min="0" step="0.1" placeholder="0.0"></div></div>
-      <div class="mo-row pair"><div class="mo-field"><label>名前</label><select id="fo_person"></select></div><div class="mo-field"><label>日付</label><input type="date" id="fo_date"></div></div>
+      <div class="mo-row pair"><div class="mo-field"><label>氏名</label><select id="fo_person"></select></div><div class="mo-field"><label>日付</label><input type="date" id="fo_date"></div></div>
       <div class="fab-hint" id="foHint"></div>
       <div class="mo-foot"><button class="cancel" onclick="Prod.closeFabMo('fabOutBg')">閉じる</button><button class="save" id="foSave" onclick="Prod.saveFabOut()">記録</button></div>
     </div>
@@ -2888,7 +2888,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   <div class="mo-bg" id="fabAdjBg">
     <div class="mo" style="max-width:640px">
       <h2>棚卸</h2>
-      <div class="mo-row pair"><div class="mo-field"><label>日付</label><input type="date" id="fa_date"></div><div class="mo-field"><label>名前</label><select id="fa_person"></select></div></div>
+      <div class="mo-row pair"><div class="mo-field"><label>日付</label><input type="date" id="fa_date"></div><div class="mo-field"><label>氏名</label><select id="fa_person"></select></div></div>
       <div class="mo-field"><label>実測のメートル（変わらない品番は空のまま）</label><div class="fab-adj-rows" id="faRows"></div></div>
       <div class="mo-foot"><button class="cancel" onclick="Prod.closeFabMo('fabAdjBg')">閉じる</button><button class="save" onclick="Prod.saveFabAdj()">保存</button></div>
     </div>
@@ -2925,7 +2925,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <!-- ===== 企画制作 section（中身は移植フェーズで流し込む） ===== -->
 <section id="view-proj" class="hidden">
-  <div class="scr-head"><h1>企画制作</h1><input class="scr-search" id="projPcSearch" placeholder="物件名・客先・受注番号で探す"></div>
+  <div class="scr-head"><h1>企画制作</h1><input class="scr-search" id="projPcSearch" placeholder="案件名・得意先・受注番号で検索"></div>
   <div class="sub-tabs" id="projTabs">
     <button class="sub-tab on" data-view="gantt">スケジュール</button>
     <button class="sub-tab" data-view="board">ボード</button>
@@ -3017,14 +3017,14 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <!-- ===== 在庫 section ===== -->
 <section id="view-inv" class="hidden">
-  <div class="scr-head"><h1>在庫管理</h1><input class="scr-search" id="invPcSearch" placeholder="品名・現場で探す"></div>
+  <div class="scr-head"><h1>在庫管理</h1><input class="scr-search" id="invPcSearch" placeholder="品名・現場で検索"></div>
   <div class="sub-tabs" id="invTabs">
     <button class="sub-tab on" data-tab="gantt" onclick="Inv.switchTab('gantt')">在庫</button>
     <button class="sub-tab" data-tab="rentals" onclick="Inv.switchTab('rentals')">貸出/予約</button>
-    <button class="sub-tab" data-tab="maint" onclick="Inv.switchTab('maint')">メンテ</button>
+    <button class="sub-tab" data-tab="maint" onclick="Inv.switchTab('maint')">メンテナンス</button>
     <button class="sub-tab" data-tab="discard" onclick="Inv.switchTab('discard')">廃棄</button>
     <button class="sub-tab" data-tab="items" onclick="Inv.switchTab('items')">商品台帳</button>
-    <button class="slog-btn" onclick="Proj.printLedgerCandidates()">台帳に載せるリスト</button>
+    <button class="slog-btn" onclick="Proj.printLedgerCandidates()">台帳登録候補</button>
     <button class="slog-btn" id="invSlogBtn" onclick="Inv.openSlog()">ステータスログ<span class="dot"></span></button>
   </div>
 
@@ -3143,17 +3143,17 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   <!-- 分けるモーダル：1行のうち N 個だけ別の状態にする（検品で 20 返却・2 メンテ・1 廃棄、のように割る） -->
   <div class="mo-bg" id="splitMoBg">
     <div class="mo" style="max-width:480px">
-      <h3>分ける</h3>
+      <h3>分割</h3>
       <input type="hidden" id="xf_sp_id">
       <div id="xf_sp_info" style="font-size:13px;color:var(--text-dim);margin-bottom:12px;line-height:1.6"></div>
       <div class="mo-row">
-        <div class="mo-field"><label>うち何個</label><input id="xf_sp_qty" type="number" min="1" value="1"></div>
-        <div class="mo-field"><label>どうする</label><select id="xf_sp_status"><option>メンテ中</option><option>返却済</option><option>廃棄予定</option><option>貸出中</option><option>予約</option></select></div>
+        <div class="mo-field"><label>分割数</label><input id="xf_sp_qty" type="number" min="1" value="1"></div>
+        <div class="mo-field"><label>変更後の状態</label><select id="xf_sp_status"><option>メンテ中</option><option>返却済</option><option>廃棄予定</option><option>貸出中</option><option>予約</option></select></div>
       </div>
-      <div style="font-size:12px;color:var(--text-faint);margin-top:-4px">残りは今の状態のまま。全部なら数量そのままで「どうする」だけ選べば行ごと変わります。</div>
+      <div style="font-size:12px;color:var(--text-faint);margin-top:-4px">残りは現在の状態のまま。全数の場合は数量を変えずに状態だけ選択。</div>
       <div class="mo-foot">
         <button class="cancel" onclick="Inv.closeSplitMo()">キャンセル</button>
-        <button class="save" onclick="Inv.doSplit()">分ける</button>
+        <button class="save" onclick="Inv.doSplit()">分割</button>
       </div>
     </div>
   </div>
@@ -3173,7 +3173,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <!-- ===== 車両 section ===== -->
 <section id="view-veh" class="hidden">
-  <div class="scr-head"><h1>車両管理</h1><input class="scr-search" id="vPcSearch" placeholder="車名・ナンバーで探す"></div>
+  <div class="scr-head"><h1>車両管理</h1><input class="scr-search" id="vPcSearch" placeholder="車名・ナンバーで検索"></div>
   <div class="sub-tabs" id="vTabs">
     <button class="sub-tab on" data-view="dash">ダッシュボード</button>
     <button class="sub-tab" data-view="admin">管理</button>
@@ -3285,7 +3285,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <!-- ===== 販売 section ===== -->
 <section id="view-sales" class="hidden">
-  <div class="scr-head"><h1>販売管理</h1><input class="scr-search" id="salesPcSearch" placeholder="物件名・客先・仕入先で探す" oninput="Sales.unifiedSearch(this.value)"></div>
+  <div class="scr-head"><h1>販売管理</h1><input class="scr-search" id="salesPcSearch" placeholder="案件名・得意先・仕入先で検索" oninput="Sales.unifiedSearch(this.value)"></div>
   <div class="sub-tabs" id="salesTabs">
     <button class="sub-tab on" data-view="board">一覧</button>
     <button class="sub-tab" data-view="archive">納品済</button>
@@ -3369,7 +3369,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <!-- ===== 工数 section ===== -->
 <section id="view-labor" class="hidden">
-  <div class="scr-head"><h1>工数管理</h1><input class="scr-search" id="laborPcSearch" placeholder="案件名・番号で探す"></div>
+  <div class="scr-head"><h1>工数管理</h1><input class="scr-search" id="laborPcSearch" placeholder="案件名・番号で検索"></div>
   <div class="sub-tabs" id="laborTabs">
     <button class="sub-tab on" data-view="active">工場ボード</button>
     <button class="sub-tab" data-view="archive">出荷済</button>
@@ -3405,9 +3405,9 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <!-- ===== 日報 section ===== -->
 <section id="view-daily" class="hidden">
-  <div class="scr-head"><h1>日報</h1><input class="scr-search" id="dailyPcSearch" placeholder="名前・内容で探す"></div>
+  <div class="scr-head"><h1>日報</h1><input class="scr-search" id="dailyPcSearch" placeholder="氏名・内容で検索"></div>
   <div class="sub-tabs" id="dailyTabs">
-    <button class="sub-tab on" data-view="write">自分で書く</button>
+    <button class="sub-tab on" data-view="write">記入</button>
     <button class="sub-tab" data-view="view">みんなの日報</button>
   </div>
 
@@ -3423,14 +3423,14 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
               <button onclick="Daily.setWriteDateToday()" class="dr-today">今日</button>
             </div>
           </div>
-          <label class="dr-who">名前<select id="whoSelect" onchange="Daily.onWhoChange()"></select></label>
+          <label class="dr-who">氏名<select id="whoSelect" onchange="Daily.onWhoChange()"></select></label>
         </div>
         <div class="saved-entries" id="savedEntries"></div>
         <!-- 入力フォーム -->
         <div id="addForm" class="add-form hidden">
           <div class="af-field">
             <label>案件</label>
-            <select id="afProj" onchange="Daily.onAfProjChange()"><option value="">選ぶ</option></select>
+            <select id="afProj" onchange="Daily.onAfProjChange()"><option value="">選択</option></select>
           </div>
           <div class="af-field hidden" id="afProjCustomWrap">
             <label>案件名（自由記述）</label>
@@ -3439,7 +3439,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
           <div class="af-row">
             <div class="af-field" style="flex:2">
               <label>作業内容</label>
-              <select id="afWork" onchange="Daily.onAfWorkChange()"><option value="">選ぶ</option></select>
+              <select id="afWork" onchange="Daily.onAfWorkChange()"><option value="">選択</option></select>
             </div>
             <div class="af-field" style="flex:1">
               <label>時間（分）</label>
@@ -3475,7 +3475,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <!-- ===== 時間外 section ===== -->
 <section id="view-ot" class="hidden">
-  <div class="scr-head"><h1>時間外ボード</h1><input class="scr-search" id="otPcSearch" placeholder="名前で探す"></div>
+  <div class="scr-head"><h1>時間外ボード</h1><input class="scr-search" id="otPcSearch" placeholder="氏名で検索"></div>
   <div class="sub-tabs" id="otTabs">
     <button class="sub-tab on" onclick="Ot.switchTab('staff')">申告する</button>
     <button class="sub-tab" onclick="Ot.switchTab('admin')">管理</button>
@@ -3496,7 +3496,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   </div>
   <div id="otAdminView" class="admin-section" style="display:none">
     <div class="admin-tools">
-      <button class="av-add" onclick="Ot.openRequestModal()">時間外募集を出す</button>
+      <button class="av-add" onclick="Ot.openRequestModal()">時間外の募集</button>
       <button class="av-add" onclick="Ot.openStaffModal()">従業員管理</button>
     </div>
     <div id="overviewGrid"></div>
@@ -3508,9 +3508,9 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <div class="mo">
       <h3>従業員管理</h3>
       <div class="mo-row full"><div class="mo-field">
-        <label>名前を追加</label>
+        <label>氏名を追加</label>
         <div style="display:flex;gap:8px">
-          <input type="text" id="newStaffName" placeholder="名前を入力" style="flex:1">
+          <input type="text" id="newStaffName" placeholder="氏名を入力" style="flex:1">
           <button class="av-add" onclick="Ot.addStaff()" style="flex-shrink:0">追加</button>
         </div>
       </div></div>
@@ -3522,7 +3522,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   <!-- 募集モーダル -->
   <div class="mo-bg" id="reqModalBg">
     <div class="mo">
-      <h3>時間外募集を出す</h3>
+      <h3>時間外の募集</h3>
       <p style="font:400 13px/1.6 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);margin-bottom:12px">この週に時間外募集のメッセージを表示します。従業員側に表示されます。</p>
       <div class="mo-row full"><div class="mo-field">
         <label>メッセージ</label>
@@ -3530,7 +3530,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       </div></div>
       <div class="mo-foot">
         <button class="cancel" onclick="Ot.closeReqModal()">キャンセル</button>
-        <button class="save" onclick="Ot.submitRequest()">募集を出す</button>
+        <button class="save" onclick="Ot.submitRequest()">募集する</button>
       </div>
     </div>
   </div>
@@ -3723,7 +3723,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 </div>
 <div id="wbPickModal" class="wb-modal hidden">
   <div class="wb-mcard">
-    <div class="wb-mhead"><span>人を追加</span><button class="wb-mx" onclick="Wb.closePick()">×</button></div>
+    <div class="wb-mhead"><span>氏名を追加</span><button class="wb-mx" onclick="Wb.closePick()">×</button></div>
     <div class="wb-mrow col"><span class="wb-mlab">staffから選ぶ（追加後、名前タップで表記を短くできます）</span><div id="wbPickList" class="wb-picklist"></div></div>
     <div class="wb-macts"><div class="wb-sp"></div><button class="wb-cancel" onclick="Wb.closePick()">閉じる</button></div>
   </div>
@@ -3917,7 +3917,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
     <div class="selbar none" id="selbar">
       <span class="lab">運転者</span>
-      <span class="who" id="selWho">下から名前を選んでください</span>
+      <span class="who" id="selWho">下から氏名を選択してください</span>
       <span class="clr hide" id="selClr" onclick="Alc.clearSel()">変更</span>
     </div>
 
@@ -4263,8 +4263,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 11:16';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1181;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 11:24';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1182;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4843,7 +4843,7 @@ const Prod = (function(){
     const inStock=fab.filter(x=>x.meters>0);
     const total=fab.reduce((s,x)=>s+(Number(x.amount)||0),0);
     $('fabSum').innerHTML=`<div class="fv-si on"><div class="n">${inStock.length}</div><div class="l">品番</div></div><div class="fv-si"><div class="n">${fabY(total)}</div><div class="l">在庫の金額</div></div>`;
-    if(!rows.length){ el.innerHTML=`<div class="fab-empty">${fab.length?'該当なし':'まだ何もありません。「入荷」から品番・メートル・単価を入れてください（最初は仕入先を「期首」にして今ある分を）'}</div>`; return; }
+    if(!rows.length){ el.innerHTML=`<div class="fab-empty">${fab.length?'該当なし':'まだ何もありません。「入荷」から品番・メートル・単価を入力してください（最初は仕入先を「期首」にして今ある分を）'}</div>`; return; }
     el.innerHTML=`<div class="fab-row hd"><span>品番</span><span class="r">残り m</span><span class="r avg">平均単価</span><span class="r">金額</span><span class="d">最終入荷</span><span></span></div>`
       +rows.map(x=>`<div class="fab-row" onclick="Prod.openFabHist('${esc(String(x.item))}')"><span class="n">${esc(x.item)}</span><span class="r${x.meters>0?'':' zero'}">${fabM(x.meters)}</span><span class="r avg">${fabY(x.avg)}</span><span class="r${x.meters>0?'':' zero'}">${fabY(x.amount)}</span><span class="d">${x.last_in?esc(String(x.last_in).slice(5).replace('-','/'))+(x.last_vendor?' '+esc(x.last_vendor):''):''}</span><button type="button" class="cut" ${x.meters>0?'':'disabled'} onclick="event.stopPropagation();Prod.openFabOut('裁断','${esc(String(x.item))}')">裁断</button></div>`).join('');
     const dl=$('fabItemList'); if(dl) dl.innerHTML=fab.map(x=>`<option value="${esc(x.item)}">`).join('');
@@ -4853,10 +4853,10 @@ const Prod = (function(){
   async function fabEnsureCases(){ if(fabCases)return fabCases; try{ const r=await fetch(API+'?dept=cases&action=read'); const j=await r.json(); fabCases=(j.data||[]).filter(c=>!c.archived&&c.status!=='見送り').map(c=>({id:String(c.id),label:dispName(c.client,c.name)})); }catch(e){ fabCases=[]; } return fabCases; }
   // --- 入荷 ---
   function openFabIn(){ $('fi_date').value=dateStr(new Date()); $('fi_vendor').value=''; $('fi_slip').value=''; $('fiRows').innerHTML=''; addFabInRow(); addFabInRow(); addFabInRow(); $('fabInBg').classList.add('show'); setTimeout(()=>$('fi_vendor').focus(),50); }
-  function addFabInRow(){ const d=document.createElement('div'); d.className='fab-in-row'; d.innerHTML=`<input list="fabItemList" placeholder="品番" class="fi-item"><input type="number" min="0" step="0.1" placeholder="メートル" class="fi-m"><input type="number" min="0" step="1" placeholder="単価（税抜）" class="fi-p"><button type="button" class="x" onclick="this.parentElement.remove()" title="行を消す">✕</button>`; $('fiRows').appendChild(d); }
+  function addFabInRow(){ const d=document.createElement('div'); d.className='fab-in-row'; d.innerHTML=`<input list="fabItemList" placeholder="品番" class="fi-item"><input type="number" min="0" step="0.1" placeholder="メートル" class="fi-m"><input type="number" min="0" step="1" placeholder="単価（税抜）" class="fi-p"><button type="button" class="x" onclick="this.parentElement.remove()" title="行を削除">✕</button>`; $('fiRows').appendChild(d); }
   function saveFabIn(){ if(fabBusy)return; const rows=[...document.querySelectorAll('#fiRows .fab-in-row')].map(r=>({item:r.querySelector('.fi-item').value.trim(),meters:Number(r.querySelector('.fi-m').value),unit_price:Number(r.querySelector('.fi-p').value)})).filter(r=>r.item&&r.meters>0);
-    if(!rows.length){ toast('品番とメートルを入れてください',true); return; }
-    if(rows.some(r=>!(r.unit_price>=0))){ toast('単価を入れてください',true); return; }
+    if(!rows.length){ toast('品番とメートルを入力してください',true); return; }
+    if(rows.some(r=>!(r.unit_price>=0))){ toast('単価を入力してください',true); return; }
     const vendor=$('fi_vendor').value.trim(), slip_no=$('fi_slip').value.trim(), date=$('fi_date').value||dateStr(new Date());
     fabBusy=true; setTimeout(()=>{fabBusy=false},1500);
     fabSend({action:'save_in',date,vendor,slip_no,rows});
@@ -4873,13 +4873,13 @@ const Prod = (function(){
     if(item){ $('fo_item').value=item; $('fo_item').onchange(); setTimeout(()=>$('fo_m').focus(),80); }
     $('fabOutBg').classList.add('show');
     const [staff,cases]=await Promise.all([fabEnsureStaff(),fabEnsureCases()]);
-    const ps=$('fo_person'); const keep=localStorage.getItem('fab_person')||''; ps.innerHTML='<option value="">名前を選ぶ</option>'+staff.map(n=>`<option${n===keep?' selected':''}>${esc(n)}</option>`).join('');
+    const ps=$('fo_person'); const keep=localStorage.getItem('fab_person')||''; ps.innerHTML='<option value="">氏名を選択</option>'+staff.map(n=>`<option${n===keep?' selected':''}>${esc(n)}</option>`).join('');
     $('fabCaseList').innerHTML=cases.map(c=>`<option value="${esc(c.label)}">`).join('');
   }
   function saveFabOut(){ if(fabBusy)return; const item=$('fo_item').value, m=Number($('fo_m').value), person=$('fo_person').value, date=$('fo_date').value||dateStr(new Date()); const caseLabel=$('fo_case').value.trim();
-    if(!item){ toast('品番を選んでください',true); return; } if(!(m>0)){ toast('メートルを入れてください',true); return; } if(!person){ toast('名前を選んでください',true); return; }
+    if(!item){ toast('品番を選択してください',true); return; } if(!(m>0)){ toast('メートルを入力してください',true); return; } if(!person){ toast('氏名を選択してください',true); return; }
     let case_id='', case_name='';
-    if(caseLabel){ const c=(fabCases||[]).find(x=>x.label===caseLabel); if(!c){ toast('案件は一覧から選んでください（無ければ空のまま）',true); return; } case_id=c.id; case_name=c.label; }
+    if(caseLabel){ const c=(fabCases||[]).find(x=>x.label===caseLabel); if(!c){ toast('案件は一覧から選択してください（無ければ空のまま）',true); return; } case_id=c.id; case_name=c.label; }
     const x=fab.find(f=>f.item===item); if(foMode==='裁断'&&x&&m>x.meters+0.004){ if(!confirm(`残り ${fabM(x.meters)}m より多い数です。このまま記録しますか？`))return; }
     fabBusy=true; setTimeout(()=>{fabBusy=false},1500); try{localStorage.setItem('fab_person',person)}catch(e){}
     fabSend({action:foMode==='裁断'?'save_out':'return_out',date,item,meters:m,case_id,case_name,person});
@@ -4888,7 +4888,7 @@ const Prod = (function(){
   }
   // --- 棚卸 ---
   async function openFabAdj(){ $('fa_date').value=dateStr(new Date()); $('faRows').innerHTML=fab.map(x=>`<div class="fab-adj-row" data-item="${esc(x.item)}"><span>${esc(x.item)}</span><span class="cur">${fabM(x.meters)}m</span><input type="number" min="0" step="0.1" placeholder="実測"></div>`).join('')||'<div class="fab-empty">品番がありません</div>';
-    $('fabAdjBg').classList.add('show'); const staff=await fabEnsureStaff(); const ps=$('fa_person'); const keep=localStorage.getItem('fab_person')||''; ps.innerHTML='<option value="">名前を選ぶ</option>'+staff.map(n=>`<option${n===keep?' selected':''}>${esc(n)}</option>`).join(''); }
+    $('fabAdjBg').classList.add('show'); const staff=await fabEnsureStaff(); const ps=$('fa_person'); const keep=localStorage.getItem('fab_person')||''; ps.innerHTML='<option value="">氏名を選択</option>'+staff.map(n=>`<option${n===keep?' selected':''}>${esc(n)}</option>`).join(''); }
   function saveFabAdj(){ if(fabBusy)return; const rows=[...document.querySelectorAll('#faRows .fab-adj-row')].map(r=>({item:r.dataset.item,v:r.querySelector('input').value})).filter(r=>r.v!=='').map(r=>({item:r.item,actual:Number(r.v)}));
     const changed=rows.filter(r=>{ const x=fab.find(f=>f.item===r.item); return !x||Math.abs(x.meters-r.actual)>=0.005; });
     if(!changed.length){ toast('変わった品番がありません',true); return; }
@@ -4905,18 +4905,18 @@ const Prod = (function(){
     const kcls=k=>k==='入荷'||k==='期首'?'in':k==='裁断'?'cut':'';
     fabHistRows=rows; fabHistItem=item;
     $('fhList').innerHTML=(st?`<div class="fab-h stock"><span class="d"></span><span class="k" style="background:none">残り</span><span class="w">${fabM(st.meters)}m　平均単価 ${fabY(st.avg)}</span><span class="r up"></span><span class="r">${fabY(st.amount)}</span><span></span></div>`:'')
-      +(rows.length?rows.map(x=>`<div class="fab-h ${kcls(x.kind)}" data-id="${esc(String(x.id))}"><span class="d">${esc(String(x.date||'').slice(5).replace('-','/'))}</span><span class="k">${esc(x.kind)}</span><span class="w">${esc(x.ref||'')}${x.who?'　'+esc(x.who):''}</span><span class="r up">${x.kind==='調整'?(x.meters>0?'+':'')+fabM(x.meters)+'m':fabM(x.meters)+'m × '+fabY(x.unit_price)}</span><span class="r">${fabY(x.amount)}</span>${x.kind==='調整'?'<span></span>':`<button type="button" class="x" title="この記録を消す（間違えた時）" onclick="Prod.delFabRow('${esc(String(x.id))}','${x.t}')">✕</button>`}</div>`).join(''):'<div class="fab-empty">記録がありません</div>');
+      +(rows.length?rows.map(x=>`<div class="fab-h ${kcls(x.kind)}" data-id="${esc(String(x.id))}"><span class="d">${esc(String(x.date||'').slice(5).replace('-','/'))}</span><span class="k">${esc(x.kind)}</span><span class="w">${esc(x.ref||'')}${x.who?'　'+esc(x.who):''}</span><span class="r up">${x.kind==='調整'?(x.meters>0?'+':'')+fabM(x.meters)+'m':fabM(x.meters)+'m × '+fabY(x.unit_price)}</span><span class="r">${fabY(x.amount)}</span>${x.kind==='調整'?'<span></span>':`<button type="button" class="x" title="この記録を削除" onclick="Prod.delFabRow('${esc(String(x.id))}','${x.t}')">✕</button>`}</div>`).join(''):'<div class="fab-empty">記録がありません</div>');
   }
   let fabHistRows=[], fabHistItem='';
   // 間違えた記録を消す（戻しは使わない＝iller 10/17「戻すことはない」）。裁断を消すと案件に入った材料の行も一緒に消える（GAS delete_out）
   function delFabRow(id,t){ if(fabBusy)return; const x=fabHistRows.find(r=>String(r.id)===String(id)); if(!x)return;
     const what=`${x.kind} ${fabM(x.meters)}m${x.ref?'（'+x.ref+'）':''}`;
-    if(!confirm(`${what} の記録を消します。${x.kind==='裁断'&&x.case_id?'案件に入った材料の行も消えます。':''}よろしいですか？`))return;
+    if(!confirm(`${what} の記録を削除します。${x.kind==='裁断'&&x.case_id?'案件に入った材料の行も消えます。':''}よろしいですか？`))return;
     fabBusy=true; setTimeout(()=>{fabBusy=false},1500);
     fabSend({action:t==='in'?'delete_in':'delete_out',id});
     const el=document.querySelector(`#fhList .fab-h[data-id="${CSS.escape(String(id))}"]`); if(el)el.remove();
     const f=fab.find(r=>r.item===fabHistItem); if(f){ const m=Number(x.meters)||0, a=Number(x.amount)||0; if(x.kind==='裁断'){f.meters+=m;f.amount+=a;} else if(x.kind==='入荷'||x.kind==='期首'){f.meters-=m;f.amount-=a;} else if(x.kind==='戻し'){f.meters-=m;f.amount-=a;} if(f.meters<0.004){f.meters=0;f.amount=0;} f.avg=f.meters>0?f.amount/f.meters:f.avg; renderFabric(); }
-    toast('消しました'); setTimeout(()=>{ loadFabric(true); if($('fabHistBg').classList.contains('show')) openFabHist(fabHistItem); },8000);
+    toast('削除しました'); setTimeout(()=>{ loadFabric(true); if($('fabHistBg').classList.contains('show')) openFabHist(fabHistItem); },8000);
   }
   // ===== 描画 =====
   function render(){
@@ -5764,7 +5764,7 @@ const Proj = (function(){
     h+='</div>'}if(d.material)h+='<div class="view-section"><h3>材料・仕入</h3><div class="view-row"><div class="view-val">'+esc(d.material)+'</div></div></div>';
     if(d.type!=='製作')h+='<div class="rental-add-section"><h3>レンタル品</h3><div id="pvBlockHost"></div></div>';   // 製作（鉄工所）はレンタル品なし
     if(d.notes)h+='<div class="view-section"><h3>備考</h3><div class="view-row"><div class="view-val">'+esc(d.notes)+'</div></div></div>';
-    {const mt=maintTargets(d);if(mt.length)h+='<div class="st-change"><div class="st-change-label">返ってきた品</div><button type="button" class="st-toggle" onclick="Proj.sendMaint(\''+esc(String(id))+'\')">メンテ送り（'+mt.length+'件を在庫のメンテ中へ）</button></div>'}
+    {const mt=maintTargets(d);if(mt.length)h+='<div class="st-change"><div class="st-change-label">返ってきた品</div><button type="button" class="st-toggle" onclick="Proj.sendMaint(\''+esc(String(id))+'\')">メンテナンスへ（'+mt.length+'件を在庫のメンテ中へ）</button></div>'}
     h+='<div class="st-change"><div class="st-change-label">ステータス変更</div>';
     h+=`<button class="st-toggle" id="projStToggle"><span class="st-cur">現在: <span class="st-cur-badge">${esc(d.status||'-')}</span></span><span class="st-caret">変更<span class="st-arrow">▼</span></span></button>`;
     h+='<div class="st-opts" id="projStOpts">';
@@ -5859,7 +5859,7 @@ const Proj = (function(){
     // 日程の前後逆（返却日が貸出日より前・撤去日が搬入日より前）は保存させない＝レンタル品にそのまま写るので
     {const _o=$('xf_date_out').value,_i=$('xf_date_in').value;if(_o&&_i&&_i<_o){toast('入庫日が出庫日より前になっています（'+_o.replace(/-/g,'/')+'〜'+_i.replace(/-/g,'/')+'）',true);return}
      const _dd=blockDates(_rPfx);if(_dd[0]&&_dd[1]&&_dd[1]<_dd[0]){toast(($('xf_is_rental').checked?'返却日が貸出日':'撤去日が搬入日')+'より前になっています（'+_dd[0].replace(/-/g,'/')+'〜'+_dd[1].replace(/-/g,'/')+'）',true);return}}
-    if(rentalRowsIncomplete(_rRows)){toast('レンタル品の行はカテゴリ・商品を選んでください',true);return}
+    if(rentalRowsIncomplete(_rRows)){toast('レンタル品の行はカテゴリ・商品を選択してください',true);return}
     if(_rRows.length&&!fillBlockDates(_rPfx))return;
     const isRental=$('xf_is_rental').checked;
     const type=isRental?'レンタル':((_xfType==='納品'||_xfType==='製作')?_xfType:'現場');
@@ -5991,7 +5991,7 @@ const Proj = (function(){
     if(d)viewProj(d.id);}
     setTimeout(()=>{_busyRental=false},1500);
   }
-  // 台帳にない物：1行1品。保存は rentals 列に「・品名｜数量」を改行区切り（形式が揃うので後で台帳候補を抜き出せる）
+  // 台帳外の品：1行1品。保存は rentals 列に「・品名｜数量」を改行区切り（形式が揃うので後で台帳候補を抜き出せる）
   // 形式に合わない既存テキストは「以前のメモ」として別に残す（捨てない）
   function splitExtras(text){
     const items=[],legacy=[];
@@ -6019,7 +6019,7 @@ const Proj = (function(){
     const lg=String(legacyText||'').trim();
     return lines.concat(lg?[lg]:[]).join('\n');
   }
-  // 台帳に載せるリスト：各現場の「台帳にない物」を品名ごとに集計し、印刷用ページを別ウィンドウで開く（台帳と同名の品は除く）
+  // 台帳に載せるリスト：各現場の「台帳外の品」を品名ごとに集計し、印刷用ページを別ウィンドウで開く（台帳と同名の品は除く）
   async function printLedgerCandidates(){
     const w=window.open('','_blank');
     if(!w){toast('ポップアップがブロックされました。許可してもう一度押してください',true);return}
@@ -6032,14 +6032,14 @@ const Proj = (function(){
       const e=map.get(k)||{name:it.name,count:0,sites:[]};e.count++;if(e.sites.length<3)e.sites.push(String(d.project||'')+(it.qty?'（'+it.qty+'）':''));map.set(k,e)})});
     const rows=[...map.values()].sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name,'ja'));
     const t=new Date(),ds=t.getFullYear()+'/'+(t.getMonth()+1)+'/'+t.getDate();
-    const body=rows.length?rows.map((r,i)=>'<tr><td class="c">□</td><td>'+esc(r.name)+'</td><td class="n">'+r.count+'</td><td class="s">'+r.sites.map(esc).join('<br>')+(r.count>r.sites.length?'<br>ほか'+(r.count-r.sites.length)+'件':'')+'</td><td></td></tr>').join(''):'<tr><td colspan="5" style="text-align:center;padding:24px;color:#888">まだありません（現場の「台帳にない物（1行に1品）」に入れた品がここに出ます）</td></tr>';
-    const html='<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>台帳に載せるリスト '+ds+'</title><style>body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;margin:24px;color:#222}h1{font-size:18px;margin:0 0 4px}.meta{font-size:12px;color:#666;margin-bottom:12px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #999;padding:6px 8px;vertical-align:top}th{background:#eee}.c{width:28px;text-align:center}.n{width:48px;text-align:right}.s{font-size:11px;color:#444;width:38%}th:last-child{width:90px}.bar{margin-bottom:12px}@media print{.bar{display:none}body{margin:10mm}}</style></head><body><div class="bar"><button onclick="window.print()" style="font-size:14px;padding:8px 18px">印刷</button></div><h1>台帳に載せるリスト</h1><div class="meta">'+ds+' 作成　'+rows.length+'品　（現場の「台帳にない物」から集計。台帳と同じ名前の'+skipped+'件は除外）</div><table><thead><tr><th class="c">済</th><th>品名</th><th class="n">回数</th><th>使った現場（数量）</th><th>保有数</th></tr></thead><tbody>'+body+'</tbody></table></body></html>';
+    const body=rows.length?rows.map((r,i)=>'<tr><td class="c">□</td><td>'+esc(r.name)+'</td><td class="n">'+r.count+'</td><td class="s">'+r.sites.map(esc).join('<br>')+(r.count>r.sites.length?'<br>ほか'+(r.count-r.sites.length)+'件':'')+'</td><td></td></tr>').join(''):'<tr><td colspan="5" style="text-align:center;padding:24px;color:#888">まだありません（現場の「台帳外の品（1行に1品）」に入れた品がここに出ます）</td></tr>';
+    const html='<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>台帳登録候補 '+ds+'</title><style>body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;margin:24px;color:#222}h1{font-size:18px;margin:0 0 4px}.meta{font-size:12px;color:#666;margin-bottom:12px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #999;padding:6px 8px;vertical-align:top}th{background:#eee}.c{width:28px;text-align:center}.n{width:48px;text-align:right}.s{font-size:11px;color:#444;width:38%}th:last-child{width:90px}.bar{margin-bottom:12px}@media print{.bar{display:none}body{margin:10mm}}</style></head><body><div class="bar"><button onclick="window.print()" style="font-size:14px;padding:8px 18px">印刷</button></div><h1>台帳に載せるリスト</h1><div class="meta">'+ds+' 作成　'+rows.length+'品　（現場の「台帳外の品」から集計。台帳と同じ名前の'+skipped+'件は除外）</div><table><thead><tr><th class="c">済</th><th>品名</th><th class="n">回数</th><th>使用現場（数量）</th><th>保有数</th></tr></thead><tbody>'+body+'</tbody></table></body></html>';
     w.document.open();w.document.write(html);w.document.close();
   }
   function projRentalsText(id){const d=projData.find(x=>String(x.id)===String(id));return d?String(d.rentals||''):null}
   function setProjRentalsText(id,text){const d=projData.find(x=>String(x.id)===String(id));if(d)d.rentals=text;_setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems})}
   // ===== レンタル品ブロック（現場詳細・現場編集・案件編集・案件新規登録の4画面で共通） =====
-  // 並び：台帳のレンタル品 → 台帳にない物（1行1品）→ 以前のメモ。
+  // 並び：台帳のレンタル品 → 台帳外の品（1行1品）→ 以前のメモ。
   // live（既存の現場）：変えた時だけ「レンタル品を保存」を出す。defer（新規）：画面の保存で一緒に登録する
   function projById(id){return projData.find(x=>String(x.id)===String(id))||null}
   function rentalBlockHtml(d,pfx,opt){
@@ -6052,8 +6052,8 @@ const Proj = (function(){
       if(list.length)list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span class="st-'+esc(r.status)+'" style="font-size:11px;padding:2px 8px;border-radius:999px">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'});
       else h+='<div style="font-size:12px;color:var(--text-faint);margin-bottom:6px">まだ登録されていません</div>';}
     h+='<div id="rentalAddRows'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="'+esc(addFn)+'">＋ 台帳から追加</button>';
-    h+='<div class="rb-h">台帳にない物（1行に1品）</div><div id="rbExtras'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="Proj.blockAddExtra(\''+pfx+'\')">＋ 台帳にない物を追加</button>';
-    h+='<div id="rbLegacy'+pfx+'Wrap" class="hidden"><div class="rb-h">以前のメモ（台帳にない物は上の行に移していく）</div><textarea id="rbLegacy'+pfx+'" class="rb-legacy"></textarea></div>';
+    h+='<div class="rb-h">台帳外の品（1行に1品）</div><div id="rbExtras'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="Proj.blockAddExtra(\''+pfx+'\')">＋ 台帳外の品を追加</button>';
+    h+='<div id="rbLegacy'+pfx+'Wrap" class="hidden"><div class="rb-h">以前のメモ（台帳外の品は上の行に移していく）</div><textarea id="rbLegacy'+pfx+'" class="rb-legacy"></textarea></div>';
     h+='<div id="rentalSaveBtnWrap'+pfx+'" class="hidden" style="margin-top:8px">'+(live?'<button type="button" class="rental-save-btn" onclick="Proj.saveBlock(\''+pfx+'\')">レンタル品を保存</button>':'')+'</div>';
     return h+'</div>';
   }
@@ -6097,13 +6097,13 @@ const Proj = (function(){
     const en=rental?pick('rental_return',true):(pick('teardown',true)||pick('event',true)||pick('rental_return',true)||st);
     fillLastRowDates(pfx,[st,en]);blockTouched(pfx);
   }
-  // ブロックの保存（台帳の行＋台帳にない物＋以前のメモ）。fromParent＝画面の保存ボタンから呼ぶ時（トースト・連打ガードは親に任せる）
+  // ブロックの保存（台帳の行＋台帳外の品＋以前のメモ）。fromParent＝画面の保存ボタンから呼ぶ時（トースト・連打ガードは親に任せる）
   let _busyBlock=false;
   function saveBlock(pfx,fromParent){
     const b=$('rblock'+pfx);if(!b||b.dataset.live!=='1')return true;
     if(!fromParent&&_busyBlock)return false;
     const rows=pendingRentalRows(pfx);
-    if(rentalRowsIncomplete(rows)){toast('レンタル品の行はカテゴリ・商品を選んでください',true);return false}
+    if(rentalRowsIncomplete(rows)){toast('レンタル品の行はカテゴリ・商品を選択してください',true);return false}
     if(!fillBlockDates(pfx))return false;
     const d=projById(b.dataset.pid);if(!d)return true;
     const txt=blockExtrasText(pfx);const changed=txt!==String(b.dataset.orig||'');
@@ -6155,7 +6155,7 @@ const Proj = (function(){
   // 未登録の行に現場の日程を入れる。日程が無ければ false
   function fillBlockDates(pfx){
     const rows=pendingRentalRows(pfx);if(!rows.length)return true;
-    const d=blockDates(pfx);if(!d[0]||!d[1]){toast('先に現場の日程（貸出日・返却日、施工なら搬入日・撤去日）を入れてください',true);return false}
+    const d=blockDates(pfx);if(!d[0]||!d[1]){toast('先に現場の日程（貸出日・返却日、施工なら搬入日・撤去日）を入力してください',true);return false}
     rows.forEach(r=>{const ds=r.querySelectorAll('.ra-date');ds[0].value=d[0];ds[1].value=d[1]});return true;
   }
   // 案件（親）の編集画面から使うレンタル品の欄。企画制作の詳細画面と同じ追加・登録・削除を pfx 付きIDで使う
@@ -6180,7 +6180,7 @@ const Proj = (function(){
     if(list.length){list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span class="st-'+esc(r.status)+'" style="font-size:11px;padding:2px 8px;border-radius:999px">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'})}
     else h+='<div style="font-size:12px;color:var(--text-faint);margin-bottom:6px">まだ登録されていません</div>';
     h+='<div id="rentalAddRows'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="Proj.addRentalRow(\''+esc(q)+'\',\''+pfx+'\')">＋ レンタル品を追加</button>';
-    h+='<div id="rentalSaveBtnWrap'+pfx+'" class="hidden"><button type="button" class="rental-save-btn" onclick="Proj.saveProjectRentals(\''+esc(q)+'\',\''+pfx+'\')">まとめて登録</button></div>';
+    h+='<div id="rentalSaveBtnWrap'+pfx+'" class="hidden"><button type="button" class="rental-save-btn" onclick="Proj.saveProjectRentals(\''+esc(q)+'\',\''+pfx+'\')">一括登録</button></div>';
     return h;
   }
   // 現場の日程→レンタル品の日付：現場の貸出〜返却（施工は搬入〜撤去）を、その現場の全レンタル品に揃える
@@ -6217,16 +6217,16 @@ const Proj = (function(){
   let _busyMaint=false;
   function sendMaint(id){
     const d=projData.find(x=>x.id===id);if(!d||_busyMaint)return;
-    const targets=maintTargets(d);if(!targets.length){toast('メンテに送る品がありません',true);return}
+    const targets=maintTargets(d);if(!targets.length){toast('メンテナンスへ送る品がありません',true);return}
     const list=targets.map(r=>esc(r.item_name)+'×'+r.qty).join('、');
     const bg=document.createElement('div');
     bg.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
     bg.innerHTML='<div style="background:var(--surface);border-radius:14px;max-width:480px;width:100%;padding:22px 24px;font-size:14px;line-height:1.7;box-shadow:0 12px 40px rgba(0,0,0,.25)">'
-      +'<div style="font-weight:700;font-size:16px;margin-bottom:8px;color:var(--text)">メンテ送り</div>'
+      +'<div style="font-weight:700;font-size:16px;margin-bottom:8px;color:var(--text)">メンテナンスへ</div>'
       +'<div style="color:var(--text-dim);font-size:12.5px;margin-bottom:4px">レンタル品：'+list+'</div>'
       +'<div style="color:var(--text-dim);font-size:12.5px;margin-bottom:14px">→ 在庫の「メンテ中」に移動します（現場の状態は変わりません）</div>'
-      +'<button id="mcSend" style="display:block;width:100%;margin-bottom:8px;padding:12px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">メンテに送る</button>'
-      +'<button id="mcNo" style="display:block;width:100%;padding:11px;border:none;border-radius:9px;background:transparent;color:var(--text-faint);font-size:13px;cursor:pointer">やめる</button></div>';
+      +'<button id="mcSend" style="display:block;width:100%;margin-bottom:8px;padding:12px;border:none;border-radius:9px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer">メンテナンスへ送る</button>'
+      +'<button id="mcNo" style="display:block;width:100%;padding:11px;border:none;border-radius:9px;background:transparent;color:var(--text-faint);font-size:13px;cursor:pointer">キャンセル</button></div>';
     document.body.appendChild(bg);
     bg.querySelector('#mcSend').onclick=()=>{bg.remove();_busyMaint=true;
       targets.forEach(r=>{r.status='メンテ中';fireAndForget({dept:'inventory',action:'save_rental',...r})});
@@ -6568,7 +6568,7 @@ const Inv = (function(){
       <td>${esc(r.client_name)}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
       <td><div class="tbl-actions">
-        <a class="edit-link" onclick="Inv.openSplit('${r.id}')">分ける</a>
+        <a class="edit-link" onclick="Inv.openSplit('${r.id}')">分割</a>
         <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
         <a class="del-link" onclick="Inv.toDiscardList('${r.id}')">廃棄リストへ</a>
       </div></td>
@@ -6631,7 +6631,7 @@ const Inv = (function(){
       <td>${esc(r.client_name)}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
       <td><div class="tbl-actions">
-        <a class="edit-link" onclick="Inv.openSplit('${r.id}')">分ける</a>
+        <a class="edit-link" onclick="Inv.openSplit('${r.id}')">分割</a>
         <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
         <a class="del-link" onclick="Inv.deleteRental('${r.id}')">削除</a>
       </div></td>
@@ -6701,7 +6701,7 @@ const Inv = (function(){
   let _busySplit=false;
   function openSplit(id){
     const r=rentals.find(x=>x.id===id);if(!r)return;
-    if(String(id).startsWith('tmp_')){toast('保存中の行です。数秒後にもう一度',false);return}
+    if(String(id).startsWith('tmp_')){toast('保存中です。しばらくしてから操作してください',false);return}
     $('xf_sp_id').value=id;
     $('xf_sp_info').innerHTML=`<b>${esc(r.item_name)}</b> × ${r.qty}　<span class="st st-${esc(r.status)}">${esc(r.status)}</span><br>${esc(r.client_name||'')}　${dateJP(r.date_start)}〜${dateJP(r.date_end)}`;
     $('xf_sp_qty').value=1;$('xf_sp_qty').max=Number(r.qty)||1;
@@ -6714,9 +6714,9 @@ const Inv = (function(){
     if(_busySplit)return;
     const id=$('xf_sp_id').value;const r=rentals.find(x=>x.id===id);if(!r){closeSplitMo();return}
     const total=Number(r.qty)||0;let n=parseInt($('xf_sp_qty').value,10);const st=$('xf_sp_status').value;
-    if(!n||n<1){toast('個数を入れてください',false);return}
+    if(!n||n<1){toast('個数を入力してください',false);return}
     if(n>total)n=total;
-    if(st===r.status){toast('今と同じ状態です',false);return}
+    if(st===r.status){toast('変更がありません',false);return}
     _busySplit=true;setTimeout(()=>{_busySplit=false},1500);
     if(n>=total){
       r.status=st;
@@ -7296,7 +7296,7 @@ const Veh = (function(){
   function saveVehicle(){
     if(_savingVehicle) return;
     const name=$('vf_name').value.trim();
-    if(!name){toast($('vf_person').checked?'名前を入力してください':'車種を入力してください',true);return}
+    if(!name){toast($('vf_person').checked?'氏名を入力してください':'車種を入力してください',true);return}
     const editId=$('vf_id').value;
     const plate=[$('vf_plate_region').value,$('vf_plate_class').value,$('vf_plate_kana').value,$('vf_plate_seq').value].map(x=>x.trim()).filter(Boolean).join(' ');
     const body={
@@ -7360,7 +7360,7 @@ const Veh = (function(){
     const th=getThresholds();
     el.innerHTML=`
       <div class="setting-group">
-        <h3>期限アラート閾値（何日前から表示するか）</h3>
+        <h3>期限アラート（表示を始める日数）</h3>
         <div class="setting-row"><label>車検</label><input id="th_shaken" type="number" value="${th.shaken}"><span>日前</span></div>
         <div class="setting-row"><label>自賠責</label><input id="th_jibaiseki" type="number" value="${th.jibaiseki}"><span>日前</span></div>
         <div class="setting-row"><label>任意保険</label><input id="th_hoken" type="number" value="${th.hoken}"><span>日前</span></div>
@@ -8130,7 +8130,7 @@ const Daily = (function(){
     const ORDER=['生産部','企画制作部','総務部','財務部'];
     const rank=d=>{const i=ORDER.indexOf(d||'');return i<0?ORDER.length:i};
     const depts=[...new Set(staffList.map(s=>s.dept||'その他'))].sort((a,b)=>rank(a)-rank(b));
-    let h='<option value="">選ぶ</option>';
+    let h='<option value="">選択</option>';
     depts.forEach(d=>{h+=`<optgroup label="${esc(d)}">`;staffList.filter(s=>(s.dept||'その他')===d).forEach(s=>{h+=`<option value="${esc(s.employee_no)}">${esc(s.name)}</option>`});h+='</optgroup>'});
     sel.innerHTML=h;
     const saved=localStorage.getItem('daily_who');
@@ -8163,7 +8163,7 @@ const Daily = (function(){
   function setWriteDateToday(){writeDate=new Date();writeDate.setHours(0,0,0,0);renderWrite()}
   function buildAfProjOptions(){
     const sel=$('afProj');if(!sel)return;
-    let h='<option value="">選ぶ</option><option value="other">その他（自由記述）</option>';
+    let h='<option value="">選択</option><option value="other">その他（自由記述）</option>';
     const w=getWho();const me=staffList.find(s=>String(s.employee_no)===String(w));const myDept=me?me.dept:'';
     const PROD_ST_ORDER={'製作中':0,'完成':1,'受注':2,'見積中':3};
     const PROJ_ST_ORDER={'進行中':0,'現場中':0,'レンタル中':1,'メンテ中':1.5,'準備中':2,'受注':3,'見積中':4};   // 古い言葉は日報の案件一覧（GAS が返す生の値）用に残す
@@ -8201,7 +8201,7 @@ const Daily = (function(){
     const sel=$('afWork');
     if(!projType){sel.innerHTML='<option value="">先に案件を選ぶ</option>';sel.disabled=true;return}
     sel.disabled=false;
-    let h='<option value="">選ぶ</option><option value="__other__">その他（自由記述）</option>';
+    let h='<option value="">選択</option><option value="__other__">その他（自由記述）</option>';
     const og=(label,arr)=>{let s='<optgroup label="'+label+'">';arr.forEach(w=>s+=`<option value="${esc(w)}">${esc(w)}</option>`);return s+'</optgroup>'};
     if(projType==='prod')h+=og('生産部作業',WORK_PRODUCTION)+og('共通',WORK_COMMON)+og('企画制作部作業',WORK_PROJECT);
     else if(projType==='proj')h+=og('企画制作部作業',WORK_PROJECT)+og('共通',WORK_COMMON)+og('生産部作業',WORK_PRODUCTION);
@@ -8220,7 +8220,7 @@ const Daily = (function(){
     else{wrap.classList.add('hidden');$('afWorkCustom').value=''}
   }
   function openAddForm(auto){
-    const w=getWho();if(!w){toast('先に氏名を選んでください',true);return}
+    const w=getWho();if(!w){toast('先に氏名を選択してください',true);return}
     editingId=null;
     $('addForm').classList.remove('hidden');$('openAddBtn').classList.add('hidden');
     const saveBtn=$('writeView').querySelector('.af-save');if(saveBtn)saveBtn.textContent='追加';
@@ -8247,11 +8247,11 @@ const Daily = (function(){
   let _busyDel=false, _busyAbsence=false;
   function addOneEntry(){
     if(_savingAddOne) return;
-    const w=getWho();if(!w){toast('氏名を選んでください',true);return}
+    const w=getWho();if(!w){toast('氏名を選択してください',true);return}
     const projVal=$('afProj').value;let work=$('afWork').value;
     const minutesStr=$('afMinutes').value.trim();const minutes=parseInt(minutesStr,10);
-    if(!projVal){toast('案件を選んでください',true);return}
-    if(!work){toast('作業内容を選んでください',true);return}
+    if(!projVal){toast('案件を選択してください',true);return}
+    if(!work){toast('作業内容を選択してください',true);return}
     if(work==='__other__'){const customWork=$('afWorkCustom').value.trim();if(!customWork){toast('作業内容を入力してください',true);return}work=customWork}
     if(!minutesStr||isNaN(minutes)||minutes<=0){toast('時間（分）を入力してください',true);return}
     let body;
@@ -8356,15 +8356,15 @@ const Daily = (function(){
         const isTmp=String(e.id).startsWith('tmp_');const editable=isMe&&!isTmp;
         const editBtn=editable?`<button class="act-btn dv-edit" onclick="Daily.gotoEditFromView('${esc(e.id)}','${esc(e.date||'')}')">編集</button>`:'';
         const note=e.note?`<div class="dv-note">${esc(e.note)}</div>`:'';
-        dvRows+=`<tr class="dv-row"><td class="dv-proj" data-l="物件">${esc(e.project_name||'(案件不明)')}${note}</td><td class="dv-work" data-l="作業">${esc(e.work||e.action||'')}</td><td class="dv-min" data-l="時間">${mins?mins+'分':''}</td><td class="dv-actc">${editBtn}</td></tr>`;
+        dvRows+=`<tr class="dv-row"><td class="dv-proj" data-l="案件">${esc(e.project_name||'(案件不明)')}${note}</td><td class="dv-work" data-l="作業">${esc(e.work||e.action||'')}</td><td class="dv-min" data-l="時間">${mins?mins+'分':''}</td><td class="dv-actc">${editBtn}</td></tr>`;
       });
     });
-    if(dvRows) h+=`<div class="dv-tblwrap"><table class="dv-tbl"><thead><tr><th>物件</th><th>作業</th><th class="r">時間</th><th></th></tr></thead><tbody>${dvRows}</tbody></table></div>`;
+    if(dvRows) h+=`<div class="dv-tblwrap"><table class="dv-tbl"><thead><tr><th>案件</th><th>作業</th><th class="r">時間</th><th></th></tr></thead><tbody>${dvRows}</tbody></table></div>`;
     el.innerHTML=h;
   }
   function markAbsent(empNo,name){
     if(_busyAbsence)return;
-    if(!confirm(`${name}さんを休み（欠勤）にしますか？`))return;
+    if(!confirm(`${name} を欠勤にしますか？`))return;
     _busyAbsence=true;
     const date=dateStr(viewingDate);const tmpId='abs_tmp_'+Date.now();
     absenceList.push({id:tmpId,date:date,employee_no:empNo});renderViewContent();
@@ -8374,11 +8374,11 @@ const Daily = (function(){
   }
   function unmarkAbsent(absId){
     if(_busyAbsence)return;
-    if(!confirm('休み設定を取り消しますか？'))return;
+    if(!confirm('休み設定を取り削除しますか？'))return;
     _busyAbsence=true;
     absenceList=absenceList.filter(a=>String(a.id)!==String(absId));renderViewContent();
     if(!String(absId).startsWith('abs_tmp_'))fireAndForget({dept:'daily',action:'delete_absence',id:absId});
-    toast('取消しました');
+    toast('取削除しました');
     const date=dateStr(viewingDate);
     setTimeout(async()=>{await loadAbsenceList(date);renderViewContent()},2500);
     setTimeout(()=>{_busyAbsence=false},1500);
@@ -8491,14 +8491,14 @@ const Ot = (function(){
     const container=$('staffChips');
     let html='<label style="font:600 13px/1 \'Noto Sans JP\',sans-serif;color:var(--text-dim);display:flex;align-items:center;gap:10px;width:100%">自分を選択（部署順）：';
     html+='<select id="otStaffSelect" onchange="Ot.onStaffSelectChange()" style="flex:1;min-width:0;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font:500 14px/1 \'Noto Sans JP\',sans-serif;background:var(--surface)">';
-    html+='<option value="">-- 氏名を選んでください --</option>';
+    html+='<option value="">-- 氏名を選択してください --</option>';
     let curDept=null;
     staffList.forEach(s=>{const d=s.dept||'その他';if(d!==curDept){if(curDept!==null)html+='</optgroup>';html+=`<optgroup label="${oesc(d)}">`;curDept=d}const sel=s.name===selectedStaff?' selected':'';html+=`<option value="${oesc(s.name)}"${sel}>${oesc(s.name)}</option>`});
     if(curDept!==null)html+='</optgroup>';
     html+='</select></label>';
     container.innerHTML=html;
     const grid=$('dayGrid');
-    if(!selectedStaff){grid.innerHTML='<div class="loading">上から自分の名前を選んでください</div>';return}
+    if(!selectedStaff){grid.innerHTML='<div class="loading">上から自分の氏名を選択してください</div>';return}
     const dates=getWeekDates(currentWeekStart);const today=todayStr();let dhtml='';
     dates.forEach(d=>{
       const ds=fmtDate(d);const dow=d.getDay();const dayName=DAY_NAMES[dow];const isToday=ds===today;
@@ -8560,7 +8560,7 @@ requestAnimationFrame(()=>{$('staffModalBg').scrollTop=0;const _mo=$('staffModal
     const container=$('staffListItems');
     if(staffList.length===0){container.innerHTML='<div class="empty-msg" style="padding:12px">まだ登録されていません</div>';return}
     let html='';
-    staffList.forEach(s=>{const name=s.name;html+=`<div class="staff-list-item"><span>${oesc(name)}</span><button class="staff-del" onclick="Ot.removeStaff('${oesc(name)}')">外す</button></div>`});
+    staffList.forEach(s=>{const name=s.name;html+=`<div class="staff-list-item"><span>${oesc(name)}</span><button class="staff-del" onclick="Ot.removeStaff('${oesc(name)}')">除外</button></div>`});
     container.innerHTML=html;
   }
   function addStaff(){if(_busyStaff)return;const input=$('newStaffName');const name=input.value.trim();if(!name)return;if(staffList.some(s=>s.name===name)){toast('すでに登録されています');return}_busyStaff=true;staffList.push({name:name,dept:'',employee_no:''});apiPost({action:'save_staff',name:name,active:true});input.value='';renderStaffView();renderStaffList();renderAdminView();setTimeout(()=>{_busyStaff=false},1500);}
@@ -8630,7 +8630,7 @@ const Card = (function(){
     let h='';
     h+='<div class="card-panes">';
     h+='<div class="card-pane"><div class="cp-title">持ち出し・返却</div>';
-    h+=`<div class="cp-selbar${_sel?'':' none'}"><span class="cp-sel-lab">持ち出す人</span><span class="cp-sel-who">${_sel?esc(_sel):'下から名前を選んでください'}</span></div>`;
+    h+=`<div class="cp-selbar${_sel?'':' none'}"><span class="cp-sel-lab">持ち出す人</span><span class="cp-sel-who">${_sel?esc(_sel):'下から氏名を選択してください'}</span></div>`;
     const nbtn=s=>`<button type="button" class="cp-nbtn${_sel===s.name?' sel':''}" onclick="Card.sel('${esc(s.name)}')">${esc(s.name)}</button>`;
     const reg=staff.filter(s=>s.reg!==false), extra=staff.filter(s=>s.reg===false);
     if(reg.length) h+=`<div class="cp-grid">${reg.map(nbtn).join('')}</div>`;
@@ -8664,7 +8664,7 @@ const Card = (function(){
   function ctoast(msg,ok,ms,wide){const t=document.getElementById('cardToast');if(!t)return;t.innerHTML=msg;t.className='card-toast show'+(ok?' ok':'')+(wide?' wide':'');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},ms||2200);}
   function out(){
     const name=_sel;
-    if(!name){ctoast('持ち出す人を選んでください');sndError();return;}
+    if(!name){ctoast('持ち出す人を選択してください');sndError();return;}
     if(openLoan()){ctoast('まだ返却されていません');sndError();return;}
     if(guard())return;
     fire({action:'out',name});
@@ -8680,7 +8680,7 @@ const Card = (function(){
     open.return_at=nowStr();
     _sel='';                 // 返却後は持ち出す人の選択を解除
     sndOK();
-    ctoast('<span class="ct-h">返却しました</span><br>伝票に氏名・用途を明記の上、経理まで速やかに提出してください',true,5000,true);
+    ctoast('<span class="ct-h">返却しました</span><br>伝票に氏名・用途を明記のうえ、経理まで速やかに提出してください',true,5000,true);
     render(); setTimeout(loadAll,8000);
   }
   return { loadAll, render, out, ret, sel, clearSel, toggleExtra, prevWeek, nextWeek, thisWeek };
@@ -8832,7 +8832,7 @@ const Wb = (function(){
       +`<span class="wb-mlabel">${rangeLbl}</span>`
       +`<button class="wb-mbtn" onclick="Wb.nextPage()">▶</button>`
       +`<button class="wb-today" onclick="Wb.goToday()">今日</button></div>`
-      +`<div class="wb-topbtns"><button class="wb-addnew" onclick="Wb.openNew()">＋ 新規登録</button><button class="wb-addp" onclick="Wb.addPerson()">＋ 人を追加</button></div>`
+      +`<div class="wb-topbtns"><button class="wb-addnew" onclick="Wb.openNew()">＋ 新規登録</button><button class="wb-addp" onclick="Wb.addPerson()">＋ 氏名を追加</button></div>`
       +`</div>`;
     h+=`<div class="wb-legend">`+CATS.map(c=>`<span class="wb-lg" style="background:${c.bg};color:${c.fg}">${c.k}</span>`).join('')+`</div>`;
     h+=`<div class="wb-scroll"><div class="wb-grid" style="--wb-n:${N}">`;
@@ -8874,7 +8874,7 @@ const Wb = (function(){
       });
       h+=`</div></div>`;
     });
-    if(!people.length) h+=`<div class="wb-empty">「＋ 人を追加」で行をつくってください</div>`;
+    if(!people.length) h+=`<div class="wb-empty">「＋ 氏名を追加」から登録してください</div>`;
     h+=`</div></div>`;
     el.innerHTML=h;
   }
@@ -8933,9 +8933,9 @@ const Wb = (function(){
     let from=document.getElementById('wbnFrom').value, to=document.getElementById('wbnTo').value||from;
     const head=document.getElementById('wbnHead').value.trim(), memo=document.getElementById('wbnText').value.trim();
     const names=[..._newSel];
-    if(!names.length){ alert('対象の名前を選んでください'); return; }
-    if(!from){ alert('開始日を入れてください'); return; }
-    if(!head){ alert('見出しを入れてください'); return; }
+    if(!names.length){ alert('対象の氏名を選択してください'); return; }
+    if(!from){ alert('開始日を入力してください'); return; }
+    if(!head){ alert('見出しを入力してください'); return; }
     if(to<from){ const t=from; from=to; to=t; }
     if(guard())return;
     const stamp=Date.now(); let mx=people.reduce((a,p)=>Math.max(a,p.sort||0),0);
@@ -8953,8 +8953,8 @@ const Wb = (function(){
     let from=document.getElementById('wbmFrom').value, to=document.getElementById('wbmTo').value||from;
     const head=document.getElementById('wbmHead').value.trim();
     const memo=document.getElementById('wbmText').value.trim();
-    if(!from){ alert('開始日を入れてください'); return; }
-    if(!head){ alert('見出しを入れてください'); return; }
+    if(!from){ alert('開始日を入力してください'); return; }
+    if(!head){ alert('見出しを入力してください'); return; }
     if(to<from){ const t=from; from=to; to=t; }
     const newRec={ date_from:from, date_to:to, person:_edit.person, text:head, memo, category:_edit.category };
     // 追加直後(tmp)の編集：GASはtmp idでは実体を更新せず新行を作るため、
@@ -9258,7 +9258,7 @@ const Cases = (function(){
     if(_deptf) und=und.filter(c=>caseDepts(c.id)[_deptf]);
     und.sort((a,b)=>(CASE_ST.indexOf(b.status)-CASE_ST.indexOf(a.status))||String(b.created_at||'').localeCompare(String(a.created_at||'')));
     if(!und.length) return '';
-    let h=`<div class="cal-undated"><div class="cal-und-hd" onclick="Cases.toggleUnd()"><span class="cal-und-caret">${_undOpen?'▼':'▶'}</span> 日程未定 <b>${und.length}件</b><span class="cal-und-note">日付が決まれば案件に入れるとカレンダーに乗る。仮でよければ開いて「社内納期」を入れると点線で表示</span></div>`;
+    let h=`<div class="cal-undated"><div class="cal-und-hd" onclick="Cases.toggleUnd()"><span class="cal-und-caret">${_undOpen?'▼':'▶'}</span> 日程未定 <b>${und.length}件</b><span class="cal-und-note">日付が決まり次第、案件に入力するとカレンダーに表示されます。仮の日付は「社内納期」に入力すると点線で表示されます</span></div>`;
     if(_undOpen){ h+='<div class="cal-und-list">';
       und.forEach(c=>{
         h+=`<button class="cal-und-card" onclick="Cases.openEdit('${esc(c.id)}')">${deptBadges(c.id)}<span class="cal-und-name">${esc(c.name||'(無題)')}</span><span class="cal-und-st">${esc(c.status||'')}</span></button>`; });
@@ -9334,7 +9334,7 @@ const Cases = (function(){
     const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['cal','カレンダー'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
     // 大見出し：名前・検索（名前はポータルと同じ。日付は出さない＝10/16 揃え）
     const head=`<div class="scr-head"><h1>案件管理</h1>`
-      +`<input class="scr-search" id="casesSearch" placeholder="案件名・客先・担当で探す" value="${esc(_q)}" oninput="Cases.search(this.value)">`
+      +`<input class="scr-search" id="casesSearch" placeholder="案件名・得意先・担当で検索" value="${esc(_q)}" oninput="Cases.search(this.value)">`
       +`</div>`;
     const bar=`<div class="sub-tabs">`
       +tabs.map(([k,l])=>`<button class="sub-tab${_tab===k?' on':''}${k==='todo'&&_tc?' has-todo':''}" onclick="Cases.tab('${k}')">${l}</button>`).join('')
@@ -9361,7 +9361,7 @@ const Cases = (function(){
       if(_deptf) rows=rows.filter(c=>caseDepts(c.id)[_deptf]);
       const settled=_cases.filter(c=>!_arch(c.archived)&&c.status==='完了'&&_inv(c.invoiced)).length;
       const bar = settled ? `<div class="todo-bulkbar"><span class="tb-txt">締め待ち（現場が完了済・伝票済）が <b>${settled}件</b>。アーカイブで片付けられます。</span><button class="todo-bulk-btn" onclick="Cases.archiveSettled()">締め待ち ${settled}件を一括アーカイブ</button></div>` : '';
-      pane.innerHTML=`<div class="fv-sum">${deptChips(base)}</div>`+bar+(rows.length?caseTodoList(rows):'<div class="cases-empty">放置されてる案件はありません 🎉</div>');
+      pane.innerHTML=`<div class="fv-sum">${deptChips(base)}</div>`+bar+(rows.length?caseTodoList(rows):'<div class="cases-empty">対応待ちの案件はありません</div>');
       return;
     }
     if(t==='list') rows=rows.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
@@ -9511,7 +9511,7 @@ const Cases = (function(){
     el.innerHTML=h;
   }
   function addCost(){ if(_costBusy||!_editId)return; const amount=Number($('cc_amount').value); const vendor=$('cc_vendor').value.trim(), item=$('cc_item').value.trim(), kind=$('cc_kind').value, date=$('cc_date').value||dateStr(new Date());
-    if(!(amount>0)){ toast('金額を入れてください',true); return; }
+    if(!(amount>0)){ toast('金額を入力してください',true); return; }
     _costBusy=true; setTimeout(()=>{_costBusy=false},1500);
     const row={id:'tmp_'+Date.now(),case_id:_editId,date,kind,vendor,item,amount,note:''};
     _costs.push(row); renderCosts();
@@ -9519,7 +9519,7 @@ const Cases = (function(){
     $('cc_vendor').value=''; $('cc_item').value=''; $('cc_amount').value='';
     const id=_editId; setTimeout(()=>{ if(_editId===id) loadCosts(id); },8000);
   }
-  function delCost(id){ if(_costBusy)return; const x=_costs.find(r=>String(r.id)===String(id)); if(!x)return; if(String(x.note||'').startsWith('fabric:')){ toast('生地の行は在庫の「生地」で戻してください',true); return; } if(!confirm('この行を消しますか？'))return;
+  function delCost(id){ if(_costBusy)return; const x=_costs.find(r=>String(r.id)===String(id)); if(!x)return; if(String(x.note||'').startsWith('fabric:')){ toast('生地の行は在庫の「生地」で戻してください',true); return; } if(!confirm('この行を削除しますか？'))return;
     _costBusy=true; setTimeout(()=>{_costBusy=false},1500);
     _costs=_costs.filter(r=>String(r.id)!==String(id)); renderCosts();
     if(!String(id).startsWith('tmp_')) fireAndForget({dept:'cases',action:'delete_cost',id});
@@ -9562,7 +9562,7 @@ const Cases = (function(){
     try{ if(dept==='production')Prod.editProd(id); else if(dept==='project')Proj.editProj(id); else if(dept==='sales')Sales.openMo(id); }catch(e){} }
   function saveEdit(){ if(!_editId)return; const c=_find(_editId); if(!c){closeEdit();return;}
     const _pj=(_children[String(_editId)]||[]).filter(k=>k.dept==='project'&&k.project);
-    if(_pj.some((k,i)=>Proj.blockDirty('_ce'+i)&&!Cases._blockRowsOk('_ce'+i))){ toast('レンタル品の行はカテゴリ・商品を選んでください',true); return; }
+    if(_pj.some((k,i)=>Proj.blockDirty('_ce'+i)&&!Cases._blockRowsOk('_ce'+i))){ toast('レンタル品の行はカテゴリ・商品を選択してください',true); return; }
     _pj.forEach((k,i)=>{ if(Proj.blockDirty('_ce'+i)) Proj.saveBlock('_ce'+i,true); });
     const upd={name:$('ce_name').value.trim(),client:$('ce_client').value.trim(),contact:$('ce_contact').value.trim(),our_person:$('ce_our_person').value.trim(),estimate_no:$('ce_estimate_no').value.trim(),order_no:$('ce_order_no').value.trim(),status:$('ce_status').value,note:$('ce_note').value.trim(),target_date:$('ce_target_date').value,amount:$('ce_amount').value};
     logStatus(c,c.status,upd.status); Object.assign(c,upd); fireAndForget({dept:'cases',action:'save',id:_editId,...upd});
@@ -9588,9 +9588,9 @@ const Cases = (function(){
         <div class="mo-row full"><div class="mo-field"><label>案件名 *</label><input id="cf_project"></div></div>
         <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="cf_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>ステータス</label><select id="cf_status"><option>見積中</option><option selected>受注</option><option>見送り</option></select></div></div>
         <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div></div>
-        <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　一案件＝一金額</label><input type="number" id="cf_case_amount" min="0" step="1"></div></div>
+        <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　案件につき 1 つ</label><input type="number" id="cf_case_amount" min="0" step="1"></div></div>
       </div>
-      <div class="cases-hint">この案件がどこで動くかを選ぶ（両方でも可）。工場で製作→自社施工なら両方にチェック。生産がベースの案件・企画制作がベースの案件、どちらもここから登録。</div>
+      <div class="cases-hint">担当部門を選択（複数可）。製作と施工の両方を行う案件は両方にチェック。</div>
 
       <div class="cases-card off" id="cf_prodCard">
         <div class="cases-sec-hd">
@@ -9724,15 +9724,15 @@ const Cases = (function(){
   function save(){
     if(_busy)return;
     const projectName=$('cf_project').value.trim();
-    if(!projectName){ toast('案件名を入れてください',true); return; }
+    if(!projectName){ toast('案件名を入力してください',true); return; }
     const useProd=$('cf_useProd').checked, useProj=$('cf_useProj').checked, useSales=$('cf_useSales').checked;
-    if(!useProd && !useProj && !useSales){ toast('生産・企画制作・販売のどれかにチェックを入れてください',true); return; }
+    if(!useProd && !useProj && !useSales){ toast('生産・企画制作・販売のどれかにチェックを入力してください',true); return; }
     const status=$('cf_status').value;
 
     // レンタル品の行（企画制作に入る時だけ登録）。未入力の行があれば案件ごと止める
     const rRows=(useProj && jType()!=='製作' && $('rentalAddRows_cf'))?[...$('rentalAddRows_cf').querySelectorAll('.rental-add-row')]:[];
-    if(rRows.some(r=>!r.querySelector('.ra-cat').value||!r.querySelector('.ra-item').value)){ toast('レンタル品の行はカテゴリ・商品を選んでください',true); return; }
-    if(rRows.length){ const dd=defaultRentalDates(); if(!dd[0]||!dd[1]){ toast('レンタル品を入れるなら、先に日程（貸出日・返却日、現場なら搬入日・撤去日）を入れてください',true); return; } }
+    if(rRows.some(r=>!r.querySelector('.ra-cat').value||!r.querySelector('.ra-item').value)){ toast('レンタル品の行はカテゴリ・商品を選択してください',true); return; }
+    if(rRows.length){ const dd=defaultRentalDates(); if(!dd[0]||!dd[1]){ toast('レンタル品を入れるなら、先に日程（貸出日・返却日、現場なら搬入日・撤去日）を入力してください',true); return; } }
     // 日程の前後逆は登録させない（返却日が貸出日より前・撤去日が搬入日より前）
     if(useProj){ const o=$('cf_date_out').value,i=$('cf_date_in').value; if(o&&i&&i<o){ toast('入庫日が出庫日より前になっています（'+o.replace(/-/g,'/')+'〜'+i.replace(/-/g,'/')+'）',true); return; }
       const dd=defaultRentalDates(); if(dd[0]&&dd[1]&&dd[1]<dd[0]){ toast((jType()==='レンタル'?'返却日が貸出日':'撤去日が搬入日')+'より前になっています（'+dd[0].replace(/-/g,'/')+'〜'+dd[1].replace(/-/g,'/')+'）',true); return; } }
@@ -9913,7 +9913,7 @@ function renderDrivers(){
   const extra=drivers.filter(d=>d.reg===false);  // 普段運転しない人（控え）
   // スマホ用のセレクト（CSSで幅480px以下の時だけ表示。同じ状態＝selDriverを共有）
   const opt=d=>{const st=statusOf(d.name);const mk=st==='full'?' ✓':(st==='half'?' •':'');return `<option value="${esc(d.name)}"${selDriver===d.name?' selected':''}>${esc(d.name)}${mk}</option>`;};
-  let html=`<div class="drvsel"><label>運転者</label><select class="${selDriver?'sel':''}" onchange="Alc.onDriverSel(this.value)"><option value="">-- 名前を選んでください --</option>${reg.map(opt).join('')}${extra.length?`<optgroup label="普段運転しない人">${extra.map(opt).join('')}</optgroup>`:''}</select></div>`;
+  let html=`<div class="drvsel"><label>運転者</label><select class="${selDriver?'sel':''}" onchange="Alc.onDriverSel(this.value)"><option value="">-- 氏名を選択してください --</option>${reg.map(opt).join('')}${extra.length?`<optgroup label="普段運転しない人">${extra.map(opt).join('')}</optgroup>`:''}</select></div>`;
   if(reg.length){html+=`<div class="ngrid">${reg.map(btn).join('')}</div>`;}
   if(extra.length){
     html+=`<div><span class="moretoggle" onclick="Alc.toggleExtra()">${showExtra?'− 控えを隠す':'＋ その他の人（普段運転しない人）'}</span></div>`;
@@ -9935,7 +9935,7 @@ function selectDriver(name){
 function clearSel(){
   selDriver=null;
   $('selbar').classList.add('none');
-  $('selWho').textContent='下から名前を選んでください';
+  $('selWho').textContent='下から氏名を選択してください';
   $('selClr').classList.add('hide');
   segSet('segAlcohol','無');onAlcoholChange();$('f_instruction').value='';$('f_note').value='';$('f_value').value='';
   renderDrivers();
@@ -9970,7 +9970,7 @@ function renderToday(){
 
 function record(phase){
   if(busy)return;
-  if(!selDriver){toast('運転者を選んでください',false);sndError();return;}
+  if(!selDriver){toast('運転者を選択してください',false);sndError();return;}
   const alcohol=segVal('segAlcohol');
   if(alcohol==='有' && !$('f_instruction').value.trim()){
     $('detailBox').classList.add('open');$('f_instruction').focus();
@@ -9998,7 +9998,7 @@ function record(phase){
 function openEdit(id){
   const r=records.find(x=>String(x.id)===String(id));
   if(!r)return;
-  if(String(id).indexOf('tmp_')===0){toast('同期中です。数秒後に編集できます',false);return;}
+  if(String(id).indexOf('tmp_')===0){toast('同期中です。しばらくしてから操作してください',false);return;}
   curEdit=r;
   $('m_sub').textContent=`${r.driver}　${(r.date||'').replace(/-/g,'/')}`;
   segSet('m_phase',r.phase);
@@ -10031,12 +10031,12 @@ function saveEdit(){
 function delById(id){
   const r=records.find(x=>String(x.id)===String(id));
   if(!r)return;
-  if(String(id).indexOf('tmp_')===0){toast('同期中です。数秒後にどうぞ',false);return;}
-  if(!confirm(`${r.driver}・${r.phase}（${fmtTime(r.time)}）の記録を取り消しますか？`))return;
+  if(String(id).indexOf('tmp_')===0){toast('同期中です。しばらくしてから操作してください',false);return;}
+  if(!confirm(`${r.driver}・${r.phase}（${fmtTime(r.time)}）の記録を取り削除しますか？`))return;
   if(busy)return;busy=true;setTimeout(()=>busy=false,1500);
   apiPost({action:'delete',id:r.id});
   records=records.filter(x=>x.id!==r.id);
-  renderDrivers();renderToday();toast('取り消しました');
+  renderDrivers();renderToday();toast('取り削除しました');
   setTimeout(()=>loadDay($('f_date').value,true),3000);
 }
 function delRecord(){
@@ -10052,7 +10052,7 @@ function delRecord(){
 /* ===== CSV ===== */
 async function exportCsv(){
   const ym=$('f_month').value;
-  if(!ym){toast('対象月を選んでください',false);return;}
+  if(!ym){toast('対象月を選択してください',false);return;}
   toast('集計中...');
   let data=[];
   try{const r=await apiGet({action:'month',ym});data=r.data||[];}catch(e){toast('取得に失敗しました',false);return;}
@@ -10247,8 +10247,8 @@ function updateSummary(){
 
 function record(){
   if(busy)return;
-  if(!machine){toast('機体を選んでください',false);sndError();return;}
-  if(!inspector){toast('点検者を選んでください',false);sndError();return;}
+  if(!machine){toast('機体を選択してください',false);sndError();return;}
+  if(!inspector){toast('点検者を選択してください',false);sndError();return;}
   const ng=ngList();
   for(const x of ng){if(!x.memo.trim()){toast('否の項目に内容を入力してください',false);sndError();
     const m=document.querySelector(`.ck-memo[data-n="${x.n}"]`);if(m)m.focus();return;}}
@@ -10291,11 +10291,11 @@ function renderDayList(){
 }
 function delById(id){
   const r=records.find(x=>String(x.id)===String(id));if(!r)return;
-  if(String(id).indexOf('tmp_')===0){toast('同期中です。数秒後にどうぞ',false);return;}
-  if(!confirm(`${r.machine}（${r.inspector||''}）の点検記録を取り消しますか？`))return;
+  if(String(id).indexOf('tmp_')===0){toast('同期中です。しばらくしてから操作してください',false);return;}
+  if(!confirm(`${r.machine}（${r.inspector||''}）の点検記録を取り削除しますか？`))return;
   if(busy)return;busy=true;setTimeout(()=>busy=false,1500);
   apiPost({action:'delete',id:r.id});
-  records=records.filter(x=>x.id!==r.id);renderDayList();toast('取り消しました');
+  records=records.filter(x=>x.id!==r.id);renderDayList();toast('取り削除しました');
   setTimeout(()=>loadDay($('fk_f_date').value,true),3000);
 }
 
@@ -10303,7 +10303,7 @@ let _xlsxP=null;
 function loadXlsx(){ if(window.XLSX)return Promise.resolve(); return _xlsxP||(_xlsxP=new Promise((ok,ng)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';sc.onload=ok;sc.onerror=()=>{_xlsxP=null;ng(new Error('lib'))};document.head.appendChild(sc);})); }
 async function exportCsv(){
   // Excel（日×機体、画面の「この 1 か月の記録」と同じ見た目）。10/9 iller「見にくい」→ CSV をやめて xlsx に
-  const ym=$('fk_f_month').value;if(!ym){toast('対象月を選んでください',false);return;}
+  const ym=$('fk_f_month').value;if(!ym){toast('対象月を選択してください',false);return;}
   toast('集計中...');
   let data=[];try{const [r]=await Promise.all([apiGet({action:'month',ym}),loadXlsx()]);data=r.data||[];}catch(e){toast(e&&e.message==='lib'?'Excel の部品が読めません':'取得に失敗しました',false);return;}
   const ids=MACHINES.map(m=>m.id), names=ids.map(id=>id.replace('フォークリフト','')), by={};
@@ -10425,9 +10425,9 @@ const Qual = (function(){
         +'<div class="chips">'+rest.map(x=>'<span class="qc '+catCls(x.qual_id)+'" title="'+esc(qname(x.qual_id))+'">'+esc(qshort(qname(x.qual_id)))+'</span>').join('')
         +'</div></div>';
     });
-    h+='<div class="qual-card addp" onclick="Qual.openMo(null)">＋ 人を追加</div>';
+    h+='<div class="qual-card addp" onclick="Qual.openMo(null)">＋ 氏名を追加</div>';
     h+='</div>';
-    if(!people.length)h+='<div class="qual-hint">まだ誰も登録されていません。「＋ 人を追加」から始めてください。</div>';
+    if(!people.length)h+='<div class="qual-hint">登録がありません。「＋ 氏名を追加」から登録してください。</div>';
     el.innerHTML=h;
     applySearch();
   }
@@ -10441,11 +10441,11 @@ const Qual = (function(){
       $('qualMoTitle').textContent=(s2?s2.name:'')+'　の保有資格';
       _moItems=holdingsOf(_moEmp).map(h=>({qual_id:String(h.qual_id),name:qname(h.qual_id)}));
     }else{
-      $('qualMoTitle').textContent='人を追加';
+      $('qualMoTitle').textContent='氏名を追加';
       _moItems=[];
       const carded=cardedPeople().map(x=>String(x.employee_no));
       const cands=staffList.filter(x=>!carded.includes(String(x.employee_no)));
-      head='<select id="qualMoPerson"><option value="">名前を選択...</option>'
+      head='<select id="qualMoPerson"><option value="">氏名を選択</option>'
         +cands.map(x=>'<option value="'+esc(String(x.employee_no))+'">'+esc(x.name)+'</option>').join('')+'</select>';
     }
     _moOrig=_moItems.map(x=>x.qual_id);
@@ -10492,7 +10492,7 @@ const Qual = (function(){
     let emp=_moEmp;
     if(!emp){
       emp=$('qualMoPerson')?$('qualMoPerson').value:'';
-      if(!emp){toast('名前を選択してください',true);return}
+      if(!emp){toast('氏名を選択してください',true);return}
     }
     _moBusy=true; setTimeout(()=>{_moBusy=false},1500);
     const cur=_moItems.map(x=>x.qual_id);
