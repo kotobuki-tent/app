@@ -4380,8 +4380,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 18:27';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1207;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 18:33';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1208;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10017,7 +10017,7 @@ const Po = (function(){
   function render(){
     const el=$('poBody'); if(!el)return;
     const open=_pos.filter(p=>p.status==='未送信').sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')));
-    const done=_pos.filter(p=>p.status!=='未送信').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,40);
+    const done=_pos.filter(p=>p.status==='送信済').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,40);   // 取消は出さない（iller 10/19）
     const me=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_person')||'';
     // 書く欄
     const form=`<div class="po-form${_formOpen?'':' closed'}"><div class="po-form-hd" onclick="Po.toggleForm()"><b>発注書を書く</b><span class="ct-sub">宛先と品名だけで送れる。単価は分かれば。案件は下の ① で付ける</span><span class="po-caret">${_formOpen?'▲':'▼'}</span></div>
@@ -10043,7 +10043,7 @@ const Po = (function(){
     let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+form;
     h+=`<div class="po-sec"><b>未送信</b> ${open.length} 件 <button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
     h+=open.length?open.map(card).join(''):'<div class="po-empty">未送信の発注書はありません</div>';
-    if(done.length) h+=`<div class="po-sec">送信済・取消（直近）</div><div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>宛先・案件</th><th>記入者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${done.map(row).join('')}</tbody></table></div>`;
+    if(done.length) h+=`<div class="po-sec">送信済（直近）</div><div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>宛先・案件</th><th>記入者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${done.map(row).join('')}</tbody></table></div>`;
     el.innerHTML=h;
   }
   function toggleForm(){ _formOpen=!_formOpen; render(); }
@@ -10079,7 +10079,7 @@ const Po = (function(){
     send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:p.kind||'材料'}); toast(p.case_name?'送信済にしました（'+p.case_name+' の原価明細へ）':'送信済にしました（案件には付けません）'); render();
     setTimeout(loadAll,8000); }
   function cancel(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; } if(!confirm('この発注書を取り消しますか？'))return; if(guard())return;
-    p.status='取消'; send({dept:'po',action:'cancel',id}); toast('取り消しました'); render(); setTimeout(loadAll,8000); }
+    _pos=_pos.filter(x=>String(x.id)!==String(id)); send({dept:'po',action:'delete',id}); toast('取り消しました'); render(); setTimeout(loadAll,8000); }
   function setSender(id,v){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; p.sender=v; try{ localStorage.setItem('po_sender',v); }catch(e){} if(!String(id).startsWith('tmp_')) send({dept:'po',action:'save',id,sender:v}); }
   function senderOf(p){ return p.sender||(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_sender')||''; }
   function reload(){ loadAll(); }
