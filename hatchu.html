@@ -135,7 +135,7 @@ let staff=[], asap=false, deliv='弊社', items=[], busy=false;
 function toggleAsap(){ asap=!asap; $('btnAsap').classList.toggle('on',asap); if(asap) $('f_deadline').value=''; }
 function setDeliv(v){ deliv=v; [...$('delivSeg').children].forEach(b=>b.classList.toggle('on',b.textContent===v)); $('delivRow').style.display=v==='別途'?'':'none'; }
 function addItem(){ items.push({name:'',qty:'',unit:'',price:''}); renderItems(); setTimeout(()=>{ const r=$('items').lastElementChild; r&&r.querySelector('input').focus(); },50); }
-function delItem(i){ items.splice(i,1); if(!items.length) items.push({name:'',qty:'',unit:'',price:''}); renderItems(); }
+function delItem(i){ items.splice(i,1); while(items.length<5) items.push({name:'',qty:'',unit:'',price:''}); renderItems(); }
 function upd(i,k,v){ items[i][k]=v; renderTotal(); }
 function renderItems(){
   $('items').innerHTML=items.map((it,i)=>`<div class="item"><input placeholder="品名" value="${esc(it.name)}" oninput="upd(${i},'name',this.value)"><input class="n" type="number" inputmode="decimal" placeholder="数量" value="${esc(it.qty)}" oninput="upd(${i},'qty',this.value)"><input placeholder="単位" value="${esc(it.unit)}" oninput="upd(${i},'unit',this.value)"><input class="n" type="number" inputmode="numeric" placeholder="単価" value="${esc(it.price)}" oninput="upd(${i},'price',this.value)"><button type="button" class="x" onclick="delItem(${i})">✕</button></div>`).join('');
@@ -169,11 +169,12 @@ function send(){
   try{ localStorage.setItem('po_person',person); }catch(e){}
   toast('事務所へ送りました');
   $('mine').insertAdjacentHTML('afterbegin',`<div class="po" style="opacity:.6"><span class="st">未送信</span><div class="t"><b>${esc(vendor)}　${rows.slice(0,2).map(it=>esc(it.name)).join('、')}</b><small>いま　${rows.length} 行</small></div><span class="a">${yen(rows.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0))}</span></div>`);
-  $('f_vendor').value=''; $('f_note').value=''; $('f_deadline').value=''; asap=false; $('btnAsap').classList.remove('on'); items=[{name:'',qty:'',unit:'',price:''}]; renderItems();
+  $('f_vendor').value=''; $('f_note').value=''; $('f_deadline').value=''; asap=false; $('btnAsap').classList.remove('on'); items=blankItems(); renderItems();
   setTimeout(async()=>{ busy=false; $('btnSend').disabled=false; try{ const po=await apiGet({dept:'po',action:'list'}); renderMine(po.data||[]); }catch(e){} },8000);
 }
 $('f_person').addEventListener('change',()=>{ try{ localStorage.setItem('po_person',$('f_person').value); }catch(e){} apiGet({dept:'po',action:'list'}).then(po=>renderMine(po.data||[])).catch(()=>{}); });
-items=[{name:'',qty:'',unit:'',price:''}]; renderItems();
+const blankItems=()=>Array.from({length:5},()=>({name:'',qty:'',unit:'',price:''}));
+items=blankItems(); renderItems();
 (async()=>{ await woffBoot(); if(window.__woffUser) $('who').textContent=window.__woffUser.name; await load(); })();
 </script>
 </body>
