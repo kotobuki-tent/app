@@ -2652,6 +2652,11 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .ce-hours .k{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-dim)}
   #view-cases .ce-hours .t{font-weight:700;font-variant-numeric:tabular-nums}
   #view-cases .ce-hours .by{color:var(--text-dim);font-size:12px}
+  #view-cases .ce-sum{display:flex;align-items:baseline;gap:10px;padding:9px 12px;border-top:1px solid var(--border-light);font-size:13px;flex-wrap:wrap;background:var(--surface2)}
+  #view-cases .ce-sum .k{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:700;background:var(--text);color:#fff}
+  #view-cases .ce-sum .t{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+  #view-cases .ce-sum .by{color:var(--text-dim);font-size:12px}
+  #view-cases .ce-sum.bad .t{color:#a32d2d}
   #view-cases .ce-cost-add{display:grid;grid-template-columns:140px 80px 1fr;gap:8px;margin-top:8px}   /* 1 段目＝日付・区分・金額、2 段目＝仕入先・内容・追加 */
   #view-cases .ce-cost-add input,#view-cases .ce-cost-add select{min-width:0}
   @media(max-width:600px){
@@ -4250,8 +4255,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-17 12:22';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1173;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 09:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1177;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9478,9 +9483,13 @@ const Cases = (function(){
       h=rows.map(x=>`<div class="ce-cost${String(x.id).startsWith('tmp_')?' tmp':''}"><span class="d">${md(x.date)}</span><span class="k">${esc(x.kind||'')}</span><span class="v">${esc(x.vendor||'')}</span><span class="i">${esc(x.item||'')}</span><span class="a">${fmt(x.amount)}</span>${String(x.note||'').startsWith('fabric:')?'<span class="x" title="生地台帳から">▫</span>':`<button type="button" class="x" onclick="Cases.delCost('${esc(String(x.id))}')" title="削除">✕</button>`}</div>`).join('')
         +`<div class="ce-cost total"><span class="d"></span><span class="k" style="background:none">合計</span><span class="v"></span><span class="i"></span><span class="a">${fmt(total)}</span><span></span></div>`;
     }
-    // 工数（日報から）。時給はまだ決めていないので時間だけ。人別は多い順に
+    // 工数（日報から）と労務費（部門の標準時給 × 時間。GAS LABOR_RATE、2026-10-19）。その下に原価と粗利
     if(_hours){ const by=(_hours.by||[]).map(b=>`${esc(b.name)} ${hm(b.minutes)}`).join('、');
-      h+=`<div class="ce-hours"><span class="k">工数</span><span class="t">${hm(_hours.total)}</span><span class="by">${_hours.total?by:'日報に記録なし'}</span></div>`; }
+      const labor=Number(_hours.cost)||0;
+      h+=`<div class="ce-hours"><span class="k">労務費</span><span class="t">${fmt(labor)}</span><span class="by">${_hours.total?hm(_hours.total)+'　'+by:'日報に記録なし'}</span></div>`;
+      const c=_find(_editId); const sales=Number((c&&(c.amount||c.case_amount))||0); const cost=total+labor; const gp=sales-cost;
+      h+=`<div class="ce-sum"><span class="k">原価</span><span class="t">${fmt(cost)}</span><span class="by">材料・外注・経費 ${fmt(total)} ＋ 労務費 ${fmt(labor)}</span></div>`;
+      h+=`<div class="ce-sum${sales?(gp<0?' bad':''):''}"><span class="k">粗利</span><span class="t">${sales?fmt(gp):'—'}</span><span class="by">${sales?('売上 '+fmt(sales)+'　粗利率 '+Math.round(gp/sales*100)+'%'):'金額が入っていません'}</span></div>`; }
     el.innerHTML=h;
   }
   function addCost(){ if(_costBusy||!_editId)return; const amount=Number($('cc_amount').value); const vendor=$('cc_vendor').value.trim(), item=$('cc_item').value.trim(), kind=$('cc_kind').value, date=$('cc_date').value||dateStr(new Date());
