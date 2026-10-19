@@ -2623,7 +2623,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .slog-nm{flex:1;min-width:0;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #view-cases .slog-ch{flex:0 0 auto;color:var(--accent);font-weight:700}
   #view-cases .slog-ts{flex:0 0 auto;color:var(--text-faint);font-size:11px}
-  /* 案件の編集：PC は 2 列（左＝基本の欄、右＝明細・レンタル品・かかったお金・工数）。縦に伸びすぎた（iller 2026-10-17）。携帯は 1 列のまま */
+  /* 案件の編集：PC は 2 列（左＝基本の欄、右＝明細・レンタル品・原価明細・工数）。縦に伸びすぎた（iller 2026-10-17）。携帯は 1 列のまま */
   #view-cases .ce-mo{max-width:560px}
   @media(min-width:900px){
     #view-cases .ce-mo{max-width:1060px}
@@ -2641,7 +2641,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .ce-cst{flex:0 0 auto;font-size:12px;color:var(--text-dim)}
   #view-cases .ce-cgo{flex:0 0 auto;font-size:11px;color:var(--accent);font-weight:700}
   #view-cases .ce-nochild{color:var(--text-dim);font-size:13px;padding:6px 2px}
-  /* かかったお金（2026-10-17）：1 行 1 件、下に合計。追加は 1 行の入力欄 */
+  /* 原価明細（2026-10-17）：1 行 1 件、下に合計。追加は 1 行の入力欄 */
   #view-cases .ce-costs{display:flex;flex-direction:column;margin-top:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
   #view-cases .ce-costs:empty{display:none}
   #view-cases .ce-cost{display:grid;grid-template-columns:76px 42px 1fr 1fr 96px 36px;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--border-light);font-size:13px}
@@ -2764,7 +2764,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
       </div><div class="ce-col">
       <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div><div id="ce_adddept" class="ce-adddept"></div><div id="ce_rentals"></div></div>
-      <div class="mo-field"><label>かかったお金（材料・外注・経費）<span class="ce-target-note">請求書が来たら 1 行。労務費は日報から別に出す</span></label>
+      <div class="mo-field"><label>原価明細（材料費・外注費・経費）<span class="ce-target-note">発注・請求ごとに 1 行。労務費は日報の工数から算出</span></label>
         <div id="ce_costs" class="ce-costs"></div>
         <div class="ce-cost-add">
           <input type="date" id="cc_date">
@@ -4263,8 +4263,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 10:10';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1179;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 11:16';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1181;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9321,7 +9321,7 @@ const Cases = (function(){
   const _inv =v=>v===true||v==='true'||v==='TRUE';
   function _find(id){ return _cases.find(c=>String(c.id)===String(id)); }
   function fmtD(s){ return s?String(s).slice(0,10).replace(/-/g,'/'):''; }
-  // 原価・粗利（一覧の列）：原価＝かかったお金＋労務費。金額が無い案件の粗利は出さない。何も無い案件は空欄
+  // 原価・粗利（一覧の列）：原価＝原価明細＋労務費。金額が無い案件の粗利は出さない。何も無い案件は空欄
   function profitOf(c){ const p=_profit[String(c.id)]; if(!p) return null; const cost=(Number(p.cost)||0)+(Number(p.labor)||0); if(!cost) return null; const sales=Number(c.amount)||0; const gp=sales?sales-cost:null; return {cost, gp, rate: sales?Math.round(gp/sales*100):null}; }
   const yen=v=>(Number(v)<0?'−¥':'¥')+Math.abs(Number(v)).toLocaleString();
   function profitCells(c){ const p=profitOf(c); return `<td class="ct-cost">${p?yen(p.cost):''}</td><td class="ct-gp${p&&p.gp!=null&&p.gp<0?' neg':''}">${p&&p.gp!=null?yen(p.gp):''}</td><td class="ct-gpr${p&&p.gp!=null&&p.gp<0?' neg':''}">${p&&p.rate!=null?p.rate+'%':''}</td>`; }
@@ -9489,7 +9489,7 @@ const Cases = (function(){
   function search(v){ _q=v; const qq=v.trim().toLowerCase(); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||tr.textContent.toLowerCase().includes(qq))?'':'none'; }); }
   function sortBy(col){ if(_sort.col===col)_sort.asc=!_sort.asc; else {_sort.col=col;_sort.asc=true;} render(); }
   function setStf(v){ _stf=(_stf===v?'':v); render(); }
-  // ---- かかったお金（原価の材料・外注・経費、2026-10-17）。案件の編集モーダルで 1 行ずつ。労務費は日報の工数から別に出す
+  // ---- 原価明細（原価の材料・外注・経費、2026-10-17）。案件の編集モーダルで 1 行ずつ。労務費は日報の工数から別に出す
   let _costs=[], _costBusy=false, _costFor='', _hours=null;   // _hours＝{total:分, by:[{name,minutes}]}（日報から。GAS caseHours）
   async function loadCosts(id){ _costFor=String(id); try{ const r=await fetch(API+'?dept=cases&action=costs&case_id='+encodeURIComponent(id)); const j=await r.json(); if(j.success && _costFor===String(id) && _editId===id){ _hours=j.hours||null; _costs=mergeWithTmp(j.data||[], _costs, x=>String(x.date||'')+'|'+String(x.kind||'')+'|'+String(x.vendor||'')+'|'+String(x.item||'')+'|'+String(x.amount||'')); renderCosts(); } }catch(e){} }
   function renderCosts(){ const el=$('ce_costs'); if(!el)return; const rows=_costs.slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
