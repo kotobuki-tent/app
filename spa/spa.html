@@ -2601,6 +2601,47 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .ctab.new{margin-left:auto;background:transparent;border-style:dashed;color:var(--accent)}
   #view-cases .ctab.new.on{background:var(--accent);border-style:solid;color:#fff}
   #view-cases .cases-empty,#view-cases .cases-loading{color:var(--text-dim);font-size:14px;text-align:center;padding:40px 0}
+  /* 採算タブ（10/19）：期間・部門の札、合計 4 つ、粗利率の低い順の表。色は 30% 未満 赤・35% 未満 黄・それ以上 緑 */
+  #view-cases .sz-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 14px}
+  #view-cases .sz-sp{flex:1 1 12px}
+  #view-cases .sz-chip{border:1px solid var(--border);background:var(--surface);color:var(--text-dim);border-radius:999px;padding:5px 12px;font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
+  #view-cases .sz-chip.on{background:var(--text);border-color:var(--text);color:#fff}
+  #view-cases .sz-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 14px}
+  #view-cases .sz-card{background:var(--surface);border-radius:12px;padding:12px 14px;min-width:0}
+  #view-cases .sz-card .k{font-size:12px;color:var(--text-dim)}
+  #view-cases .sz-card .v{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  #view-cases .sz-card .s{font-size:11px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #view-cases .v.bad,#view-cases .sz-pct.bad,#view-cases .sz-tbl td.bad{color:#a32d2d}
+  #view-cases .v.warn,#view-cases .sz-pct.warn{color:#854f0b}
+  #view-cases .v.ok,#view-cases .sz-pct.ok{color:#3b6d11}
+  #view-cases .sz-wrap{background:var(--surface);border-radius:12px;overflow:hidden}
+  #view-cases .sz-tbl{width:100%;border-collapse:collapse}
+  #view-cases .sz-tbl th{font-size:12px;font-weight:500;color:var(--text-dim);text-align:left;padding:9px 12px;background:var(--surface2)}
+  #view-cases .sz-tbl th.num{text-align:right}
+  #view-cases .sz-tbl td{padding:9px 12px;border-top:1px solid var(--border-light);vertical-align:middle;font-size:13px}
+  #view-cases .sz-tbl td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  #view-cases .sz-tbl tr{cursor:pointer}
+  #view-cases .sz-tbl tr:hover td{background:var(--surface2)}
+  #view-cases .sz-tbl tr.dim td{color:var(--text-faint)}
+  #view-cases .sz-tbl .faint{color:var(--text-faint);font-size:12px}
+  #view-cases .sz-tbl td.rate{min-width:150px}
+  #view-cases .sz-bar-bg{display:inline-block;vertical-align:middle;width:calc(100% - 48px);height:8px;border-radius:4px;background:var(--surface3);overflow:hidden}
+  #view-cases .sz-bar-fg{display:block;height:100%;background:#639922}
+  #view-cases .sz-bar-fg.bad{background:#e24b4a}
+  #view-cases .sz-bar-fg.warn{background:#ef9f27}
+  #view-cases .sz-pct{display:inline-block;width:44px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;vertical-align:middle}
+  @media(max-width:768px){
+    #view-cases .sz-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+    #view-cases .sz-tbl thead{display:none}
+    #view-cases .sz-tbl tr{display:flex;flex-wrap:wrap;gap:4px 10px;padding:10px 12px;border-top:1px solid var(--border-light)}
+    #view-cases .sz-tbl td{display:block;padding:0;border:none}
+    #view-cases .sz-tbl td:first-child{flex:1 1 100%}
+    #view-cases .sz-tbl td.num{flex:0 0 auto;font-size:12px}
+    #view-cases .sz-tbl td.num:nth-child(2)::before{content:'金額 ';color:var(--text-faint)}
+    #view-cases .sz-tbl td.num:nth-child(3)::before{content:'原価 ';color:var(--text-faint)}
+    #view-cases .sz-tbl td.num:nth-child(4)::before{content:'粗利 ';color:var(--text-faint)}
+    #view-cases .sz-tbl td.rate{flex:1 1 100%;min-width:0}
+  }
   #view-cases .case-st-sel{padding:4px 8px;border:1px solid var(--border);border-radius:6px;font:400 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);cursor:pointer}
   #view-cases #casesPane table th{cursor:default}
   #view-cases #casesPane table th:hover{color:var(--text-dim)}
@@ -4257,8 +4298,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 14:32';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1185;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 14:43';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1186;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9158,7 +9199,7 @@ const Cases = (function(){
   ];
   const DEPT=Object.fromEntries(DEPTS.map((d,i)=>[d.k,{s:d.s,n:d.n,c:d.c,o:i}]));
   let _cases=[], _tab='list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='', _qexp=false;   // _qexp＝「期限切れ」チップで絞り込み中
-  let _profit={};   // 全案件の原価 {case_id:{cost,minutes,labor}}（dept=cases&action=profit、一覧の 原価・粗利・粗利率 の列、10/19）
+  let _profit={}, _profitAt=0, _szPeriod='', _szDept='';   // 全案件の原価 {case_id:{cost,minutes,labor}}（dept=cases&action=profit）。採算タブが使う（10/19）
   // 完了タブの得意先トグル（大口客を隠して残りを見やすく）。非表示中のキーをlocalStorageに保持
   // 'tsp'＝TSP太陽㈱のみ（TSP東日本・西日本・東北・プラスは含めない）。TSP太陽の商品センターは対象外＝トグルで消さない（illerの指示 09-08）
   const CL_GROUPS=[['tsp','TSP太陽',v=>/TSP\s*太陽/i.test(v)&&!v.includes('商品センター')],['taiyo','太陽工業',v=>v.includes('太陽工業')],['ceres','セレスポ',v=>v.includes('セレスポ')]];
@@ -9324,12 +9365,57 @@ const Cases = (function(){
   const yen=v=>(Number(v)<0?'−¥':'¥')+Math.abs(Number(v)).toLocaleString();
   function profitCells(c){ const p=profitOf(c); return `<td class="ct-cost">${p?yen(p.cost):''}</td><td class="ct-gp${p&&p.gp!=null&&p.gp<0?' neg':''}">${p&&p.gp!=null?yen(p.gp):''}</td><td class="ct-gpr${p&&p.gp!=null&&p.gp<0?' neg':''}">${p&&p.rate!=null?p.rate+'%':''}</td>`; }
   async function loadProfit(){ try{ const r=await fetch(API+'?dept=cases&action=profit'); const j=await r.json(); if(j&&j.success&&j.data){ _profit=j.data; fillProfit(); } }catch(e){} }
+  // ===== 採算タブ（2026-10-19 iller）：期間（進行中／月）と部門で絞り、合計 4 つと案件ごとの粗利率（低い順）。30% 未満 赤・35% 未満 黄（損益ゼロ 29%・目標 35%、勘定科目残高 4〜7 月から）
+  function caseDoneDate(c){ const ks=(_children[String(c.id)]||[]).filter(k=>k.status!=='見送り'); let m=null; ks.forEach(k=>{ const d=_childDoneDate(k); if(d&&(!m||d>m)) m=d; }); return m||parseD(String(c.created_at||'').slice(0,10)); }
+  const ymOf=d=>d?d.getFullYear()+'/'+(d.getMonth()+1):'';
+  async function ensureProfit(){ if(Object.keys(_profit).length && Date.now()-_profitAt<5*60*1000) return false; await loadProfit(); _profitAt=Date.now(); return true; }
+  function rateCls(r){ return r==null?'':r<30?' bad':r<35?' warn':' ok'; }
+  function renderSaisan(pane){
+    if(!Object.keys(_profit).length){ pane.innerHTML='<div class="cases-loading">集計中...</div>'; ensureProfit().then(()=>{ if(_tab==='saisan') render(); }); return; }
+    ensureProfit().then(ch=>{ if(ch && _tab==='saisan') render(); });   // 5 分より古ければ裏で取り直す
+    const now=new Date(); const cur=ymOf(now); if(!_szPeriod) _szPeriod=cur;
+    const months=[]; for(let i=0;i<6;i++){ months.push(ymOf(new Date(now.getFullYear(),now.getMonth()-i,1))); }
+    const live=c=>!_arch(c.archived)&&c.status!=='完了';
+    const base=_cases.filter(c=>c.status!=='見送り');
+    let rows=base.filter(c=> _szPeriod==='__live' ? live(c) : ymOf(caseDoneDate(c))===_szPeriod);
+    if(_szDept) rows=rows.filter(c=>caseDepts(c.id)[_szDept]);
+    const items=rows.map(c=>{ const p=_profit[String(c.id)]||{}; const mat=Number(p.cost)||0, labor=Number(p.labor)||0, cost=mat+labor, sales=Number(c.amount)||0;
+      return {c, sales, mat, labor, cost, gp:(sales&&cost)?sales-cost:null, rate:(sales&&cost)?(sales-cost)/sales*100:null}; });
+    const ranked=items.filter(x=>x.rate!=null).sort((a,b)=>a.rate-b.rate);
+    const noAmt=items.filter(x=>!x.sales&&x.cost>0), noCost=items.filter(x=>x.sales>0&&!x.cost);
+    const T=ranked.reduce((t,x)=>{t.sales+=x.sales;t.mat+=x.mat;t.labor+=x.labor;return t},{sales:0,mat:0,labor:0});
+    const gp=T.sales-T.mat-T.labor, rate=T.sales?gp/T.sales*100:null;
+    const chip=(on,label,fn)=>`<button class="sz-chip${on?' on':''}" onclick="${fn}">${label}</button>`;
+    let h='<div class="sz-bar">'+chip(_szPeriod==='__live','進行中',"Cases.setSzPeriod('__live')")+months.map(m=>chip(_szPeriod===m,m,`Cases.setSzPeriod('${m}')`)).join('')
+      +'<span class="sz-sp"></span>'+chip(!_szDept,'全部門',"Cases.setSzDept('')")+DEPTS.map(d=>chip(_szDept===d.k,d.n,`Cases.setSzDept('${d.k}')`)).join('')+'</div>';
+    const yen=v=>'¥'+Math.round(v).toLocaleString('ja-JP'), ym=v=>(v<0?'−¥':'¥')+Math.abs(Math.round(v)).toLocaleString('ja-JP');
+    h+='<div class="sz-cards">'
+      +`<div class="sz-card"><div class="k">売上</div><div class="v">${ranked.length?yen(T.sales):'—'}</div><div class="s">${ranked.length} 件</div></div>`
+      +`<div class="sz-card"><div class="k">原価</div><div class="v">${ranked.length?yen(T.mat+T.labor):'—'}</div><div class="s">材料等 ${yen(T.mat)}　労務費 ${yen(T.labor)}</div></div>`
+      +`<div class="sz-card"><div class="k">粗利</div><div class="v${gp<0?' bad':''}">${ranked.length?ym(gp):'—'}</div><div class="s">${noAmt.length?'金額なし '+noAmt.length+' 件':''}${noAmt.length&&noCost.length?'・':''}${noCost.length?'原価なし '+noCost.length+' 件':''}${(noAmt.length||noCost.length)?' は除く':'&nbsp;'}</div></div>`
+      +`<div class="sz-card"><div class="k">粗利率</div><div class="v${rateCls(rate)}">${rate!=null?Math.round(rate)+'%':'—'}</div><div class="s">損益ゼロ 29%・目標 35%</div></div>`
+      +'</div>';
+    const who=c=>{ const d=DEPTS.filter(x=>caseDepts(c.id)[x.k]).map(x=>x.n).join('・'); return esc([d,c.our_person].filter(Boolean).join('　')); };
+    const row=(x,extra)=>`<tr data-cid="${esc(x.c.id)}" onclick="Cases.openEdit('${esc(x.c.id)}')"${extra?' class="dim"':''}>`
+      +`<td><div class="ct-main">${esc(dispName(x.c.client,x.c.name))}</div><div class="ct-sub">${who(x.c)}</div></td>`
+      +`<td class="num">${x.sales?yen(x.sales):'<span class="faint">金額なし</span>'}</td>`
+      +`<td class="num">${x.cost?yen(x.cost):'<span class="faint">原価なし</span>'}</td>`
+      +`<td class="num${x.gp!=null&&x.gp<0?' bad':''}">${x.gp!=null?ym(x.gp):'—'}</td>`
+      +`<td class="rate">${x.rate!=null?`<span class="sz-bar-bg"><span class="sz-bar-fg${rateCls(x.rate)}" style="width:${Math.max(0,Math.min(100,x.rate))}%"></span></span><span class="sz-pct${rateCls(x.rate)}">${Math.round(x.rate)}%</span>`:`<span class="faint">${x.sales?'原価明細か日報が入ると出る':'金額を入れると出る'}</span>`}</td></tr>`;
+    if(!items.length){ h+='<div class="cases-empty">この期間の案件はありません</div>'; pane.innerHTML=h; return; }
+    h+='<div class="sz-wrap"><table class="sz-tbl"><thead><tr><th>案件</th><th class="num">金額</th><th class="num">原価</th><th class="num">粗利</th><th>粗利率</th></tr></thead><tbody>'
+      +ranked.map(x=>row(x)).join('')+noCost.map(x=>row(x,true)).join('')+noAmt.map(x=>row(x,true)).join('')
+      +`</tbody></table><div class="tbl-foot"><span>${items.length} 件</span></div></div>`;
+    pane.innerHTML=h;
+  }
+  function setSzPeriod(v){ _szPeriod=v; render(); }
+  function setSzDept(v){ _szDept=v; render(); }
   function fillProfit(){ document.querySelectorAll('#casesPane tr[data-cid]').forEach(tr=>{ const c=_find(tr.getAttribute('data-cid')); const old=tr.querySelector('.ct-cost'); if(!c||!old) return; const t=document.createElement('tr'); t.innerHTML=profitCells(c); const cells=t.querySelectorAll('td'); ['.ct-cost','.ct-gp','.ct-gpr'].forEach((k,i)=>{ const o=tr.querySelector(k); o.className=cells[i].className; o.innerHTML=cells[i].innerHTML; }); }); }
 
   // ===== 案件タブ：登録 / 一覧 / 完了 / アーカイブ / 管理 =====
   function render(){
     const _tc=todoCount();
-    const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['cal','カレンダー'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
+    const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['cal','カレンダー'],['saisan','採算'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
     // 大見出し：名前・検索（名前はポータルと同じ。日付は出さない＝10/16 揃え）
     const head=`<div class="scr-head"><h1>案件管理</h1>`
       +`<input class="scr-search" id="casesSearch" placeholder="案件名・得意先・担当で検索" value="${esc(_q)}" oninput="Cases.search(this.value)">`
@@ -9351,6 +9437,7 @@ const Cases = (function(){
     const pane=$('casesPane');
     let rows=_cases.slice();
     if(t==='cal'){ renderCalendar(pane); return; }
+    if(t==='saisan'){ renderSaisan(pane); return; }
     if(t==='todo'){
       rows=rows.filter(c=>caseFlags(c).length>0);
       const sev=c=>{const f=caseFlags(c); return f.some(x=>x.lv==='hi')?0:f.some(x=>x.lv==='mid')?1:2;};
@@ -9791,7 +9878,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept };
 })();
 
 const Alc=(function(){
