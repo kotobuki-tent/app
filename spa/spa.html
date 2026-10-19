@@ -4380,8 +4380,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 18:25';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1206;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 18:27';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1207;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10022,14 +10022,14 @@ const Po = (function(){
     // 書く欄
     const form=`<div class="po-form${_formOpen?'':' closed'}"><div class="po-form-hd" onclick="Po.toggleForm()"><b>発注書を書く</b><span class="ct-sub">宛先と品名だけで送れる。単価は分かれば。案件は下の ① で付ける</span><span class="po-caret">${_formOpen?'▲':'▼'}</span></div>
       ${_formOpen?`<div class="po-form-body">
-      <div class="po-f"><label>記入者</label><select id="pf_person">${['<option value="">選択</option>'].concat(_staff.map(n=>`<option${n===me?' selected':''}>${esc(n)}</option>`)).join('')}${me&&!_staff.includes(me)?`<option selected>${esc(me)}</option>`:''}</select></div>
-      <div class="po-f"><label>宛先</label><input id="pf_vendor" list="poVendorList" placeholder="仕入先" autocomplete="off"><datalist id="poVendorList">${[...new Set(_pos.map(p=>p.vendor).filter(Boolean))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>
+      <div class="po-f"><label>記入者</label><select id="pof_person">${['<option value="">選択</option>'].concat(_staff.map(n=>`<option${n===me?' selected':''}>${esc(n)}</option>`)).join('')}${me&&!_staff.includes(me)?`<option selected>${esc(me)}</option>`:''}</select></div>
+      <div class="po-f"><label>宛先</label><input id="pof_vendor" list="poVendorList" placeholder="仕入先" autocomplete="off"><datalist id="poVendorList">${[...new Set(_pos.map(p=>p.vendor).filter(Boolean))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>
       <div class="po-f wide"><label>明細</label><div class="po-item-hd"><span>品名・品番・仕様</span><span>数量</span><span>単位</span><span>単価</span><span></span></div>
         ${_items.map((it,i)=>`<div class="po-item"><input placeholder="品名" value="${esc(it.name)}" oninput="Po.upd(${i},'name',this.value)"><input class="n" type="number" inputmode="decimal" placeholder="数量" value="${esc(it.qty)}" oninput="Po.upd(${i},'qty',this.value)"><input placeholder="単位" value="${esc(it.unit)}" oninput="Po.upd(${i},'unit',this.value)"><input class="n" type="number" inputmode="numeric" placeholder="単価" value="${esc(it.price)}" oninput="Po.upd(${i},'price',this.value)"><button type="button" class="act-btn del" onclick="Po.delItem(${i})">✕</button></div>`).join('')}
-        <div class="po-item-ft"><button type="button" class="act-btn" onclick="Po.addItem()">＋ 行を追加</button><span>合計（税抜）<b id="pf_total">${yen(_items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0))}</b></span></div></div>
-      <div class="po-f"><label>納期</label><div class="po-inline"><input type="date" id="pf_deadline" ${_asap?'disabled':''}><button type="button" class="po-tg${_asap?' on':''}" onclick="Po.toggleAsap()">最短</button></div></div>
-      <div class="po-f"><label>納品先</label><div class="po-inline"><button type="button" class="po-tg${_deliv==='弊社'?' on':''}" onclick="Po.setDeliv('弊社')">弊社</button><button type="button" class="po-tg${_deliv==='別途'?' on':''}" onclick="Po.setDeliv('別途')">別途</button><input id="pf_deliver_to" placeholder="納品先" style="${_deliv==='別途'?'':'display:none'}"></div></div>
-      <div class="po-f wide"><label>備考</label><input id="pf_note" placeholder="空欄可"></div>
+        <div class="po-item-ft"><button type="button" class="act-btn" onclick="Po.addItem()">＋ 行を追加</button><span>合計（税抜）<b id="pof_total">${yen(_items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0))}</b></span></div></div>
+      <div class="po-f"><label>納期</label><div class="po-inline"><input type="date" id="pof_deadline" ${_asap?'disabled':''}><button type="button" class="po-tg${_asap?' on':''}" onclick="Po.toggleAsap()">最短</button></div></div>
+      <div class="po-f"><label>納品先</label><div class="po-inline"><button type="button" class="po-tg${_deliv==='弊社'?' on':''}" onclick="Po.setDeliv('弊社')">弊社</button><button type="button" class="po-tg${_deliv==='別途'?' on':''}" onclick="Po.setDeliv('別途')">別途</button><input id="pof_deliver_to" placeholder="納品先" style="${_deliv==='別途'?'':'display:none'}"></div></div>
+      <div class="po-f wide"><label>備考</label><input id="pof_note" placeholder="空欄可"></div>
       <div class="po-f wide" style="text-align:right"><button type="button" class="po-submit" onclick="Po.submit()">発注書を出す</button></div>
       </div>`:''}</div>`;
     const caseOpts=liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('');
@@ -10047,19 +10047,19 @@ const Po = (function(){
     el.innerHTML=h;
   }
   function toggleForm(){ _formOpen=!_formOpen; render(); }
-  function upd(i,k,v){ if(_items[i]) _items[i][k]=v; const t=$('pf_total'); if(t) t.textContent=yen(_items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0)); }
+  function upd(i,k,v){ if(_items[i]) _items[i][k]=v; const t=$('pof_total'); if(t) t.textContent=yen(_items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0)); }
   function addItem(){ _items.push({name:'',qty:'',unit:'',price:''}); keepForm(); render(); }
   function delItem(i){ _items.splice(i,1); while(_items.length<5)_items.push({name:'',qty:'',unit:'',price:''}); keepForm(); render(); }
   let _keep={};
-  function keepForm(){ _keep={person:$('pf_person')&&$('pf_person').value,vendor:$('pf_vendor')&&$('pf_vendor').value,deadline:$('pf_deadline')&&$('pf_deadline').value,deliver_to:$('pf_deliver_to')&&$('pf_deliver_to').value,note:$('pf_note')&&$('pf_note').value}; setTimeout(()=>{ Object.keys(_keep).forEach(k=>{ const el=$('pf_'+k); if(el&&_keep[k]!=null) el.value=_keep[k]; }); },0); }
+  function keepForm(){ _keep={person:$('pof_person')&&$('pof_person').value,vendor:$('pof_vendor')&&$('pof_vendor').value,deadline:$('pof_deadline')&&$('pof_deadline').value,deliver_to:$('pof_deliver_to')&&$('pof_deliver_to').value,note:$('pof_note')&&$('pof_note').value}; setTimeout(()=>{ Object.keys(_keep).forEach(k=>{ const el=$('pof_'+k); if(el&&_keep[k]!=null) el.value=_keep[k]; }); },0); }
   function toggleAsap(){ _asap=!_asap; keepForm(); render(); }
   function setDeliv(v){ _deliv=v; keepForm(); render(); }
   function submit(){ if(_busy)return;
-    const person=$('pf_person').value; if(!person){ toast('記入者を選択してください',true); return; }
-    const vendor=$('pf_vendor').value.trim(); if(!vendor){ toast('宛先を入力してください',true); return; }
+    const person=$('pof_person').value; if(!person){ toast('記入者を選択してください',true); return; }
+    const vendor=$('pof_vendor').value.trim(); if(!vendor){ toast('宛先を入力してください',true); return; }
     const rows=_items.filter(it=>String(it.name||'').trim()); if(!rows.length){ toast('品名を入力してください',true); return; }
     if(guard())return; try{ localStorage.setItem('po_person',person); }catch(e){}
-    const body={dept:'po',action:'save',person,vendor,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline:_asap?'最短':($('pf_deadline').value||''),deliver_to:_deliv==='別途'?$('pf_deliver_to').value.trim():'弊社',note:$('pf_note').value.trim()};
+    const body={dept:'po',action:'save',person,vendor,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline:_asap?'最短':($('pof_deadline').value||''),deliver_to:_deliv==='別途'?$('pof_deliver_to').value.trim():'弊社',note:$('pof_note').value.trim()};
     send(body);
     _pos.push({id:'tmp_'+Date.now(),created_at:new Date().toISOString(),status:'未送信',person,vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,kind:'材料'});
     _items=blankItems(); _asap=false; _deliv='弊社'; toast('発注書を出しました。下の ①→②→③ へ'); render();
