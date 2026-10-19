@@ -2624,6 +2624,12 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .sz-tbl tr:hover td{background:var(--surface2)}
   #view-cases .sz-tbl tr.dim td{color:var(--text-faint)}
   #view-cases .sz-tbl .faint{color:var(--text-faint);font-size:12px}
+  #view-cases .sz-miss{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:999px;background:#faeeda;color:#854f0b;font-size:11px;font-weight:600}
+  #view-cases .ce-chk{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 12px;border-top:1px solid var(--border-light);font-size:12px}
+  #view-cases .ce-chk .ck{display:inline-flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap}
+  #view-cases .ce-chk .ck input{width:15px;height:15px;margin:0}
+  #view-cases .ce-chk .ck.ok{color:#3b6d11}
+  #view-cases .ce-chk .ck.miss{color:#854f0b}
   #view-cases .sz-tbl td.rate{min-width:150px}
   #view-cases .sz-bar-bg{display:inline-block;vertical-align:middle;width:calc(100% - 48px);height:8px;border-radius:4px;background:var(--surface3);overflow:hidden}
   #view-cases .sz-bar-fg{display:block;height:100%;background:#639922}
@@ -4298,8 +4304,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 14:43';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1186;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 14:49';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1187;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9380,9 +9386,10 @@ const Cases = (function(){
     let rows=base.filter(c=> _szPeriod==='__live' ? live(c) : ymOf(caseDoneDate(c))===_szPeriod);
     if(_szDept) rows=rows.filter(c=>caseDepts(c.id)[_szDept]);
     const items=rows.map(c=>{ const p=_profit[String(c.id)]||{}; const mat=Number(p.cost)||0, labor=Number(p.labor)||0, cost=mat+labor, sales=Number(c.amount)||0;
-      return {c, sales, mat, labor, cost, gp:(sales&&cost)?sales-cost:null, rate:(sales&&cost)?(sales-cost)/sales*100:null}; });
+      const miss=costMissing(c,p); const has=cost>0||!miss.length;   // 3 区分とも「なし」で確認済みなら原価 0 でも出す
+      return {c, sales, mat, labor, cost, miss, gp:(sales&&has)?sales-cost:null, rate:(sales&&has)?(sales-cost)/sales*100:null}; });
     const ranked=items.filter(x=>x.rate!=null).sort((a,b)=>a.rate-b.rate);
-    const noAmt=items.filter(x=>!x.sales&&x.cost>0), noCost=items.filter(x=>x.sales>0&&!x.cost);
+    const noAmt=items.filter(x=>!x.sales&&x.cost>0), noCost=items.filter(x=>x.sales>0&&x.rate==null); const unconfirmed=ranked.filter(x=>x.miss.length).length;
     const T=ranked.reduce((t,x)=>{t.sales+=x.sales;t.mat+=x.mat;t.labor+=x.labor;return t},{sales:0,mat:0,labor:0});
     const gp=T.sales-T.mat-T.labor, rate=T.sales?gp/T.sales*100:null;
     const chip=(on,label,fn)=>`<button class="sz-chip${on?' on':''}" onclick="${fn}">${label}</button>`;
@@ -9392,12 +9399,12 @@ const Cases = (function(){
     h+='<div class="sz-cards">'
       +`<div class="sz-card"><div class="k">売上</div><div class="v">${ranked.length?yen(T.sales):'—'}</div><div class="s">${ranked.length} 件</div></div>`
       +`<div class="sz-card"><div class="k">原価</div><div class="v">${ranked.length?yen(T.mat+T.labor):'—'}</div><div class="s">材料等 ${yen(T.mat)}　労務費 ${yen(T.labor)}</div></div>`
-      +`<div class="sz-card"><div class="k">粗利</div><div class="v${gp<0?' bad':''}">${ranked.length?ym(gp):'—'}</div><div class="s">${noAmt.length?'金額なし '+noAmt.length+' 件':''}${noAmt.length&&noCost.length?'・':''}${noCost.length?'原価なし '+noCost.length+' 件':''}${(noAmt.length||noCost.length)?' は除く':'&nbsp;'}</div></div>`
+      +`<div class="sz-card"><div class="k">粗利</div><div class="v${gp<0?' bad':''}">${ranked.length?ym(gp):'—'}</div><div class="s">${unconfirmed?'原価が未確認 '+unconfirmed+' 件':''}${unconfirmed&&(noAmt.length||noCost.length)?'・':''}${noAmt.length?'金額なし '+noAmt.length:''}${noAmt.length&&noCost.length?'・':''}${noCost.length?'原価なし '+noCost.length:''}${(noAmt.length||noCost.length)?' は除く':''}${(unconfirmed||noAmt.length||noCost.length)?'':'&nbsp;'}</div></div>`
       +`<div class="sz-card"><div class="k">粗利率</div><div class="v${rateCls(rate)}">${rate!=null?Math.round(rate)+'%':'—'}</div><div class="s">損益ゼロ 29%・目標 35%</div></div>`
       +'</div>';
     const who=c=>{ const d=DEPTS.filter(x=>caseDepts(c.id)[x.k]).map(x=>x.n).join('・'); return esc([d,c.our_person].filter(Boolean).join('　')); };
     const row=(x,extra)=>`<tr data-cid="${esc(x.c.id)}" onclick="Cases.openEdit('${esc(x.c.id)}')"${extra?' class="dim"':''}>`
-      +`<td><div class="ct-main">${esc(dispName(x.c.client,x.c.name))}</div><div class="ct-sub">${who(x.c)}</div></td>`
+      +`<td><div class="ct-main">${esc(dispName(x.c.client,x.c.name))}</div><div class="ct-sub">${who(x.c)}${x.miss.length?`<span class="sz-miss">未確認 ${x.miss.map(k=>COST_LABEL[k]).join('・')}</span>`:''}</div></td>`
       +`<td class="num">${x.sales?yen(x.sales):'<span class="faint">金額なし</span>'}</td>`
       +`<td class="num">${x.cost?yen(x.cost):'<span class="faint">原価なし</span>'}</td>`
       +`<td class="num${x.gp!=null&&x.gp<0?' bad':''}">${x.gp!=null?ym(x.gp):'—'}</td>`
@@ -9576,6 +9583,10 @@ const Cases = (function(){
   // ---- 原価明細（原価の材料・外注・経費、2026-10-17）。案件の編集モーダルで 1 行ずつ。労務費は日報の工数から別に出す
   let _costs=[], _costBusy=false, _costFor='', _hours=null;   // _hours＝{total:分, by:[{name,minutes}]}（日報から。GAS caseHours）
   async function loadCosts(id){ _costFor=String(id); try{ const r=await fetch(API+'?dept=cases&action=costs&case_id='+encodeURIComponent(id)); const j=await r.json(); if(j.success && _costFor===String(id) && _editId===id){ _hours=j.hours||null; _costs=mergeWithTmp(j.data||[], _costs, x=>String(x.date||'')+'|'+String(x.kind||'')+'|'+String(x.vendor||'')+'|'+String(x.item||'')+'|'+String(x.amount||'')); renderCosts(); } }catch(e){} }
+  const COST_KINDS=['材料','外注','経費'], COST_LABEL={材料:'材料費',外注:'外注費',経費:'経費'};
+  const costNoneSet=c=>new Set(String((c&&c.cost_none)||'').split(',').map(x=>x.trim()).filter(Boolean));
+  function toggleCostNone(k){ const c=_find(_editId); if(!c)return; const set=costNoneSet(c); if(set.has(k))set.delete(k); else set.add(k); c.cost_none=[...set].join(','); fireAndForget({dept:'cases',action:'cost_none',id:_editId,cost_none:c.cost_none}); renderCosts(); }
+  function costMissing(c,p){ const none=costNoneSet(c), k=(p&&p.k)||{}; return COST_KINDS.filter(x=>!(Number(k[x])>0)&&!none.has(x)); }   // 採算：まだ確認されていない区分
   function renderCosts(){ const el=$('ce_costs'); if(!el)return; const rows=_costs.slice().sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
     const fmt=n=>'¥'+Number(n||0).toLocaleString('ja-JP'); const md=d=>{const m=String(d||'').match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${+m[2]}/${+m[3]}`:'';};
     const hm=m=>{m=Number(m)||0; const h=Math.floor(m/60), r=m%60; return h+'時間'+(r?r+'分':'');};
@@ -9585,6 +9596,10 @@ const Cases = (function(){
       h=rows.map(x=>`<div class="ce-cost${String(x.id).startsWith('tmp_')?' tmp':''}"><span class="d">${md(x.date)}</span><span class="k">${esc(x.kind||'')}</span><span class="v">${esc(x.vendor||'')}</span><span class="i">${esc(x.item||'')}</span><span class="a">${fmt(x.amount)}</span>${String(x.note||'').startsWith('fabric:')?'<span class="x" title="生地台帳から">▫</span>':`<button type="button" class="x" onclick="Cases.delCost('${esc(String(x.id))}')" title="削除">✕</button>`}</div>`).join('')
         +`<div class="ce-cost total"><span class="d"></span><span class="k" style="background:none">合計</span><span class="v"></span><span class="i"></span><span class="a">${fmt(total)}</span><span></span></div>`;
     }
+    // 原価の確認（2026-10-19 iller「何の材料が足りてないかのチェック欄」）：区分ごとに、行があれば金額、無ければ「なし（0 円）」のチェック。未チェックは未確認
+    { const c0=_find(_editId); const none=costNoneSet(c0); const sumK=k=>rows.filter(x=>x.kind===k).reduce((a,x)=>a+(Number(x.amount)||0),0);
+      h+='<div class="ce-chk">'+COST_KINDS.map(k=>{ const v=sumK(k); if(v>0) return `<span class="ck ok">${COST_LABEL[k]} ${fmt(v)}</span>`;
+        return `<label class="ck${none.has(k)?' ok':' miss'}"><input type="checkbox" ${none.has(k)?'checked':''} onchange="Cases.toggleCostNone('${k}')">${COST_LABEL[k]} なし（0 円）</label>`; }).join('')+'</div>'; }
     // 工数（日報から）と労務費（部門の標準時給 × 時間。GAS LABOR_RATE、2026-10-19）。その下に原価と粗利
     if(_hours){ const by=(_hours.by||[]).map(b=>`${esc(b.name)} ${hm(b.minutes)}`).join('、');
       const labor=Number(_hours.cost)||0;
@@ -9878,7 +9893,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone };
 })();
 
 const Alc=(function(){
