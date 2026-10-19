@@ -2665,6 +2665,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-po .po-n{font-size:12px;font-weight:700;color:var(--text-dim)}
   #view-po .po-case{width:100%;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font:400 13px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
   #view-po .po-kind{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
+  #view-po .po-sender{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);max-width:100%}
   #view-po .po-btn{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:999px;padding:8px 16px;font:600 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
   #view-po .po-btn.dark{background:var(--text);border-color:var(--text);color:#fff}
   #view-po .po-kind-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-dim)}
@@ -4379,8 +4380,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 18:18';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1205;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 18:25';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1206;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10032,10 +10033,11 @@ const Po = (function(){
       <div class="po-f wide" style="text-align:right"><button type="button" class="po-submit" onclick="Po.submit()">発注書を出す</button></div>
       </div>`:''}</div>`;
     const caseOpts=liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('');
+    const sender0=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_sender')||'';   // 発注者（送る人）の既定＝LINE WORKS の名前か前回
     const card=p=>`<div class="po-card" data-id="${esc(p.id)}">
       <div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${p.deadline?'納期 '+esc(p.deadline)+'　':''}${p.deliver_to&&p.deliver_to!=='弊社'?'納品先 '+esc(p.deliver_to)+'　':''}${p.note?'備考 '+esc(p.note)+'　':''}合計 ${yen(total(p))}</div></div>
       <div class="po-step"><div class="po-n">① 案件と区分</div><input class="po-case" list="poCaseList" placeholder="案件を検索（付けないなら空）" value="${esc(p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'')}" onchange="Po.assign('${esc(p.id)}')"><select class="po-kind" onchange="Po.assign('${esc(p.id)}')">${KINDS.map(k=>`<option${(p.kind||'材料')===k?' selected':''}>${k}</option>`).join('')}</select><div class="ct-sub po-case-st">${p.case_name?'注文番号 '+esc(p.order_no||p.id):'案件なし＝在庫・共用。注文番号は '+esc(p.id)}</div></div>
-      <div class="po-step"><div class="po-n">② 発注書</div><button type="button" class="po-btn" onclick="Po.print('${esc(p.id)}')">開いて送る</button><div class="ct-sub">印刷して FAX か、PDF でメール</div></div>
+      <div class="po-step"><div class="po-n">② 発注者と発注書</div><select class="po-sender" onchange="Po.setSender('${esc(p.id)}',this.value)">${['<option value="">発注者（送る人）</option>'].concat(_staff.map(n=>`<option${(p.sender||sender0)===n?' selected':''}>${esc(n)}</option>`)).join('')}</select><button type="button" class="po-btn" onclick="Po.print('${esc(p.id)}')">開いて送る</button><div class="ct-sub">印刷して FAX か、PDF でメール</div></div>
       <div class="po-step"><div class="po-n">③ 送ったら</div><button type="button" class="po-btn dark" onclick="Po.markSent('${esc(p.id)}')">送信済にする</button><button type="button" class="act-btn del" onclick="Po.cancel('${esc(p.id)}')">取消</button><div class="ct-sub po-send-st">${p.case_name?'原価明細に入る':'原価明細には入れない'}</div></div></div>`;
     const row=p=>`<tr><td><div class="po-vendor">${esc(p.vendor||'')} <span class="po-kind-tag">${esc(p.kind||'')}</span></div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):'案件なし'}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><span class="po-st${p.status==='送信済'?' sent':' cancel'}">${esc(p.status)}${p.status==='送信済'&&p.sent_at?'<br><small>'+d8(p.sent_at)+(p.sent_by?' '+esc(p.sent_by):'')+'</small>':''}</span><button type="button" class="act-btn" onclick="Po.print('${esc(p.id)}')">発注書</button></td></tr>`;
     let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+form;
@@ -10072,12 +10074,14 @@ const Po = (function(){
   function markSent(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
     const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(el){ const v=el.querySelector('.po-case').value.trim(); if(v&&!caseOf(v)){ toast('案件は候補から選択してください',true); return; } assign(id); }
     if(!confirm(p.case_name?`仕入先へ送りましたか？\n送信済にして、明細を ${p.case_name} の原価明細（${p.kind||'材料'}）に入れます。`:'仕入先へ送りましたか？\n案件なし（在庫・共用）なので原価明細には入れません。'))return;
-    if(guard())return; const me=(window.__woffUser&&window.__woffUser.name)||'';
+    if(guard())return; const me=senderOf(p);
     p.status='送信済'; p.sent_at=new Date().toISOString(); p.sent_by=me;
     send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:p.kind||'材料'}); toast(p.case_name?'送信済にしました（'+p.case_name+' の原価明細へ）':'送信済にしました（案件には付けません）'); render();
     setTimeout(loadAll,8000); }
   function cancel(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; } if(!confirm('この発注書を取り消しますか？'))return; if(guard())return;
     p.status='取消'; send({dept:'po',action:'cancel',id}); toast('取り消しました'); render(); setTimeout(loadAll,8000); }
+  function setSender(id,v){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; p.sender=v; try{ localStorage.setItem('po_sender',v); }catch(e){} if(!String(id).startsWith('tmp_')) send({dept:'po',action:'save',id,sender:v}); }
+  function senderOf(p){ return p.sender||(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_sender')||''; }
   function reload(){ loadAll(); }
   // 発注書を別窓で（A4、印刷か PDF）。紙の 発注書.pdf と同じ形。注文番号＝案件を付けていれば受注番号、無ければ発注書の番号
   function print(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return;
@@ -10101,11 +10105,11 @@ table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.item
 <table class="items"><tr><th style="width:8mm">No</th><th>品名・品番・仕様</th><th style="width:16mm">数量</th><th style="width:12mm">単位</th><th style="width:24mm">単価</th><th style="width:28mm">金額（税抜）</th></tr>${rows}<tr><td colspan="5" class="num">合計（税抜）</td><td class="num">${n(total(p))} 円</td></tr></table>
 <table class="cond"><tr><th>納期</th><td style="white-space:nowrap">${esc(dl)}</td><th>納品先</th><td>${esc(p.deliver_to||'弊社')}</td></tr><tr><th>支払</th><td colspan="3">20 日締め／翌月 15 日払い</td></tr><tr><th>備考</th><td colspan="3" style="height:12mm">${esc(p.note||'')}</td></tr></table>
 <p class="note">納品書・請求書に上記の<b>注文番号</b>をご記載いただけますと幸いです。</p>
-<table class="foot"><tr><td class="co" style="vertical-align:bottom"><span class="n">有限会社寿テント</span><br>〒689-2102　鳥取県東伯郡北栄町国坂104-2<br>TEL 0858-36-2811　FAX 0858-36-2863　mail kt-info@kototen.com</td><td class="co" style="text-align:right;vertical-align:bottom;white-space:nowrap">発注者印<br><span style="display:inline-block;width:18mm;height:18mm;border:1px solid #000"></span></td></tr></table>
+<table class="foot"><tr><td class="co" style="vertical-align:bottom"><span class="n">有限会社寿テント</span><br>〒689-2102　鳥取県東伯郡北栄町国坂104-2<br>TEL 0858-36-2811　FAX 0858-36-2863　mail kt-info@kototen.com</td><td class="co" style="text-align:right;vertical-align:bottom;white-space:nowrap">発注者　${esc(senderOf(p))}</td></tr></table>
 </body></html>`;
     w.document.open(); w.document.write(html); w.document.close(); }
   function init(){}
-  return { loadAll, render, init, toggleForm, upd, addItem, delItem, toggleAsap, setDeliv, submit, assign, markSent, cancel, reload, print };
+  return { loadAll, render, init, toggleForm, upd, addItem, delItem, toggleAsap, setDeliv, submit, assign, setSender, markSent, cancel, reload, print };
 })();
 
 const Alc=(function(){
