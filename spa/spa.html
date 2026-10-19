@@ -2624,6 +2624,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .sz-tbl tr:hover td{background:var(--surface2)}
   #view-cases .sz-tbl tr.dim td{color:var(--text-faint)}
   #view-cases .sz-tbl .faint{color:var(--text-faint);font-size:12px}
+  #view-cases .sz-parts{font-size:11px;color:var(--text-faint);font-weight:400;white-space:normal;margin-top:2px}
   #view-cases .sz-miss{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:999px;background:#faeeda;color:#854f0b;font-size:11px;font-weight:600}
   #view-cases .ce-chk{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 12px;border-top:1px solid var(--border-light);font-size:12px}
   #view-cases .ce-chk .ck{display:inline-flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap}
@@ -4304,8 +4305,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 14:49';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1187;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-19 14:54';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1188;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9382,12 +9383,14 @@ const Cases = (function(){
     const now=new Date(); const cur=ymOf(now); if(!_szPeriod) _szPeriod=cur;
     const months=[]; for(let i=0;i<6;i++){ months.push(ymOf(new Date(now.getFullYear(),now.getMonth()-i,1))); }
     const live=c=>!_arch(c.archived)&&c.status!=='完了';
+    const yen=v=>'¥'+Math.round(v).toLocaleString('ja-JP'), ym=v=>(v<0?'−¥':'¥')+Math.abs(Math.round(v)).toLocaleString('ja-JP');
     const base=_cases.filter(c=>c.status!=='見送り');
     let rows=base.filter(c=> _szPeriod==='__live' ? live(c) : ymOf(caseDoneDate(c))===_szPeriod);
     if(_szDept) rows=rows.filter(c=>caseDepts(c.id)[_szDept]);
     const items=rows.map(c=>{ const p=_profit[String(c.id)]||{}; const mat=Number(p.cost)||0, labor=Number(p.labor)||0, cost=mat+labor, sales=Number(c.amount)||0;
       const miss=costMissing(c,p); const has=cost>0||!miss.length;   // 3 区分とも「なし」で確認済みなら原価 0 でも出す
-      return {c, sales, mat, labor, cost, miss, gp:(sales&&has)?sales-cost:null, rate:(sales&&has)?(sales-cost)/sales*100:null}; });
+      const k=p.k||{}; const parts=COST_KINDS.filter(x=>Number(k[x])>0).map(x=>COST_LABEL[x]+' '+yen(k[x])); if(labor>0) parts.push('労務費 '+yen(labor)+'（'+(Math.round((Number(p.minutes)||0)/6)/10)+'h）');   // 原価の内訳（iller 10/19「ここで原価の内訳が知りたい」）
+      return {c, sales, mat, labor, cost, miss, parts, gp:(sales&&has)?sales-cost:null, rate:(sales&&has)?(sales-cost)/sales*100:null}; });
     const ranked=items.filter(x=>x.rate!=null).sort((a,b)=>a.rate-b.rate);
     const noAmt=items.filter(x=>!x.sales&&x.cost>0), noCost=items.filter(x=>x.sales>0&&x.rate==null); const unconfirmed=ranked.filter(x=>x.miss.length).length;
     const T=ranked.reduce((t,x)=>{t.sales+=x.sales;t.mat+=x.mat;t.labor+=x.labor;return t},{sales:0,mat:0,labor:0});
@@ -9395,7 +9398,6 @@ const Cases = (function(){
     const chip=(on,label,fn)=>`<button class="sz-chip${on?' on':''}" onclick="${fn}">${label}</button>`;
     let h='<div class="sz-bar">'+chip(_szPeriod==='__live','進行中',"Cases.setSzPeriod('__live')")+months.map(m=>chip(_szPeriod===m,m,`Cases.setSzPeriod('${m}')`)).join('')
       +'<span class="sz-sp"></span>'+chip(!_szDept,'全部門',"Cases.setSzDept('')")+DEPTS.map(d=>chip(_szDept===d.k,d.n,`Cases.setSzDept('${d.k}')`)).join('')+'</div>';
-    const yen=v=>'¥'+Math.round(v).toLocaleString('ja-JP'), ym=v=>(v<0?'−¥':'¥')+Math.abs(Math.round(v)).toLocaleString('ja-JP');
     h+='<div class="sz-cards">'
       +`<div class="sz-card"><div class="k">売上</div><div class="v">${ranked.length?yen(T.sales):'—'}</div><div class="s">${ranked.length} 件</div></div>`
       +`<div class="sz-card"><div class="k">原価</div><div class="v">${ranked.length?yen(T.mat+T.labor):'—'}</div><div class="s">材料等 ${yen(T.mat)}　労務費 ${yen(T.labor)}</div></div>`
@@ -9406,7 +9408,7 @@ const Cases = (function(){
     const row=(x,extra)=>`<tr data-cid="${esc(x.c.id)}" onclick="Cases.openEdit('${esc(x.c.id)}')"${extra?' class="dim"':''}>`
       +`<td><div class="ct-main">${esc(dispName(x.c.client,x.c.name))}</div><div class="ct-sub">${who(x.c)}${x.miss.length?`<span class="sz-miss">未確認 ${x.miss.map(k=>COST_LABEL[k]).join('・')}</span>`:''}</div></td>`
       +`<td class="num">${x.sales?yen(x.sales):'<span class="faint">金額なし</span>'}</td>`
-      +`<td class="num">${x.cost?yen(x.cost):'<span class="faint">原価なし</span>'}</td>`
+      +`<td class="num">${x.cost?yen(x.cost):'<span class="faint">原価なし</span>'}${x.parts.length?`<div class="sz-parts">${x.parts.join('・')}</div>`:''}</td>`
       +`<td class="num${x.gp!=null&&x.gp<0?' bad':''}">${x.gp!=null?ym(x.gp):'—'}</td>`
       +`<td class="rate">${x.rate!=null?`<span class="sz-bar-bg"><span class="sz-bar-fg${rateCls(x.rate)}" style="width:${Math.max(0,Math.min(100,x.rate))}%"></span></span><span class="sz-pct${rateCls(x.rate)}">${Math.round(x.rate)}%</span>`:`<span class="faint">${x.sales?'原価明細か日報が入ると出る':'金額を入れると出る'}</span>`}</td></tr>`;
     if(!items.length){ h+='<div class="cases-empty">この期間の案件はありません</div>'; pane.innerHTML=h; return; }
