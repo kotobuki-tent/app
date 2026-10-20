@@ -4392,8 +4392,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-20 16:55';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1214;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-20 17:08';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1215;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8887,6 +8887,7 @@ const Wb = (function(){
     _holCache[year]=H; return H;
   }
   function holName(dt){ return buildJpHolidays(dt.getFullYear())[(dt.getMonth()+1)+'-'+dt.getDate()]||null; }
+  window.jpHolName=holName;   // 他の画面（リフト点検）からも祝日を引く（2026-10-20）
 
   async function apiGet(){ try{ const r=await fetch(API+'?dept=wb&action=read'); return await r.json(); }catch(e){ return null; } }
   function fire(body){ Pending.touch(); try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'wb',...body})}); }catch(e){} }
@@ -10510,12 +10511,13 @@ function renderHistory(){
   const by={};hist.forEach(r=>{by[String(r.date).slice(0,10)+'|'+r.machine]=r;});
   const days=[];const d=new Date();d.setHours(0,0,0,0);
   for(let i=0;i<31;i++){const x=new Date(d);x.setDate(d.getDate()-i);days.push(x);}
-  const cnt={},wd=days.filter(x=>x.getDay()!==0&&x.getDay()!==6).length;
+  const isOff=x=>x.getDay()===0||x.getDay()===6||!!(window.jpHolName&&window.jpHolName(x));   // 土日＋祝日（iller 10/20「祝日入れられるだろ」）
+  const cnt={},wd=days.filter(x=>!isOff(x)).length;
   ids.forEach(id=>{cnt[id]=days.filter(x=>by[fmt(x)+'|'+id]).length;});
   const fmtD=x=>fmt(x);
-  const rows=days.map(x=>{const ds=fmtD(x),off=x.getDay()===0||x.getDay()===6;
+  const rows=days.map(x=>{const ds=fmtD(x),off=isOff(x),hn=(window.jpHolName&&window.jpHolName(x))||'';
     const cells=ids.map(id=>{const r=by[ds+'|'+id];if(!r)return `<td class="${off?'':'no'}">${off?'':'未点検'}</td>`;const ng=r.status==='否';return `<td class="${ng?'ng':'ok'}">${ng?'否':'良'} <span style="color:var(--text-dim);font-weight:400">${esc(r.inspector||'')}</span></td>`;}).join('');
-    return `<tr class="${off?'off':''}"><td class="d">${x.getMonth()+1}/${x.getDate()}（${'日月火水木金土'[x.getDay()]}）</td>${cells}</tr>`;}).join('');
+    return `<tr class="${off?'off':''}"><td class="d">${x.getMonth()+1}/${x.getDate()}（${'日月火水木金土'[x.getDay()]}）${hn?' '+esc(hn):''}</td>${cells}</tr>`;}).join('');
   el.innerHTML=`<div class="fk-sum">${ids.map(id=>`<span>${esc(id.replace('フォークリフト',''))}：<b>${cnt[id]}</b> / 平日 ${wd} 日</span>`).join('')}</div><table class="fk-hist"><thead><tr><th>日付</th>${ids.map(id=>`<th>${esc(id.replace('フォークリフト',''))}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 function fmt(x){return x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate());}
@@ -10661,8 +10663,8 @@ async function exportCsv(){
   names.forEach(n=>aoa[1].push(n+' 判定',n+' 点検者',n+' 否の項目・備考'));
   const cnt={};ids.forEach(id=>cnt[id]=0);let wd=0;
   for(let dd=1;dd<=last;dd++){
-    const x=new Date(y,m-1,dd), ds=fmt(x), off=x.getDay()===0||x.getDay()===6; if(!off)wd++;
-    const row=[`${m}/${dd}（${'日月火水木金土'[x.getDay()]}）`];
+    const x=new Date(y,m-1,dd), ds=fmt(x), hn=(window.jpHolName&&window.jpHolName(x))||'', off=x.getDay()===0||x.getDay()===6||!!hn; if(!off)wd++;
+    const row=[`${m}/${dd}（${'日月火水木金土'[x.getDay()]}）${hn?' '+hn:''}`];
     ids.forEach(id=>{const r=by[ds+'|'+id];
       if(!r){row.push(off?'':'未点検','','');return;}
       cnt[id]++;let ng=[];try{ng=JSON.parse(r.ng||'[]');}catch(e){}
@@ -10681,7 +10683,7 @@ async function exportCsv(){
     if(r===0){ws[ref].s=F(null,null,true);continue;}
     if(r===1){ws[ref].s=F('E5E7EB',null,true,'center');continue;}
     if(r===nr-1){ws[ref].s=F('F3F4F6','6B7280',false,c?'center':'left');continue;}
-    const dd=r-1, x=new Date(y,m-1,dd), off=x.getDay()===0||x.getDay()===6, kind=c===0?'d':((c-1)%3===0?'j':'t');
+    const dd=r-1, x=new Date(y,m-1,dd), off=x.getDay()===0||x.getDay()===6||!!(window.jpHolName&&window.jpHolName(x)), kind=c===0?'d':((c-1)%3===0?'j':'t');
     let st=F(off?'F3F4F6':null, off?'9CA3AF':null, false, kind==='j'?'center':'left');
     if(kind==='j'){ if(v==='否')st=F('FEE2E2','B91C1C',true,'center'); else if(v==='未点検')st=F(null,'DC2626',true,'center'); else if(v==='良')st=F(null,'15803D',true,'center'); }
     ws[ref].s=st;
