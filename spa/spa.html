@@ -2664,6 +2664,8 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-po .po-card{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.3fr) 170px 200px;gap:16px;background:var(--surface);border-radius:12px;padding:14px 16px;margin-bottom:10px;align-items:start}
   #view-po .po-vendor{font-size:15px;font-weight:600}
   #view-po .po-items{font-size:14px;margin:4px 0}
+  #view-po .po-card.simple{grid-template-columns:minmax(0,1fr) auto}
+  #view-po .po-act{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
   #view-po .po-step{border-left:1px solid var(--border-light);padding-left:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
   #view-po .po-n{font-size:12px;font-weight:700;color:var(--text-dim)}
   #view-po .po-case{width:100%;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font:400 13px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
@@ -4383,8 +4385,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-20 11:05';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1210;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-20 16:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1211;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10035,7 +10037,7 @@ const Po = (function(){
     const done=_pos.filter(p=>p.status==='発注済').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,40);   // 取消は出さない（iller 10/19）
     const me=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_person')||'';
     // 書く欄
-    const form=`<div class="po-form${_formOpen?'':' closed'}"><div class="po-form-hd" onclick="Po.toggleForm()"><b>発注書を書く</b><span class="ct-sub">宛先と品名だけで送れる。単価は分かれば。案件は下の ① で付ける</span><span class="po-caret">${_formOpen?'▲':'▼'}</span></div>
+    const form=`<div class="po-form${_formOpen?'':' closed'}"><div class="po-form-hd" onclick="Po.toggleForm()"><b>発注書を書く</b><span class="ct-sub">宛先と品名だけで送れる。単価は分かれば。案件は発注書を開いた時に付ける</span><span class="po-caret">${_formOpen?'▲':'▼'}</span></div>
       ${_formOpen?`<div class="po-form-body">
       <div class="po-f"><label>記入者</label><select id="pof_person">${['<option value="">選択</option>'].concat(_staff.map(n=>`<option${n===me?' selected':''}>${esc(n)}</option>`)).join('')}${me&&!_staff.includes(me)?`<option selected>${esc(me)}</option>`:''}</select></div>
       <div class="po-f"><label>宛先</label><input id="pof_vendor" list="poVendorList" placeholder="仕入先" autocomplete="off"><datalist id="poVendorList">${[...new Set(_pos.map(p=>p.vendor).filter(Boolean))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>
@@ -10049,11 +10051,9 @@ const Po = (function(){
       </div>`:''}</div>`;
     const caseOpts=liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('');
     const sender0=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_sender')||'';   // 発注者（送る人）の既定＝LINE WORKS の名前か前回
-    const card=p=>`<div class="po-card" data-id="${esc(p.id)}">
-      <div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${p.deadline?'納期 '+esc(p.deadline)+'　':''}${p.deliver_to&&p.deliver_to!=='弊社'?'納品先 '+esc(p.deliver_to)+'　':''}${p.note?'備考 '+esc(p.note)+'　':''}合計 ${yen(total(p))}</div></div>
-      <div class="po-step"><div class="po-n">① 案件と区分</div><input class="po-case" list="poCaseList" placeholder="案件を検索（付けないなら空）" value="${esc(p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'')}" onchange="Po.assign('${esc(p.id)}')"><select class="po-kind" onchange="Po.assign('${esc(p.id)}')">${KINDS.map(k=>`<option${(p.kind||'材料')===k?' selected':''}>${k}</option>`).join('')}</select><div class="ct-sub po-case-st">${p.case_name?'注文番号 '+esc(p.order_no||p.id):'案件なし＝在庫・共用。注文番号は '+esc(p.id)}</div></div>
-      <div class="po-step"><div class="po-n">② 発注者と発注書</div><select class="po-sender" onchange="Po.setSender('${esc(p.id)}',this.value)">${['<option value="">発注者（送る人）</option>'].concat(_staff.map(n=>`<option${(p.sender||sender0)===n?' selected':''}>${esc(n)}</option>`)).join('')}</select><button type="button" class="po-btn" onclick="Po.print('${esc(p.id)}')">開いて送る</button><div class="ct-sub">印刷して FAX か、PDF でメール</div></div>
-      <div class="po-step"><div class="po-n">③ 発注したら</div><button type="button" class="po-btn dark" onclick="Po.markSent('${esc(p.id)}')">発注済にする</button><button type="button" class="act-btn del" onclick="Po.cancel('${esc(p.id)}')">取消</button><div class="ct-sub po-send-st">${p.case_name?'原価明細に入る':'原価明細には入れない'}</div></div></div>`;
+    const card=p=>`<div class="po-card simple" data-id="${esc(p.id)}">
+      <div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}${p.deadline?'　納期 '+esc(p.deadline):''}${p.deliver_to&&p.deliver_to!=='弊社'?'　納品先 '+esc(p.deliver_to):''}${p.note?'　備考 '+esc(p.note):''}　合計 ${yen(total(p))}</div></div>
+      <div class="po-act"><button type="button" class="po-btn dark" onclick="Po.print('${esc(p.id)}')">発注書</button><button type="button" class="act-btn del" onclick="Po.cancel('${esc(p.id)}')">取消</button></div></div>`;
     const row=p=>`<tr><td><div class="po-vendor">${esc(p.vendor||'')} <span class="po-kind-tag">${esc(p.kind||'')}</span></div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):'案件なし'}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><span class="po-st${p.status==='発注済'?' sent':' cancel'}">${esc(p.status)}${p.status==='発注済'&&p.sent_at?'<br><small>'+d8(p.sent_at)+(p.sent_by?' '+esc(p.sent_by):'')+'</small>':''}</span><button type="button" class="act-btn" onclick="Po.print('${esc(p.id)}')">発注書</button></td></tr>`;
     let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+form;
     h+=`<div class="po-sec"><b>未発注</b> ${open.length} 件 <button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
@@ -10086,13 +10086,13 @@ const Po = (function(){
     p.kind=kind; if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=''; p.order_no=''; }
     send({dept:'po',action:'save',id,case_id:p.case_id,case_name:p.case_name,order_no:p.order_no,kind:p.kind});
     el.querySelector('.po-case-st').textContent=c?('注文番号 '+(p.order_no||p.id)):('案件なし＝在庫・共用。注文番号は '+p.id); el.querySelector('.po-send-st').textContent=c?'原価明細に入る':'原価明細には入れない'; }
-  function markSent(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
-    const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(el){ const v=el.querySelector('.po-case').value.trim(); if(v&&!caseOf(v)){ toast('案件は候補から選択してください',true); return; } assign(id); }
-    if(!confirm(p.case_name?`仕入先へ発注しましたか？\n発注済にして、明細を ${p.case_name} の原価明細（${p.kind||'材料'}）に入れます。`:'仕入先へ発注しましたか？\n案件なし（在庫・共用）なので原価明細には入れません。'))return;
-    if(guard())return; const me=senderOf(p);
+  function markSent(id, caseText){ if(_busy)return 'busy'; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return 'none'; if(String(id).startsWith('tmp_')) return '保存中です。しばらくしてから操作してください';
+    const v=String(caseText||'').trim(); const c=v?caseOf(v):null; if(v&&!c) return '案件は候補から選んでください（付けないなら空）';
+    if(guard())return 'busy'; const me=senderOf(p); p.kind='材料';
+    if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=''; p.order_no=''; }
     p.status='発注済'; p.sent_at=new Date().toISOString(); p.sent_by=me;
-    send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:p.kind||'材料'}); toast(p.case_name?'発注済にしました（'+p.case_name+' の原価明細へ）':'発注済にしました（案件には付けません）'); render();
-    setTimeout(loadAll,8000); }
+    send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:'材料'}); toast(p.case_name?'発注済にしました（'+p.case_name+' の原価明細へ）':'発注済にしました'); render();
+    setTimeout(loadAll,8000); return 'ok'; }
   function cancel(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; } if(!confirm('この発注書を取り消しますか？'))return; if(guard())return;
     _pos=_pos.filter(x=>String(x.id)!==String(id)); send({dept:'po',action:'delete',id}); toast('取り消しました'); render(); setTimeout(loadAll,8000); }
   function setSender(id,v){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; p.sender=v; try{ localStorage.setItem('po_sender',v); }catch(e){} if(!String(id).startsWith('tmp_')) send({dept:'po',action:'save',id,sender:v}); }
@@ -10112,9 +10112,9 @@ h1{font-size:16pt;font-weight:bold;text-align:center;margin:0 0 6mm;letter-spaci
 table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.items th{border:1px solid #000;background:#eee;font-weight:normal;font-size:10pt;padding:1.5mm 2mm}.items td{border:1px solid #000;font-size:10pt;padding:0 2mm;height:8.5mm}
 .num{text-align:right}.c{text-align:center}.cond{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.cond td,.cond th{padding:2mm 3mm;border:1px solid #000;font-size:10pt;vertical-align:top}.cond th{background:#eee;font-weight:normal;white-space:nowrap;width:22mm}
 .note{font-size:10pt;margin-top:4mm}.foot{width:100%;margin-top:8mm;border-collapse:collapse}.co{font-size:10pt;line-height:1.5}.co .n{font-size:12pt;font-weight:bold}
-.bar{position:fixed;top:0;left:0;right:0;background:#1c1c1e;color:#fff;padding:10px 16px;font:600 14px/1 -apple-system,'Hiragino Sans',sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between}.bar button{border:none;border-radius:8px;padding:8px 14px;font:600 14px/1 inherit;background:#fff;color:#1c1c1e}
+.bar{position:fixed;top:0;left:0;right:0;background:#1c1c1e;color:#fff;padding:10px 16px;font:600 14px/1 -apple-system,'Hiragino Sans',sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between}.bar button{border:none;border-radius:8px;padding:8px 14px;font:600 14px/1 inherit;background:#fff;color:#1c1c1e;cursor:pointer}.bar .ctl{display:flex;gap:8px;align-items:center}.bar input{border:none;border-radius:8px;padding:8px 10px;font:400 14px/1 inherit;width:260px;background:#fff;color:#1c1c1e}.bar button.go{background:#2f6fed;color:#fff}
 @media print{.bar{display:none}}@media screen{body{padding:60px 22mm 22mm;max-width:210mm;margin:0 auto}}
-</style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}　${esc(p.case_name||'')}</span><button onclick="window.print()">印刷／PDF</button></div>
+</style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}</span><span class="ctl"><input id="poCase" list="poCases" placeholder="案件（付けないなら空）" value="${esc(p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'')}" autocomplete="off"><datalist id="poCases">${liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('')}</datalist><button onclick="window.print()">印刷</button><button class="go" onclick="(function(){var o=window.opener||window.parent;var r=o&&o.Po?o.Po.markSent('${esc(p.id)}',document.getElementById('poCase').value):'none';if(r==='ok'){window.close();}else if(r!=='busy'){alert(r);}})()">発注した</button></span></div>
 <h1>発注書</h1><div class="row"><div class="to">${esc(p.vendor||'')}　御中</div><table class="meta"><tr><th>注文番号</th><td>${esc(p.order_no||p.id||'')}</td></tr><tr><th>発注日</th><td>${ds}</td></tr></table></div>
 <p class="lead">下記のとおり発注します。</p><div class="case"><span><b>件名</b>　${esc(p.case_name||((p.items||[])[0]&&(p.items||[])[0].name)||'')}</span><span><b>担当</b>　${esc(p.person||'')}</span></div>
 <table class="items"><tr><th style="width:8mm">No</th><th>品名・品番・仕様</th><th style="width:16mm">数量</th><th style="width:12mm">単位</th><th style="width:24mm">単価</th><th style="width:28mm">金額（税抜）</th></tr>${rows}<tr><td colspan="5" class="num">合計（税抜）</td><td class="num">${n(total(p))} 円</td></tr></table>
@@ -10126,6 +10126,7 @@ table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.item
   function init(){}
   return { loadAll, render, init, toggleForm, upd, addItem, delItem, toggleAsap, setDeliv, submit, assign, setSender, markSent, cancel, reload, print };
 })();
+window.Po=Po;   // 発注書の別窓（window.opener）から markSent を呼ぶため。const は window に乗らない（2026-10-20）
 
 const Alc=(function(){
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
