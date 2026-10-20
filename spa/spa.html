@@ -2664,6 +2664,12 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-po .po-card{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.3fr) 170px 200px;gap:16px;background:var(--surface);border-radius:12px;padding:14px 16px;margin-bottom:10px;align-items:start}
   #view-po .po-vendor{font-size:15px;font-weight:600}
   #view-po .po-items{font-size:14px;margin:4px 0}
+  #view-po .po-pick{position:relative}
+  #view-po .po-pick input{width:100%;box-sizing:border-box}
+  #view-po .po-pick-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:50;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);max-height:360px;overflow:auto;padding:4px}
+  #view-po .po-pick-it{padding:8px 12px;border-radius:6px;font-size:13px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #view-po .po-pick-it:hover{background:var(--surface3)}
+  #view-po .po-pick-none{padding:8px 12px;font-size:13px;color:var(--text-dim)}
   #view-po .po-card.simple{grid-template-columns:minmax(0,1fr) auto}
   #view-po .po-act{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
   #view-po .po-step{border-left:1px solid var(--border-light);padding-left:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
@@ -4385,8 +4391,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-20 16:48';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1212;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-20 16:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1213;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10041,7 +10047,7 @@ const Po = (function(){
       ${_formOpen?`<div class="po-form-body">
       <div class="po-f"><label>記入者</label><select id="pof_person">${['<option value="">選択</option>'].concat(_staff.map(n=>`<option${n===me?' selected':''}>${esc(n)}</option>`)).join('')}${me&&!_staff.includes(me)?`<option selected>${esc(me)}</option>`:''}</select></div>
       <div class="po-f"><label>宛先</label><input id="pof_vendor" list="poVendorList" placeholder="仕入先" autocomplete="off"><datalist id="poVendorList">${[...new Set(_pos.map(p=>p.vendor).filter(Boolean))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>
-      <div class="po-f wide"><label>案件</label><input id="pof_case" list="poCaseList" placeholder="付けないなら空（在庫・共用）" autocomplete="off"></div>
+      <div class="po-f wide"><label>案件</label><div class="po-pick"><input id="pof_case" placeholder="付けないなら空（在庫・共用）。得意先・案件名・受注番号で絞る" autocomplete="off" oninput="Po.pick(this)" onfocus="Po.pick(this)" onblur="Po.pickHide()"><div class="po-pick-list" id="pof_case_list"></div></div></div>
       <div class="po-f wide"><label>明細</label><div class="po-item-hd"><span>品名・品番・仕様</span><span>数量</span><span>単位</span><span>単価</span><span></span></div>
         ${_items.map((it,i)=>`<div class="po-item"><input placeholder="品名" value="${esc(it.name)}" oninput="Po.upd(${i},'name',this.value)"><input class="n" type="number" inputmode="decimal" placeholder="数量" value="${esc(it.qty)}" oninput="Po.upd(${i},'qty',this.value)"><input placeholder="単位" value="${esc(it.unit)}" oninput="Po.upd(${i},'unit',this.value)"><input class="n" type="number" inputmode="numeric" placeholder="単価" value="${esc(it.price)}" oninput="Po.upd(${i},'price',this.value)"><button type="button" class="act-btn del" onclick="Po.delItem(${i})">✕</button></div>`).join('')}
         <div class="po-item-ft"><button type="button" class="act-btn" onclick="Po.addItem()">＋ 行を追加</button><span>合計（税抜）<b id="pof_total">${yen(_items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0))}</b></span></div></div>
@@ -10099,6 +10105,12 @@ const Po = (function(){
     _pos=_pos.filter(x=>String(x.id)!==String(id)); send({dept:'po',action:'delete',id}); toast('取り消しました'); render(); setTimeout(loadAll,8000); }
   function setSender(id,v){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; p.sender=v; try{ localStorage.setItem('po_sender',v); }catch(e){} if(!String(id).startsWith('tmp_')) send({dept:'po',action:'save',id,sender:v}); }
   function senderOf(p){ return p.sender||(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_sender')||''; }
+  // 案件の候補：datalist は 5 件しか見えない（iller 10/20「もっとたくさん出ないのか」）→ 自前の一覧。空なら新しい順に全部、打てば得意先・案件名・受注番号で絞る
+  function pick(inp){ const box=$('pof_case_list'); if(!box)return; const q=String(inp.value||'').trim().toLowerCase();
+    const list=liveCases().slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).filter(c=>!q||caseLabel(c).toLowerCase().includes(q)||String(c.order_no||'').includes(q)).slice(0,60);
+    box.innerHTML=list.length?list.map(c=>`<div class="po-pick-it" onmousedown="Po.pickSet(this.textContent)">${esc(caseLabel(c))}</div>`).join(''):'<div class="po-pick-none">該当なし</div>'; box.style.display='block'; }
+  function pickSet(v){ const inp=$('pof_case'); if(inp) inp.value=v; pickHide(); }
+  function pickHide(){ setTimeout(()=>{ const box=$('pof_case_list'); if(box) box.style.display='none'; },150); }
   function reload(){ loadAll(); }
   // 発注書を別窓で（A4、印刷か PDF）。紙の 発注書.pdf と同じ形。注文番号＝案件を付けていれば受注番号、無ければ発注書の番号
   function print(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return;
@@ -10126,7 +10138,7 @@ table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.item
 </body></html>`;
     w.document.open(); w.document.write(html); w.document.close(); }
   function init(){}
-  return { loadAll, render, init, toggleForm, upd, addItem, delItem, toggleAsap, setDeliv, submit, assign, setSender, markSent, cancel, reload, print };
+  return { loadAll, render, init, toggleForm, upd, addItem, delItem, toggleAsap, setDeliv, submit, assign, setSender, markSent, cancel, reload, print, pick, pickSet, pickHide };
 })();
 window.Po=Po;   // 発注書の別窓（window.opener）から markSent を呼ぶため。const は window に乗らない（2026-10-20）
 
