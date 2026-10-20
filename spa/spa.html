@@ -137,7 +137,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .nav-link:hover{color:var(--text);background:var(--surface3)}
 .nav-link.on{background:transparent;color:var(--text);font-weight:700}
 .nav-link.on::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2.5px;border-radius:2px;background:var(--accent)}
-.nav-cnt{display:inline-block;min-width:18px;height:18px;line-height:18px;padding:0 5px;margin-left:6px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}   /* 未送信の発注書の件数（2026-10-20） */
+.nav-cnt{display:inline-block;min-width:18px;height:18px;line-height:18px;padding:0 5px;margin-left:6px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}   /* 未発注の発注書の件数（2026-10-20） */
 .portal-card-icon{position:relative}
 .portal-cnt{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;line-height:22px;padding:0 6px;border-radius:11px;background:var(--red);color:#fff;font-size:12px;font-weight:700;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.25);font-variant-numeric:tabular-nums}
 .home-link{font-weight:700;display:inline-flex;align-items:center}
@@ -3696,7 +3696,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   <div id="cardToast" class="card-toast"></div>
 </section>
 
-<!-- ===== 発注 section（2026-10-19）：発注書を書く（誰でも）＋未送信の処理（事務所） ===== -->
+<!-- ===== 発注 section（2026-10-19）：発注書を書く（誰でも）＋未発注の処理（事務所） ===== -->
 <section id="view-po" class="hidden">
   <div class="scr-head"><h1>発注</h1></div>
   <div class="po-wrap"><div id="poBody"><div class="po-empty">読み込み中...</div></div></div>
@@ -4383,7 +4383,7 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-20 10:22';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_VER='2026-10-20 11:05';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
 const APP_BUILD=1210;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
@@ -4651,7 +4651,7 @@ let _moneyTotal=null;   // 今抱えている案件の積み上げ総額（バ�
 function moneyShort(v){if(v==null)return'¥ 合計';if(!v)return'¥0';if(v>=1e8)return'¥'+((v%1e8)?(v/1e8).toFixed(1):(v/1e8))+'億';if(v>=1e4)return'¥'+Math.round(v/1e4).toLocaleString()+'万';return'¥'+v.toLocaleString()}
 function updateMoneyBadges(){document.querySelectorAll('.mny-btn').forEach(b=>{b.textContent=moneyShort(_moneyTotal)})}
 // 案件>一覧と同条件（アーカイブ・完了・見送り除外）の案件の金額（一案件＝一金額）を合算
-// 未送信の発注書の件数をナビ「発注」とポータルのカードに赤い丸で出す（2026-10-20 iller「通知をやめて業務管理の中で分かる形に」）。
+// 未発注の発注書の件数をナビ「発注」とポータルのカードに赤い丸で出す（2026-10-20 iller「通知をやめて業務管理の中で分かる形に」）。
 // 5 分ごと＋発注画面の loadAll から。GET は控えを使わない。
 const PoBadge=(function(){
   let _n=-1;
@@ -4659,7 +4659,7 @@ const PoBadge=(function(){
     const nv=document.getElementById('navPo'); if(nv){ let b=nv.querySelector('.nav-cnt'); if(n>0){ if(!b){ b=document.createElement('span'); b.className='nav-cnt'; nv.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
     const ic=document.querySelector('.portal-card[data-app="po"] .portal-card-icon'); if(ic){ let b=ic.querySelector('.portal-cnt'); if(n>0){ if(!b){ b=document.createElement('span'); b.className='portal-cnt'; ic.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
   }
-  function fetchCount(){ if(typeof App!=='undefined'&&App.denied.indexOf('po')>=0) return; return fetch(API+'?dept=po&action=list&status=未送信&nocache='+Date.now()).then(r=>r.json()).then(j=>{ if(j&&j.success) set((j.data||[]).length); }).catch(()=>{}); }
+  function fetchCount(){ if(typeof App!=='undefined'&&App.denied.indexOf('po')>=0) return; return fetch(API+'?dept=po&action=list&status=未発注&nocache='+Date.now()).then(r=>r.json()).then(j=>{ if(j&&j.success) set((j.data||[]).length); }).catch(()=>{}); }
   return { set, fetchCount };
 })();
 function moneyFetch(){
@@ -9998,7 +9998,7 @@ const Cases = (function(){
   return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal };
 })();
 
-// ===== 発注（2026-10-19）：発注書を書く（記入者・宛先・明細・納期・納品先・備考）→ シート purchase_orders に未送信 → ① 案件と区分 → ② 発注書を開いて送る → ③ 送信済（案件を付けていれば原価明細へ）
+// ===== 発注（2026-10-19）：発注書を書く（記入者・宛先・明細・納期・納品先・備考）→ シート purchase_orders に未発注 → ① 案件と区分 → ② 発注書を開いて発注る → ③ 発注済（案件を付けていれば原価明細へ）
 // iller「案件になんでもかんでも乗っけすぎ」「あっちこっち行ったり来たり」＝案件管理から出して独立した画面に。書く欄も同じ画面（hatchu.html は 10/19 に廃止＝部長も PC でここから書く）
 const Po = (function(){
   const KINDS=['材料','外注','経費'];
@@ -10018,7 +10018,7 @@ const Po = (function(){
         fetch(API+'?dept=po&action=list&nocache='+Date.now()).then(r=>r.json()).catch(()=>({})),   // 発注書は控えを使わない（届いたらすぐ見たい）
         fetch(API+'?dept=cases&action=read').then(r=>r.json()).catch(()=>({})),
         fetch(API+'?dept=daily&action=staff_for_daily').then(r=>r.json()).catch(()=>({}))]);
-      if(po&&po.success){ _pos=po.data||[]; _posAt=Date.now(); PoBadge.set(_pos.filter(p=>p.status==='未送信').length); }
+      if(po&&po.success){ _pos=po.data||[]; _posAt=Date.now(); PoBadge.set(_pos.filter(p=>p.status==='未発注').length); }
       if(cs&&cs.data) _cases=cs.data;
       if(st&&st.staff) _staff=st.staff.map(x=>x.name).filter(Boolean);
     }catch(e){}
@@ -10029,10 +10029,10 @@ const Po = (function(){
   const caseLabel=c=>(c.order_no?'#'+c.order_no+' ':'')+dispName(c.client,c.name);
   function caseOf(v){ v=String(v||'').trim(); if(!v) return null; const live=liveCases(); return live.find(x=>caseLabel(x)===v)||live.find(x=>dispName(x.client,x.name)===v)||null; }
   function render(){
-    PoBadge.set(_pos.filter(p=>p.status==='未送信').length);
+    PoBadge.set(_pos.filter(p=>p.status==='未発注').length);
     const el=$('poBody'); if(!el)return;
-    const open=_pos.filter(p=>p.status==='未送信').sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')));
-    const done=_pos.filter(p=>p.status==='送信済').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,40);   // 取消は出さない（iller 10/19）
+    const open=_pos.filter(p=>p.status==='未発注').sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')));
+    const done=_pos.filter(p=>p.status==='発注済').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,40);   // 取消は出さない（iller 10/19）
     const me=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_person')||'';
     // 書く欄
     const form=`<div class="po-form${_formOpen?'':' closed'}"><div class="po-form-hd" onclick="Po.toggleForm()"><b>発注書を書く</b><span class="ct-sub">宛先と品名だけで送れる。単価は分かれば。案件は下の ① で付ける</span><span class="po-caret">${_formOpen?'▲':'▼'}</span></div>
@@ -10053,12 +10053,12 @@ const Po = (function(){
       <div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${p.deadline?'納期 '+esc(p.deadline)+'　':''}${p.deliver_to&&p.deliver_to!=='弊社'?'納品先 '+esc(p.deliver_to)+'　':''}${p.note?'備考 '+esc(p.note)+'　':''}合計 ${yen(total(p))}</div></div>
       <div class="po-step"><div class="po-n">① 案件と区分</div><input class="po-case" list="poCaseList" placeholder="案件を検索（付けないなら空）" value="${esc(p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'')}" onchange="Po.assign('${esc(p.id)}')"><select class="po-kind" onchange="Po.assign('${esc(p.id)}')">${KINDS.map(k=>`<option${(p.kind||'材料')===k?' selected':''}>${k}</option>`).join('')}</select><div class="ct-sub po-case-st">${p.case_name?'注文番号 '+esc(p.order_no||p.id):'案件なし＝在庫・共用。注文番号は '+esc(p.id)}</div></div>
       <div class="po-step"><div class="po-n">② 発注者と発注書</div><select class="po-sender" onchange="Po.setSender('${esc(p.id)}',this.value)">${['<option value="">発注者（送る人）</option>'].concat(_staff.map(n=>`<option${(p.sender||sender0)===n?' selected':''}>${esc(n)}</option>`)).join('')}</select><button type="button" class="po-btn" onclick="Po.print('${esc(p.id)}')">開いて送る</button><div class="ct-sub">印刷して FAX か、PDF でメール</div></div>
-      <div class="po-step"><div class="po-n">③ 送ったら</div><button type="button" class="po-btn dark" onclick="Po.markSent('${esc(p.id)}')">送信済にする</button><button type="button" class="act-btn del" onclick="Po.cancel('${esc(p.id)}')">取消</button><div class="ct-sub po-send-st">${p.case_name?'原価明細に入る':'原価明細には入れない'}</div></div></div>`;
-    const row=p=>`<tr><td><div class="po-vendor">${esc(p.vendor||'')} <span class="po-kind-tag">${esc(p.kind||'')}</span></div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):'案件なし'}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><span class="po-st${p.status==='送信済'?' sent':' cancel'}">${esc(p.status)}${p.status==='送信済'&&p.sent_at?'<br><small>'+d8(p.sent_at)+(p.sent_by?' '+esc(p.sent_by):'')+'</small>':''}</span><button type="button" class="act-btn" onclick="Po.print('${esc(p.id)}')">発注書</button></td></tr>`;
+      <div class="po-step"><div class="po-n">③ 発注したら</div><button type="button" class="po-btn dark" onclick="Po.markSent('${esc(p.id)}')">発注済にする</button><button type="button" class="act-btn del" onclick="Po.cancel('${esc(p.id)}')">取消</button><div class="ct-sub po-send-st">${p.case_name?'原価明細に入る':'原価明細には入れない'}</div></div></div>`;
+    const row=p=>`<tr><td><div class="po-vendor">${esc(p.vendor||'')} <span class="po-kind-tag">${esc(p.kind||'')}</span></div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):'案件なし'}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><span class="po-st${p.status==='発注済'?' sent':' cancel'}">${esc(p.status)}${p.status==='発注済'&&p.sent_at?'<br><small>'+d8(p.sent_at)+(p.sent_by?' '+esc(p.sent_by):'')+'</small>':''}</span><button type="button" class="act-btn" onclick="Po.print('${esc(p.id)}')">発注書</button></td></tr>`;
     let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+form;
-    h+=`<div class="po-sec"><b>未送信</b> ${open.length} 件 <button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
-    h+=open.length?open.map(card).join(''):'<div class="po-empty">未送信の発注書はありません</div>';
-    if(done.length) h+=`<div class="po-sec">送信済（直近）</div><div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>宛先・案件</th><th>記入者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${done.map(row).join('')}</tbody></table></div>`;
+    h+=`<div class="po-sec"><b>未発注</b> ${open.length} 件 <button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
+    h+=open.length?open.map(card).join(''):'<div class="po-empty">未発注の発注書はありません</div>';
+    if(done.length) h+=`<div class="po-sec">発注済（直近）</div><div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>宛先・案件</th><th>記入者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${done.map(row).join('')}</tbody></table></div>`;
     el.innerHTML=h;
   }
   function toggleForm(){ _formOpen=!_formOpen; render(); }
@@ -10076,7 +10076,7 @@ const Po = (function(){
     if(guard())return; try{ localStorage.setItem('po_person',person); }catch(e){}
     const body={dept:'po',action:'save',person,vendor,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline:_asap?'最短':($('pof_deadline').value||''),deliver_to:_deliv==='別途'?$('pof_deliver_to').value.trim():'弊社',note:$('pof_note').value.trim()};
     send(body);
-    _pos.push({id:'tmp_'+Date.now(),created_at:new Date().toISOString(),status:'未送信',person,vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,kind:'材料'});
+    _pos.push({id:'tmp_'+Date.now(),created_at:new Date().toISOString(),status:'未発注',person,vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,kind:'材料'});
     _items=blankItems(); _asap=false; _deliv='弊社'; toast('発注書を出しました'); render();
     setTimeout(loadAll,8000);
   }
@@ -10088,10 +10088,10 @@ const Po = (function(){
     el.querySelector('.po-case-st').textContent=c?('注文番号 '+(p.order_no||p.id)):('案件なし＝在庫・共用。注文番号は '+p.id); el.querySelector('.po-send-st').textContent=c?'原価明細に入る':'原価明細には入れない'; }
   function markSent(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
     const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(el){ const v=el.querySelector('.po-case').value.trim(); if(v&&!caseOf(v)){ toast('案件は候補から選択してください',true); return; } assign(id); }
-    if(!confirm(p.case_name?`仕入先へ送りましたか？\n送信済にして、明細を ${p.case_name} の原価明細（${p.kind||'材料'}）に入れます。`:'仕入先へ送りましたか？\n案件なし（在庫・共用）なので原価明細には入れません。'))return;
+    if(!confirm(p.case_name?`仕入先へ発注しましたか？\n発注済にして、明細を ${p.case_name} の原価明細（${p.kind||'材料'}）に入れます。`:'仕入先へ発注しましたか？\n案件なし（在庫・共用）なので原価明細には入れません。'))return;
     if(guard())return; const me=senderOf(p);
-    p.status='送信済'; p.sent_at=new Date().toISOString(); p.sent_by=me;
-    send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:p.kind||'材料'}); toast(p.case_name?'送信済にしました（'+p.case_name+' の原価明細へ）':'送信済にしました（案件には付けません）'); render();
+    p.status='発注済'; p.sent_at=new Date().toISOString(); p.sent_by=me;
+    send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:p.kind||'材料'}); toast(p.case_name?'発注済にしました（'+p.case_name+' の原価明細へ）':'発注済にしました（案件には付けません）'); render();
     setTimeout(loadAll,8000); }
   function cancel(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; } if(!confirm('この発注書を取り消しますか？'))return; if(guard())return;
     _pos=_pos.filter(x=>String(x.id)!==String(id)); send({dept:'po',action:'delete',id}); toast('取り消しました'); render(); setTimeout(loadAll,8000); }
@@ -10999,7 +10999,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 window.addEventListener('focus',()=>App.softRefresh());
 window.addEventListener('pageshow',()=>App.softRefresh());
 setInterval(()=>{ if(document.visibilityState==='visible') moneyFetch(); },5*60*1000);   // ¥バッジは従来どおり5分
-setInterval(()=>{ if(document.visibilityState==='visible') PoBadge.fetchCount(); },5*60*1000);   // 未送信の発注書の件数も 5 分
+setInterval(()=>{ if(document.visibilityState==='visible') PoBadge.fetchCount(); },5*60*1000);   // 未発注の発注書の件数も 5 分
 
 // 初期表示：各アプリの init（イベント配線）→ ポータル（入口）を開く
 window.addEventListener('load', async ()=>{
@@ -11015,7 +11015,7 @@ window.addEventListener('load', async ()=>{
   App.current=null;
   App.nav((_deepGo && App.reg(_deepGo)) ? _deepGo : 'portal');
   setTimeout(()=>{moneyFetch()},2500);   // ¥バッジ（案件積み上げ総額）の初期値
-  setTimeout(()=>{PoBadge.fetchCount()},3000);   // 未送信の発注書の件数の初期値
+  setTimeout(()=>{PoBadge.fetchCount()},3000);   // 未発注の発注書の件数の初期値
   // Service Worker登録（同一オリジンの静的ファイル＝spa.html本体をキャッシュから即表示し、裏で最新を取得）。
   // 従来はregister.htmlだけが登録していたので、LINE WORKSやスマホで開く端末には無かった。失敗しても何もしない
   try{ if('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js').catch(()=>{}); }catch(e){}
