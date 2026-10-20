@@ -2665,7 +2665,8 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-po .po-vendor{font-size:15px;font-weight:600}
   #view-po .po-items{font-size:14px;margin:4px 0}
   #view-po .po-pick{position:relative}
-  #view-po .po-pick input{width:100%;box-sizing:border-box}
+  #view-po .po-pick input{width:100%;box-sizing:border-box;padding-right:30px}
+  #view-po .po-pick-arr{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text-dim);pointer-events:none;font-size:14px}
   #view-po .po-pick-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:50;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);max-height:360px;overflow:auto;padding:4px}
   #view-po .po-pick-it{padding:8px 12px;border-radius:6px;font-size:13px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #view-po .po-pick-it:hover{background:var(--surface3)}
@@ -4391,8 +4392,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-20 16:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1213;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-20 16:55';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1214;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10043,17 +10044,17 @@ const Po = (function(){
     const done=_pos.filter(p=>p.status==='発注済').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,40);   // 取消は出さない（iller 10/19）
     const me=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_person')||'';
     // 書く欄
-    const form=`<div class="po-form${_formOpen?'':' closed'}"><div class="po-form-hd" onclick="Po.toggleForm()"><b>発注書を書く</b><span class="ct-sub">宛先と品名だけで送れる。単価は分かれば。案件は分かれば（後から発注書の窓でも付けられる）</span><span class="po-caret">${_formOpen?'▲':'▼'}</span></div>
+    const form=`<div class="po-form${_formOpen?'':' closed'}"><div class="po-form-hd" onclick="Po.toggleForm()"><b>発注書を書く</b><span class="ct-sub"></span><span class="po-caret">${_formOpen?'▲':'▼'}</span></div>
       ${_formOpen?`<div class="po-form-body">
       <div class="po-f"><label>記入者</label><select id="pof_person">${['<option value="">選択</option>'].concat(_staff.map(n=>`<option${n===me?' selected':''}>${esc(n)}</option>`)).join('')}${me&&!_staff.includes(me)?`<option selected>${esc(me)}</option>`:''}</select></div>
-      <div class="po-f"><label>宛先</label><input id="pof_vendor" list="poVendorList" placeholder="仕入先" autocomplete="off"><datalist id="poVendorList">${[...new Set(_pos.map(p=>p.vendor).filter(Boolean))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>
-      <div class="po-f wide"><label>案件</label><div class="po-pick"><input id="pof_case" placeholder="付けないなら空（在庫・共用）。得意先・案件名・受注番号で絞る" autocomplete="off" oninput="Po.pick(this)" onfocus="Po.pick(this)" onblur="Po.pickHide()"><div class="po-pick-list" id="pof_case_list"></div></div></div>
+      <div class="po-f"><label>宛先</label><input id="pof_vendor" list="poVendorList" autocomplete="off"><datalist id="poVendorList">${[...new Set(_pos.map(p=>p.vendor).filter(Boolean))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist></div>
+      <div class="po-f"><label>案件</label><div class="po-pick"><input id="pof_case" autocomplete="off" oninput="Po.pick(this)" onfocus="Po.pick(this)" onblur="Po.pickHide()"><span class="po-pick-arr">▾</span><div class="po-pick-list" id="pof_case_list"></div></div></div>
       <div class="po-f wide"><label>明細</label><div class="po-item-hd"><span>品名・品番・仕様</span><span>数量</span><span>単位</span><span>単価</span><span></span></div>
-        ${_items.map((it,i)=>`<div class="po-item"><input placeholder="品名" value="${esc(it.name)}" oninput="Po.upd(${i},'name',this.value)"><input class="n" type="number" inputmode="decimal" placeholder="数量" value="${esc(it.qty)}" oninput="Po.upd(${i},'qty',this.value)"><input placeholder="単位" value="${esc(it.unit)}" oninput="Po.upd(${i},'unit',this.value)"><input class="n" type="number" inputmode="numeric" placeholder="単価" value="${esc(it.price)}" oninput="Po.upd(${i},'price',this.value)"><button type="button" class="act-btn del" onclick="Po.delItem(${i})">✕</button></div>`).join('')}
+        ${_items.map((it,i)=>`<div class="po-item"><input value="${esc(it.name)}" oninput="Po.upd(${i},'name',this.value)"><input class="n" type="number" inputmode="decimal" value="${esc(it.qty)}" oninput="Po.upd(${i},'qty',this.value)"><input value="${esc(it.unit)}" oninput="Po.upd(${i},'unit',this.value)"><input class="n" type="number" inputmode="numeric" value="${esc(it.price)}" oninput="Po.upd(${i},'price',this.value)"><button type="button" class="act-btn del" onclick="Po.delItem(${i})">✕</button></div>`).join('')}
         <div class="po-item-ft"><button type="button" class="act-btn" onclick="Po.addItem()">＋ 行を追加</button><span>合計（税抜）<b id="pof_total">${yen(_items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0))}</b></span></div></div>
       <div class="po-f"><label>納期</label><div class="po-inline"><input type="date" id="pof_deadline" ${_asap?'disabled':''}><button type="button" class="po-tg${_asap?' on':''}" onclick="Po.toggleAsap()">最短</button></div></div>
-      <div class="po-f"><label>納品先</label><div class="po-inline"><button type="button" class="po-tg${_deliv==='弊社'?' on':''}" onclick="Po.setDeliv('弊社')">弊社</button><button type="button" class="po-tg${_deliv==='別途'?' on':''}" onclick="Po.setDeliv('別途')">別途</button><input id="pof_deliver_to" placeholder="納品先" style="${_deliv==='別途'?'':'display:none'}"></div></div>
-      <div class="po-f wide"><label>備考</label><input id="pof_note" placeholder="空欄可"></div>
+      <div class="po-f"><label>納品先</label><div class="po-inline"><button type="button" class="po-tg${_deliv==='弊社'?' on':''}" onclick="Po.setDeliv('弊社')">弊社</button><button type="button" class="po-tg${_deliv==='別途'?' on':''}" onclick="Po.setDeliv('別途')">別途</button><input id="pof_deliver_to" style="${_deliv==='別途'?'':'display:none'}"></div></div>
+      <div class="po-f wide"><label>備考</label><input id="pof_note"></div>
       <div class="po-f wide" style="text-align:right"><button type="button" class="po-submit" onclick="Po.submit()">発注書を出す</button></div>
       </div>`:''}</div>`;
     const caseOpts=liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('');
@@ -10128,7 +10129,7 @@ table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.item
 .note{font-size:10pt;margin-top:4mm}.foot{width:100%;margin-top:8mm;border-collapse:collapse}.co{font-size:10pt;line-height:1.5}.co .n{font-size:12pt;font-weight:bold}
 .bar{position:fixed;top:0;left:0;right:0;background:#1c1c1e;color:#fff;padding:10px 16px;font:600 14px/1 -apple-system,'Hiragino Sans',sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between}.bar button{border:none;border-radius:8px;padding:8px 14px;font:600 14px/1 inherit;background:#fff;color:#1c1c1e;cursor:pointer}.bar .ctl{display:flex;gap:8px;align-items:center}.bar input{border:none;border-radius:8px;padding:8px 10px;font:400 14px/1 inherit;width:260px;background:#fff;color:#1c1c1e}.bar button.go{background:#2f6fed;color:#fff}
 @media print{.bar{display:none}}@media screen{body{padding:60px 22mm 22mm;max-width:210mm;margin:0 auto}}
-</style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}</span><span class="ctl"><input id="poCase" list="poCases" placeholder="案件（付けないなら空）" value="${esc(p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'')}" autocomplete="off"><datalist id="poCases">${liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('')}</datalist><button onclick="window.print()">印刷</button><button class="go" onclick="(function(){var o=window.opener||window.parent;var r=o&&o.Po?o.Po.markSent('${esc(p.id)}',document.getElementById('poCase').value):'none';if(r==='ok'){window.close();}else if(r!=='busy'){alert(r);}})()">発注した</button></span></div>
+</style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}</span><span class="ctl"><input id="poCase" list="poCases" placeholder="案件" value="${esc(p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'')}" autocomplete="off"><datalist id="poCases">${liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('')}</datalist><button onclick="window.print()">印刷</button><button class="go" onclick="(function(){var o=window.opener||window.parent;var r=o&&o.Po?o.Po.markSent('${esc(p.id)}',document.getElementById('poCase').value):'none';if(r==='ok'){window.close();}else if(r!=='busy'){alert(r);}})()">発注した</button></span></div>
 <h1>発注書</h1><div class="row"><div class="to">${esc(p.vendor||'')}　御中</div><table class="meta"><tr><th>注文番号</th><td>${esc(p.order_no||p.id||'')}</td></tr><tr><th>発注日</th><td>${ds}</td></tr></table></div>
 <p class="lead">下記のとおり発注します。</p><div class="case"><span><b>件名</b>　${esc(p.case_name||((p.items||[])[0]&&(p.items||[])[0].name)||'')}</span><span><b>担当</b>　${esc(p.person||'')}</span></div>
 <table class="items"><tr><th style="width:8mm">No</th><th>品名・品番・仕様</th><th style="width:16mm">数量</th><th style="width:12mm">単位</th><th style="width:24mm">単価</th><th style="width:28mm">金額（税抜）</th></tr>${rows}<tr><td colspan="5" class="num">合計（税抜）</td><td class="num">${n(total(p))} 円</td></tr></table>
