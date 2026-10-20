@@ -137,6 +137,9 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .nav-link:hover{color:var(--text);background:var(--surface3)}
 .nav-link.on{background:transparent;color:var(--text);font-weight:700}
 .nav-link.on::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2.5px;border-radius:2px;background:var(--accent)}
+.nav-cnt{display:inline-block;min-width:18px;height:18px;line-height:18px;padding:0 5px;margin-left:6px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}   /* 未送信の発注書の件数（2026-10-20） */
+.portal-card-icon{position:relative}
+.portal-cnt{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;line-height:22px;padding:0 6px;border-radius:11px;background:var(--red);color:#fff;font-size:12px;font-weight:700;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.25);font-variant-numeric:tabular-nums}
 .home-link{font-weight:700;display:inline-flex;align-items:center}
 .nav-div{flex:0 0 auto;align-self:center;width:1px;height:18px;background:var(--border);margin:0 6px}
 #authGate{position:fixed;inset:0;z-index:1000;background:rgba(20,22,30,.96);display:flex;align-items:center;justify-content:center;padding:24px}
@@ -4380,8 +4383,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-19 18:33';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1208;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-20 10:22';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1210;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4648,6 +4651,17 @@ let _moneyTotal=null;   // 今抱えている案件の積み上げ総額（バ�
 function moneyShort(v){if(v==null)return'¥ 合計';if(!v)return'¥0';if(v>=1e8)return'¥'+((v%1e8)?(v/1e8).toFixed(1):(v/1e8))+'億';if(v>=1e4)return'¥'+Math.round(v/1e4).toLocaleString()+'万';return'¥'+v.toLocaleString()}
 function updateMoneyBadges(){document.querySelectorAll('.mny-btn').forEach(b=>{b.textContent=moneyShort(_moneyTotal)})}
 // 案件>一覧と同条件（アーカイブ・完了・見送り除外）の案件の金額（一案件＝一金額）を合算
+// 未送信の発注書の件数をナビ「発注」とポータルのカードに赤い丸で出す（2026-10-20 iller「通知をやめて業務管理の中で分かる形に」）。
+// 5 分ごと＋発注画面の loadAll から。GET は控えを使わない。
+const PoBadge=(function(){
+  let _n=-1;
+  function set(n){ n=Number(n)||0; if(n===_n)return; _n=n;
+    const nv=document.getElementById('navPo'); if(nv){ let b=nv.querySelector('.nav-cnt'); if(n>0){ if(!b){ b=document.createElement('span'); b.className='nav-cnt'; nv.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
+    const ic=document.querySelector('.portal-card[data-app="po"] .portal-card-icon'); if(ic){ let b=ic.querySelector('.portal-cnt'); if(n>0){ if(!b){ b=document.createElement('span'); b.className='portal-cnt'; ic.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
+  }
+  function fetchCount(){ if(typeof App!=='undefined'&&App.denied.indexOf('po')>=0) return; return fetch(API+'?dept=po&action=list&status=未送信&nocache='+Date.now()).then(r=>r.json()).then(j=>{ if(j&&j.success) set((j.data||[]).length); }).catch(()=>{}); }
+  return { set, fetchCount };
+})();
 function moneyFetch(){
   if(typeof App!=='undefined'&&App.denied.indexOf('cases')>=0) return Promise.resolve(null);   // 同上
   return fetch(API+'?dept=cases&action=read').then(r=>r.json()).catch(()=>null).then(cs=>{
@@ -10004,7 +10018,7 @@ const Po = (function(){
         fetch(API+'?dept=po&action=list&nocache='+Date.now()).then(r=>r.json()).catch(()=>({})),   // 発注書は控えを使わない（届いたらすぐ見たい）
         fetch(API+'?dept=cases&action=read').then(r=>r.json()).catch(()=>({})),
         fetch(API+'?dept=daily&action=staff_for_daily').then(r=>r.json()).catch(()=>({}))]);
-      if(po&&po.success){ _pos=po.data||[]; _posAt=Date.now(); }
+      if(po&&po.success){ _pos=po.data||[]; _posAt=Date.now(); PoBadge.set(_pos.filter(p=>p.status==='未送信').length); }
       if(cs&&cs.data) _cases=cs.data;
       if(st&&st.staff) _staff=st.staff.map(x=>x.name).filter(Boolean);
     }catch(e){}
@@ -10015,6 +10029,7 @@ const Po = (function(){
   const caseLabel=c=>(c.order_no?'#'+c.order_no+' ':'')+dispName(c.client,c.name);
   function caseOf(v){ v=String(v||'').trim(); if(!v) return null; const live=liveCases(); return live.find(x=>caseLabel(x)===v)||live.find(x=>dispName(x.client,x.name)===v)||null; }
   function render(){
+    PoBadge.set(_pos.filter(p=>p.status==='未送信').length);
     const el=$('poBody'); if(!el)return;
     const open=_pos.filter(p=>p.status==='未送信').sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')));
     const done=_pos.filter(p=>p.status==='送信済').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).slice(0,40);   // 取消は出さない（iller 10/19）
@@ -10062,7 +10077,7 @@ const Po = (function(){
     const body={dept:'po',action:'save',person,vendor,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline:_asap?'最短':($('pof_deadline').value||''),deliver_to:_deliv==='別途'?$('pof_deliver_to').value.trim():'弊社',note:$('pof_note').value.trim()};
     send(body);
     _pos.push({id:'tmp_'+Date.now(),created_at:new Date().toISOString(),status:'未送信',person,vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,kind:'材料'});
-    _items=blankItems(); _asap=false; _deliv='弊社'; toast('発注書を出しました。下の ①→②→③ へ'); render();
+    _items=blankItems(); _asap=false; _deliv='弊社'; toast('発注書を出しました'); render();
     setTimeout(loadAll,8000);
   }
   function assign(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(!el)return; const v=el.querySelector('.po-case').value.trim(), kind=el.querySelector('.po-kind').value; const c=caseOf(v);
@@ -10984,6 +10999,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 window.addEventListener('focus',()=>App.softRefresh());
 window.addEventListener('pageshow',()=>App.softRefresh());
 setInterval(()=>{ if(document.visibilityState==='visible') moneyFetch(); },5*60*1000);   // ¥バッジは従来どおり5分
+setInterval(()=>{ if(document.visibilityState==='visible') PoBadge.fetchCount(); },5*60*1000);   // 未送信の発注書の件数も 5 分
 
 // 初期表示：各アプリの init（イベント配線）→ ポータル（入口）を開く
 window.addEventListener('load', async ()=>{
@@ -10999,6 +11015,7 @@ window.addEventListener('load', async ()=>{
   App.current=null;
   App.nav((_deepGo && App.reg(_deepGo)) ? _deepGo : 'portal');
   setTimeout(()=>{moneyFetch()},2500);   // ¥バッジ（案件積み上げ総額）の初期値
+  setTimeout(()=>{PoBadge.fetchCount()},3000);   // 未送信の発注書の件数の初期値
   // Service Worker登録（同一オリジンの静的ファイル＝spa.html本体をキャッシュから即表示し、裏で最新を取得）。
   // 従来はregister.htmlだけが登録していたので、LINE WORKSやスマホで開く端末には無かった。失敗しても何もしない
   try{ if('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js').catch(()=>{}); }catch(e){}
