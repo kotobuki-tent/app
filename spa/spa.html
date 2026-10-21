@@ -2631,11 +2631,12 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .sz-tbl tr:hover td{background:var(--surface2)}
   #view-cases .sz-tbl tr.dim td{color:var(--text-faint)}
   #view-cases .sz-tbl .faint{color:var(--text-dim);font-size:13px}
-  #view-cases .sz-parts{display:grid;grid-template-columns:repeat(4,1fr);gap:0 8px;margin-top:6px;font-size:13px;color:var(--text);font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
+  #view-cases .sz-parts{display:grid;grid-template-columns:repeat(5,1fr);gap:0 8px;margin-top:6px;font-size:13px;color:var(--text);font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
   #view-cases .sz-parts em{display:block;font-style:normal;font-size:11px;font-weight:400;color:var(--text-dim)}
   #view-cases .sz-parts small{display:block;font-size:11px;font-weight:400;color:var(--text-dim)}
   #view-cases .sz-parts .zero-miss{color:#a32d2d}   /* 0 で未確認＝赤 */
   #view-cases .sz-parts .zero-ok{color:#185fa5}     /* 0 で「なし」の確認済み＝青 */
+  #view-cases .sz-parts .redo{color:#a32d2d}        /* やり直しの金額＝赤 */
   /* 発注（独立画面、2026-10-19） */
   #view-po .po-wrap{max-width:1180px;margin:0 auto;padding:12px 16px 40px}
   #view-po .ct-sub{font-size:12px;color:var(--text-dim);margin-top:2px;font-variant-numeric:tabular-nums}
@@ -4394,8 +4395,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-21 09:32';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1218;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-21 09:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1219;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9514,7 +9515,7 @@ const Cases = (function(){
     const row=(x,extra)=>`<tr data-cid="${esc(x.c.id)}" onclick="Cases.openEdit('${esc(x.c.id)}')"${extra?' class="dim"':''}>`
       +`<td><div class="ct-main">${esc(dispName(x.c.client,x.c.name))}</div><div class="ct-sub">${who(x.c)}</div></td>`
       +`<td class="num">${x.sales?yen(x.sales):'<span class="faint">金額なし</span>'}</td>`
-      +`<td class="num cost"><span class="sz-fin${x.isFinal?' on':''}">${x.isFinal?'確定':'仮'}</span>${x.cost?yen(x.cost):'<span class="faint">原価なし</span>'}${x.after>0?`<div class="sz-after">確定後に追加 ${yen(x.after)}</div>`:''}${x.redo.total>0?`<div class="sz-redo">やり直し ${yen(x.redo.total)}${x.redo.minutes?'・'+(Math.round(x.redo.minutes/6)/10)+'h':''}</div>`:''}<div class="sz-parts"><span><em>労務費</em>${Math.round(x.labor).toLocaleString('ja-JP')}<small>${Math.round((Number(x.p.minutes)||0)/6)/10}h</small></span>${COST_KINDS.map(k=>{ const v=Math.round(Number((x.p.k||{})[k])||0); const cls=v>0?'':(costNoneSet(x.c).has(k)?' zero-ok':' zero-miss'); return `<span class="${cls.trim()}"><em>${COST_LABEL[k]}</em>${v.toLocaleString('ja-JP')}</span>`; }).join('')}</div></td>`
+      +`<td class="num cost"><span class="sz-fin${x.isFinal?' on':''}">${x.isFinal?'確定':'仮'}</span>${x.cost?yen(x.cost):'<span class="faint">原価なし</span>'}${x.after>0?`<div class="sz-after">確定後に追加 ${yen(x.after)}</div>`:''}${x.redo.total>0?`<div class="sz-redo">やり直し ${yen(x.redo.total)}${x.redo.minutes?'・'+(Math.round(x.redo.minutes/6)/10)+'h':''}</div>`:''}<div class="sz-parts"><span><em>労務費</em>${Math.round(x.labor).toLocaleString('ja-JP')}<small>${Math.round((Number(x.p.minutes)||0)/6)/10}h</small></span>${COST_KINDS.map(k=>{ const v=Math.round(Number((x.p.k||{})[k])||0); const cls=v>0?'':(costNoneSet(x.c).has(k)?' zero-ok':' zero-miss'); return `<span class="${cls.trim()}"><em>${COST_LABEL[k]}</em>${v.toLocaleString('ja-JP')}</span>`; }).join('')}${(()=>{ const v=Math.round(Number((x.p.k||{})['やり直し'])||0); return `<span class="${v>0?'redo':''}"><em>やり直し</em>${v.toLocaleString('ja-JP')}</span>`; })()}</div></td>`
       +`<td class="num${x.gp!=null&&x.gp<0?' bad':''}">${x.gp!=null?ym(x.gp):'—'}</td>`
       +`<td class="rate">${x.rate!=null?`<span class="sz-bar-bg"><span class="sz-bar-fg${rateCls(x.rate)}" style="width:${Math.max(0,Math.min(100,x.rate))}%"></span></span><span class="sz-pct${rateCls(x.rate)}">${Math.round(x.rate)}%</span>`:`<span class="faint">${x.sales?'原価明細か日報が入ると出る':'金額を入れると出る'}</span>`}</td></tr>`;
     if(!items.length){ h+='<div class="cases-empty">この期間の案件はありません</div>'; pane.innerHTML=h; return; }
