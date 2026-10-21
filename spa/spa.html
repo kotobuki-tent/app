@@ -4404,8 +4404,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-21 15:26';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1227;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-21 15:29';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1228;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10156,13 +10156,31 @@ table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.item
 .note{font-size:10pt;margin-top:4mm}.foot{width:100%;margin-top:8mm;border-collapse:collapse}.co{font-size:10pt;line-height:1.5}.co .n{font-size:12pt;font-weight:bold}
 .bar{position:fixed;top:0;left:0;right:0;background:#1c1c1e;color:#fff;padding:10px 16px;font:600 14px/1 -apple-system,'Hiragino Sans',sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between}.bar button{border:none;border-radius:8px;padding:8px 14px;font:600 14px/1 inherit;background:#fff;color:#1c1c1e;cursor:pointer}.bar .ctl{display:flex;gap:8px;align-items:center}.bar input{border:none;border-radius:8px;padding:8px 10px;font:400 14px/1 inherit;width:260px;background:#fff;color:#1c1c1e}.bar button.go{background:#2f6fed;color:#fff}
 @media print{.bar{display:none}}@media screen{body{padding:60px 22mm 22mm;max-width:210mm;margin:0 auto}}
-</style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}</span><span class="ctl"><input id="poCase" list="poCases" placeholder="案件" value="${esc(p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'')}" autocomplete="off"><datalist id="poCases">${liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('')}</datalist><button onclick="window.print()">印刷</button><button class="go" onclick="(function(){var o=window.opener||window.parent;var r=o&&o.Po?o.Po.markSent('${esc(p.id)}',document.getElementById('poCase').value):'none';if(r==='ok'){window.close();}else if(r!=='busy'){alert(r);}})()">発注した</button></span></div>
+</style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}</span><span class="ctl"><input id="poCase" list="poCases" placeholder="案件" value="${esc(p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'')}" autocomplete="off"><datalist id="poCases">${liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('')}</datalist><button onclick="window.print()">印刷</button><button id="pdfBtn" onclick="toPdf()">PDF</button><button class="go" onclick="(function(){var o=window.opener||window.parent;var r=o&&o.Po?o.Po.markSent('${esc(p.id)}',document.getElementById('poCase').value):'none';if(r==='ok'){window.close();}else if(r!=='busy'){alert(r);}})()">発注した</button></span></div>
 <h1>発注書</h1><div class="row"><div class="to">${esc(p.vendor||'')}　御中</div><table class="meta"><tr><th>注文番号</th><td>${esc(p.order_no||p.id||'')}</td></tr><tr><th>発注日</th><td>${ds}</td></tr></table></div>
 <p class="lead">下記のとおり発注します。</p><div class="case"><span><b>件名</b>　${esc(p.case_name||((p.items||[])[0]&&(p.items||[])[0].name)||'')}</span><span><b>担当</b>　${esc(p.person||'')}</span></div>
 <table class="items"><tr><th style="width:8mm">No</th><th>品名・品番・仕様</th><th style="width:16mm">数量</th><th style="width:12mm">単位</th><th style="width:24mm">単価</th><th style="width:28mm">金額（税抜）</th></tr>${rows}<tr><td colspan="5" class="num">合計（税抜）</td><td class="num">${n(total(p))} 円</td></tr></table>
 <table class="cond"><tr><th>納期</th><td style="white-space:nowrap">${esc(dl)}</td><th>納品先</th><td>${esc(p.deliver_to||'弊社')}</td></tr><tr><th>支払</th><td colspan="3">20 日締め／翌月 15 日払い</td></tr><tr><th>備考</th><td colspan="3" style="height:12mm">${esc(p.note||'')}</td></tr></table>
 <p class="note">納品書・請求書に上記の<b>注文番号</b>をご記載いただけますと幸いです。</p>
 <table class="foot"><tr><td class="co" style="vertical-align:bottom"><span class="n">有限会社寿テント</span><br>〒689-2102　鳥取県東伯郡北栄町国坂104-2<br>TEL 0858-36-2811　FAX 0858-36-2863　mail kt-info@kototen.com</td><td class="co" style="text-align:right;vertical-align:bottom;white-space:nowrap">発注者　${esc(senderOf(p))}</td></tr></table>
+<script>
+// PDF ボタン：紙面を画像にして A4 の PDF に落とす（html2canvas + jsPDF、CDN から押した時だけ読む）。文字のコピーはできない。2026-10-21 iller「印刷ボタンと pdf 化ボタンって分けられる？」
+var PDF_NAME=${JSON.stringify('発注書_'+String(p.vendor||'').replace(/[\\/:*?"<>|]/g,'')+'_'+String(p.order_no||p.id||'')+'.pdf')};
+function loadScript(src){ return new Promise(function(ok,ng){ var sc=document.createElement('script'); sc.src=src; sc.onload=ok; sc.onerror=function(){ ng(new Error(src)); }; document.head.appendChild(sc); }); }
+async function toPdf(){ var b=document.getElementById('pdfBtn'); if(b.disabled) return; b.disabled=true; var t=b.textContent; b.textContent='作成中';
+  try{
+    if(!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    if(!(window.jspdf&&window.jspdf.jsPDF)) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    var bar=document.querySelector('.bar'); bar.style.display='none';
+    var prev=document.body.getAttribute('style')||''; document.body.setAttribute('style','padding:22mm;max-width:none;width:210mm;box-sizing:border-box;margin:0;background:#fff');
+    var canvas=await html2canvas(document.body,{scale:2,backgroundColor:'#ffffff',useCORS:true});
+    document.body.setAttribute('style',prev); bar.style.display='';
+    var pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+    var w=210, h=canvas.height*w/canvas.width; if(h>297){ h=297; w=canvas.width*h/canvas.height; }
+    pdf.addImage(canvas.toDataURL('image/jpeg',0.95),'JPEG',(210-w)/2,0,w,h); pdf.save(PDF_NAME);
+  }catch(e){ alert('PDF を作れませんでした：'+e.message); var bar2=document.querySelector('.bar'); if(bar2) bar2.style.display=''; }
+  b.disabled=false; b.textContent=t; }
+<\/script>
 </body></html>`;
     w.document.open(); w.document.write(html); w.document.close(); }
   function init(){}
