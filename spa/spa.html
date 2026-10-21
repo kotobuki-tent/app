@@ -2610,7 +2610,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .sz-sp{flex:1 1 12px}
   #view-cases .sz-chip{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 13px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
   #view-cases .sz-chip.on{background:var(--text);border-color:var(--text);color:#fff}
-  #view-cases .sz-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 14px}
+  #view-cases .sz-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 14px}
   #view-cases .sz-card{background:var(--surface);border-radius:12px;padding:12px 14px;min-width:0}
   #view-cases .sz-card .k{font-size:13px;color:var(--text-dim)}
   #view-cases .sz-card .v{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -2696,6 +2696,11 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .sz-fin{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-dim);vertical-align:1px}
   #view-cases .sz-fin.on{background:#eaf3de;color:#3b6d11}
   #view-cases .sz-after{font-size:11px;font-weight:600;color:#854f0b;margin-top:2px}
+  #view-cases .sz-redo{font-size:11px;font-weight:700;color:#a32d2d;margin-top:2px}
+  #view-cases .ce-redo{display:inline-block;margin-right:6px;padding:0 6px;border-radius:999px;font-size:10px;font-weight:700;color:#a32d2d;background:#fdeaea}
+  #view-cases .cc-redo{display:inline-flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap;color:var(--text)}
+  #view-cases .cc-add-r{display:flex;gap:10px;align-items:center}
+  #view-cases .cc-add-r .btn{flex:1}
   #view-cases .ce-final{margin-left:auto;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:3px 12px;font:600 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
   #view-cases .ce-final.on{margin-left:auto;display:inline-flex;align-items:center;gap:8px;color:#3b6d11;font-weight:600}
   #view-cases .ce-final-x{border:none;background:none;color:var(--text-faint);font-size:11px;cursor:pointer;text-decoration:underline}
@@ -2793,7 +2798,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     #view-cases .ce-cost{grid-template-columns:76px 42px 1fr 96px 30px}
     #view-cases .ce-cost .i{display:none}
     #view-cases .ce-cost-add{grid-template-columns:1fr 1fr}
-    #view-cases .ce-cost-add #cc_amount,#view-cases .ce-cost-add .btn{grid-column:1/-1}
+    #view-cases .ce-cost-add #cc_amount,#view-cases .ce-cost-add .cc-add-r{grid-column:1/-1}
   }
   #view-cases .ce-adddept{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
   #view-cases .ce-add-lbl{font-size:12px;color:var(--text-dim);margin-right:2px}
@@ -2894,7 +2899,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
           <input type="number" id="cc_amount" min="0" step="1" placeholder="金額（税抜）">
           <input id="cc_vendor" placeholder="仕入先">
           <input id="cc_item" placeholder="内容">
-          <button type="button" class="btn gray" onclick="Cases.addCost()">＋ 追加</button>
+          <div class="cc-add-r"><label class="cc-redo"><input type="checkbox" id="cc_redo">やり直し</label><button type="button" class="btn gray" onclick="Cases.addCost()">＋ 追加</button></div>
         </div>
       </div>
       </div></div>
@@ -4392,8 +4397,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-20 17:08';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1215;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-21 09:05';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1216;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9491,7 +9496,8 @@ const Cases = (function(){
     const items=rows.map(c=>{ const p=_profit[String(c.id)]||{}; const mat=Number(p.cost)||0, labor=Number(p.labor)||0, cost=mat+labor, sales=Number(c.amount)||0;
       const miss=costMissing(c,p); const has=cost>0||!miss.length;   // 3 区分とも「なし」で確認済みなら原価 0 でも出す
       const isFinal=!!c.cost_final, after=Number(p.after)||0;
-      return {c, p, sales, mat, labor, cost, miss, isFinal, after, gp:(sales&&has)?sales-cost:null, rate:(sales&&has)?(sales-cost)/sales*100:null}; });
+      const rd=p.redo||{}; const redo={cost:Number(rd.cost)||0, labor:Number(rd.labor)||0, minutes:Number(rd.minutes)||0}; redo.total=redo.cost+redo.labor;
+      return {c, p, sales, mat, labor, cost, miss, isFinal, after, redo, gp:(sales&&has)?sales-cost:null, rate:(sales&&has)?(sales-cost)/sales*100:null}; });
     const ranked=items.filter(x=>x.rate!=null).sort((a,b)=>a.rate-b.rate);
     const noAmt=items.filter(x=>!x.sales&&x.cost>0), noCost=items.filter(x=>x.sales>0&&x.rate==null); const unconfirmed=ranked.filter(x=>x.miss.length).length;
     const fin=ranked.filter(x=>x.isFinal), prov=ranked.length-fin.length;   // 月の合計は確定した案件だけ（iller 10/19）
@@ -9504,13 +9510,14 @@ const Cases = (function(){
       +`<div class="sz-card"><div class="k">売上（確定分）</div><div class="v">${fin.length?yen(T.sales):'—'}</div><div class="s">確定 ${fin.length} 件${prov?'・仮 '+prov+' 件':''}</div></div>`
       +`<div class="sz-card"><div class="k">原価</div><div class="v">${fin.length?yen(T.mat+T.labor):'—'}</div><div class="s">材料等 ${yen(T.mat)}　労務費 ${yen(T.labor)}</div></div>`
       +`<div class="sz-card"><div class="k">粗利</div><div class="v${gp<0?' bad':''}">${fin.length?ym(gp):'—'}</div><div class="s">${unconfirmed?'原価が未確認 '+unconfirmed+' 件':''}${unconfirmed&&(noAmt.length||noCost.length)?'・':''}${noAmt.length?'金額なし '+noAmt.length:''}${noAmt.length&&noCost.length?'・':''}${noCost.length?'原価なし '+noCost.length:''}${(noAmt.length||noCost.length)?' は除く':''}${(unconfirmed||noAmt.length||noCost.length)?'':'&nbsp;'}</div></div>`
+      +(()=>{ const rd=items.filter(x=>x.redo.total>0); const rt=rd.reduce((t,x)=>t+x.redo.total,0); return `<div class="sz-card"><div class="k">やり直し</div><div class="v${rd.length?' bad':''}">${rd.length?yen(rt):'—'}</div><div class="s">${rd.length?rd.length+' 件':'&nbsp;'}</div></div>`; })()
       +`<div class="sz-card"><div class="k">粗利率</div><div class="v${rateCls(rate)}">${fin.length&&rate!=null?Math.round(rate)+'%':'—'}</div><div class="s">損益ゼロ 29%・目標 35%</div></div>`
       +'</div>';
     const who=c=>{ const d=DEPTS.filter(x=>caseDepts(c.id)[x.k]).map(x=>x.n).join('・'); return esc([d,c.our_person].filter(Boolean).join('　')); };
     const row=(x,extra)=>`<tr data-cid="${esc(x.c.id)}" onclick="Cases.openEdit('${esc(x.c.id)}')"${extra?' class="dim"':''}>`
       +`<td><div class="ct-main">${esc(dispName(x.c.client,x.c.name))}</div><div class="ct-sub">${who(x.c)}</div></td>`
       +`<td class="num">${x.sales?yen(x.sales):'<span class="faint">金額なし</span>'}</td>`
-      +`<td class="num cost"><span class="sz-fin${x.isFinal?' on':''}">${x.isFinal?'確定':'仮'}</span>${x.cost?yen(x.cost):'<span class="faint">原価なし</span>'}${x.after>0?`<div class="sz-after">確定後に追加 ${yen(x.after)}</div>`:''}<div class="sz-parts"><span><em>労務費</em>${Math.round(x.labor).toLocaleString('ja-JP')}<small>${Math.round((Number(x.p.minutes)||0)/6)/10}h</small></span>${COST_KINDS.map(k=>{ const v=Math.round(Number((x.p.k||{})[k])||0); const cls=v>0?'':(costNoneSet(x.c).has(k)?' zero-ok':' zero-miss'); return `<span class="${cls.trim()}"><em>${COST_LABEL[k]}</em>${v.toLocaleString('ja-JP')}</span>`; }).join('')}</div></td>`
+      +`<td class="num cost"><span class="sz-fin${x.isFinal?' on':''}">${x.isFinal?'確定':'仮'}</span>${x.cost?yen(x.cost):'<span class="faint">原価なし</span>'}${x.after>0?`<div class="sz-after">確定後に追加 ${yen(x.after)}</div>`:''}${x.redo.total>0?`<div class="sz-redo">やり直し ${yen(x.redo.total)}${x.redo.minutes?'・'+(Math.round(x.redo.minutes/6)/10)+'h':''}</div>`:''}<div class="sz-parts"><span><em>労務費</em>${Math.round(x.labor).toLocaleString('ja-JP')}<small>${Math.round((Number(x.p.minutes)||0)/6)/10}h</small></span>${COST_KINDS.map(k=>{ const v=Math.round(Number((x.p.k||{})[k])||0); const cls=v>0?'':(costNoneSet(x.c).has(k)?' zero-ok':' zero-miss'); return `<span class="${cls.trim()}"><em>${COST_LABEL[k]}</em>${v.toLocaleString('ja-JP')}</span>`; }).join('')}</div></td>`
       +`<td class="num${x.gp!=null&&x.gp<0?' bad':''}">${x.gp!=null?ym(x.gp):'—'}</td>`
       +`<td class="rate">${x.rate!=null?`<span class="sz-bar-bg"><span class="sz-bar-fg${rateCls(x.rate)}" style="width:${Math.max(0,Math.min(100,x.rate))}%"></span></span><span class="sz-pct${rateCls(x.rate)}">${Math.round(x.rate)}%</span>`:`<span class="faint">${x.sales?'原価明細か日報が入ると出る':'金額を入れると出る'}</span>`}</td></tr>`;
     if(!items.length){ h+='<div class="cases-empty">この期間の案件はありません</div>'; pane.innerHTML=h; return; }
@@ -9701,7 +9708,7 @@ const Cases = (function(){
     const total=rows.reduce((s,x)=>s+(Number(x.amount)||0),0);
     let h='';
     if(rows.length){
-      h=rows.map(x=>`<div class="ce-cost${String(x.id).startsWith('tmp_')?' tmp':''}"><span class="d">${md(x.date)}</span><span class="k">${esc(x.kind||'')}</span><span class="v">${esc(x.vendor||'')}</span><span class="i">${esc(x.item||'')}</span><span class="a">${fmt(x.amount)}</span>${String(x.note||'').startsWith('fabric:')?'<span class="x" title="生地台帳から">▫</span>':`<button type="button" class="x" onclick="Cases.delCost('${esc(String(x.id))}')" title="削除">✕</button>`}</div>`).join('')
+      h=rows.map(x=>`<div class="ce-cost${String(x.id).startsWith('tmp_')?' tmp':''}"><span class="d">${md(x.date)}</span><span class="k">${esc(x.kind||'')}</span><span class="v">${esc(x.vendor||'')}</span><span class="i">${String(x.note||'').indexOf('やり直し')>=0?'<span class="ce-redo">やり直し</span>':''}${esc(x.item||'')}</span><span class="a">${fmt(x.amount)}</span>${String(x.note||'').startsWith('fabric:')?'<span class="x" title="生地台帳から">▫</span>':`<button type="button" class="x" onclick="Cases.delCost('${esc(String(x.id))}')" title="削除">✕</button>`}</div>`).join('')
         +`<div class="ce-cost total"><span class="d"></span><span class="k" style="background:none">合計</span><span class="v"></span><span class="i"></span><span class="a">${fmt(total)}</span><span></span></div>`;
     }
     // 原価の確認（2026-10-19 iller「何の材料が足りてないかのチェック欄」）：区分ごとに、行があれば金額、無ければ「なし（0 円）」のチェック。未チェックは未確認
@@ -9724,10 +9731,11 @@ const Cases = (function(){
   function addCost(){ if(_costBusy||!_editId)return; const amount=Number($('cc_amount').value); const vendor=$('cc_vendor').value.trim(), item=$('cc_item').value.trim(), kind=$('cc_kind').value, date=$('cc_date').value||dateStr(new Date());
     if(!(amount>0)){ toast('金額を入力してください',true); return; }
     _costBusy=true; setTimeout(()=>{_costBusy=false},1500);
-    const row={id:'tmp_'+Date.now(),case_id:_editId,date,kind,vendor,item,amount,note:''};
+    const note=($('cc_redo')&&$('cc_redo').checked)?'やり直し':'';   // やり直し＝手戻りの分。採算に別立てで出す（2026-10-21）
+    const row={id:'tmp_'+Date.now(),case_id:_editId,date,kind,vendor,item,amount,note};
     _costs.push(row); renderCosts();
-    fireAndForget({dept:'cases',action:'save_cost',case_id:_editId,date,kind,vendor,item,amount,note:''});
-    $('cc_vendor').value=''; $('cc_item').value=''; $('cc_amount').value='';
+    fireAndForget({dept:'cases',action:'save_cost',case_id:_editId,date,kind,vendor,item,amount,note});
+    $('cc_vendor').value=''; $('cc_item').value=''; $('cc_amount').value=''; if($('cc_redo'))$('cc_redo').checked=false;
     const id=_editId; setTimeout(()=>{ if(_editId===id) loadCosts(id); },8000);
   }
   function delCost(id){ if(_costBusy)return; const x=_costs.find(r=>String(r.id)===String(id)); if(!x)return; if(String(x.note||'').startsWith('fabric:')){ toast('生地の行は在庫の「生地」で戻してください',true); return; } if(!confirm('この行を削除しますか？'))return;
