@@ -2697,10 +2697,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .sz-fin.on{background:#eaf3de;color:#3b6d11}
   #view-cases .sz-after{font-size:11px;font-weight:600;color:#854f0b;margin-top:2px}
   #view-cases .sz-redo{font-size:11px;font-weight:700;color:#a32d2d;margin-top:2px}
-  #view-cases .ce-redo{display:inline-block;margin-right:6px;padding:0 6px;border-radius:999px;font-size:10px;font-weight:700;color:#a32d2d;background:#fdeaea}
-  #view-cases .cc-redo{display:inline-flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap;color:var(--text)}
-  #view-cases .cc-add-r{display:flex;gap:10px;align-items:center}
-  #view-cases .cc-add-r .btn{flex:1}
+  #view-cases .ce-cost .k.redo{color:#a32d2d;background:#fdeaea}
   #view-cases .ce-final{margin-left:auto;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:3px 12px;font:600 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
   #view-cases .ce-final.on{margin-left:auto;display:inline-flex;align-items:center;gap:8px;color:#3b6d11;font-weight:600}
   #view-cases .ce-final-x{border:none;background:none;color:var(--text-faint);font-size:11px;cursor:pointer;text-decoration:underline}
@@ -2798,7 +2795,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     #view-cases .ce-cost{grid-template-columns:76px 42px 1fr 96px 30px}
     #view-cases .ce-cost .i{display:none}
     #view-cases .ce-cost-add{grid-template-columns:1fr 1fr}
-    #view-cases .ce-cost-add #cc_amount,#view-cases .ce-cost-add .cc-add-r{grid-column:1/-1}
+    #view-cases .ce-cost-add #cc_amount,#view-cases .ce-cost-add .btn{grid-column:1/-1}
   }
   #view-cases .ce-adddept{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
   #view-cases .ce-add-lbl{font-size:12px;color:var(--text-dim);margin-right:2px}
@@ -2895,11 +2892,11 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
         <div id="ce_costs" class="ce-costs"></div>
         <div class="ce-cost-add">
           <input type="date" id="cc_date">
-          <select id="cc_kind"><option>材料</option><option>外注</option><option>経費</option></select>
+          <select id="cc_kind"><option>材料</option><option>外注</option><option>経費</option><option>やり直し</option></select>
           <input type="number" id="cc_amount" min="0" step="1" placeholder="金額（税抜）">
           <input id="cc_vendor" placeholder="仕入先">
           <input id="cc_item" placeholder="内容">
-          <div class="cc-add-r"><label class="cc-redo"><input type="checkbox" id="cc_redo">やり直し</label><button type="button" class="btn gray" onclick="Cases.addCost()">＋ 追加</button></div>
+          <button type="button" class="btn gray" onclick="Cases.addCost()">＋ 追加</button>
         </div>
       </div>
       </div></div>
@@ -4397,8 +4394,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-21 09:17';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1217;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-21 09:32';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1218;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9708,7 +9705,7 @@ const Cases = (function(){
     const total=rows.reduce((s,x)=>s+(Number(x.amount)||0),0);
     let h='';
     if(rows.length){
-      h=rows.map(x=>`<div class="ce-cost${String(x.id).startsWith('tmp_')?' tmp':''}"><span class="d">${md(x.date)}</span><span class="k">${esc(x.kind||'')}</span><span class="v">${esc(x.vendor||'')}</span><span class="i">${String(x.note||'').indexOf('やり直し')>=0?'<span class="ce-redo">やり直し</span>':''}${esc(x.item||'')}</span><span class="a">${fmt(x.amount)}</span>${String(x.note||'').startsWith('fabric:')?'<span class="x" title="生地台帳から">▫</span>':`<button type="button" class="x" onclick="Cases.delCost('${esc(String(x.id))}')" title="削除">✕</button>`}</div>`).join('')
+      h=rows.map(x=>`<div class="ce-cost${String(x.id).startsWith('tmp_')?' tmp':''}"><span class="d">${md(x.date)}</span><span class="k${x.kind==='やり直し'?' redo':''}">${esc(x.kind||'')}</span><span class="v">${esc(x.vendor||'')}</span><span class="i">${esc(x.item||'')}</span><span class="a">${fmt(x.amount)}</span>${String(x.note||'').startsWith('fabric:')?'<span class="x" title="生地台帳から">▫</span>':`<button type="button" class="x" onclick="Cases.delCost('${esc(String(x.id))}')" title="削除">✕</button>`}</div>`).join('')
         +`<div class="ce-cost total"><span class="d"></span><span class="k" style="background:none">合計</span><span class="v"></span><span class="i"></span><span class="a">${fmt(total)}</span><span></span></div>`;
     }
     // 原価の確認（2026-10-19 iller「何の材料が足りてないかのチェック欄」）：区分ごとに、行があれば金額、無ければ「なし（0 円）」のチェック。未チェックは未確認
@@ -9731,11 +9728,11 @@ const Cases = (function(){
   function addCost(){ if(_costBusy||!_editId)return; const amount=Number($('cc_amount').value); const vendor=$('cc_vendor').value.trim(), item=$('cc_item').value.trim(), kind=$('cc_kind').value, date=$('cc_date').value||dateStr(new Date());
     if(!(amount>0)){ toast('金額を入力してください',true); return; }
     _costBusy=true; setTimeout(()=>{_costBusy=false},1500);
-    const note=($('cc_redo')&&$('cc_redo').checked)?'やり直し':'';   // やり直し＝手戻りの分。採算に別立てで出す（2026-10-21）
+    const note=kind==='やり直し'?'やり直し':'';   // 区分「やり直し」＝手戻りの分。採算に別立てで出す（2026-10-21、チェック式は「わかりにくすぎる」で区分に）
     const row={id:'tmp_'+Date.now(),case_id:_editId,date,kind,vendor,item,amount,note};
     _costs.push(row); renderCosts();
     fireAndForget({dept:'cases',action:'save_cost',case_id:_editId,date,kind,vendor,item,amount,note});
-    $('cc_vendor').value=''; $('cc_item').value=''; $('cc_amount').value=''; if($('cc_redo'))$('cc_redo').checked=false;
+    $('cc_vendor').value=''; $('cc_item').value=''; $('cc_amount').value='';
     const id=_editId; setTimeout(()=>{ if(_editId===id) loadCosts(id); },8000);
   }
   function delCost(id){ if(_costBusy)return; const x=_costs.find(r=>String(r.id)===String(id)); if(!x)return; if(String(x.note||'').startsWith('fabric:')){ toast('生地の行は在庫の「生地」で戻してください',true); return; } if(!confirm('この行を削除しますか？'))return;
