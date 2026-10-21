@@ -4407,8 +4407,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-21 16:35';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1236;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-21 17:38';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1237;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10027,7 +10027,7 @@ const Cases = (function(){
   return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal };
 })();
 
-// ===== 発注（2026-10-19）：発注書を書く（記入者・宛先・明細・納期・納品先・備考）→ シート purchase_orders に未発注 → ① 案件と区分 → ② 発注書を開いて発注る → ③ 発注済（案件を付けていれば原価明細へ）
+// ===== 発注（2026-10-19）：発注書を書く（記入者・宛先・明細・納期・納品先・備考）→ シート purchase_orders に未発注。2026-10-21 v134：発注書は注文するだけ、原価明細には流さない（案件は注文番号＝受注番号のため） → ① 案件と区分 → ② 発注書を開いて発注る → ③ 発注済（案件を付けていれば原価明細へ）
 // iller「案件になんでもかんでも乗っけすぎ」「あっちこっち行ったり来たり」＝案件管理から出して独立した画面に。書く欄も同じ画面（hatchu.html は 10/19 に廃止＝部長も PC でここから書く）
 const Po = (function(){
   const KINDS=['材料','外注','経費'];
@@ -10080,13 +10080,13 @@ const Po = (function(){
     if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
     p.kind=kind; if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=''; p.order_no=''; }
     send({dept:'po',action:'save',id,case_id:p.case_id,case_name:p.case_name,order_no:p.order_no,kind:p.kind});
-    el.querySelector('.po-case-st').textContent=c?('注文番号 '+(p.order_no||p.id)):('案件なし＝在庫・共用。注文番号は '+p.id); el.querySelector('.po-send-st').textContent=c?'原価明細に入る':'原価明細には入れない'; }
+    el.querySelector('.po-case-st').textContent=c?('注文番号 '+(p.order_no||p.id)):('案件なし＝在庫・共用。注文番号は '+p.id); el.querySelector('.po-send-st').textContent=''; }
   function markSent(id, caseText){ if(_busy)return 'busy'; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return 'none'; if(String(id).startsWith('tmp_')) return '保存中です。しばらくしてから操作してください';
     const v=String(caseText||'').trim(); const c=v?caseOf(v):null; if(v&&!c) return '案件は候補から選んでください（付けないなら空）';
     if(guard())return 'busy'; const me=senderOf(p); p.kind='材料';
     if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=''; p.order_no=''; }
     p.status='発注済'; p.sent_at=new Date().toISOString(); p.sent_by=me;
-    send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:'材料'}); toast(p.case_name?'発注済にしました（'+p.case_name+' の原価明細へ）':'発注済にしました'); render();
+    send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:'材料'}); toast('発注済にしました'); render();
     setTimeout(loadAll,8000); return 'ok'; }
   function cancel(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; } if(!confirm('この発注書を削除しますか？\n元には戻せません'))return; if(guard())return;
     _pos=_pos.filter(x=>String(x.id)!==String(id)); send({dept:'po',action:'delete',id}); toast('削除しました'); render(); setTimeout(loadAll,8000); }
@@ -10132,7 +10132,7 @@ const Po = (function(){
   function eCancel(){ if(!_edit)return; const id=_edit.id; eClose(); cancel(id); }
   // 「発注した」の誤爆用（iller 2026-10-21）。GAS unsend が状態を戻し、案件の原価明細に入れた行も消す（Code.gs v133）
   function eUnsend(){ if(!_edit||_busy)return; const p=_pos.find(x=>String(x.id)===String(_edit.id)); if(!p||p.status!=='発注済')return;
-    if(!confirm('未発注に戻しますか？'+(p.case_name?'\n案件の原価明細に入れた分も消えます':'')))return; if(guard())return;
+    if(!confirm('未発注に戻しますか？'))return; if(guard())return;
     p.status='未発注'; p.sent_at=''; p.sent_by=''; send({dept:'po',action:'unsend',id:p.id}); eClose(); toast('未発注に戻しました'); render(); setTimeout(loadAll,8000); }
   function eSave(){ if(!_edit||_edit.locked||_busy)return; eKeep(); const e=_edit;
     if(!e.isNew&&String(e.id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
