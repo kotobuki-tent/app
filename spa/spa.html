@@ -2679,6 +2679,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-po .po-edit-body{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
   #view-po .po-edit-body .mo-foot{grid-column:1/-1}
   #view-po .po-edit-body .mo-foot .left{margin-right:auto;display:flex;gap:8px}
+  #view-po .po-edit-body .mo-foot .po-del{color:#c62828;border-color:#e8b4b4}
   @media(max-width:900px){#view-po .po-edit-body{grid-template-columns:1fr}}
   #view-po .po-act{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
   #view-po .po-step{border-left:1px solid var(--border-light);padding-left:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
@@ -4404,8 +4405,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-21 15:39';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1231;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-21 15:43';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1232;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10064,7 +10065,7 @@ const Po = (function(){
     const sender0=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_sender')||'';   // 発注者（送る人）の既定＝LINE WORKS の名前か前回
     const card=p=>`<div class="po-card simple" data-id="${esc(p.id)}" onclick="Po.edit('${esc(p.id)}')">
       <div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}${p.case_name?`<span class="po-kind-tag">${esc((p.order_no?'#'+p.order_no+' ':'')+p.case_name)}</span>`:''}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}${p.deadline?'　納期 '+esc(p.deadline):''}${p.deliver_to&&p.deliver_to!=='弊社'?'　納品先 '+esc(p.deliver_to):''}${p.note?'　備考 '+esc(p.note):''}　合計 ${yen(total(p))}</div></div>
-      <div class="po-act"><button type="button" class="po-btn dark" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button><button type="button" class="act-btn del" onclick="event.stopPropagation();Po.cancel('${esc(p.id)}')">取消</button></div></div>`;
+      <div class="po-act"><button type="button" class="po-btn dark" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button></div></div>`;
     const row=p=>`<tr onclick="Po.edit('${esc(p.id)}')"><td><div class="po-vendor">${esc(p.vendor||'')} <span class="po-kind-tag">${esc(p.kind||'')}</span></div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):'案件なし'}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><span class="po-st${p.status==='発注済'?' sent':' cancel'}">${esc(p.status)}${p.status==='発注済'&&p.sent_at?'<br><small>'+d8(p.sent_at)+(p.sent_by?' '+esc(p.sent_by):'')+'</small>':''}</span><button type="button" class="act-btn" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button></td></tr>`;
     let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+vendorList+`<button type="button" class="po-new" onclick="Po.newPo()">＋ 発注書を書く</button>`;   // 書く欄は 2026-10-21 にモーダルへ（iller「書く欄が上半分」→ 一覧を先に、ボタンは一覧の上に四角く）
     h+=`<div class="po-sec"><b>未発注</b> ${open.length} 件 <button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
@@ -10085,8 +10086,8 @@ const Po = (function(){
     p.status='発注済'; p.sent_at=new Date().toISOString(); p.sent_by=me;
     send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:'材料'}); toast(p.case_name?'発注済にしました（'+p.case_name+' の原価明細へ）':'発注済にしました'); render();
     setTimeout(loadAll,8000); return 'ok'; }
-  function cancel(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; } if(!confirm('この発注書を取り消しますか？'))return; if(guard())return;
-    _pos=_pos.filter(x=>String(x.id)!==String(id)); send({dept:'po',action:'delete',id}); toast('取り消しました'); render(); setTimeout(loadAll,8000); }
+  function cancel(id){ if(_busy)return; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; } if(!confirm('この発注書を削除しますか？\n元には戻せません'))return; if(guard())return;
+    _pos=_pos.filter(x=>String(x.id)!==String(id)); send({dept:'po',action:'delete',id}); toast('削除しました'); render(); setTimeout(loadAll,8000); }
   function setSender(id,v){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; p.sender=v; try{ localStorage.setItem('po_sender',v); }catch(e){} if(!String(id).startsWith('tmp_')) send({dept:'po',action:'save',id,sender:v}); }
   function senderOf(p){ return p.sender||(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_sender')||''; }
   // 案件の候補：datalist は 5 件しか見えない（iller 10/20「もっとたくさん出ないのか」）→ 自前の一覧。空なら新しい順に全部、打てば得意先・案件名・受注番号で絞る
@@ -10118,7 +10119,7 @@ const Po = (function(){
       <div class="po-f"><label>納期</label><div class="po-inline"><input type="date" id="poe_deadline" value="${esc(e.deadline)}" ${e.asap||e.locked?'disabled':''}><button type="button" class="po-tg${e.asap?' on':''}" onclick="Po.eAsap()"${ro}>最短</button></div></div>
       <div class="po-f"><label>納品先</label><div class="po-inline"><button type="button" class="po-tg${e.deliv==='弊社'?' on':''}" onclick="Po.eDeliv('弊社')"${ro}>弊社</button><button type="button" class="po-tg${e.deliv==='別途'?' on':''}" onclick="Po.eDeliv('別途')"${ro}>別途</button><input id="poe_deliver_to" value="${esc(e.deliver_to)}" style="${e.deliv==='別途'?'':'display:none'}"${ro}></div></div>
       <div class="po-f wide"><label>備考</label><input id="poe_note" value="${esc(e.note)}"${ro}></div>
-      <div class="mo-foot">${e.locked||e.isNew?'':`<span class="left"><button type="button" class="cancel" onclick="Po.eCancel()">取消</button></span>`}${e.status==='発注済'?`<span class="left"><button type="button" class="cancel" onclick="Po.eUnsend()">未発注に戻す</button></span>`:''}<button type="button" class="cancel" onclick="Po.eClose()">閉じる</button>${e.isNew?'':`<button type="button" class="cancel" onclick="Po.print('${esc(e.id)}')">発注書</button>`}${e.locked?'':`<button type="button" class="save" onclick="Po.eSave()">${e.isNew?'発注書を出す':'保存'}</button>`}</div>
+      <div class="mo-foot">${e.locked||e.isNew?'':`<span class="left"><button type="button" class="cancel po-del" onclick="Po.eCancel()">削除</button></span>`}${e.status==='発注済'?`<span class="left"><button type="button" class="cancel" onclick="Po.eUnsend()">未発注に戻す</button></span>`:''}<button type="button" class="cancel" onclick="Po.eClose()">閉じる</button>${e.isNew?'':`<button type="button" class="cancel" onclick="Po.print('${esc(e.id)}')">発注書</button>`}${e.locked?'':`<button type="button" class="save" onclick="Po.eSave()">${e.isNew?'発注書を出す':'保存'}</button>`}</div>
     </div>`; }
   function eUpd(i,k,v){ if(_edit&&_edit.items[i]) _edit.items[i][k]=v; const t=$('poe_total'); if(t&&_edit) t.textContent=yen(_edit.items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0)); }
   function eAdd(){ if(!_edit)return; eKeep(); _edit.items.push({name:'',qty:'',unit:'',price:''}); renderEdit(); }
