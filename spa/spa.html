@@ -4404,8 +4404,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-21 15:19';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1226;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-21 15:26';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1227;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10069,7 +10069,7 @@ const Po = (function(){
     let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+vendorList+`<button type="button" class="po-new" onclick="Po.newPo()">＋ 発注書を書く</button>`;   // 書く欄は 2026-10-21 にモーダルへ（iller「書く欄が上半分」→ 一覧を先に、ボタンは一覧の上に四角く）
     h+=`<div class="po-sec"><b>未発注</b> ${open.length} 件 <button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
     h+=open.length?open.map(card).join(''):'<div class="po-empty">未発注の発注書はありません</div>';
-    if(done.length) h+=`<div class="po-sec">発注済（直近）</div><div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>宛先・案件</th><th>記入者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${done.map(row).join('')}</tbody></table></div>`;
+    if(done.length) h+=`<div class="po-sec">発注済（直近）</div><div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>仕入先・案件</th><th>記入者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${done.map(row).join('')}</tbody></table></div>`;
     el.innerHTML=h;
   }
   function assign(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(!el)return; const v=el.querySelector('.po-case').value.trim(), kind=el.querySelector('.po-kind').value; const c=caseOf(v);
@@ -10110,7 +10110,7 @@ const Po = (function(){
     const tot=e.items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0);
     el.innerHTML=`<div class="po-edit-body">
       <div class="po-f"><label>記入者</label><select id="poe_person"${ro}>${['<option value="">選択</option>'].concat(_staff.map(n=>`<option${n===e.person?' selected':''}>${esc(n)}</option>`)).join('')}${e.person&&!_staff.includes(e.person)?`<option selected>${esc(e.person)}</option>`:''}</select></div>
-      <div class="po-f"><label>宛先</label><input id="poe_vendor" list="poVendorList" autocomplete="off" value="${esc(e.vendor)}"${ro}></div>
+      <div class="po-f"><label>仕入先</label><input id="poe_vendor" list="poVendorList" autocomplete="off" value="${esc(e.vendor)}"${ro}></div>
       <div class="po-f wide"><label>案件</label><div class="po-pick"><input id="poe_case" autocomplete="off" value="${esc(e.caseText)}" oninput="Po.pick(this)" onfocus="Po.pick(this)" onblur="Po.pickHide()"${ro}><span class="po-pick-arr">▾</span><div class="po-pick-list"></div></div></div>
       <div class="po-f wide"><label>明細</label><div class="po-item-hd"><span>品名・品番・仕様</span><span>数量</span><span>単位</span><span>単価</span><span></span></div>
         ${e.items.map((it,i)=>`<div class="po-item"><input value="${esc(it.name)}" oninput="Po.eUpd(${i},'name',this.value)"${ro}><input class="n" type="number" inputmode="decimal" value="${esc(it.qty)}" oninput="Po.eUpd(${i},'qty',this.value)"${ro}><input value="${esc(it.unit)}" oninput="Po.eUpd(${i},'unit',this.value)"${ro}><input class="n" type="number" inputmode="numeric" value="${esc(it.price)}" oninput="Po.eUpd(${i},'price',this.value)"${ro}>${e.locked?'<span></span>':`<button type="button" class="act-btn del" onclick="Po.eDel(${i})">✕</button>`}</div>`).join('')}
@@ -10130,7 +10130,7 @@ const Po = (function(){
   function eSave(){ if(!_edit||_edit.locked||_busy)return; eKeep(); const e=_edit;
     if(!e.isNew&&String(e.id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
     const person=e.person; if(!person){ toast('記入者を選択してください',true); return; }
-    const vendor=e.vendor.trim(); if(!vendor){ toast('宛先を入力してください',true); return; }
+    const vendor=e.vendor.trim(); if(!vendor){ toast('仕入先を入力してください',true); return; }
     const rows=e.items.filter(it=>String(it.name||'').trim()); if(!rows.length){ toast('品名を入力してください',true); return; }
     const cv=e.caseText.trim(); const cs=cv?caseOf(cv):null; if(cv&&!cs){ toast('案件は候補から選んでください（付けないなら空）',true); return; }
     if(guard())return; try{ localStorage.setItem('po_person',person); }catch(err){}
