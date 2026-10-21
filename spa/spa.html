@@ -4404,8 +4404,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-21 15:29';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1228;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-21 15:35';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1229;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10118,7 +10118,7 @@ const Po = (function(){
       <div class="po-f"><label>納期</label><div class="po-inline"><input type="date" id="poe_deadline" value="${esc(e.deadline)}" ${e.asap||e.locked?'disabled':''}><button type="button" class="po-tg${e.asap?' on':''}" onclick="Po.eAsap()"${ro}>最短</button></div></div>
       <div class="po-f"><label>納品先</label><div class="po-inline"><button type="button" class="po-tg${e.deliv==='弊社'?' on':''}" onclick="Po.eDeliv('弊社')"${ro}>弊社</button><button type="button" class="po-tg${e.deliv==='別途'?' on':''}" onclick="Po.eDeliv('別途')"${ro}>別途</button><input id="poe_deliver_to" value="${esc(e.deliver_to)}" style="${e.deliv==='別途'?'':'display:none'}"${ro}></div></div>
       <div class="po-f wide"><label>備考</label><input id="poe_note" value="${esc(e.note)}"${ro}></div>
-      <div class="mo-foot">${e.locked||e.isNew?'':`<span class="left"><button type="button" class="cancel" onclick="Po.eCancel()">取消</button></span>`}<button type="button" class="cancel" onclick="Po.eClose()">閉じる</button>${e.isNew?'':`<button type="button" class="cancel" onclick="Po.print('${esc(e.id)}')">発注書</button>`}${e.locked?'':`<button type="button" class="save" onclick="Po.eSave()">${e.isNew?'発注書を出す':'保存'}</button>`}</div>
+      <div class="mo-foot">${e.locked||e.isNew?'':`<span class="left"><button type="button" class="cancel" onclick="Po.eCancel()">取消</button></span>`}${e.status==='発注済'?`<span class="left"><button type="button" class="cancel" onclick="Po.eUnsend()">未発注に戻す</button></span>`:''}<button type="button" class="cancel" onclick="Po.eClose()">閉じる</button>${e.isNew?'':`<button type="button" class="cancel" onclick="Po.print('${esc(e.id)}')">発注書</button>`}${e.locked?'':`<button type="button" class="save" onclick="Po.eSave()">${e.isNew?'発注書を出す':'保存'}</button>`}</div>
     </div>`; }
   function eUpd(i,k,v){ if(_edit&&_edit.items[i]) _edit.items[i][k]=v; const t=$('poe_total'); if(t&&_edit) t.textContent=yen(_edit.items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0)); }
   function eAdd(){ if(!_edit)return; eKeep(); _edit.items.push({name:'',qty:'',unit:'',price:''}); renderEdit(); }
@@ -10127,6 +10127,10 @@ const Po = (function(){
   function eDeliv(v){ if(!_edit)return; eKeep(); _edit.deliv=v; renderEdit(); }
   function eClose(){ _edit=null; $('poEditBg').classList.remove('show'); }
   function eCancel(){ if(!_edit)return; const id=_edit.id; eClose(); cancel(id); }
+  // 「発注した」の誤爆用（iller 2026-10-21）。GAS unsend が状態を戻し、案件の原価明細に入れた行も消す（Code.gs v133）
+  function eUnsend(){ if(!_edit||_busy)return; const p=_pos.find(x=>String(x.id)===String(_edit.id)); if(!p||p.status!=='発注済')return;
+    if(!confirm('未発注に戻しますか？'+(p.case_name?'\n案件の原価明細に入れた分も消えます':'')))return; if(guard())return;
+    p.status='未発注'; p.sent_at=''; p.sent_by=''; send({dept:'po',action:'unsend',id:p.id}); eClose(); toast('未発注に戻しました'); render(); setTimeout(loadAll,8000); }
   function eSave(){ if(!_edit||_edit.locked||_busy)return; eKeep(); const e=_edit;
     if(!e.isNew&&String(e.id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
     const person=e.person; if(!person){ toast('記入者を選択してください',true); return; }
@@ -10184,7 +10188,7 @@ async function toPdf(){ var b=document.getElementById('pdfBtn'); if(b.disabled) 
 </body></html>`;
     w.document.open(); w.document.write(html); w.document.close(); }
   function init(){}
-  return { loadAll, render, init, assign, setSender, markSent, cancel, reload, print, pick, pickSet, pickHide, newPo, edit, eUpd, eAdd, eDel, eAsap, eDeliv, eClose, eCancel, eSave };
+  return { loadAll, render, init, assign, setSender, markSent, cancel, reload, print, pick, pickSet, pickHide, newPo, edit, eUpd, eAdd, eDel, eAsap, eDeliv, eClose, eCancel, eUnsend, eSave };
 })();
 window.Po=Po;   // 発注書の別窓（window.opener）から markSent を呼ぶため。const は window に乗らない（2026-10-20）
 
