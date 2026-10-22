@@ -2367,6 +2367,14 @@ html.in-woff .portal-head{display:none}
   .portal-card::after{content:none}
   .portal-footer{margin-top:40px}
 }
+/* 横置きの大画面（2F の 27 インチ、1920 幅）は 3 列 × 6 段だと下が切れる（10/22 iller「下が切れてる。並びを考えて」）
+   → 毎日の記録／仕事／管理 の 3 つのグループを横に並べる（各 3 列、縦は最長の 仕事 で 3 段）。1600px 未満の窓は今までどおり縦に積む */
+@media(min-width:1600px) and (orientation:landscape){
+  .portal-head{max-width:1560px}
+  .portal-list{display:grid;grid-template-columns:repeat(3,480px);gap:0 60px;width:1560px;margin-top:40px;align-items:start}
+  .portal-grp{margin-bottom:0}
+  .portal-wrap{min-height:calc(100dvh - 48px);justify-content:center;padding-top:0;padding-bottom:40px}   /* 上に寄らず縦の真ん中に */
+}
 /* ポータルの足元は版の表示。ポータルを出している間は右下の小さな版は重ねない */
 .portal-footer{letter-spacing:.12em;padding-left:.12em;font-variant-numeric:tabular-nums}
 body:has(#view-portal:not(.hidden)) #appVer{display:none}
@@ -4432,8 +4440,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-22 11:27';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1247;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-22 11:36';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1248;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
