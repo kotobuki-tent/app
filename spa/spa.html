@@ -2643,7 +2643,14 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-po .po-empty{color:var(--text-dim);font-size:14px;text-align:center;padding:30px 0}
   #view-po .po-sec{font-size:14px;color:var(--text);margin:18px 0 8px;display:flex;align-items:center;gap:10px}
   #view-po .po-sec .sp{flex:1}
-  #view-po .po-top{display:flex;align-items:center;gap:8px;margin:4px 0 10px}
+  #view-po .po-top{display:flex;align-items:center;gap:8px;margin:4px 0 12px}
+  #view-po .po-panel{background:var(--surface);border-radius:14px;padding:14px 16px 16px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  #view-po .po-panel-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:15px}
+  #view-po .po-panel-hd .sp{flex:1}
+  #view-po .po-panel .po-new{margin:0;padding:11px 20px;font-size:14px}
+  #view-po .po-panel .po-card{background:var(--surface2);box-shadow:none;border:1px solid var(--border-light)}
+  #view-po .po-panel .po-tblwrap{border:1px solid var(--border-light)}
+  #view-po .po-panel .po-empty{padding:18px 0}
   #view-po .po-search{margin-left:auto;background:#fff;border:1px solid var(--border);border-radius:9px;padding:8px 12px 8px 32px;font:400 14px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;width:260px;max-width:50%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center}
   #view-po .po-tbl td:nth-child(2),#view-po .po-tbl td:nth-child(5){white-space:normal}
   #view-po .po-form{background:var(--surface);border-radius:12px;margin-bottom:6px}
@@ -4410,8 +4417,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-22 10:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1239;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-22 10:41';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1240;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10075,15 +10082,18 @@ const Po = (function(){
     let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+vendorList;
     h+=`<div class="po-top"><button type="button" class="sub-tab${_tab==='open'?' on':''}" onclick="Po.tab('open')">未発注${open.length?' '+open.length:''}</button><button type="button" class="sub-tab${_tab==='sent'?' on':''}" onclick="Po.tab('sent')">発注済</button>${_tab==='sent'?`<input class="po-search" id="poSearch" value="${esc(_q)}" oninput="Po.search(this.value)">`:''}</div>`;
     if(_tab==='sent'){
-      h+=`<div class="po-sec"><b>発注済</b> ${done.length} 件 <button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
+      h+=`<div class="po-panel"><div class="po-panel-hd"><b>発注済</b><span class="ct-sub">${done.length} 件</span><button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
       h+=done.length?`<div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>発注日</th><th>仕入先・案件</th><th>記入者</th><th>発注者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${done.map(row).join('')}</tbody></table></div>`:'<div class="po-empty">発注済の発注書はありません</div>';
-      el.innerHTML=h; if(_q.trim()) search(_q); return;
-    }
-    h+=`<button type="button" class="po-new" onclick="Po.newPo()">＋ 発注書を書く</button>`;   // 書く欄は 2026-10-21 にモーダルへ（iller「書く欄が上半分」→ 一覧を先に、ボタンは一覧の上に四角く）
-    h+=`<div class="po-sec"><b>未発注</b> ${open.length} 件 <button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
+      h+='</div>'; el.innerHTML=h; if(_q.trim()) search(_q); return;
+    }   // 書く欄は 2026-10-21 にモーダルへ（iller「書く欄が上半分」→ 一覧を先に、ボタンは一覧の上に四角く）
+    // 未発注と発注済を窓（パネル）で分ける（iller 10/22「がらんどうすぎる」）
+    h+=`<div class="po-panel"><div class="po-panel-hd"><b>未発注</b><span class="ct-sub">${open.length} 件</span><button type="button" class="act-btn" onclick="Po.reload()">更新</button><span class="sp"></span><button type="button" class="po-new" onclick="Po.newPo()">＋ 発注書を書く</button></div>`;
     h+=open.length?open.map(card).join(''):'<div class="po-empty">未発注の発注書はありません</div>';
+    h+='</div>';
     const recent=done.slice(0,10);   // 直近は未発注の下にも残す（iller 10/22「直近はあるべきだろ」）。全部は 発注済 タブ
-    if(recent.length) h+=`<div class="po-sec">発注済（直近）<button type="button" class="act-btn" onclick="Po.tab('sent')">すべて</button></div><div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>発注日</th><th>仕入先・案件</th><th>記入者</th><th>発注者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${recent.map(row).join('')}</tbody></table></div>`;
+    h+=`<div class="po-panel"><div class="po-panel-hd"><b>発注済</b><span class="ct-sub">直近 ${recent.length} 件</span><button type="button" class="act-btn" onclick="Po.tab('sent')">すべて</button></div>`;
+    h+=recent.length?`<div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>発注日</th><th>仕入先・案件</th><th>記入者</th><th>発注者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${recent.map(row).join('')}</tbody></table></div>`:'<div class="po-empty">発注済の発注書はありません</div>';
+    h+='</div>';
     el.innerHTML=h;
   }
   function tab(t){ _tab=t; render(); if(t==='sent'){ const i=$('poSearch'); if(i) i.focus(); } }
