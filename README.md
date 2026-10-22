@@ -53,7 +53,7 @@ LINE WORKS（WOFF）から入った人のうち、**案件画面を開けるの�
 | `staff` | スタッフ名簿（employee_no・name・name_kana・active・dept・position＋各画面の表示フラグ in_overtime / in_attendance / in_daily / in_alcohol / in_forklift / in_case / in_card＋考課アプリ用 in_hr / hr_kind / hr_evaluator1 / hr_token） |
 | `overtime` | 時間外申告データ |
 | `ot_requests` | 休日出勤希望データ |
-| `daily_reports` | 日報データ（date・employee_no・project・work・minutes） |
+| `daily_reports` | 日報データ（date・employee_no・project_type・project_id・project_name・work・minutes・note）。project_type＝production／project／sales／case（見積中の案件そのもの、2026-10-22）／other |
 | `attendance` | 出勤管理データ |
 | `absence` | 欠勤・休暇データ（日報で使用） |
 | `daily_reports_YYYY年度` | 日報の年度アーカイブ（決算後に手動退避。例: `daily_reports_2024年度`） |
