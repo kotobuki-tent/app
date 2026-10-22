@@ -1619,6 +1619,12 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane .cp-nbtn:active{transform:scale(.96)}
 .card-pane .cp-more{display:inline-block;margin:10px 2px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer}
 .card-pane .cp-more:hover{text-decoration:underline}
+.card-pane .cp-cards{display:flex;gap:10px;margin:0 0 12px}
+.card-pane .cp-card{flex:1;border:1.5px solid var(--border);background:var(--surface);border-radius:14px;padding:12px 10px;font:700 16px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.card-pane .cp-card small{font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim)}
+.card-pane .cp-card.on{background:var(--text);border-color:var(--text);color:#fff}
+.card-pane .cp-card.on small{color:rgba(255,255,255,.75)}
+.loan-row .lr-card{flex:0 0 auto;margin-left:-8px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:700;background:#e3eefc;color:#185fa5}
 .card-pane .cp-selbar{position:relative;display:flex;align-items:center;justify-content:center;padding:18px 20px;border-radius:14px;background:var(--accent-dim);border:1.5px solid var(--accent);margin-bottom:18px;height:76px}
 .card-pane .cp-selbar.none{display:none}
 .card-pane .cp-sel-lab{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.08em}
@@ -2167,6 +2173,7 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 .loan-card.out{background:#faeeda}
 .loan-card .lc-name{font-weight:600}
 .loan-card .lc-v{font-weight:600}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){.loan-row{gap:8px}.loan-row .lr-date{flex-basis:auto}.loan-row .lr-arrow{display:none}.loan-row .lr-now{padding:3px 8px;font-size:11px}.loan-row .lr-card{margin-left:-4px}}
 /* 携帯のスケジュール＝白いカード（縁取り無し） */
 .prj-card{border-left:none;box-shadow:none;padding:14px 16px;margin-bottom:8px}
 .prj-card .pc-name{font-weight:600}
@@ -3699,7 +3706,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
         <a class="portal-card" data-app="cal" onclick="App.nav('cal')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h3M13 14h3M8 17.5h3"/></svg></div><div class="portal-card-body"><div class="portal-card-title">スケジュール</div></div></a>
         <a class="portal-card" data-app="alcohol" onclick="App.nav('alcohol')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5 11-12"/></svg></div><div class="portal-card-body"><div class="portal-card-title">アルコールチェック</div></div></a>
         <a class="portal-card" data-app="forklift" onclick="App.nav('forklift')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V9h6l2 3h2"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="13" cy="18.5" r="1.6"/><path d="M17 17V5"/><path d="M17 17h5M17 12h4"/></svg></div><div class="portal-card-body"><div class="portal-card-title">フォークリフト点検</div></div></a>
-        <a class="portal-card" data-app="card" onclick="App.nav('card')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10.5h18"/></svg></div><div class="portal-card-body"><div class="portal-card-title">いないカード</div></div></a>
+        <a class="portal-card" data-app="card" onclick="App.nav('card')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10.5h18"/></svg></div><div class="portal-card-body"><div class="portal-card-title">カード</div></div></a>
       </div></div>
       <div class="portal-grp"><div class="portal-cap">仕事</div><div class="portal-rows">
         <a class="portal-card" data-app="cases" onclick="App.nav('cases')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L13 14l-4 1 1-4z"/></svg></div><div class="portal-card-body"><div class="portal-card-title">案件管理</div></div></a>
@@ -3727,7 +3734,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 </section>
 
 <section id="view-card" class="hidden">
-  <div class="scr-head"><h1>いないカード</h1></div>
+  <div class="scr-head"><h1>カード</h1></div>
   <div class="card-wrap"><div id="cardBody"></div></div>
   <div id="cardToast" class="card-toast"></div>
 </section>
@@ -4420,8 +4427,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-22 10:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1242;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-22 11:04';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1243;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8779,7 +8786,9 @@ const Card = (function(){
   const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const DOW=['日','月','火','水','木','金','土'];
-  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel='', _showExtra=false;
+  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel='', _showExtra=false, _card='いない';   // _card：いない／AMS（2026-10-22 iller「AMS カードが仲間入り」）
+  const CARDS=[{key:'いない',label:'いないカード'},{key:'AMS',label:'AMSカード'}];
+  const cardOf=l=>String(l.card||'いない');
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   function pad(n){ return String(n).padStart(2,'0'); }
   function ymd(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
@@ -8791,7 +8800,7 @@ const Card = (function(){
   async function apiGet(){ try{ const r=await fetch(API+'?dept=card&action=read'); return await r.json(); }catch(e){ return null; } }
   function fire(body){ Pending.touch(); try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'card',...body})}); }catch(e){} }
   async function loadAll(){ const d=await apiGet(); if(d){ loans=d.loans||[]; staff=(d.staff||[]).map(s=>typeof s==='string'?{name:s,reg:true}:s); } render(); }
-  function openLoan(){ return loans.find(l=>!l.return_at); } // loansはout_at降順＝先頭の未返却が最新
+  function openLoan(card){ const c=card||_card; return loans.find(l=>!l.return_at&&cardOf(l)===c); } // loansはout_at降順＝先頭の未返却が最新（カードごと）
   function prevWeek(){ _wk=addDays(_wk,-7); render(); }
   function nextWeek(){ _wk=addDays(_wk,7); render(); }
   function thisWeek(){ _wk=monday(new Date()); render(); }
@@ -8803,6 +8812,7 @@ const Card = (function(){
     let h='';
     h+='<div class="card-panes">';
     h+='<div class="card-pane"><div class="cp-title">持ち出し・返却</div>';
+    h+=`<div class="cp-cards">${CARDS.map(c=>{ const o=openLoan(c.key); return `<button type="button" class="cp-card${_card===c.key?' on':''}" onclick="Card.card('${c.key}')">${c.label}${o?`<small>${esc(o.name)} が持ち出し中</small>`:'<small>あり</small>'}</button>`; }).join('')}</div>`;
     h+=`<div class="cp-selbar${_sel?'':' none'}"><span class="cp-sel-lab">持ち出す人</span><span class="cp-sel-who">${_sel?esc(_sel):'下から氏名を選択してください'}</span></div>`;
     const nbtn=s=>`<button type="button" class="cp-nbtn${_sel===s.name?' sel':''}" onclick="Card.sel('${esc(s.name)}')">${esc(s.name)}</button>`;
     const reg=staff.filter(s=>s.reg!==false), extra=staff.filter(s=>s.reg===false);
@@ -8821,7 +8831,7 @@ const Card = (function(){
         const op=parseTs(l.out_at), rp=l.return_at?parseTs(l.return_at):null;
         const dd=new Date(op.date+'T00:00:00');
         const ret=rp?`<span class="lr-ret">${rp.hm}</span>`:'<span class="lr-now">持ち出し中</span>';
-        h+=`<div class="loan-row${rp?'':' out'}"><span class="lr-date">${lbl(dd)}</span><span class="lr-name">${esc(l.name||'')}</span><span class="lr-out">${op?op.hm:''}</span><span class="lr-arrow">→</span>${ret}</div>`;
+        h+=`<div class="loan-row${rp?'':' out'}"><span class="lr-date">${lbl(dd)}</span><span class="lr-name">${esc(l.name||'')}</span>${cardOf(l)!=='いない'?`<span class="lr-card">${esc(cardOf(l))}</span>`:''}<span class="lr-out">${op?op.hm:''}</span><span class="lr-arrow">→</span>${ret}</div>`;
       });
       h+='</div>';
     }else{
@@ -8831,6 +8841,7 @@ const Card = (function(){
     el.innerHTML=h;
   }
   function sel(n){ _sel=(_sel===n?'':n); render(); }
+  function card(c){ _card=c; render(); }
   function clearSel(){ _sel=''; render(); }
   function toggleExtra(){ _showExtra=!_showExtra; render(); }
   // 画面ど真ん中に出す警告（最下部だと気づきにくいため）
@@ -8840,8 +8851,8 @@ const Card = (function(){
     if(!name){ctoast('持ち出す人を選択してください');sndError();return;}
     if(openLoan()){ctoast('まだ返却されていません');sndError();return;}
     if(guard())return;
-    fire({action:'out',name});
-    loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:''});
+    fire({action:'out',name,card:_card});
+    loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:'',card:_card});
     _sel=''; _wk=monday(new Date()); // 記録後は選択解除＋今週を表示
     sndOK();
     render(); setTimeout(loadAll,8000);
@@ -8849,14 +8860,15 @@ const Card = (function(){
   function ret(){
     const open=openLoan(); if(!open){ctoast('持ち出し中の記録がありません');sndError();return;}
     if(guard())return;
-    fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id});
+    fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id,card:_card});
     open.return_at=nowStr();
     _sel='';                 // 返却後は持ち出す人の選択を解除
     sndOK();
-    ctoast('<span class="ct-h">返却しました</span><br>伝票に氏名・用途を明記のうえ、経理まで速やかに提出してください',true,5000,true);
+    if(_card==='AMS') ctoast('<span class="ct-h">返却しました</span><br>給油のレシートに氏名・車両を明記のうえ、経理まで提出してください',true,5000,true);
+    else ctoast('<span class="ct-h">返却しました</span><br>伝票に氏名・用途を明記のうえ、経理まで速やかに提出してください',true,5000,true);
     render(); setTimeout(loadAll,8000);
   }
-  return { loadAll, render, out, ret, sel, clearSel, toggleExtra, prevWeek, nextWeek, thisWeek };
+  return { loadAll, render, out, ret, sel, clearSel, toggleExtra, prevWeek, nextWeek, thisWeek, card };
 })();
 
 /* ========================================================================

@@ -61,7 +61,7 @@ LINE WORKS（WOFF）から入った人のうち、**案件画面を開けるの�
 | `forklift_checks` | フォークリフト始業前点検（機体×日）。点検者/判定(良/否)/否の項目JSON(ng)/備考。SPAの「リフト」画面から記録。既定すべて良・否のみ記録、機種(エンジン/バッテリー)で項目出し分け |
 | `qualifications` | 資格カタログ（正式名称・区分・備考・並び順）。法定の免許・技能講習・特別教育等を約90件先載せ＝画面は選択のみで追加UIなし（増減はシート直編集）。GASが自動生成 |
 | `staff_qualifications` | 資格の保有記録（employee_no×qual_id）。SPAの「資格」画面＝個人カード→モーダルのプルダウンで付け外し |
-| `card_loans` | いないカード（ホームセンター売掛カード）の持ち出し/返却ログ。name・out_at・return_at。SPAの「カード」画面から記録。氏名は staff の `in_card`=TRUE で絞り込み |
+| `card_loans` | カード（いないカード＝ホームセンター売掛カード／AMS カード＝給油カード）の持ち出し/返却ログ。name・out_at・return_at・card（`いない`／`AMS`、空＝いない。2026-10-22 Code.gs v135）。SPAの「カード」画面から記録。氏名は staff の `in_card`=TRUE で絞り込み |
 
 ## バックアップ・運用（GAS）
 
