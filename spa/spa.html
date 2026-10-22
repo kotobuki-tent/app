@@ -4442,8 +4442,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-22 16:58';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1251;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-22 16:59';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1252;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8826,7 +8826,6 @@ const Card = (function(){
     const inWk=loans.filter(l=>parseTs(l.out_at)).sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at))).slice(0,RECENT);
     let h='';
     // カードごとに箱を並べる（2026-10-22 iller「切替は違う」→ いない／AMS／ETC を横に、記録はその下に横いっぱい）
-    const reg=staff.filter(s=>s.reg!==false), extra=staff.filter(s=>s.reg===false);
     const md=d=>`${d.getMonth()+1}/${d.getDate()}`;
     h+='<div class="card-boxes">';
     CARDS.forEach(c=>{
@@ -8838,7 +8837,7 @@ const Card = (function(){
         h+=`<div class="cb-status out"><span><b>${esc(o.name)}</b> が持ち出し中</span><small>${dd?lbl(dd)+' '+op.hm:''}</small></div>`;
         h+=`<div class="cp-acts"><button class="cp-btn ret" onclick="Card.ret('${c.key}')">返却</button></div>`;
       }else{
-        h+=`<select class="cp-selname" onchange="Card.sel('${c.key}',this.value)"><option value="">氏名</option>${reg.map(opt).join('')}${extra.length?`<optgroup label="その他">${extra.map(opt).join('')}</optgroup>`:''}</select>`;
+        h+=`<select class="cp-selname" onchange="Card.sel('${c.key}',this.value)"><option value="">氏名</option>${staff.map(opt).join('')}</select>`;   // 全員を五十音で 1 本（in_card の「その他」分けはやめた。2026-10-22 iller「初期メンバー式じゃなくていい」）
         h+=`<div class="cp-acts"><button class="cp-btn take" onclick="Card.out('${c.key}')">持ち出し</button></div>`;
       }
       h+='</div>';
