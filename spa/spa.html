@@ -4442,8 +4442,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-22 11:57';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1249;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-22 16:57';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1250;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10091,10 +10091,10 @@ const Po = (function(){
       const [po,cs,st]=await Promise.all([
         fetch(API+'?dept=po&action=list&nocache='+Date.now()).then(r=>r.json()).catch(()=>({})),   // 発注書は控えを使わない（届いたらすぐ見たい）
         fetch(API+'?dept=cases&action=read').then(r=>r.json()).catch(()=>({})),
-        fetch(API+'?dept=daily&action=staff_for_daily').then(r=>r.json()).catch(()=>({}))]);
+        fetch(API+'?dept=qual&action=staff').then(r=>r.json()).catch(()=>({}))]);   // 記入者・発注者は在籍の全員（日報の名簿だと事務所などが抜ける。2026-10-22 iller「全員入れて」）
       if(po&&po.success){ _pos=(po.data||[]).map(p=>{ if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(String(p.deadline||''))) p.deadline=String(p.deadline).slice(0,10); return p; }); _posAt=Date.now(); PoBadge.set(_pos.filter(p=>p.status==='未発注').length); }   // 納期はシートが Date にするので日付だけに
       if(cs&&cs.data) _cases=cs.data;
-      if(st&&st.staff) _staff=st.staff.map(x=>x.name).filter(Boolean);
+      if(st&&st.data) _staff=st.data.map(x=>x.name).filter(Boolean);
     }catch(e){}
     const typing=document.activeElement&&/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)&&document.activeElement.closest('#view-po');
     if(!typing) render();
