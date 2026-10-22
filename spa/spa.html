@@ -1620,6 +1620,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane .cp-more{display:inline-block;margin:10px 2px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer}
 .card-pane .cp-more:hover{text-decoration:underline}
 .card-pane .cp-cards{display:flex;gap:10px;margin:0 0 12px}
+.card-pane .cp-selname{display:block;width:100%;height:56px;margin:0 0 14px;padding:0 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 20px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
 .card-pane .cp-card{flex:1;border:1.5px solid var(--border);background:var(--surface);border-radius:14px;padding:12px 10px;font:700 16px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
 .card-pane .cp-card small{font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim)}
 .card-pane .cp-card.on{background:var(--text);border-color:var(--text);color:#fff}
@@ -2173,7 +2174,7 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 .loan-card.out{background:#faeeda}
 .loan-card .lc-name{font-weight:600}
 .loan-card .lc-v{font-weight:600}
-@media(max-width:480px),(orientation:portrait) and (pointer:coarse){.loan-row{gap:8px}.loan-row .lr-date{flex-basis:auto}.loan-row .lr-arrow{display:none}.loan-row .lr-now{padding:3px 8px;font-size:11px}.loan-row .lr-card{margin-left:-4px}}
+@media(max-width:480px),(orientation:portrait) and (pointer:coarse){.loan-row{gap:6px}.loan-row .lr-date{flex-basis:auto;font-size:12px}.loan-row .lr-arrow{display:none}.loan-row .lr-now{padding:3px 6px;font-size:11px}.loan-row .lr-card{margin-left:-2px;padding:1px 5px;font-size:10px}}
 /* 携帯のスケジュール＝白いカード（縁取り無し） */
 .prj-card{border-left:none;box-shadow:none;padding:14px 16px;margin-bottom:8px}
 .prj-card .pc-name{font-weight:600}
@@ -4427,8 +4428,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-22 11:04';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1243;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-22 11:11';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1244;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8786,7 +8787,7 @@ const Card = (function(){
   const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const DOW=['日','月','火','水','木','金','土'];
-  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel='', _showExtra=false, _card='いない';   // _card：いない／AMS（2026-10-22 iller「AMS カードが仲間入り」）
+  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel='', _card='いない';   // _card：いない／AMS（2026-10-22 iller「AMS カードが仲間入り」）
   const CARDS=[{key:'いない',label:'いないカード'},{key:'AMS',label:'AMSカード'}];
   const cardOf=l=>String(l.card||'いない');
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
@@ -8813,14 +8814,10 @@ const Card = (function(){
     h+='<div class="card-panes">';
     h+='<div class="card-pane"><div class="cp-title">持ち出し・返却</div>';
     h+=`<div class="cp-cards">${CARDS.map(c=>{ const o=openLoan(c.key); return `<button type="button" class="cp-card${_card===c.key?' on':''}" onclick="Card.card('${c.key}')">${c.label}${o?`<small>${esc(o.name)} が持ち出し中</small>`:'<small>あり</small>'}</button>`; }).join('')}</div>`;
-    h+=`<div class="cp-selbar${_sel?'':' none'}"><span class="cp-sel-lab">持ち出す人</span><span class="cp-sel-who">${_sel?esc(_sel):'下から氏名を選択してください'}</span></div>`;
-    const nbtn=s=>`<button type="button" class="cp-nbtn${_sel===s.name?' sel':''}" onclick="Card.sel('${esc(s.name)}')">${esc(s.name)}</button>`;
+    // 氏名は選択式（2026-10-22 iller「カードの氏名を選択式に」。タイルの格子はやめた）
+    const opt=s=>`<option value="${esc(s.name)}"${_sel===s.name?' selected':''}>${esc(s.name)}</option>`;
     const reg=staff.filter(s=>s.reg!==false), extra=staff.filter(s=>s.reg===false);
-    if(reg.length) h+=`<div class="cp-grid">${reg.map(nbtn).join('')}</div>`;
-    if(extra.length){
-      h+=`<div><span class="cp-more" onclick="Card.toggleExtra()">${_showExtra?'− 控えを隠す':'＋ その他の人'}</span></div>`;
-      if(_showExtra) h+=`<div class="cp-grid">${extra.map(nbtn).join('')}</div>`;
-    }
+    h+=`<select class="cp-selname" onchange="Card.sel(this.value)"><option value="">氏名</option>${reg.map(opt).join('')}${extra.length?`<optgroup label="その他">${extra.map(opt).join('')}</optgroup>`:''}</select>`;
     h+=`<div class="cp-acts"><button class="cp-btn take" onclick="Card.out()">持ち出し</button><button class="cp-btn ret" onclick="Card.ret()">返却</button></div>`;
     h+='</div>';
     h+=`<div class="card-pane"><div class="cp-title">持ち出し記録<span class="cp-sub">直近 ${RECENT} 件</span></div>`;
@@ -8840,10 +8837,9 @@ const Card = (function(){
     h+='</div></div>';
     el.innerHTML=h;
   }
-  function sel(n){ _sel=(_sel===n?'':n); render(); }
+  function sel(n){ _sel=n||''; render(); }
   function card(c){ _card=c; render(); }
   function clearSel(){ _sel=''; render(); }
-  function toggleExtra(){ _showExtra=!_showExtra; render(); }
   // 画面ど真ん中に出す警告（最下部だと気づきにくいため）
   function ctoast(msg,ok,ms,wide){const t=document.getElementById('cardToast');if(!t)return;t.innerHTML=msg;t.className='card-toast show'+(ok?' ok':'')+(wide?' wide':'');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},ms||2200);}
   function out(){
@@ -8868,7 +8864,7 @@ const Card = (function(){
     else ctoast('<span class="ct-h">返却しました</span><br>伝票に氏名・用途を明記のうえ、経理まで速やかに提出してください',true,5000,true);
     render(); setTimeout(loadAll,8000);
   }
-  return { loadAll, render, out, ret, sel, clearSel, toggleExtra, prevWeek, nextWeek, thisWeek, card };
+  return { loadAll, render, out, ret, sel, clearSel, prevWeek, nextWeek, thisWeek, card };
 })();
 
 /* ========================================================================
