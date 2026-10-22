@@ -4442,8 +4442,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-22 17:52';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1253;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-22 18:02';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1254;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10112,7 +10112,7 @@ const Po = (function(){
     const caseOpts=liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('');
     const sender0=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_sender')||'';   // 発注者（送る人）の既定＝LINE WORKS の名前か前回
     const card=p=>`<div class="po-card simple" data-id="${esc(p.id)}" onclick="Po.edit('${esc(p.id)}')">
-      <div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}${p.case_name?`<span class="po-case-tag">案件</span><span class="po-kind-tag">${esc((p.order_no?'#'+p.order_no+' ':'')+p.case_name)}</span>`:''}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}${p.deadline?'　納期 '+esc(p.deadline):''}${p.deliver_to&&p.deliver_to!=='弊社'?'　納品先 '+esc(p.deliver_to):''}${p.note?'　備考 '+esc(p.note):''}　合計 ${yen(total(p))}</div></div>
+      <div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}${p.case_name?`${p.case_id?'<span class="po-case-tag">案件</span>':''}<span class="po-kind-tag">${esc((p.order_no?'#'+p.order_no+' ':'')+p.case_name)}</span>`:''}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}${p.deadline?'　納期 '+esc(p.deadline):''}${p.deliver_to&&p.deliver_to!=='弊社'?'　納品先 '+esc(p.deliver_to):''}${p.note?'　備考 '+esc(p.note):''}　合計 ${yen(total(p))}</div></div>
       <div class="po-act"><button type="button" class="po-btn dark" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button></div></div>`;
     const row=p=>`<tr onclick="Po.edit('${esc(p.id)}')"><td class="num" style="text-align:left;white-space:nowrap">${p.sent_at?d8(p.sent_at):''}</td><td><div class="po-vendor">${esc(p.vendor||'')} <span class="po-kind-tag">${esc(p.kind||'')}</span></div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):'案件なし'}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${esc(p.sent_by||'')}</td><td>${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><button type="button" class="act-btn" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button></td></tr>`;
     let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+vendorList;
@@ -10142,16 +10142,15 @@ const Po = (function(){
   function month(m){ _ym=m; render(); }
   function search(v){ _q=v; const q=v.trim().toLowerCase(); document.querySelectorAll('#view-po .po-tbl tbody tr').forEach(tr=>{ tr.style.display=(!q||tr.textContent.toLowerCase().includes(q))?'':'none'; }); }
   function assign(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(!el)return; const v=el.querySelector('.po-case').value.trim(), kind=el.querySelector('.po-kind').value; const c=caseOf(v);
-    if(v&&!c){ toast('案件は候補から選択してください',true); return; }
     if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
-    p.kind=kind; if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=''; p.order_no=''; }
+    p.kind=kind; if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=v; p.order_no=''; }
     send({dept:'po',action:'save',id,case_id:p.case_id,case_name:p.case_name,order_no:p.order_no,kind:p.kind});
     el.querySelector('.po-case-st').textContent=c?('注文番号 '+(p.order_no||p.id)):('案件なし＝在庫・共用。注文番号は '+p.id); el.querySelector('.po-send-st').textContent=''; }
   function markSent(id, caseText, sender){ if(_busy)return 'busy'; const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return 'none'; if(String(id).startsWith('tmp_')) return '保存中です。しばらくしてから操作してください';
-    const v=String(caseText||'').trim(); const c=v?caseOf(v):null; if(v&&!c) return '案件は候補から選んでください（付けないなら空）';
+    const v=String(caseText||'').trim(); const c=v?caseOf(v):null;   // 候補に無い文字（会社備品 など）はそのまま案件名に（紐づけ無し、注文番号は P 番号）。弾かない（2026-10-22 iller「案件って選ばないといけないのかよ」）
     if(sender!==undefined){ const sv=String(sender||'').trim(); if(!sv) return '発注者を選んでください'; p.sender=sv; try{ localStorage.setItem('po_sender',sv); }catch(e){} }   // 発注書の窓で選んだ発注者（事務所の端末で押す。2026-10-22）
     if(guard())return 'busy'; const me=senderOf(p); p.kind='材料';
-    if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=''; p.order_no=''; }
+    if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=v; p.order_no=''; }
     p.status='発注済'; p.sent_at=new Date().toISOString(); p.sent_by=me;
     send({dept:'po',action:'send',id,sent_by:me,case_id:p.case_id||'',case_name:p.case_name||'',order_no:p.order_no||'',kind:'材料'}); toast('発注済にしました'); render();
     setTimeout(loadAll,8000); return 'ok'; }
@@ -10206,9 +10205,9 @@ const Po = (function(){
     const person=e.person; if(!person){ toast('記入者を選択してください',true); return; }
     const vendor=e.vendor.trim(); if(!vendor){ toast('仕入先を入力してください',true); return; }
     const rows=e.items.filter(it=>String(it.name||'').trim()); if(!rows.length){ toast('品名を入力してください',true); return; }
-    const cv=e.caseText.trim(); const cs=cv?caseOf(cv):null; if(cv&&!cs){ toast('案件は候補から選んでください（付けないなら空）',true); return; }
+    const cv=e.caseText.trim(); const cs=cv?caseOf(cv):null;   // 候補に無い文字はそのまま案件名（紐づけ無し）
     if(guard())return; try{ localStorage.setItem('po_person',person); }catch(err){}
-    const body={dept:'po',action:'save',person,vendor,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline:e.asap?'最短':(e.deadline||''),deliver_to:e.deliv==='別途'?e.deliver_to.trim():'弊社',note:e.note.trim(),case_id:cs?cs.id:'',case_name:cs?dispName(cs.client,cs.name):'',order_no:cs?(cs.order_no||''):'',kind:'材料'};
+    const body={dept:'po',action:'save',person,vendor,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline:e.asap?'最短':(e.deadline||''),deliver_to:e.deliv==='別途'?e.deliver_to.trim():'弊社',note:e.note.trim(),case_id:cs?cs.id:'',case_name:cs?dispName(cs.client,cs.name):cv,order_no:cs?(cs.order_no||''):'',kind:'材料'};
     if(e.isNew){ send(body); _pos.push({id:'tmp_'+Date.now(),created_at:new Date().toISOString(),status:'未発注',person,vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,kind:'材料',case_id:body.case_id,case_name:body.case_name,order_no:body.order_no}); eClose(); toast('発注書を出しました'); render(); setTimeout(loadAll,8000); return; }
     body.id=e.id; send(body);
     const p=_pos.find(x=>String(x.id)===String(e.id)); if(p) Object.assign(p,{person,vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,case_id:body.case_id,case_name:body.case_name,order_no:body.order_no});
