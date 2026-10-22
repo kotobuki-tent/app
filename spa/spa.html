@@ -1619,20 +1619,24 @@ table.jobs tr:last-child td{border-bottom:none}
 .card-pane .cp-nbtn:active{transform:scale(.96)}
 .card-pane .cp-more{display:inline-block;margin:10px 2px;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer}
 .card-pane .cp-more:hover{text-decoration:underline}
-.card-pane .cp-cards{display:flex;gap:10px;margin:0 0 12px}
-.card-pane .cp-selname{display:block;width:100%;height:56px;margin:0 0 14px;padding:0 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 20px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
-.card-pane .cp-card{flex:1;border:1.5px solid var(--border);background:var(--surface);border-radius:14px;padding:12px 10px;font:700 16px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
-.card-pane .cp-card small{font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim)}
-.card-pane .cp-card.on{background:var(--text);border-color:var(--text);color:#fff}
-.card-pane .cp-card.on small{color:rgba(255,255,255,.75)}
-.loan-row .lr-card{flex:0 0 auto;margin-left:-8px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:700;background:#e3eefc;color:#185fa5}
+.card-pane .cp-selname{display:block;width:100%;height:56px;margin:0 0 16px;padding:0 14px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);font:700 20px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.card-boxes{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:20px}
+.card-pane.cbox .cp-title{margin-bottom:16px}
+.card-pane.cbox .cb-status{display:flex;flex-direction:column;justify-content:center;gap:2px;height:56px;margin:0 0 16px;padding:0 14px;border-radius:14px;background:#faeeda;font-size:18px;font-weight:600;color:var(--orange)}
+.card-pane.cbox .cb-status b{font-weight:800;color:var(--text)}
+.card-pane.cbox .cb-status small{font-size:12px;font-weight:600;color:var(--text-dim)}
+.card-pane.cbox .cp-acts{grid-template-columns:1fr;margin-top:0}
+.card-pane.cbox .cp-btn{height:100px}
+.loan-row .lr-card.c-いない{background:#ececef;color:#555}
+.loan-row .lr-card.c-ETC{background:#e3f5e9;color:#1e7a3a}
+.loan-row .lr-card{flex:0 0 auto;min-width:3.6em;text-align:center;padding:2px 7px;border-radius:999px;font-size:11px;font-weight:700;background:#e3eefc;color:#185fa5}
 .card-pane .cp-selbar{position:relative;display:flex;align-items:center;justify-content:center;padding:18px 20px;border-radius:14px;background:var(--accent-dim);border:1.5px solid var(--accent);margin-bottom:18px;height:76px}
 .card-pane .cp-selbar.none{display:none}
 .card-pane .cp-sel-lab{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.08em}
 .card-pane .cp-selbar.none .cp-sel-lab{color:var(--text-faint)}
 .card-pane .cp-sel-who{font-size:32px;font-weight:900;color:var(--accent);letter-spacing:.04em}
 .card-pane .cp-selbar.none .cp-sel-who{font-size:17px;font-weight:600;color:var(--text-faint)}
-@media(max-width:840px),(orientation:portrait) and (pointer:coarse){.card-panes{grid-template-columns:1fr}}
+@media(max-width:840px){.card-boxes{grid-template-columns:1fr;gap:14px;margin-bottom:14px}}
 
 /* キオスク（27インチ横・広幅）：左右ペインを画面いっぱいの等高にし、各ペイン内部スクロール
    → 右ペインが記録で伸びない／左右の高さが揃う。リフトは記録ボタンを上部に移したので埋もれない。
@@ -1641,11 +1645,8 @@ table.jobs tr:last-child td{border-bottom:none}
   html #view-alcohol, html #view-forklift{min-height:0}
   #view-alcohol .kiosk, #view-forklift .kiosk{height:calc(100dvh - 48px - 52px);grid-template-rows:minmax(0,1fr);align-items:stretch}
   #view-alcohol .pane, #view-forklift .pane{height:100%;min-height:0;overflow-y:auto}
-  #view-card .card-wrap{box-sizing:border-box}
-  #view-card .card-panes{height:calc(100dvh - 48px - 40px - 52px);grid-template-columns:400px minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:start}
-  #view-card .card-pane{min-height:0;max-height:100%;overflow-y:auto}   /* 箱は中身の高さだけ、溢れたら中でスクロール（2026-10-22 iller「こんなに不細工な UI があるか」：箱の 3 分の 2 が空き地だった） */
-  #view-card .loan-row .lr-name{flex:0 0 9em}            /* 時刻は名前のすぐ右（画面幅いっぱいに引き離さない） */
-  #view-card .loan-list{display:block;columns:2;column-gap:40px}   /* 広い画面は記録を 2 列に（flex だと columns が効かない） */
+  #view-card .loan-row .lr-name{flex:0 0 7em}            /* 時刻は名前のすぐ右（画面幅いっぱいに引き離さない） */
+  #view-card .loan-list{display:block;columns:3;column-gap:40px}   /* 広い画面は記録を 3 列に（flex だと columns が効かない） */
   #view-card .loan-row{break-inside:avoid}
 }
 /* 縦画面キオスク（事務所前タブレット 1080×1920）：省スペース優先。余白・高さを詰めて記録を上に出す */
@@ -2172,12 +2173,12 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 .loan-row .lr-name{flex:1 1 auto;min-width:0;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .loan-row .lr-out{flex:0 0 auto;font-weight:600}
 .loan-row .lr-arrow{flex:0 0 auto;color:var(--text-faint)}
-.loan-row .lr-ret{flex:0 0 52px;text-align:right;font-weight:600;color:var(--green)}
+.loan-row .lr-ret{flex:0 0 auto;min-width:52px;text-align:right;font-weight:600;color:var(--green);white-space:nowrap}
 .loan-row .lr-now{flex:0 0 auto;font-size:12px;font-weight:600;color:var(--orange);background:#fff;padding:4px 10px;border-radius:999px}
 .loan-card.out{background:#faeeda}
 .loan-card .lc-name{font-weight:600}
 .loan-card .lc-v{font-weight:600}
-@media(max-width:480px),(orientation:portrait) and (pointer:coarse){.loan-row{gap:6px}.loan-row .lr-date{flex-basis:auto;font-size:12px}.loan-row .lr-arrow{display:none}.loan-row .lr-now{padding:3px 6px;font-size:11px}.loan-row .lr-card{margin-left:-2px;padding:1px 5px;font-size:10px}}
+@media(max-width:480px){.loan-row{gap:6px}.loan-row .lr-date{flex-basis:auto;font-size:12px}.loan-row .lr-dow,.loan-row .lr-arrow{display:none}.loan-row .lr-now{padding:3px 6px;font-size:11px}.loan-row .lr-card{min-width:3.2em;padding:1px 5px;font-size:10px}}
 /* 携帯のスケジュール＝白いカード（縁取り無し） */
 .prj-card{border-left:none;box-shadow:none;padding:14px 16px;margin-bottom:8px}
 .prj-card .pc-name{font-weight:600}
@@ -4431,8 +4432,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-22 11:16';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1245;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-22 11:25';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1246;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8790,8 +8791,8 @@ const Card = (function(){
   const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const DOW=['日','月','火','水','木','金','土'];
-  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel='', _card='いない';   // _card：いない／AMS（2026-10-22 iller「AMS カードが仲間入り」）
-  const CARDS=[{key:'いない',label:'いないカード'},{key:'AMS',label:'AMSカード'}];
+  let loans=[], staff=[], _busy=false, _wk=monday(new Date()), _sel={};   // _sel：カードごとに選んだ氏名（2026-10-22 iller「AMS カードが仲間入り」「ETC カードも入れて」。いない＝ホームセンターの売掛会員カード＝その日のうち、AMS・ETC＝出張のレンタカー用＝日をまたぐ）
+  const CARDS=[{key:'いない',label:'いないカード'},{key:'AMS',label:'AMSカード'},{key:'ETC',label:'ETCカード'}];
   const cardOf=l=>String(l.card||'いない');
   function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>_busy=false,1500); return false; }
   function pad(n){ return String(n).padStart(2,'0'); }
@@ -8804,7 +8805,7 @@ const Card = (function(){
   async function apiGet(){ try{ const r=await fetch(API+'?dept=card&action=read'); return await r.json(); }catch(e){ return null; } }
   function fire(body){ Pending.touch(); try{ fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({dept:'card',...body})}); }catch(e){} }
   async function loadAll(){ const d=await apiGet(); if(d){ loans=d.loans||[]; staff=(d.staff||[]).map(s=>typeof s==='string'?{name:s,reg:true}:s); } render(); }
-  function openLoan(card){ const c=card||_card; return loans.find(l=>!l.return_at&&cardOf(l)===c); } // loansはout_at降順＝先頭の未返却が最新（カードごと）
+  function openLoan(card){ return loans.find(l=>!l.return_at&&cardOf(l)===card); } // loansはout_at降順＝先頭の未返却が最新（カードごと）
   function prevWeek(){ _wk=addDays(_wk,-7); render(); }
   function nextWeek(){ _wk=addDays(_wk,7); render(); }
   function thisWeek(){ _wk=monday(new Date()); render(); }
@@ -8814,60 +8815,70 @@ const Card = (function(){
     const RECENT=50;
     const inWk=loans.filter(l=>parseTs(l.out_at)).sort((a,b)=>String(b.out_at).localeCompare(String(a.out_at))).slice(0,RECENT);
     let h='';
-    h+='<div class="card-panes">';
-    h+='<div class="card-pane"><div class="cp-title">持ち出し・返却</div>';
-    h+=`<div class="cp-cards">${CARDS.map(c=>{ const o=openLoan(c.key); return `<button type="button" class="cp-card${_card===c.key?' on':''}" onclick="Card.card('${c.key}')">${c.label}${o?`<small>${esc(o.name)} が持ち出し中</small>`:'<small>あり</small>'}</button>`; }).join('')}</div>`;
-    // 氏名は選択式（2026-10-22 iller「カードの氏名を選択式に」。タイルの格子はやめた）
-    const opt=s=>`<option value="${esc(s.name)}"${_sel===s.name?' selected':''}>${esc(s.name)}</option>`;
+    // カードごとに箱を並べる（2026-10-22 iller「切替は違う」→ いない／AMS／ETC を横に、記録はその下に横いっぱい）
     const reg=staff.filter(s=>s.reg!==false), extra=staff.filter(s=>s.reg===false);
-    h+=`<select class="cp-selname" onchange="Card.sel(this.value)"><option value="">氏名</option>${reg.map(opt).join('')}${extra.length?`<optgroup label="その他">${extra.map(opt).join('')}</optgroup>`:''}</select>`;
-    h+=`<div class="cp-acts"><button class="cp-btn take" onclick="Card.out()">持ち出し</button><button class="cp-btn ret" onclick="Card.ret()">返却</button></div>`;
+    const md=d=>`${d.getMonth()+1}/${d.getDate()}`;
+    h+='<div class="card-boxes">';
+    CARDS.forEach(c=>{
+      const o=openLoan(c.key), sl=_sel[c.key]||'';
+      const opt=x=>`<option value="${esc(x.name)}"${sl===x.name?' selected':''}>${esc(x.name)}</option>`;
+      h+=`<div class="card-pane cbox${o?' out':''}"><div class="cp-title">${c.label}</div>`;
+      if(o){
+        const op=parseTs(o.out_at), dd=op?new Date(op.date+'T00:00:00'):null;
+        h+=`<div class="cb-status out"><span><b>${esc(o.name)}</b> が持ち出し中</span><small>${dd?lbl(dd)+' '+op.hm:''}</small></div>`;
+        h+=`<div class="cp-acts"><button class="cp-btn ret" onclick="Card.ret('${c.key}')">返却</button></div>`;
+      }else{
+        h+=`<select class="cp-selname" onchange="Card.sel('${c.key}',this.value)"><option value="">氏名</option>${reg.map(opt).join('')}${extra.length?`<optgroup label="その他">${extra.map(opt).join('')}</optgroup>`:''}</select>`;
+        h+=`<div class="cp-acts"><button class="cp-btn take" onclick="Card.out('${c.key}')">持ち出し</button></div>`;
+      }
+      h+='</div>';
+    });
     h+='</div>';
-    h+=`<div class="card-pane"><div class="cp-title">持ち出し記録<span class="cp-sub">直近 ${RECENT} 件</span></div>`;
+    h+=`<div class="card-pane rec"><div class="cp-title">持ち出し記録<span class="cp-sub">直近 ${RECENT} 件</span></div>`;
     if(inWk.length){
-      // 1 行 1 件を新しい順に積む（日付・名前・持ち出し→返却）。3 列のカードは時系列が読めない（10/15 iller）
+      // 1 行 1 件を新しい順に積む（日付・カード・名前・持ち出し→返却）。返却が別の日なら日付も出す（AMS・ETC は出張で日をまたぐ）
       h+='<div class="loan-list">';
       inWk.forEach(l=>{
         const op=parseTs(l.out_at), rp=l.return_at?parseTs(l.return_at):null;
         const dd=new Date(op.date+'T00:00:00');
-        const ret=rp?`<span class="lr-ret">${rp.hm}</span>`:'<span class="lr-now">持ち出し中</span>';
-        h+=`<div class="loan-row${rp?'':' out'}"><span class="lr-date">${lbl(dd)}</span><span class="lr-name">${esc(l.name||'')}</span>${cardOf(l)!=='いない'?`<span class="lr-card">${esc(cardOf(l))}</span>`:''}<span class="lr-out">${op?op.hm:''}</span><span class="lr-arrow">→</span>${ret}</div>`;
+        const ret=rp?`<span class="lr-ret">${rp.date!==op.date?md(new Date(rp.date+'T00:00:00'))+' ':''}${rp.hm}</span>`:'<span class="lr-now">持ち出し中</span>';
+        h+=`<div class="loan-row${rp?'':' out'}"><span class="lr-date">${md(dd)}<span class="lr-dow">（${DOW[dd.getDay()]}）</span></span><span class="lr-card c-${esc(cardOf(l))}">${esc(cardOf(l))}</span><span class="lr-name">${esc(l.name||'')}</span><span class="lr-out">${op?op.hm:''}</span><span class="lr-arrow">→</span>${ret}</div>`;
       });
       h+='</div>';
     }else{
       h+='<div class="cp-empty">記録はありません</div>';
     }
-    h+='</div></div>';
+    h+='</div>';
     el.innerHTML=h;
   }
-  function sel(n){ _sel=n||''; render(); }
-  function card(c){ _card=c; render(); }
-  function clearSel(){ _sel=''; render(); }
+  function sel(c,n){ _sel[c]=n||''; }
+  function clearSel(){ _sel={}; render(); }
   // 画面ど真ん中に出す警告（最下部だと気づきにくいため）
   function ctoast(msg,ok,ms,wide){const t=document.getElementById('cardToast');if(!t)return;t.innerHTML=msg;t.className='card-toast show'+(ok?' ok':'')+(wide?' wide':'');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},ms||2200);}
-  function out(){
-    const name=_sel;
+  function out(c){
+    const name=_sel[c]||'';
     if(!name){ctoast('持ち出す人を選択してください');sndError();return;}
-    if(openLoan()){ctoast('まだ返却されていません');sndError();return;}
+    if(openLoan(c)){ctoast('まだ返却されていません');sndError();return;}
     if(guard())return;
-    fire({action:'out',name,card:_card});
-    loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:'',card:_card});
-    _sel=''; _wk=monday(new Date()); // 記録後は選択解除＋今週を表示
+    fire({action:'out',name,card:c});
+    loans.unshift({id:'tmp_'+Date.now(),name,out_at:nowStr(),return_at:'',card:c});
+    _sel[c]=''; // 記録後は選択解除
     sndOK();
     render(); setTimeout(loadAll,8000);
   }
-  function ret(){
-    const open=openLoan(); if(!open){ctoast('持ち出し中の記録がありません');sndError();return;}
+  function ret(c){
+    const open=openLoan(c); if(!open){ctoast('持ち出し中の記録がありません');sndError();return;}
     if(guard())return;
-    fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id,card:_card});
+    fire({action:'return',id:String(open.id).indexOf('tmp_')===0?undefined:open.id,card:c});
     open.return_at=nowStr();
-    _sel='';                 // 返却後は持ち出す人の選択を解除
+    _sel[c]='';
     sndOK();
-    if(_card==='AMS') ctoast('<span class="ct-h">返却しました</span><br>給油のレシートに氏名・車両を明記のうえ、経理まで提出してください',true,5000,true);
-    else ctoast('<span class="ct-h">返却しました</span><br>伝票に氏名・用途を明記のうえ、経理まで速やかに提出してください',true,5000,true);
+    if(c==='AMS') ctoast('<span class="ct-h">返却しました</span><br>給油のレシートに氏名・車両を明記のうえ、経理まで提出してください',true,5000,true);
+    else if(c==='いない') ctoast('<span class="ct-h">返却しました</span><br>伝票に氏名・用途を明記のうえ、経理まで速やかに提出してください',true,5000,true);
+    else ctoast('返却しました',true);
     render(); setTimeout(loadAll,8000);
   }
-  return { loadAll, render, out, ret, sel, clearSel, prevWeek, nextWeek, thisWeek, card };
+  return { loadAll, render, out, ret, sel, clearSel, prevWeek, nextWeek, thisWeek };
 })();
 
 /* ========================================================================
