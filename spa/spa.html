@@ -4462,8 +4462,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-23 11:32';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1265;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-23 11:33';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1266;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10184,7 +10184,10 @@ const Po = (function(){
   let _pickInp=null;
   function pick(inp){ _pickInp=inp; const box=inp.parentElement&&inp.parentElement.querySelector('.po-pick-list'); if(!box)return; const q=String(inp.value||'').trim().toLowerCase();
     const list=liveCases().slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))).filter(c=>!q||caseLabel(c).toLowerCase().includes(q)||String(c.order_no||'').includes(q)).slice(0,60);
-    box.innerHTML=list.length?list.map(c=>`<div class="po-pick-it" onmousedown="Po.pickSet(this.textContent)">${esc(caseLabel(c))}</div>`).join(''):'<div class="po-pick-none">該当なし</div>'; box.style.display='block'; }
+    const raw=String(inp.value||'').trim(); const exact=raw&&list.some(c=>caseLabel(c)===raw||dispName(c.client,c.name)===raw);
+    // 打った文字が案件に無い時は、その文字をそのまま件名にする候補を先頭に（自由記述できることを見せる。10/23 iller「自由記述ができるかどうか不明」）
+    const free=raw&&!exact?`<div class="po-pick-it" onmousedown="Po.pickSet(this.dataset.v)" data-v="${esc(raw)}">${esc(raw)}　<small>案件なし</small></div>`:'';
+    box.innerHTML=free+(list.length?list.map(c=>`<div class="po-pick-it" onmousedown="Po.pickSet(this.textContent)">${esc(caseLabel(c))}</div>`).join(''):''); if(!box.innerHTML) box.innerHTML='<div class="po-pick-none">該当なし</div>'; box.style.display='block'; }
   function pickSet(v){ const inp=_pickInp||$('pof_case'); if(inp) inp.value=v; pickHide(); }
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') pickHide(); });
   function pickHide(){ setTimeout(()=>{ document.querySelectorAll('.po-pick-list').forEach(box=>{ box.style.display='none'; }); },150); }   // モーダルは section の外に出したので #view-po 限定を外す（10/23 iller「選ばない限り閉じられない」）
