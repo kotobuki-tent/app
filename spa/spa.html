@@ -2663,7 +2663,6 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   /* 発注（独立画面、2026-10-19） */
   :is(#view-po,#view-poreq,#poEditBg) .po-wrap{max-width:1180px;margin:0 auto;padding:12px 16px 40px}
   #view-poreq .po-wrap{max-width:820px}
-  #view-poreq .pr-lead{font-size:15px;line-height:1.7;margin:0 0 14px}
   #view-poreq .pr-steps{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px;font-size:14px;font-weight:600}
   #view-poreq .pr-steps span{background:var(--surface2);border-radius:999px;padding:6px 14px}
   #view-poreq .pr-steps i{font-style:normal;color:var(--text-faint)}
@@ -4465,7 +4464,7 @@ async function woffBoot(){
   }
 }
 const APP_VER='2026-10-23 11:26';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1260;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_BUILD=1261;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10316,8 +10315,7 @@ const PoReq = (function(){
   function render(){ const el=$('poReqBody'); if(!el)return; const who=me(); const staff=Po.staff();
     const mine=Po.list().filter(p=>who&&p.person===who&&p.status!=='取消').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
     let h='';
-    h+=`<div class="po-panel"><p class="pr-lead">材料や備品を頼む時はここから。書いた依頼は事務所が発注書にして、仕入先へ出します。</p>
-      <div class="pr-steps"><span>① 依頼を書く</span><i>→</i><span>② 事務所が仕上げる</span><i>→</i><span>③ 発注済</span></div>
+    h+=`<div class="po-panel"><div class="pr-steps"><span>① 依頼を書く</span><i>→</i><span>② 事務所が仕上げる</span><i>→</i><span>③ 発注済</span></div>
       <button type="button" class="po-new" onclick="Po.newPo({req:true})">＋ 依頼を書く</button>
       <ul class="pr-how"><li>品名は型番・寸法・色まで。数量と単位も。</li><li>急ぐ時は納期を「最短」に。</li><li>案件が決まっていれば案件を選ぶ。決まっていなければ空のまま。</li></ul></div>`;
     h+=`<div class="po-panel"><div class="po-panel-hd"><b>自分の依頼</b><span class="ct-sub">${mine.length} 件</span><button type="button" class="act-btn" onclick="PoReq.loadAll()">更新</button></div>`;
