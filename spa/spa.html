@@ -2666,7 +2666,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-poreq .pr-steps{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px;font-size:14px;font-weight:600}
   #view-poreq .pr-steps span{background:var(--surface2);border-radius:999px;padding:6px 14px}
   #view-poreq .pr-steps i{font-style:normal;color:var(--text-faint)}
-  #view-poreq .pr-how{font-size:13.5px;line-height:1.8;color:var(--text-dim);margin:14px 0 0}
+  #poEditBg .po-how{grid-column:1/-1;font-size:13px;line-height:1.7;color:var(--text-dim);margin:0 0 4px}
   #view-poreq .pr-stage{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;background:var(--surface2);color:var(--text-dim)}
   #view-poreq .pr-stage.req{background:#fff3e0;color:#b25e00}
   #view-poreq .pr-stage.doc{background:#e3eefc;color:#185fa5}
@@ -4462,8 +4462,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-23 11:28';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1263;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-23 11:29';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1264;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10200,6 +10200,7 @@ const Po = (function(){
   function renderEdit(){ const e=_edit, el=$('poEditBody'); if(!e||!el)return; const ro=e.locked?' disabled':''; $('poe_title').textContent=e.isNew?'発注依頼を書く':(e.status==='発注済'?('発注済'+(e.sent?'　'+e.sent:'')):e.status);
     const tot=e.items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0);
     el.innerHTML=`<div class="po-edit-body">
+      ${e.req?'<p class="po-how">記載事項：品名（型番・寸法・色）、数量・単位、納期（日付または最短）、案件（該当があれば）</p>':''}
       <div class="po-f"><label>記入者</label><select id="poe_person"${ro}>${['<option value="">選択</option>'].concat(_staff.map(n=>`<option${n===e.person?' selected':''}>${esc(n)}</option>`)).join('')}${e.person&&!_staff.includes(e.person)?`<option selected>${esc(e.person)}</option>`:''}</select></div>
       <div class="po-f"><label>仕入先</label><input id="poe_vendor" list="poVendorList" autocomplete="off" value="${esc(e.vendor)}"${e.req?' placeholder="例：モノタロウ"':''}${ro}></div>
       <div class="po-f wide"><label>案件</label><div class="po-pick"><input id="poe_case" autocomplete="off" value="${esc(e.caseText)}" oninput="Po.pick(this)" onfocus="Po.pick(this)" onblur="Po.pickHide()"${ro}><span class="po-pick-arr">▾</span><div class="po-pick-list"></div></div></div>
@@ -10315,8 +10316,7 @@ const PoReq = (function(){
     const mine=Po.list().filter(p=>who&&p.person===who&&p.status!=='取消').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
     let h='';
     h+=`<div class="po-panel"><div class="pr-steps"><span>依頼</span><i>→</i><span>発注書</span><i>→</i><span>発注済</span></div>
-      <button type="button" class="po-new" onclick="Po.newPo({req:true})">＋ 発注依頼</button>
-      <p class="pr-how">記載事項：品名（型番・寸法・色）、数量・単位、納期（日付または最短）、案件（該当があれば）</p></div>`;
+      <button type="button" class="po-new" onclick="Po.newPo({req:true})">＋ 発注依頼</button></div>`;
     h+=`<div class="po-panel"><div class="po-panel-hd"><b>依頼の状況</b><span class="ct-sub">${mine.length} 件</span><button type="button" class="act-btn" onclick="PoReq.loadAll()">更新</button></div>`;
     h+=`<div class="pr-who"><span>記入者</span><select onchange="PoReq.setMe(this.value)"><option value="">選択</option>${staff.map(n=>`<option${n===who?' selected':''}>${esc(n)}</option>`).join('')}</select></div>`;
     h+=mine.length?mine.map(p=>{ const st=STAGE[p.status]||['',p.status]; return `<div class="po-card simple" onclick="Po.edit('${esc(p.id)}')"><div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}${p.case_name?`<span class="po-kind-tag">${esc((p.order_no?'#'+p.order_no+' ':'')+p.case_name)}</span>`:''}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${d8(p.created_at)}${p.deadline?'　納期 '+esc(p.deadline):''}　合計 ${yen(total(p))}</div></div><div class="po-act"><span class="pr-stage ${st[0]}">${esc(st[1])}${p.status==='発注済'&&p.sent_at?'　'+d8(p.sent_at):''}</span></div></div>`; }).join(''):(who?'<div class="po-empty">依頼はありません</div>':'');
