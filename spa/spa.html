@@ -1889,13 +1889,13 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
    .scr-head を display:contents でほどき、親を flex にして 見出し・日付・サブタブ・検索 を並べ、中身（.app／#casesPane）は次の行に */
 @media(min-width:481px) and (pointer:fine),(min-width:481px) and (orientation:landscape){
   /* 畳む画面の一覧（画面を足したらここに。中身の入れ物は .app か .main か #casesPane） */
-  #view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-daily,#view-wb,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
-  #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#view-inv>.scr-head,#view-veh>.scr-head,#view-qual>.scr-head,#view-ot>.scr-head,#view-daily>.scr-head,#view-wb>.scr-head,#casesBody>.scr-head{display:contents}
-  #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head h1,#view-labor>.scr-head h1,#view-inv>.scr-head h1,#view-veh>.scr-head h1,#view-qual>.scr-head h1,#view-ot>.scr-head h1,#view-daily>.scr-head h1,#view-wb>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
-  #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head .scr-sub,#view-labor>.scr-head .scr-sub,#view-inv>.scr-head .scr-sub,#view-veh>.scr-head .scr-sub,#view-qual>.scr-head .scr-sub,#view-ot>.scr-head .scr-sub,#view-daily>.scr-head .scr-sub,#view-wb>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
-  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#view-inv>.sub-tabs,#view-veh>.sub-tabs,#view-qual>.sub-tabs,#view-ot>.sub-tabs,#view-daily>.sub-tabs,#view-wb>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
-  #view-prod>.scr-head .scr-search,#view-proj>.scr-head .scr-search,#view-sales>.scr-head .scr-search,#view-labor>.scr-head .scr-search,#view-inv>.scr-head .scr-search,#view-veh>.scr-head .scr-search,#view-qual>.scr-head .scr-search,#view-ot>.scr-head .scr-search,#view-daily>.scr-head .scr-search,#view-wb>.scr-head .scr-search,#casesBody>.scr-head .scr-search{order:3;margin:12px 16px 0 0;width:200px}
-  #view-prod>.app,#view-proj>.app,#view-sales>.app,#view-labor>.app,#view-inv>.main,#view-veh>.app,#view-qual>#qualBody,#view-ot>.app,#view-daily>.app,#view-wb>#wbBody,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
+  #view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-daily,#view-wb,#view-po,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
+  #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#view-inv>.scr-head,#view-veh>.scr-head,#view-qual>.scr-head,#view-ot>.scr-head,#view-daily>.scr-head,#view-wb>.scr-head,#view-po>.scr-head,#casesBody>.scr-head{display:contents}
+  #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head h1,#view-labor>.scr-head h1,#view-inv>.scr-head h1,#view-veh>.scr-head h1,#view-qual>.scr-head h1,#view-ot>.scr-head h1,#view-daily>.scr-head h1,#view-wb>.scr-head h1,#view-po>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
+  #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head .scr-sub,#view-labor>.scr-head .scr-sub,#view-inv>.scr-head .scr-sub,#view-veh>.scr-head .scr-sub,#view-qual>.scr-head .scr-sub,#view-ot>.scr-head .scr-sub,#view-daily>.scr-head .scr-sub,#view-wb>.scr-head .scr-sub,#view-po>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
+  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#view-inv>.sub-tabs,#view-veh>.sub-tabs,#view-qual>.sub-tabs,#view-ot>.sub-tabs,#view-daily>.sub-tabs,#view-wb>.sub-tabs,#view-po>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
+  #view-prod>.scr-head .scr-search,#view-proj>.scr-head .scr-search,#view-sales>.scr-head .scr-search,#view-labor>.scr-head .scr-search,#view-inv>.scr-head .scr-search,#view-veh>.scr-head .scr-search,#view-qual>.scr-head .scr-search,#view-ot>.scr-head .scr-search,#view-daily>.scr-head .scr-search,#view-wb>.scr-head .scr-search,#view-po>.scr-head .scr-search,#casesBody>.scr-head .scr-search{order:3;margin:12px 16px 0 0;width:200px}
+  #view-prod>.app,#view-proj>.app,#view-sales>.app,#view-labor>.app,#view-inv>.main,#view-veh>.app,#view-qual>#qualBody,#view-ot>.app,#view-daily>.app,#view-wb>#wbBody,#view-po>.app,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
   #view-qual>.scr-head .scr-search{margin-left:auto}   /* 資格にはサブタブが無いので検索を右端へ */
   #view-wb>.wb-hint,#view-wb>.wb-tip,#view-wb>.wb-modal{order:5}
   #view-cal>.scr-head h1,#view-alcohol>.scr-head h1,#view-forklift>.scr-head h1,#view-card>.scr-head h1{font-size:24px}   /* PC の見出しはどの画面も 24px */
@@ -2661,8 +2661,8 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .sz-parts .zero-ok{color:#185fa5}     /* 0 で「なし」の確認済み＝青 */
   #view-cases .sz-parts .redo{color:#a32d2d}        /* やり直しの金額＝赤 */
   /* 発注（独立画面、2026-10-19） */
-  :is(#view-po,#view-poreq,#poEditBg) .po-wrap{max-width:1180px;margin:0 auto;padding:12px 16px 40px}
-  #view-poreq .po-wrap{max-width:820px}
+  #view-po .app{padding:6px 16px 24px}   /* 他の一覧画面と同じ作り：見出し・サブタブ・検索を 1 行に畳み、中身は横いっぱい（10/23 iller「他と揃えて」） */
+  #view-poreq .po-wrap{max-width:760px;margin:0 auto;padding:12px 16px 40px}   /* 自分で書く画面は 日報・時間外 と同じ 760 中央 */
   #view-poreq .pr-steps{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px;font-size:14px;font-weight:600}
   #view-poreq .pr-steps span{background:var(--surface2);border-radius:999px;padding:6px 14px}
   #view-poreq .pr-steps i{font-style:normal;color:var(--text-faint)}
@@ -2677,7 +2677,6 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   :is(#view-po,#view-poreq,#poEditBg) .po-empty{color:var(--text-dim);font-size:14px;text-align:center;padding:30px 0}
   :is(#view-po,#view-poreq,#poEditBg) .po-sec{font-size:14px;color:var(--text);margin:18px 0 8px;display:flex;align-items:center;gap:10px}
   :is(#view-po,#view-poreq,#poEditBg) .po-sec .sp{flex:1}
-  :is(#view-po,#view-poreq,#poEditBg) .po-top{display:flex;align-items:center;gap:8px;margin:4px 0 12px}
   :is(#view-po,#view-poreq,#poEditBg) .po-panel{background:var(--surface);border-radius:14px;padding:14px 16px 16px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
   :is(#view-po,#view-poreq,#poEditBg) .po-panel-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:15px}
   :is(#view-po,#view-poreq,#poEditBg) .po-panel-hd .sp{flex:1}
@@ -2688,7 +2687,6 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   :is(#view-po,#view-poreq,#poEditBg) .po-panel .po-card{background:var(--surface2);box-shadow:none;border:1px solid var(--border-light)}
   :is(#view-po,#view-poreq,#poEditBg) .po-panel .po-tblwrap{border:1px solid var(--border-light)}
   :is(#view-po,#view-poreq,#poEditBg) .po-panel .po-empty{padding:18px 0}
-  :is(#view-po,#view-poreq,#poEditBg) .po-search{margin-left:auto;background:#fff;border:1px solid var(--border);border-radius:9px;padding:8px 12px 8px 32px;font:400 14px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;width:260px;max-width:50%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center}
   :is(#view-po,#view-poreq,#poEditBg) .po-tbl td.wrap{white-space:normal}   /* 仕入先・明細は折り返す（列番号指定は列を動かすと壊れる 10/23） */
   :is(#view-po,#view-poreq,#poEditBg) .po-tbl td.vend{min-width:200px}
   :is(#view-po,#view-poreq,#poEditBg) .po-form{background:var(--surface);border-radius:12px;margin-bottom:6px}
@@ -3771,8 +3769,9 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <!-- ===== 発注 section（2026-10-19）：発注書を書く（誰でも）＋未発注の処理（事務所） ===== -->
 <section id="view-po" class="hidden">
-  <div class="scr-head"><h1>発注</h1></div>
-  <div class="po-wrap"><div id="poBody"><div class="po-empty">読み込み中...</div></div></div>
+  <div class="scr-head"><h1>発注</h1><input class="scr-search" id="poSearch" placeholder="仕入先・案件・品名で検索" oninput="Po.search(this.value)"></div>
+  <div class="sub-tabs" id="poTabs"></div>
+  <div class="app"><div id="poBody"><div class="po-empty">読み込み中...</div></div></div>
 </section>
 <!-- 発注依頼（2026-10-23 iller「発注依頼と、依頼を受け取って仕上げるページを別に」）：全員向け。書く＋自分の依頼の段 -->
 <section id="view-poreq" class="hidden">
@@ -4463,8 +4462,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-23 13:51';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1283;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-23 13:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1284;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10140,7 +10139,7 @@ const Po = (function(){
     const docRow=p=>`<tr onclick="Po.edit('${esc(p.id)}')"><td class="wrap vend"><div class="po-vendor">${esc(p.vendor||'')}</div><div class="ct-sub">${p.case_name?esc(p.case_name)+'　':''}注文番号 ${esc(poNo(p))}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${esc(p.sender||'')}</td><td class="wrap">${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><button type="button" class="act-btn" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button><button type="button" class="act-btn" onclick="event.stopPropagation();Po.sentNow('${esc(p.id)}')">発注した</button></td></tr>`;
     const row=p=>`<tr onclick="Po.edit('${esc(p.id)}')"><td style="white-space:nowrap">${p.sent_at?d8(p.sent_at):''}<div class="ct-sub">${esc(poNo(p))}</div></td><td class="wrap vend"><div class="po-vendor">${esc(p.vendor||'')}</div><div class="ct-sub">${p.case_name?esc(p.case_name):'案件なし'}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td class="wrap">${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td style="white-space:nowrap">${esc(p.sent_by||'')}</td><td class="po-ops"><button type="button" class="act-btn" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button></td></tr>`;
     let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+vendorList;
-    h+=`<div class="po-top"><button type="button" class="sub-tab${_tab==='req'?' on':''}" onclick="Po.tab('req')">依頼${req.length?' '+req.length:''}</button><button type="button" class="sub-tab${_tab==='doc'?' on':''}" onclick="Po.tab('doc')">発注書${doc.length?' '+doc.length:''}</button><button type="button" class="sub-tab${_tab==='sent'?' on':''}" onclick="Po.tab('sent')">発注済</button>${_tab==='sent'?`<input class="po-search" id="poSearch" value="${esc(_q)}" oninput="Po.search(this.value)">`:''}</div>`;
+    const tabs=$('poTabs'); if(tabs) tabs.innerHTML=`<button type="button" class="sub-tab${_tab==='req'?' on':''}" onclick="Po.tab('req')">依頼${req.length?' '+req.length:''}</button><button type="button" class="sub-tab${_tab==='doc'?' on':''}" onclick="Po.tab('doc')">発注書${doc.length?' '+doc.length:''}</button><button type="button" class="sub-tab${_tab==='sent'?' on':''}" onclick="Po.tab('sent')">発注済</button>`;
     if(_tab==='sent'){
       // 月のチップ（発注日の年月、新しい順）。選ぶとその月だけ
       const ymOf=p=>{ const d=new Date(String(p.sent_at||p.created_at||'')); return isNaN(d)?'':d.getFullYear()+'/'+(d.getMonth()+1); };
@@ -10150,22 +10149,22 @@ const Po = (function(){
       const chips=`<div class="po-months"><button type="button" class="sz-chip${_ym?'':' on'}" onclick="Po.month('')">すべて</button>${months.map(m=>`<button type="button" class="sz-chip${_ym===m?' on':''}" onclick="Po.month('${m}')">${m}</button>`).join('')}</div>`;
       h+=`<div class="po-panel"><div class="po-panel-hd"><b>発注済</b><span class="ct-sub">${list.length} 件</span><button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>${chips}`;
       h+=list.length?`<div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>発注日・注文番号</th><th>仕入先・案件</th><th>記入者</th><th>明細</th><th class="num">合計（税抜）</th><th>発注者</th><th></th></tr></thead><tbody>${list.map(row).join('')}</tbody></table></div>`:'<div class="po-empty">発注済の発注書はありません</div>';
-      h+='</div>'; el.innerHTML=h; if(_q.trim()) search(_q); return;
+      h+='</div>'; el.innerHTML=h; search(_q); return;
     }
     if(_tab==='doc'){
       const sum=doc.reduce((s,p)=>s+total(p),0);
       h+=`<div class="po-panel"><div class="po-panel-hd"><b>発注書</b><span class="ct-sub">${doc.length} 件　合計 ${yen(sum)}</span><button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
       h+=doc.length?`<div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>仕入先・件名</th><th>記入者</th><th>発注者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${doc.map(docRow).join('')}</tbody></table></div>`:'<div class="po-empty">発注書はありません</div>';
-      h+='</div>'; el.innerHTML=h; return;
+      h+='</div>'; el.innerHTML=h; search(_q); return;
     }
     h+=`<div class="po-panel"><div class="po-panel-hd"><b>依頼</b><span class="ct-sub">${req.length} 件</span><button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
     h+=req.length?req.map(card).join(''):'<div class="po-empty">依頼はありません</div>';
     h+='</div>';
-    el.innerHTML=h;
+    el.innerHTML=h; search(_q);
   }
-  function tab(t){ _tab=t; render(); if(t==='sent'){ const i=$('poSearch'); if(i) i.focus(); } }
+  function tab(t){ _tab=t; render(); }
   function month(m){ _ym=m; render(); }
-  function search(v){ _q=v; const q=v.trim().toLowerCase(); document.querySelectorAll('#view-po .po-tbl tbody tr').forEach(tr=>{ tr.style.display=(!q||tr.textContent.toLowerCase().includes(q))?'':'none'; }); }
+  function search(v){ _q=v||''; const q=_q.trim().toLowerCase(); document.querySelectorAll('#view-po .po-tbl tbody tr,#view-po .po-card').forEach(tr=>{ tr.style.display=(!q||tr.textContent.toLowerCase().includes(q))?'':'none'; }); }   // 見出し行の検索＝どの段でも効く（10/23）
   function assign(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(!el)return; const v=el.querySelector('.po-case').value.trim(), kind=el.querySelector('.po-kind').value; const c=caseOf(v);
     if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
     p.kind=kind; if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=v; p.order_no=''; }
