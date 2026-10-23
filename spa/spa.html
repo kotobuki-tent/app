@@ -4462,8 +4462,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-23 11:33';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1266;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-23 11:37';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1267;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10309,24 +10309,24 @@ async function toPdf(){ var b=document.getElementById('pdfBtn'); if(b.disabled) 
 const PoReq = (function(){
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const $=id=>document.getElementById(id);
-  const me=()=>(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_person')||'';
+  let _who='';   // 絞り（''＝全員）。既定は全員（10/23 iller「こっちには何も残らないのか」＝自分の分だけでは空に見える）
   const yen=n=>'¥'+Math.round(n||0).toLocaleString('ja-JP');
   const total=p=>(p.items||[]).reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0);
   const d8=v=>{ const d=new Date(String(v||'')); return isNaN(d)?'':`${d.getMonth()+1}/${d.getDate()}`; };
   const itemsTxt=p=>(p.items||[]).filter(it=>String(it.name||'').trim()).map(it=>esc(it.name)+(it.qty?` ×${esc(it.qty)}${esc(it.unit||'')}`:'')).join('、');
   const STAGE={'依頼':['req','依頼'],'未発注':['req','依頼'],'発注書':['doc','発注書'],'発注済':['sent','発注済'],'取消':['','取消']};
   async function loadAll(){ await Po.loadAll(); render(); }
-  function render(){ const el=$('poReqBody'); if(!el)return; const who=me(); const staff=Po.staff();
-    const mine=Po.list().filter(p=>who&&p.person===who&&p.status!=='取消').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+  function render(){ const el=$('poReqBody'); if(!el)return; const who=_who; const staff=Po.staff();
+    const mine=Po.list().filter(p=>(!who||p.person===who)&&p.status!=='取消').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
     let h='';
     h+=`<div class="po-panel"><div class="pr-steps"><span>依頼</span><i>→</i><span>発注書</span><i>→</i><span>発注済</span></div>
       <button type="button" class="po-new" onclick="Po.newPo({req:true})">＋ 発注依頼</button></div>`;
     h+=`<div class="po-panel"><div class="po-panel-hd"><b>依頼の状況</b><span class="ct-sub">${mine.length} 件</span><button type="button" class="act-btn" onclick="PoReq.loadAll()">更新</button></div>`;
-    h+=`<div class="pr-who"><span>記入者</span><select onchange="PoReq.setMe(this.value)"><option value="">選択</option>${staff.map(n=>`<option${n===who?' selected':''}>${esc(n)}</option>`).join('')}</select></div>`;
-    h+=mine.length?mine.map(p=>{ const st=STAGE[p.status]||['',p.status]; return `<div class="po-card simple" onclick="Po.edit('${esc(p.id)}')"><div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}${p.case_name?`<span class="po-kind-tag">${esc((p.order_no?'#'+p.order_no+' ':'')+p.case_name)}</span>`:''}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${d8(p.created_at)}${p.deadline?'　納期 '+esc(p.deadline):''}　合計 ${yen(total(p))}</div></div><div class="po-act"><span class="pr-stage ${st[0]}">${esc(st[1])}${p.status==='発注済'&&p.sent_at?'　'+d8(p.sent_at):''}</span></div></div>`; }).join(''):(who?'<div class="po-empty">依頼はありません</div>':'');
+    h+=`<div class="pr-who"><span>記入者</span><select onchange="PoReq.setMe(this.value)"><option value="">全員</option>${staff.map(n=>`<option${n===who?' selected':''}>${esc(n)}</option>`).join('')}</select></div>`;
+    h+=mine.length?mine.map(p=>{ const st=STAGE[p.status]||['',p.status]; return `<div class="po-card simple" onclick="Po.edit('${esc(p.id)}')"><div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}${p.case_name?`<span class="po-kind-tag">${esc((p.order_no?'#'+p.order_no+' ':'')+p.case_name)}</span>`:''}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}${p.deadline?'　納期 '+esc(p.deadline):''}　合計 ${yen(total(p))}</div></div><div class="po-act"><span class="pr-stage ${st[0]}">${esc(st[1])}${p.status==='発注済'&&p.sent_at?'　'+d8(p.sent_at):''}</span></div></div>`; }).join(''):'<div class="po-empty">依頼はありません</div>';
     h+='</div>';
     el.innerHTML=h; }
-  function setMe(v){ try{ if(v) localStorage.setItem('po_person',v); else localStorage.removeItem('po_person'); }catch(e){} render(); }
+  function setMe(v){ _who=v||''; render(); }
   function init(){}
   return { loadAll, render, init, setMe };
 })();
