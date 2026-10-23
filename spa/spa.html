@@ -4462,8 +4462,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-23 11:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1270;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-23 11:41';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1271;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10320,7 +10320,7 @@ const PoReq = (function(){
   function render(){ const el=$('poReqBody'); if(!el)return; const who=_who; const staff=Po.staff();
     const mine=Po.list().filter(p=>(!who||p.person===who)&&p.status!=='取消').sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
     let h='';
-    h+=`<div class="po-panel"><div class="pr-steps"><span>依頼</span><i>→</i><span>発注書</span><i>→</i><span>発注済</span></div>
+    h+=`<div class="po-panel"><div class="pr-steps"><span>依頼を出す</span><i>→</i><span>事務所が発注書を作る</span><i>→</i><span>事務所が発注する</span></div>
       <button type="button" class="po-new" onclick="Po.newPo({req:true})">＋ 発注依頼</button></div>`;
     h+=`<div class="po-panel"><div class="po-panel-hd"><b>依頼の状況</b><span class="ct-sub">${mine.length} 件</span><button type="button" class="act-btn" onclick="PoReq.loadAll()">更新</button></div>`;
     h+=`<div class="pr-who"><span>記入者</span><select onchange="PoReq.setMe(this.value)"><option value="">全員</option>${staff.map(n=>`<option${n===who?' selected':''}>${esc(n)}</option>`).join('')}</select></div>`;
