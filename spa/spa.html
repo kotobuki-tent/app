@@ -4442,8 +4442,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-23 10:10';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1257;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-23 11:13';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1258;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4718,7 +4718,7 @@ const PoBadge=(function(){
     const nv=document.getElementById('navPo'); if(nv){ let b=nv.querySelector('.nav-cnt'); if(n>0){ if(!b){ b=document.createElement('span'); b.className='nav-cnt'; nv.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
     const ic=document.querySelector('.portal-card[data-app="po"] .portal-card-icon'); if(ic){ let b=ic.querySelector('.portal-cnt'); if(n>0){ if(!b){ b=document.createElement('span'); b.className='portal-cnt'; ic.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
   }
-  function fetchCount(){ if(typeof App!=='undefined'&&App.denied.indexOf('po')>=0) return; return fetch(API+'?dept=po&action=list&status=未発注&nocache='+Date.now()).then(r=>r.json()).then(j=>{ if(j&&j.success) set((j.data||[]).length); }).catch(()=>{}); }
+  function fetchCount(){ if(typeof App!=='undefined'&&App.denied.indexOf('po')>=0) return; return fetch(API+'?dept=po&action=list&status=依頼&nocache='+Date.now()).then(r=>r.json()).then(j=>{ if(j&&j.success) set((j.data||[]).length); }).catch(()=>{}); }
   return { set, fetchCount };
 })();
 function moneyFetch(){
@@ -10077,7 +10077,7 @@ const Cases = (function(){
 // iller「案件になんでもかんでも乗っけすぎ」「あっちこっち行ったり来たり」＝案件管理から出して独立した画面に。書く欄も同じ画面（hatchu.html は 10/19 に廃止＝部長も PC でここから書く）
 const Po = (function(){
   const KINDS=['材料','外注','経費'];
-  let _pos=[], _posAt=0, _cases=[], _staff=[], _busy=false, _tab='open', _q='', _ym='';   // _ym：発注済一覧の月（''＝全部）2026-10-22   // _tab：open＝未発注、sent＝発注済一覧（2026-10-22 iller「発注済一覧を作って」）
+  let _pos=[], _posAt=0, _cases=[], _staff=[], _busy=false, _tab='req', _q='', _ym='';   // _tab：req＝依頼、doc＝発注書、sent＝発注済（三段、2026-10-23）   // _ym：発注済一覧の月（''＝全部）2026-10-22   // _tab：open＝未発注、sent＝発注済一覧（2026-10-22 iller「発注済一覧を作って」）
   function blankItems(){ return Array.from({length:5},()=>({name:'',qty:'',unit:'',price:''})); }   // 最初から 5 行（iller 10/19）
   const $=id=>document.getElementById(id);
   const _arch=v=>v===true||v==='true'||v==='TRUE';
@@ -10093,7 +10093,7 @@ const Po = (function(){
         fetch(API+'?dept=po&action=list&nocache='+Date.now()).then(r=>r.json()).catch(()=>({})),   // 発注書は控えを使わない（届いたらすぐ見たい）
         fetch(API+'?dept=cases&action=read').then(r=>r.json()).catch(()=>({})),
         fetch(API+'?dept=qual&action=staff').then(r=>r.json()).catch(()=>({}))]);   // 記入者・発注者は在籍の全員（日報の名簿だと事務所などが抜ける。2026-10-22 iller「全員入れて」）
-      if(po&&po.success){ _pos=(po.data||[]).map(p=>{ if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(String(p.deadline||''))) p.deadline=String(p.deadline).slice(0,10); return p; }); _posAt=Date.now(); PoBadge.set(_pos.filter(p=>p.status==='未発注').length); }   // 納期はシートが Date にするので日付だけに
+      if(po&&po.success){ _pos=(po.data||[]).map(p=>{ if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(String(p.deadline||''))) p.deadline=String(p.deadline).slice(0,10); return p; }); _posAt=Date.now(); PoBadge.set(_pos.filter(p=>p.status==='依頼'||p.status==='未発注').length); }   // 納期はシートが Date にするので日付だけに
       if(cs&&cs.data) _cases=cs.data;
       if(st&&st.data) _staff=st.data.map(x=>x.name).filter(Boolean);
     }catch(e){}
@@ -10104,20 +10104,21 @@ const Po = (function(){
   const caseLabel=c=>(c.order_no?'#'+c.order_no+' ':'')+dispName(c.client,c.name);
   const poNo=p=>p.order_no||(p.po_no?'KT-'+String(p.po_no).padStart(4,'0'):String(p.id||''));   // 注文番号：案件があれば受注番号、無ければ通し番号 KT-0001（2026-10-22 iller「KT-◯◯みたいな」。v138 より前は P… の id）
   function caseOf(v){ v=String(v||'').trim(); if(!v) return null; const live=liveCases(); return live.find(x=>caseLabel(x)===v)||live.find(x=>dispName(x.client,x.name)===v)||null; }
+  // 三段（2026-10-23 iller）：依頼（部長側が出した・未完成）→ 発注書（事務所が仕上げた・溜め置き）→ 発注済（仕入先に出した）。段を動かすのは人の手だけ、印刷・PDF は動かさない
   function render(){
-    PoBadge.set(_pos.filter(p=>p.status==='未発注').length);
+    const req=_pos.filter(p=>p.status==='依頼'||p.status==='未発注').sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')));
+    const doc=_pos.filter(p=>p.status==='発注書').sort((a,b)=>String(a.vendor||'').localeCompare(String(b.vendor||''),'ja')||String(a.created_at||'').localeCompare(String(b.created_at||'')));   // 仕入先ごとに固める（まとめて出す日のため）
+    PoBadge.set(req.length);
     const el=$('poBody'); if(!el)return;
-    const open=_pos.filter(p=>p.status==='未発注').sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')));
     const done=_pos.filter(p=>p.status==='発注済').sort((a,b)=>String(b.sent_at||b.created_at||'').localeCompare(String(a.sent_at||a.created_at||'')));   // 取消は出さない（iller 10/19）。発注日の新しい順
     const vendorList=`<datalist id="poVendorList">${[...new Set(_pos.map(p=>p.vendor).filter(Boolean))].map(v=>`<option value="${esc(v)}">`).join('')}</datalist>`;
     const caseOpts=liveCases().map(c=>`<option value="${esc(caseLabel(c))}">`).join('');
-    const sender0=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_sender')||'';   // 発注者（送る人）の既定＝LINE WORKS の名前か前回
     const card=p=>`<div class="po-card simple" data-id="${esc(p.id)}" onclick="Po.edit('${esc(p.id)}')">
-      <div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}${p.case_name?`${p.case_id?'<span class="po-case-tag">案件</span>':''}<span class="po-kind-tag">${esc((p.order_no?'#'+p.order_no+' ':'')+p.case_name)}</span>`:''}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}${p.deadline?'　納期 '+esc(p.deadline):''}${p.deliver_to&&p.deliver_to!=='弊社'?'　納品先 '+esc(p.deliver_to):''}${p.note?'　備考 '+esc(p.note):''}　合計 ${yen(total(p))}</div></div>
-      <div class="po-act"><button type="button" class="po-btn dark" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button></div></div>`;
-    const row=p=>`<tr onclick="Po.edit('${esc(p.id)}')"><td class="num" style="text-align:left;white-space:nowrap">${p.sent_at?d8(p.sent_at):''}</td><td><div class="po-vendor">${esc(p.vendor||'')} <span class="po-kind-tag">${esc(p.kind||'')}</span></div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):'案件なし'}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${esc(p.sent_by||'')}</td><td>${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><button type="button" class="act-btn" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button></td></tr>`;
+      <div class="po-c1"><div class="po-vendor">${esc(p.vendor||'')}${p.case_name?`${p.case_id?'<span class="po-case-tag">案件</span>':''}<span class="po-kind-tag">${esc((p.order_no?'#'+p.order_no+' ':'')+p.case_name)}</span>`:''}</div><div class="po-items">${itemsTxt(p)}</div><div class="ct-sub">${esc(p.person||'')}　${d8(p.created_at)}${p.deadline?'　納期 '+esc(p.deadline):''}${p.deliver_to&&p.deliver_to!=='弊社'?'　納品先 '+esc(p.deliver_to):''}${p.note?'　備考 '+esc(p.note):''}　合計 ${yen(total(p))}</div></div></div>`;
+    const docRow=p=>`<tr onclick="Po.edit('${esc(p.id)}')"><td><div class="po-vendor">${esc(p.vendor||'')}</div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):''}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${esc(p.sender||'')}</td><td>${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><button type="button" class="act-btn" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button><button type="button" class="act-btn" onclick="event.stopPropagation();Po.sentNow('${esc(p.id)}')">発注した</button></td></tr>`;
+    const row=p=>`<tr onclick="Po.edit('${esc(p.id)}')"><td class="num" style="text-align:left;white-space:nowrap">${p.sent_at?d8(p.sent_at):''}</td><td><div class="po-vendor">${esc(p.vendor||'')}</div><div class="ct-sub">${p.case_name?esc(p.case_name)+(p.order_no?'　受注 '+esc(p.order_no):''):'案件なし'}</div></td><td>${esc(p.person||'')}<div class="ct-sub">${d8(p.created_at)}</div></td><td>${esc(p.sent_by||'')}</td><td>${itemsTxt(p)}</td><td class="num">${yen(total(p))}</td><td class="po-ops"><button type="button" class="act-btn" onclick="event.stopPropagation();Po.print('${esc(p.id)}')">発注書</button></td></tr>`;
     let h=`<datalist id="poCaseList">${caseOpts}</datalist>`+vendorList;
-    h+=`<div class="po-top"><button type="button" class="sub-tab${_tab==='open'?' on':''}" onclick="Po.tab('open')">未発注${open.length?' '+open.length:''}</button><button type="button" class="sub-tab${_tab==='sent'?' on':''}" onclick="Po.tab('sent')">発注済</button>${_tab==='sent'?`<input class="po-search" id="poSearch" value="${esc(_q)}" oninput="Po.search(this.value)">`:''}</div>`;
+    h+=`<div class="po-top"><button type="button" class="sub-tab${_tab==='req'?' on':''}" onclick="Po.tab('req')">依頼${req.length?' '+req.length:''}</button><button type="button" class="sub-tab${_tab==='doc'?' on':''}" onclick="Po.tab('doc')">発注書${doc.length?' '+doc.length:''}</button><button type="button" class="sub-tab${_tab==='sent'?' on':''}" onclick="Po.tab('sent')">発注済</button>${_tab==='sent'?`<input class="po-search" id="poSearch" value="${esc(_q)}" oninput="Po.search(this.value)">`:''}</div>`;
     if(_tab==='sent'){
       // 月のチップ（発注日の年月、新しい順）。選ぶとその月だけ
       const ymOf=p=>{ const d=new Date(String(p.sent_at||p.created_at||'')); return isNaN(d)?'':d.getFullYear()+'/'+(d.getMonth()+1); };
@@ -10128,14 +10129,15 @@ const Po = (function(){
       h+=`<div class="po-panel"><div class="po-panel-hd"><b>発注済</b><span class="ct-sub">${list.length} 件</span><button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>${chips}`;
       h+=list.length?`<div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>発注日</th><th>仕入先・案件</th><th>記入者</th><th>発注者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${list.map(row).join('')}</tbody></table></div>`:'<div class="po-empty">発注済の発注書はありません</div>';
       h+='</div>'; el.innerHTML=h; if(_q.trim()) search(_q); return;
-    }   // 書く欄は 2026-10-21 にモーダルへ（iller「書く欄が上半分」→ 一覧を先に、ボタンは一覧の上に四角く）
-    // 未発注と発注済を窓（パネル）で分ける（iller 10/22「がらんどうすぎる」）
-    h+=`<div class="po-panel"><div class="po-panel-hd"><b>未発注</b><span class="ct-sub">${open.length} 件</span><button type="button" class="act-btn" onclick="Po.reload()">更新</button><span class="sp"></span><button type="button" class="po-new" onclick="Po.newPo()">＋ 発注書を書く</button></div>`;
-    h+=open.length?open.map(card).join(''):'<div class="po-empty">未発注の発注書はありません</div>';
-    h+='</div>';
-    const recent=done.slice(0,10);   // 直近は未発注の下にも残す（iller 10/22「直近はあるべきだろ」）。全部は 発注済 タブ
-    h+=`<div class="po-panel"><div class="po-panel-hd"><b>発注済</b><span class="ct-sub">直近 ${recent.length} 件</span><button type="button" class="act-btn" onclick="Po.tab('sent')">すべて</button></div>`;
-    h+=recent.length?`<div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>発注日</th><th>仕入先・案件</th><th>記入者</th><th>発注者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${recent.map(row).join('')}</tbody></table></div>`:'<div class="po-empty">発注済の発注書はありません</div>';
+    }
+    if(_tab==='doc'){
+      const sum=doc.reduce((s,p)=>s+total(p),0);
+      h+=`<div class="po-panel"><div class="po-panel-hd"><b>発注書</b><span class="ct-sub">${doc.length} 件　合計 ${yen(sum)}</span><button type="button" class="act-btn" onclick="Po.reload()">更新</button></div>`;
+      h+=doc.length?`<div class="po-tblwrap"><table class="po-tbl"><thead><tr><th>仕入先・件名</th><th>記入者</th><th>発注者</th><th>明細</th><th class="num">合計（税抜）</th><th></th></tr></thead><tbody>${doc.map(docRow).join('')}</tbody></table></div>`:'<div class="po-empty">仕上げた発注書はありません</div>';
+      h+='</div>'; el.innerHTML=h; return;
+    }
+    h+=`<div class="po-panel"><div class="po-panel-hd"><b>依頼</b><span class="ct-sub">${req.length} 件</span><button type="button" class="act-btn" onclick="Po.reload()">更新</button><span class="sp"></span><button type="button" class="po-new" onclick="Po.newPo()">＋ 発注書を書く</button></div>`;
+    h+=req.length?req.map(card).join(''):'<div class="po-empty">依頼はありません</div>';
     h+='</div>';
     el.innerHTML=h;
   }
@@ -10168,14 +10170,14 @@ const Po = (function(){
   // ===== カードをクリック → 編集のモーダル（追加・変更・案件の紐付け。発注済は見るだけ）2026-10-21 iller「カードをクリックしてモーダルは出さないのか」 =====
   let _edit=null;
   function newPo(){ const me=(window.__woffUser&&window.__woffUser.name)||localStorage.getItem('po_person')||'';
-    _edit={id:'', isNew:true, locked:false, status:'未発注', person:me, vendor:'', caseText:'', items:blankItems(), asap:false, deadline:'', deliv:'弊社', deliver_to:'', note:'', sent:''};
+    _edit={id:'', isNew:true, locked:false, status:'依頼', person:me, vendor:'', caseText:'', items:blankItems(), asap:false, deadline:'', deliv:'弊社', deliver_to:'', note:'', sent:''};
     renderEdit(); $('poEditBg').classList.add('show'); const v=$('poe_vendor'); if(v) setTimeout(()=>v.focus(),50); }
   function edit(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return;
     const items=(p.items||[]).map(it=>({name:it.name||'',qty:it.qty==null?'':it.qty,unit:it.unit||'',price:it.price==null?'':it.price})); while(items.length<5) items.push({name:'',qty:'',unit:'',price:''});
-    _edit={id:p.id, locked:p.status!=='未発注', status:p.status, person:p.person||'', vendor:p.vendor||'', caseText:p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'', items, asap:p.deadline==='最短', deadline:p.deadline&&p.deadline!=='最短'?String(p.deadline).slice(0,10):'', deliv:p.deliver_to&&p.deliver_to!=='弊社'?'別途':'弊社', deliver_to:p.deliver_to&&p.deliver_to!=='弊社'?p.deliver_to:'', note:p.note||'', sender:p.sender||(p.status==='未発注'?senderOf(p):''), sent:p.status==='発注済'&&p.sent_at?(d8(p.sent_at)+(p.sent_by?' '+p.sent_by:'')):''};
+    _edit={id:p.id, locked:p.status==='発注済'||p.status==='取消', status:(p.status==='未発注'?'依頼':p.status), person:p.person||'', vendor:p.vendor||'', caseText:p.case_name?((p.order_no?'#'+p.order_no+' ':'')+p.case_name):'', items, asap:p.deadline==='最短', deadline:p.deadline&&p.deadline!=='最短'?String(p.deadline).slice(0,10):'', deliv:p.deliver_to&&p.deliver_to!=='弊社'?'別途':'弊社', deliver_to:p.deliver_to&&p.deliver_to!=='弊社'?p.deliver_to:'', note:p.note||'', sender:p.sender||(p.status!=='発注済'?senderOf(p):''), sent:p.status==='発注済'&&p.sent_at?(d8(p.sent_at)+(p.sent_by?' '+p.sent_by:'')):''};
     renderEdit(); $('poEditBg').classList.add('show'); }
   function eKeep(){ if(!_edit)return; const g=id=>{ const el=$(id); return el?el.value:null; }; const v=g('poe_person'); if(v!=null)_edit.person=v; const w=g('poe_vendor'); if(w!=null)_edit.vendor=w; const c=g('poe_case'); if(c!=null)_edit.caseText=c; const d=g('poe_deadline'); if(d!=null)_edit.deadline=d; const dt=g('poe_deliver_to'); if(dt!=null)_edit.deliver_to=dt; const n=g('poe_note'); if(n!=null)_edit.note=n; const sd=g('poe_sender'); if(sd!=null)_edit.sender=sd; }
-  function renderEdit(){ const e=_edit, el=$('poEditBody'); if(!e||!el)return; const ro=e.locked?' disabled':''; $('poe_title').textContent=e.isNew?'発注書を書く':(e.locked?(e.status+(e.sent?'　'+e.sent:'')):'発注書');
+  function renderEdit(){ const e=_edit, el=$('poEditBody'); if(!e||!el)return; const ro=e.locked?' disabled':''; $('poe_title').textContent=e.isNew?'発注書を書く':(e.status==='発注済'?('発注済'+(e.sent?'　'+e.sent:'')):e.status);
     const tot=e.items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0);
     el.innerHTML=`<div class="po-edit-body">
       <div class="po-f"><label>記入者</label><select id="poe_person"${ro}>${['<option value="">選択</option>'].concat(_staff.map(n=>`<option${n===e.person?' selected':''}>${esc(n)}</option>`)).join('')}${e.person&&!_staff.includes(e.person)?`<option selected>${esc(e.person)}</option>`:''}</select></div>
@@ -10188,7 +10190,7 @@ const Po = (function(){
       <div class="po-f"><label>納品先</label><div class="po-inline"><button type="button" class="po-tg${e.deliv==='弊社'?' on':''}" onclick="Po.eDeliv('弊社')"${ro}>弊社</button><button type="button" class="po-tg${e.deliv==='別途'?' on':''}" onclick="Po.eDeliv('別途')"${ro}>別途</button><input id="poe_deliver_to" value="${esc(e.deliver_to)}" style="${e.deliv==='別途'?'':'display:none'}"${ro}></div></div>
       <div class="po-f wide"><label>備考</label><input id="poe_note" value="${esc(e.note)}"${ro}></div>
       ${e.isNew?'':`<div class="po-f"><label>発注者</label><select id="poe_sender"${ro}>${['<option value="">選択</option>'].concat(_staff.map(n=>`<option${n===e.sender?' selected':''}>${esc(n)}</option>`)).join('')}${e.sender&&!_staff.includes(e.sender)?`<option selected>${esc(e.sender)}</option>`:''}</select></div>`}
-      <div class="mo-foot">${e.locked||e.isNew?'':`<span class="left"><button type="button" class="cancel po-del" onclick="Po.eCancel()">削除</button></span>`}${e.status==='発注済'?`<span class="left"><button type="button" class="cancel" onclick="Po.eUnsend()">未発注に戻す</button></span>`:''}<button type="button" class="cancel" onclick="Po.eClose()">閉じる</button>${e.isNew?'':`<button type="button" class="cancel" onclick="Po.print('${esc(e.id)}')">発注書</button>`}${e.locked?'':`<button type="button" class="save" onclick="Po.eSave()">${e.isNew?'発注書を出す':'保存'}</button>`}${e.locked||e.isNew?'':`<button type="button" class="save" onclick="Po.eSent()">発注した</button>`}</div>
+      <div class="mo-foot">${e.locked||e.isNew?'':`<span class="left"><button type="button" class="cancel po-del" onclick="Po.eCancel()">削除</button>${e.status==='発注書'?`<button type="button" class="cancel" onclick="Po.eStage('依頼')">依頼に戻す</button>`:''}</span>`}${e.status==='発注済'?`<span class="left"><button type="button" class="cancel" onclick="Po.eUnsend()">発注書に戻す</button></span>`:''}<button type="button" class="cancel" onclick="Po.eClose()">閉じる</button>${e.isNew||e.status==='依頼'?'':`<button type="button" class="cancel" onclick="Po.print('${esc(e.id)}')">発注書</button>`}${e.locked?'':`<button type="button" class="save" onclick="Po.eSave()">${e.isNew?'発注書を出す':'保存'}</button>`}${!e.locked&&!e.isNew&&e.status==='依頼'?`<button type="button" class="save" onclick="Po.eStage('発注書')">発注書にする</button>`:''}${!e.locked&&!e.isNew&&e.status==='発注書'?`<button type="button" class="save" onclick="Po.eSent()">発注した</button>`:''}</div>
     </div>`; }
   function eUpd(i,k,v){ if(_edit&&_edit.items[i]) _edit.items[i][k]=v; const t=$('poe_total'); if(t&&_edit) t.textContent=yen(_edit.items.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0)); }
   function eAdd(){ if(!_edit)return; eKeep(); _edit.items.push({name:'',qty:'',unit:'',price:''}); renderEdit(); }
@@ -10199,8 +10201,8 @@ const Po = (function(){
   function eCancel(){ if(!_edit)return; const id=_edit.id; eClose(); cancel(id); }
   // 「発注した」の誤爆用（iller 2026-10-21）。GAS unsend が状態を戻し、案件の原価明細に入れた行も消す（Code.gs v133）
   function eUnsend(){ if(!_edit||_busy)return; const p=_pos.find(x=>String(x.id)===String(_edit.id)); if(!p||p.status!=='発注済')return;
-    if(!confirm('未発注に戻しますか？'))return; if(guard())return;
-    p.status='未発注'; p.sent_at=''; p.sent_by=''; send({dept:'po',action:'unsend',id:p.id}); eClose(); toast('未発注に戻しました'); render(); setTimeout(loadAll,8000); }
+    if(!confirm('発注書に戻しますか？'))return; if(guard())return;
+    p.status='発注書'; p.sent_at=''; p.sent_by=''; send({dept:'po',action:'unsend',id:p.id}); eClose(); toast('発注書に戻しました'); render(); setTimeout(loadAll,8000); }
   // 仕上げはモーダル 1 つで（2026-10-23 iller「発注依頼は未完成のもの。事務所が案件を聞いて仕上げる。発注書を仕上げるのもモーダルで」）
   function eBody(){ const e=_edit; eKeep();
     if(!e.isNew&&String(e.id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return null; }
@@ -10213,10 +10215,19 @@ const Po = (function(){
   function eApply(p,body){ Object.assign(p,{person:body.person,vendor:body.vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,case_id:body.case_id,case_name:body.case_name,order_no:body.order_no,sender:body.sender}); }
   function eSave(){ if(!_edit||_edit.locked||_busy)return; const e=_edit; const body=eBody(); if(!body)return;
     if(guard())return; try{ localStorage.setItem('po_person',body.person); if(body.sender) localStorage.setItem('po_sender',body.sender); }catch(err){}
-    if(e.isNew){ send(body); _pos.push({id:'tmp_'+Date.now(),created_at:new Date().toISOString(),status:'未発注',person:body.person,vendor:body.vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,kind:'材料',case_id:body.case_id,case_name:body.case_name,order_no:body.order_no,sender:body.sender}); eClose(); toast('発注書を出しました'); render(); setTimeout(loadAll,8000); return; }
+    if(e.isNew){ send(body); _pos.push({id:'tmp_'+Date.now(),created_at:new Date().toISOString(),status:'依頼',person:body.person,vendor:body.vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,kind:'材料',case_id:body.case_id,case_name:body.case_name,order_no:body.order_no,sender:body.sender}); eClose(); toast('発注書を出しました'); render(); setTimeout(loadAll,8000); return; }
     body.id=e.id; send(body);
     const p=_pos.find(x=>String(x.id)===String(e.id)); if(p) eApply(p,body);
     eClose(); toast('保存しました'); render(); setTimeout(loadAll,8000); }
+  // 段の上げ下げ（依頼 ⇄ 発注書）：直した中身と一緒に save で status を送る（GAS v140 の savePo が 依頼／発注書 だけ受ける）
+  function eStage(st){ if(!_edit||_edit.locked||_busy||_edit.isNew)return; const e=_edit; const body=eBody(); if(!body)return;
+    if(st==='発注書'&&!body.sender){ toast('発注者を選択してください',true); return; }
+    if(guard())return; try{ localStorage.setItem('po_person',body.person); if(body.sender) localStorage.setItem('po_sender',body.sender); }catch(err){}
+    body.id=e.id; body.status=st; send(body);
+    const p=_pos.find(x=>String(x.id)===String(e.id)); if(p){ eApply(p,body); p.status=st; }
+    eClose(); toast(st==='発注書'?'発注書にしました':'依頼に戻しました'); render(); setTimeout(loadAll,8000); }
+  // 発注書の表の「発注した」（開かずに出す。保存済みの中身のまま）
+  function sentNow(id){ const r=markSent(id); if(r!=='ok'&&r!=='busy') toast(r,true); }
   // 「発注した」：直した中身と一緒に 1 回で送る（GAS v139 の sendPo が中身も書く）。発注者が空なら押せない
   function eSent(){ if(!_edit||_edit.locked||_busy||_edit.isNew)return; const e=_edit; const body=eBody(); if(!body)return;
     if(!body.sender){ toast('発注者を選択してください',true); return; }
@@ -10241,7 +10252,7 @@ table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.item
 .note{font-size:10pt;margin-top:4mm}.foot{width:100%;margin-top:8mm;border-collapse:collapse}.co{font-size:10pt;line-height:1.5}.co .n{font-size:12pt;font-weight:bold}
 .bar{position:fixed;top:0;left:0;right:0;background:#1c1c1e;color:#fff;padding:10px 16px;font:600 14px/1 -apple-system,'Hiragino Sans',sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between}.bar button{border:none;border-radius:8px;padding:8px 14px;font:600 14px/1 inherit;background:#fff;color:#1c1c1e;cursor:pointer}.bar .ctl{display:flex;gap:8px;align-items:center}.bar input{border:none;border-radius:8px;padding:8px 10px;font:400 14px/1 inherit;width:260px;background:#fff;color:#1c1c1e}.bar select{border:none;border-radius:8px;padding:8px 10px;font:400 14px/1 inherit;background:#fff;color:#1c1c1e}.bar button.go{background:#2f6fed;color:#fff}
 #paper{width:210mm;min-height:297mm;box-sizing:border-box;padding:22mm;background:#fff}@media print{.bar{display:none}#paper{padding:0;min-height:0}}@media screen{body{padding:60px 0 22mm;margin:0;background:#eee}#paper{margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
-</style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}</span><span class="ctl"><button onclick="window.print()">印刷</button><button id="pdfBtn" onclick="toPdf()">PDF</button>${p.status==='未発注'?`<button class="go" onclick="(function(){var o=window.opener||window.parent;var r=o&&o.Po?o.Po.markSent('${esc(p.id)}'):'none';if(r==='ok'){window.close();}else if(r!=='busy'){alert(r);}})()">発注した</button>`:''}</span></div>
+</style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}</span><span class="ctl"><button onclick="window.print()">印刷</button><button id="pdfBtn" onclick="toPdf()">PDF</button>${p.status==='発注書'?`<button class="go" onclick="(function(){var o=window.opener||window.parent;var r=o&&o.Po?o.Po.markSent('${esc(p.id)}'):'none';if(r==='ok'){window.close();}else if(r!=='busy'){alert(r);}})()">発注した</button>`:''}</span></div>
 <div id="paper"><h1>発注書</h1><div class="row"><div class="to">${esc(p.vendor||'')}　御中</div><table class="meta"><tr><th>注文番号</th><td>${esc(poNo(p))}</td></tr><tr><th>発注日</th><td>${ds}</td></tr></table></div>
 <p class="lead">下記のとおり発注します。</p><div class="case"><span><b>件名</b>　${esc(p.case_name||'')}</span><span><b>担当</b>　${esc(p.person||'')}</span></div>
 <table class="items"><tr><th style="width:8mm">No</th><th>品名・品番・仕様</th><th style="width:16mm">数量</th><th style="width:12mm">単位</th><th style="width:24mm">単価</th><th style="width:28mm">金額（税抜）</th></tr>${rows}<tr><td colspan="5" class="num">合計（税抜）</td><td class="num">${n(total(p))} 円</td></tr></table>
@@ -10267,7 +10278,7 @@ async function toPdf(){ var b=document.getElementById('pdfBtn'); if(b.disabled) 
 </body></html>`;
     w.document.open(); w.document.write(html); w.document.close(); }
   function init(){}
-  return { loadAll, render, init, tab, search, month, assign, setSender, markSent, cancel, reload, print, pick, pickSet, pickHide, newPo, edit, eUpd, eAdd, eDel, eAsap, eDeliv, eClose, eCancel, eUnsend, eSave, eSent };
+  return { loadAll, render, init, tab, search, month, assign, setSender, markSent, cancel, reload, print, pick, pickSet, pickHide, newPo, edit, eUpd, eAdd, eDel, eAsap, eDeliv, eClose, eCancel, eUnsend, eSave, eSent, eStage, sentNow };
 })();
 window.Po=Po;   // 発注書の別窓（window.opener）から markSent を呼ぶため。const は window に乗らない（2026-10-20）
 
