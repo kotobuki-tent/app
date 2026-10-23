@@ -11,7 +11,7 @@ description: iller との仕事の進め方（口調・判断・デプロイ作�
 - 日本語で返す（コードと識別子は原文ママ）。iller を「iller」と呼ぶ（岸田ではない）。
 
 ## デプロイ・コミット
-- **デプロイ = commit + `git push origin main`**（GitHub Pages が main を直配信）。リモートは SSH `git@github.com:kotobuki-tent/app.git`。
+- **デプロイ = commit + `git push origin main`**（GitHub Pages が main を直配信）。**不具合の直し（iller が今見ている画面の崩れ・動かない・見えない）は commit したらそのまま push**（10/23「それくらい push しとけよ」）。新しい機能・作りの変更は iller の「push」を待つ。リモートは SSH `git@github.com:kotobuki-tent/app.git`。
 - 編集は **diff で**。ファイル丸ごとの消して貼り直しはしない。
 - コミットメッセージ末尾は必ず: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`
 - **版の表示**：画面右下（ポータルでは足元）の「Ver. N」＝その端末が読み込んでいる spa.html の通し番号（`const APP_BUILD`＝コミット数、`.git/hooks/pre-commit` が毎コミット自動で書き換える＝spa.html を触らないコミットでも版は進む（2026-10-21〜、通し番号とずれないように）。手で触らない）。「最新版か」は `git rev-list --count HEAD` と見比べる。マウスを乗せるとコミット日時（`const APP_VER`、新版検知に使う）が出る。
