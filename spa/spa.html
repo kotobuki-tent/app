@@ -591,6 +591,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .rental-existing{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;border-bottom:1px solid var(--surface3)}
 .rental-existing:last-child{border-bottom:none}
 .rental-existing .re-info{flex:1}
+.rental-existing .re-qty{width:56px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;font:inherit;text-align:right;background:var(--surface);color:var(--text)}
 .rental-existing .re-del{background:none;border:none;color:var(--red);font-size:11px;cursor:pointer}
 .rental-existing .re-del:hover{text-decoration:underline}
 .nav-menu-btn{background:rgba(255,255,255,.08);border:none;color:#4a0e1f;font-size:20px;line-height:1;padding:0 12px;border-radius:6px;cursor:pointer;height:32px;align-self:center;display:none}
@@ -4462,8 +4463,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-23 13:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1284;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-26 09:28';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1285;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -5505,7 +5506,7 @@ const Proj = (function(){
 
   // ===== データ読み込み（loadAll本物化：project+rentals+inventoryの3本。rentals/inventoryはviewProj/ganttで即使うため起動時取得） =====
   async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success){const arr=Norm.proj(Array.isArray(j.data)?j.data.slice().reverse():[]);projData=Pending.apply('project','',mergeWithTmp(arr,projData,r=>String(r.project||'')+'|'+String(r.estimate_no||'')));detectStatusChanges()}}catch(e){toast('企画制作データ取得エラー',true)}}
-  async function loadRentals(){try{const r=await fetch(API+'?dept=inventory&action=rentals');const j=await r.json();rentalsData=Norm.rent(j||[])}catch(e){rentalsData=[]}}
+  async function loadRentals(){try{const r=await fetch(API+'?dept=inventory&action=rentals');const j=await r.json();rentalsData=Pending.apply('inventory','rental',Norm.rent(j||[]))}catch(e){rentalsData=[]}}   // 数量の直しなど送信中の値を守る（10/26）
   async function loadInventoryItems(){try{const r=await fetch(API+'?dept=inventory&action=list');const j=await r.json();inventoryItems=j||[]}catch(e){inventoryItems=[]}}
   async function loadAll(){
     const cached=_getCache('project');
@@ -6259,7 +6260,7 @@ const Proj = (function(){
     let h='<div class="rblock" id="rblock'+pfx+'" data-pid="'+(live?esc(String(d.id)):'')+'" data-live="'+(live?1:0)+'" data-addfn="'+esc(opt.addLedger||'')+'" oninput="Proj.blockTouched(\''+pfx+'\')">';
     h+='<div class="rb-h">台帳のレンタル品</div>';
     if(live){const list=rentalsData.filter(r=>r.client_name===d.project);
-      if(list.length)list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span class="st-'+esc(r.status)+'" style="font-size:11px;padding:2px 8px;border-radius:999px">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'});
+      if(list.length)list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × <input type="number" class="re-qty" min="1" inputmode="numeric" value="'+esc(r.qty)+'" onclick="event.stopPropagation()" oninput="event.stopPropagation()" onchange="Proj.setRentalQty(\''+esc(r.id)+'\',this)">　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span class="st-'+esc(r.status)+'" style="font-size:11px;padding:2px 8px;border-radius:999px">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'});
       else h+='<div style="font-size:12px;color:var(--text-faint);margin-bottom:6px">まだ登録されていません</div>';}
     h+='<div id="rentalAddRows'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="'+esc(addFn)+'">＋ 台帳から追加</button>';
     h+='<div class="rb-h">台帳外の品（1行に1品）</div><div id="rbExtras'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="Proj.blockAddExtra(\''+pfx+'\')">＋ 台帳外の品を追加</button>';
@@ -6387,7 +6388,7 @@ const Proj = (function(){
     const list=rentalsData.filter(r=>r.client_name===projectName);
     const md=v=>{if(!v)return'';const t=new Date(v+'T00:00:00');return (t.getMonth()+1)+'/'+t.getDate()};
     let h='';
-    if(list.length){list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × '+r.qty+'　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span class="st-'+esc(r.status)+'" style="font-size:11px;padding:2px 8px;border-radius:999px">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'})}
+    if(list.length){list.forEach(r=>{h+='<div class="rental-existing"><span class="re-info">'+esc(r.category)+' '+esc(r.item_name)+' × <input type="number" class="re-qty" min="1" inputmode="numeric" value="'+esc(r.qty)+'" onclick="event.stopPropagation()" oninput="event.stopPropagation()" onchange="Proj.setRentalQty(\''+esc(r.id)+'\',this)">　'+md(r.date_start)+'〜'+md(r.date_end)+'　<span class="st-'+esc(r.status)+'" style="font-size:11px;padding:2px 8px;border-radius:999px">'+esc(r.status)+'</span></span><button type="button" class="re-del" onclick="Proj.deleteProjectRental(\''+esc(r.id)+'\',\''+pfx+'\')">削除</button></div>'})}
     else h+='<div style="font-size:12px;color:var(--text-faint);margin-bottom:6px">まだ登録されていません</div>';
     h+='<div id="rentalAddRows'+pfx+'"></div><button type="button" class="rental-add-btn" onclick="Proj.addRentalRow(\''+esc(q)+'\',\''+pfx+'\')">＋ レンタル品を追加</button>';
     h+='<div id="rentalSaveBtnWrap'+pfx+'" class="hidden"><button type="button" class="rental-save-btn" onclick="Proj.saveProjectRentals(\''+esc(q)+'\',\''+pfx+'\')">一括登録</button></div>';
@@ -6448,6 +6449,19 @@ const Proj = (function(){
     bg.querySelector('#mcNo').onclick=()=>bg.remove();
     bg.onclick=e=>{if(e.target===bg)bg.remove()};
   }
+  // 登録済みのレンタル品の数量を直す（10/26 iller「数量が後で変更になることがある」）。変えたらその場で保存
+  let _busyQty=false;
+  function setRentalQty(id,el){
+    const r=rentalsData.find(x=>String(x.id)===String(id));if(!r||_busyQty)return;
+    const q=parseInt(el.value,10);
+    if(!(q>0)){el.value=r.qty;toast('数量は 1 以上',true);return}
+    if(String(q)===String(r.qty))return;
+    _busyQty=true;setTimeout(()=>{_busyQty=false},1500);
+    r.qty=q;fireAndForget({dept:'inventory',action:'save_rental',...r});
+    _setCache('project',{proj:projData,rent:rentalsData,inv:inventoryItems});
+    toast(r.item_name+' を '+q+' に変更しました');
+    setTimeout(loadAll,8000);
+  }
   function deleteProjectRental(id,pfx){
     if(_busyRental)return;
     if(!confirm('このレンタル品を削除しますか？'))return;
@@ -6475,7 +6489,7 @@ const Proj = (function(){
     openProjMo, closeProjMo, editProj, saveProj, delProj, toggleProjType, addToCase,
     changeProjStatus, toggleProjInvoiced, sendMaint,
     archiveProj, unarchiveProj,
-    viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, addDateInput, moneySum,
+    viewProj, addRentalRow, saveProjectRentals, deleteProjectRental, setRentalQty, addDateInput, moneySum,
     ensureRentalData, hasRentalData, rentalPanelHtml, addExtraRow, composeExtras, splitExtras, fillExtras, projRentalsText, setProjRentalsText, printLedgerCandidates,
     projById, renderBlock, blockTouched, blockDirty, blockAddExtra, blockAddLedger, blockExtrasText, saveBlock, addRentalRowXfNew, pendingRentalRows, rentalRowsIncomplete,
     ganttMove, ganttToday, setGanttFilter, setGanttDays,
