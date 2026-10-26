@@ -2575,6 +2575,12 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .case-st-sel[data-st="見積中"]{background-color:#f1efe8;color:#5f5e5a}
   #view-cases .case-st-sel[data-st="受注"]{background-color:#eaf3de;color:#3b6d11}
   #view-cases .case-st-sel[data-st="完了"]{background-color:#e6f1fb;color:#185fa5}
+  #view-cases .case-st-stop{display:inline-block;border-radius:999px;padding:4px 10px;font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:#f1efe8;color:#9a9890}
+  #view-cases .case-cancel{display:inline-block;margin-left:6px;border-radius:999px;padding:2px 8px;font:600 11px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:#fcebeb;color:#a32d2d;vertical-align:middle}
+  #view-cases .ce-cancel{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-2px 0 10px}
+  #view-cases .ce-cancel .lbl{font-size:13px;font-weight:600;color:#a32d2d}
+  #view-cases .ce-cancel button{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:8px;padding:6px 12px;font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
+  #view-cases .ce-cancel button.go{border-color:#e7b3b3;color:#a32d2d}
   #view-cases .case-st-sel[data-st="見送り"]{background-color:#f1efe8;color:#9a9890;text-decoration:line-through}
   #view-cases .tbl-wrap td{color:var(--text)}
   #view-cases .ct-main{font-size:14px;color:var(--text)}
@@ -2942,6 +2948,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <div class="mo-row pair"><div class="mo-field f7"><label>得意先</label><input id="ce_client"></div><div class="mo-field f3"><label>窓口</label><input id="ce_contact"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>案件名</label><input id="ce_name"></div></div>
       <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="ce_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>状態</label><select id="ce_status"><option>見積中</option><option>受注</option><option>完了</option><option>見送り</option></select><span id="ce_qa"></span></div></div>
+      <div class="ce-cancel" id="ce_cancel"></div>
       <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="ce_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="ce_order_no"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>社内納期（目標・仮）<span class="ce-target-note">顧客の納期ではない／カレンダーに点線で表示</span></label><input type="date" id="ce_target_date"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　案件につき 1 つ</label><input type="number" id="ce_amount" min="0" step="1"></div></div>
@@ -4463,8 +4470,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-26 09:28';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1285;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-26 10:39';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1286;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4559,7 +4566,7 @@ const deliveryRaw=o=>String((o&&(o.date_delivery||o.date_rental_out))||'');
 function rowStale(d, dept){
   if(!d) return null;
   const TERM={production:'出荷済',project:'完了',sales:'納品済'}[dept];
-  const st=String(d.status||''); if(st==='見送り') return null;
+  const st=String(d.status||''); if(st==='見送り'||st==='中止') return null;
   const inv=String(d.invoiced||'').toUpperCase()==='TRUE';
   const term=st===TERM;
   const last=s=>{let m=null;if(s)String(s).split(',').forEach(x=>{const dd=parseD(x.trim());if(dd&&(!m||dd>m))m=dd});return m;};
@@ -4747,7 +4754,7 @@ function moneyFetch(){
   return fetch(API+'?dept=cases&action=read').then(r=>r.json()).catch(()=>null).then(cs=>{
     if(!cs||!Array.isArray(cs.data))return null;
     const isT=v=>v===true||v==='true'||v==='TRUE';
-    const live=cs.data.filter(c=>!isT(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
+    const live=cs.data.filter(c=>!isT(c.archived)&&c.status!=='完了'&&c.status!=='見送り'&&c.status!=='中止');
     // 合計に入れるのは受注のみ。見積中は合計外の参考として別枠で返す
     const by={};let total=0,cnt=0;const quote={sum:0,n:0};
     live.forEach(c=>{const a=Number(c.amount);if(!a||isNaN(a))return;const st=c.status||'不明';
@@ -4773,11 +4780,11 @@ function moneySummary(){
     const el=bg.querySelector('#mnyBody');if(!el)return;
     if(!cs||!Array.isArray(cs.data)){el.textContent='案件データの取得に失敗しました';return}
     const isT=v=>v===true||v==='true'||v==='TRUE';
-    const live=cs.data.filter(c=>!isT(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
+    const live=cs.data.filter(c=>!isT(c.archived)&&c.status!=='完了'&&c.status!=='見送り'&&c.status!=='中止');
     const depts={};
     [[od,'生'],[pj,'企'],[sl,'販']].forEach(([j,k])=>{const rows=(j&&j.data)||[];rows.forEach(r=>{
       const cid=String(r.case_id||'').trim();if(!cid)return;
-      if(r.status==='見送り'||isT(r.archived))return;
+      if(r.status==='見送り'||r.status==='中止'||isT(r.archived))return;
       (depts[cid]=depts[cid]||new Set()).add(k);
     })});
     const groups={'生':{label:'生産のみ',sum:0,n:0},'企':{label:'企画制作のみ',sum:0,n:0},'販':{label:'販売のみ',sum:0,n:0},'mix':{label:'部門またぎ',sum:0,n:0},'none':{label:'明細なし',sum:0,n:0}};
@@ -5061,7 +5068,7 @@ const Prod = (function(){
   }
   function closeFabMo(id){ $(id).classList.remove('show'); }
   async function fabEnsureStaff(){ if(fabStaff)return fabStaff; try{ const r=await fetch(API+'?dept=daily&action=staff_for_daily'); const j=await r.json(); fabStaff=(j.staff||[]).map(s=>s.name); }catch(e){ fabStaff=[]; } return fabStaff; }
-  async function fabEnsureCases(){ if(fabCases)return fabCases; try{ const r=await fetch(API+'?dept=cases&action=read'); const j=await r.json(); fabCases=(j.data||[]).filter(c=>!c.archived&&c.status!=='見送り').map(c=>({id:String(c.id),label:dispName(c.client,c.name)})); }catch(e){ fabCases=[]; } return fabCases; }
+  async function fabEnsureCases(){ if(fabCases)return fabCases; try{ const r=await fetch(API+'?dept=cases&action=read'); const j=await r.json(); fabCases=(j.data||[]).filter(c=>!c.archived&&c.status!=='見送り'&&c.status!=='中止').map(c=>({id:String(c.id),label:dispName(c.client,c.name)})); }catch(e){ fabCases=[]; } return fabCases; }
   // --- 入荷 ---
   function openFabIn(){ $('fi_date').value=dateStr(new Date()); $('fi_vendor').value=''; $('fi_slip').value=''; $('fiRows').innerHTML=''; addFabInRow(); addFabInRow(); addFabInRow(); $('fabInBg').classList.add('show'); setTimeout(()=>$('fi_vendor').focus(),50); }
   function addFabInRow(){ const d=document.createElement('div'); d.className='fab-in-row'; d.innerHTML=`<input list="fabItemList" placeholder="品番" class="fi-item"><input type="number" min="0" step="0.1" placeholder="メートル" class="fi-m"><input type="number" min="0" step="1" placeholder="単価（税抜）" class="fi-p"><button type="button" class="x" onclick="this.parentElement.remove()" title="行を削除">✕</button>`; $('fiRows').appendChild(d); }
@@ -5142,7 +5149,7 @@ const Prod = (function(){
   // ===== 工場ボード =====
   function renderFactory(){
     const el=$('prodFactory');
-    let items=prodData.filter(d=>!['見積中','見送り','出荷済'].includes(d.status));
+    let items=prodData.filter(d=>!['見積中','見送り','出荷済','中止'].includes(d.status));
     const statusCnt=s=>items.filter(d=>d.status===s).length;
     const secCnt=s=>items.filter(d=>d.section===s).length;
     items.forEach(d=>{const dl=parseD(d.deadline);if(!dl){d._urgN=999;return}const diff=diffDays(dl,today);d._urgN=diff<0?-1:diff<=3?0:diff<=7?1:diff<=14?2:3});
@@ -5629,7 +5636,7 @@ const Proj = (function(){
     const FIELDS=[['date_load_in','搬入'],['date_setup','設営'],['date_event','現場'],['date_teardown','撤去'],['date_rental_out','貸出'],['date_delivery','発送'],['date_rental_return','返却'],['date_make_start','作業開始'],['date_make_end','完成']];
     const day0=new Date(today.getFullYear(),today.getMonth(),today.getDate());
     const dd=dt=>Math.round((new Date(dt.getFullYear(),dt.getMonth(),dt.getDate())-day0)/86400000);
-    let items=projData.filter(d=>!['終了','完了','見送り'].includes(d.status));
+    let items=projData.filter(d=>!['終了','完了','見送り','中止'].includes(d.status));
     items.forEach(d=>{
       const evs=[];
       FIELDS.forEach(([f,l])=>{parseDates(d[f]).forEach(dt=>evs.push({dt,l}))});
@@ -5702,7 +5709,7 @@ const Proj = (function(){
   function setGanttDays(v){ganttDays=+v;render()}
   function renderGantt(){
     if(!ganttStart)initGanttStart();const el=$('projGantt');
-    let allItems=projData.filter(d=>!['終了','完了','見送り'].includes(d.status));
+    let allItems=projData.filter(d=>!['終了','完了','見送り','中止'].includes(d.status));
     if(ganttStatusFilter)allItems=allItems.filter(d=>d.status===ganttStatusFilter);
     const sortFn=(a,b)=>{const da=parseDates(a.date_load_in)[0]||parseDates(a.date_setup)[0]||parseDates(a.date_event)[0]||parseDates(a.date_rental_out)[0]||parseDates(a.date_delivery)[0]||new Date('9999-12-31');const db=parseDates(b.date_load_in)[0]||parseDates(b.date_setup)[0]||parseDates(b.date_event)[0]||parseDates(b.date_rental_out)[0]||parseDates(b.date_delivery)[0]||new Date('9999-12-31');return da-db};
     const siteItems=allItems.filter(d=>d.type!=='レンタル').sort(sortFn);
@@ -5710,7 +5717,7 @@ const Proj = (function(){
     const dates=[];for(let i=0;i<ganttDays;i++){const d=new Date(ganttStart);d.setDate(d.getDate()+i);dates.push(d)}
     let h='';
     // ステータスフィルタチップ
-    const allActive=projData.filter(d=>!['終了','完了','見送り'].includes(d.status));
+    const allActive=projData.filter(d=>!['終了','完了','見送り','中止'].includes(d.status));
     const cnt={};ACTIVE_PROJ_ST.forEach(s=>cnt[s]=0);
     allActive.forEach(d=>{if(cnt[d.status]!==undefined)cnt[d.status]++});
     h+='<div class="gantt-top"><div class="fv-sum">';
@@ -7654,7 +7661,7 @@ const Sales = (function(){
   const SLOG_LIST_KEY='sales_status_log';
   const SLOG_UNREAD_KEY='sales_status_unread';
   const ACTIVE_ST=['見積中','受注','発注済','入荷済'];
-  const ARCHIVE_ST=['納品済','見送り'];
+  const ARCHIVE_ST=['納品済','見送り','中止'];
   const ALL_ST=[...ACTIVE_ST,...ARCHIVE_ST];
   const SEL_ST=['受注','発注済','入荷済','納品済'];   // 自分で選べる状態（2026-09-18 iller。見積中・見送りは案件の言葉）
 
@@ -8126,7 +8133,7 @@ const Labor = (function(){
   let slog=[];
   let detailId=null;
   let _arcBusy=false;
-  const stOrderActive={'完成':1,'製作中':2,'受注':3,'見積中':4,'見送り':5};
+  const stOrderActive={'完成':1,'製作中':2,'受注':3,'見積中':4,'見送り':5,'中止':5};
   const stOrderArchive={'出荷済':1};
   const SLOG_LIST_KEY='prod_status_log';
   const SLOG_UNREAD_KEY='prod_status_unread';
@@ -9416,7 +9423,7 @@ const Cases = (function(){
   const C_RANK={production:{'見積中':0,'受注':1,'製作中':2,'完成':3,'出荷済':4},project:{'見積中':0,'受注':1,'進行中':3,'準備中':2,'現場中':3,'レンタル中':3,'メンテ中':3,'終了':4},sales:{'見積中':0,'受注':1,'発注済':2,'入荷済':3,'納品済':4}};
   function cRank(k){ return (C_RANK[k.dept]&&C_RANK[k.dept][k.status])!=null?C_RANK[k.dept][k.status]:0; }
   // 案件の進捗＝見送り以外の子のうち一番遅れてる子のランク（全子終端なら4、見積中の子が居れば0）。子なしは-1で末尾へ。
-  function caseProgress(id){ const ks=(_children[String(id)]||[]).filter(k=>k.status!=='見送り'); if(!ks.length)return -1; return Math.min.apply(null, ks.map(cRank)); }
+  function caseProgress(id){ const ks=(_children[String(id)]||[]).filter(k=>k.status!=='見送り'&&k.status!=='中止'); if(!ks.length)return -1; return Math.min.apply(null, ks.map(cRank)); }
   function caseDepts(id){ const s={}; (_children[String(id)]||[]).forEach(k=>s[k.dept]=1); return s; }
   // 案件の部門バッジ（生/企/販）。日程未定リストとカレンダー行ラベルで共用。
   function deptBadges(id){ const dps=caseDepts(id); return DEPTS.filter(d=>dps[d.k]).map(d=>`<span class="cal-dept" style="background:${d.c}">${d.s}</span>`).join(''); }
@@ -9431,12 +9438,12 @@ const Cases = (function(){
   function caseFlags(c){
     if(!c||_arch(c.archived)) return [];
     const kids=_children[String(c.id)]||[]; const t=_today0();
-    const st=c.status, inv=_inv(c.invoiced), terminal=(st==='完了'||st==='見送り');
+    const st=c.status, inv=_inv(c.invoiced), terminal=(st==='完了'||st==='見送り'||st==='中止');
     const out=[];
     if(st==='完了' && inv) out.push({lv:'ok',t:'締め待ち',d:'完了・伝票済。アーカイブで片付けられる'});
     if(inv && !terminal) out.push({lv:'hi',t:'伝票済・未完了',d:'伝票は出てるのに案件が未完了のまま'});
     let doneOverdue=false, notStarted=false;
-    kids.forEach(k=>{ if(k.status==='見送り')return; const term=cRank(k)===4;
+    kids.forEach(k=>{ if(k.status==='見送り'||k.status==='中止')return; const term=cRank(k)===4;
       const dd=_childDoneDate(k); if(!term && dd && dd<t) doneOverdue=true;
       const sd=_childStartDate(k); if((k.status==='見積中'||k.status==='受注') && sd && sd<t) notStarted=true; });
     if(doneOverdue && !terminal) out.push({lv:'hi',t:'予定日経過・未完了',d:'本番/納期を過ぎてるのに完了になってない'});
@@ -9453,7 +9460,7 @@ const Cases = (function(){
       const id=esc(c.id), flags=caseFlags(c);
       const fb=flags.map(f=>`<span class="todo-flag tf-${f.lv}" title="${esc(f.d)}">${esc(f.t)}</span>`).join('');
       const kids=(_children[String(c.id)]||[]).slice().sort((a,b)=>dord(a.dept)-dord(b.dept));
-      const chips=kids.map(k=>{const cl=k.status==='見送り'?'is-kill':(DONE_ST[k.status]?'is-done':'is-active');return `<span class="cchip cchip-${k.dept} ${cl}"><span class="cl">${DEPT[k.dept]?DEPT[k.dept].s:'?'}</span>${esc(k.status||'—')}</span>`;}).join('');
+      const chips=kids.map(k=>{const cl=(k.status==='見送り'||k.status==='中止')?'is-kill':(DONE_ST[k.status]?'is-done':'is-active');return `<span class="cchip cchip-${k.dept} ${cl}"><span class="cl">${DEPT[k.dept]?DEPT[k.dept].s:'?'}</span>${esc(k.status||'—')}</span>`;}).join('');
       // 事務は状態を変えない（現場に直させる）。締め待ち＝現場が完了済→アーカイブ整理だけ事務の仕事。
       const chase = c.our_person
         ? `<span class="todo-chase">督促先 <b>${esc(c.our_person)}</b></span>`
@@ -9485,7 +9492,7 @@ const Cases = (function(){
     {dept:'sales',f:'deadline',t:'納品',c:DEPT.sales.c}
   ];
   function caseEvents(id,c0){ const ks=_children[String(id)]||[]; const evs=[];
-    ks.forEach(k=>{ if(k.status==='見送り')return; CAL_EV.forEach(et=>{ if(k.dept!==et.dept)return;
+    ks.forEach(k=>{ if(k.status==='見送り'||k.status==='中止')return; CAL_EV.forEach(et=>{ if(k.dept!==et.dept)return;
       String(k[et.f]||'').split(',').forEach(s=>{ const d=parseD(s.trim()); if(d) evs.push({date:d,t:et.t,c:et.c}); }); });
       // 企画制作：納品＝date_delivery（旧date_rental_outにフォールバック）→「納品」、レンタル/現場＝date_rental_out→「貸出」、返却→「返却」
       if(k.dept==='project'){
@@ -9497,7 +9504,7 @@ const Cases = (function(){
   function calInit(){ const d=new Date(today); const off=(d.getDay()+6)%7; d.setDate(d.getDate()-off); _calStart=d; }
   // 日程未定：日付がどこにも入ってないアクティブ案件（仮日付を入れさせず忘れ防止）
   function undatedHtml(){
-    let und=_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り'&&!caseEvents(c.id,c).length);
+    let und=_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り'&&c.status!=='中止'&&!caseEvents(c.id,c).length);
     if(_deptf) und=und.filter(c=>caseDepts(c.id)[_deptf]);
     und.sort((a,b)=>(CASE_ST.indexOf(b.status)-CASE_ST.indexOf(a.status))||String(b.created_at||'').localeCompare(String(a.created_at||'')));
     if(!und.length) return '';
@@ -9517,7 +9524,7 @@ const Cases = (function(){
     const dates=[]; for(let i=0;i<_calDays;i++){ const d=new Date(_calStart); d.setDate(d.getDate()+i); dates.push(d); }
     const lo=dateStr(dates[0]), hi=dateStr(dates[dates.length-1]);
     const inWin=d=>{ const s=dateStr(d); return s>=lo&&s<=hi; };
-    let rows=_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り')
+    let rows=_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り'&&c.status!=='中止')
       .map(c=>({c,evs:caseEvents(c.id,c).filter(e=>inWin(e.date))})).filter(r=>r.evs.length);
     if(_deptf) rows=rows.filter(r=>caseDepts(r.c.id)[_deptf]);
     rows.sort((a,b)=>Math.min.apply(null,a.evs.map(e=>+e.date))-Math.min.apply(null,b.evs.map(e=>+e.date)));
@@ -9569,7 +9576,7 @@ const Cases = (function(){
   function profitCells(c){ const p=profitOf(c); return `<td class="ct-cost">${p?yen(p.cost):''}</td><td class="ct-gp${p&&p.gp!=null&&p.gp<0?' neg':''}">${p&&p.gp!=null?yen(p.gp):''}</td><td class="ct-gpr${p&&p.gp!=null&&p.gp<0?' neg':''}">${p&&p.rate!=null?p.rate+'%':''}</td>`; }
   async function loadProfit(){ try{ const r=await fetch(API+'?dept=cases&action=profit'); const j=await r.json(); if(j&&j.success&&j.data){ _profit=j.data; fillProfit(); } }catch(e){} }
   // ===== 採算タブ（2026-10-19 iller）：期間（進行中／月）と部門で絞り、合計 4 つと案件ごとの粗利率（低い順）。30% 未満 赤・35% 未満 黄（損益ゼロ 29%・目標 35%、勘定科目残高 4〜7 月から）
-  function caseDoneDate(c){ const ks=(_children[String(c.id)]||[]).filter(k=>k.status!=='見送り'); let m=null; ks.forEach(k=>{ const d=_childDoneDate(k); if(d&&(!m||d>m)) m=d; }); return m||parseD(String(c.created_at||'').slice(0,10)); }
+  function caseDoneDate(c){ const ks=(_children[String(c.id)]||[]).filter(k=>k.status!=='見送り'&&k.status!=='中止'); let m=null; ks.forEach(k=>{ const d=_childDoneDate(k); if(d&&(!m||d>m)) m=d; }); return m||parseD(String(c.created_at||'').slice(0,10)); }
   const ymOf=d=>d?d.getFullYear()+'/'+(d.getMonth()+1):'';
   async function ensureProfit(){ if(Object.keys(_profit).length && Date.now()-_profitAt<5*60*1000) return false; await loadProfit(); _profitAt=Date.now(); return true; }
   function rateCls(r){ return r==null?'':r<30?' bad':r<35?' warn':' ok'; }
@@ -9580,7 +9587,7 @@ const Cases = (function(){
     const months=[]; for(let i=0;i<6;i++){ months.push(ymOf(new Date(now.getFullYear(),now.getMonth()-i,1))); }
     const live=c=>!_arch(c.archived)&&c.status!=='完了';
     const yen=v=>'¥'+Math.round(v).toLocaleString('ja-JP'), ym=v=>(v<0?'−¥':'¥')+Math.abs(Math.round(v)).toLocaleString('ja-JP');
-    const base=_cases.filter(c=>c.status!=='見送り');
+    const base=_cases.filter(c=>c.status!=='見送り'&&c.status!=='中止');
     let rows=base.filter(c=> _szPeriod==='__live' ? live(c) : ymOf(caseDoneDate(c))===_szPeriod);
     if(_szDept) rows=rows.filter(c=>caseDepts(c.id)[_szDept]);
     const items=rows.map(c=>{ const p=_profit[String(c.id)]||{}; const mat=Number(p.cost)||0, labor=Number(p.labor)||0, cost=mat+labor, sales=Number(c.amount)||0;
@@ -9605,7 +9612,7 @@ const Cases = (function(){
       +'</div>';
     const who=c=>{ const d=DEPTS.filter(x=>caseDepts(c.id)[x.k]).map(x=>x.n).join('・'); return esc([d,c.our_person].filter(Boolean).join('　')); };
     const row=(x,extra)=>`<tr data-cid="${esc(x.c.id)}" onclick="Cases.openEdit('${esc(x.c.id)}')"${extra?' class="dim"':''}>`
-      +`<td><div class="ct-main">${esc(dispName(x.c.client,x.c.name))}</div><div class="ct-sub">${who(x.c)}</div></td>`
+      +`<td><div class="ct-main">${esc(dispName(x.c.client,x.c.name))}${x.c.cancel==='あり'?'<span class="case-cancel">キャンセル料</span>':''}</div><div class="ct-sub">${who(x.c)}</div></td>`
       +`<td class="num">${x.sales?yen(x.sales):'<span class="faint">金額なし</span>'}</td>`
       +`<td class="num cost"><span class="sz-fin${x.isFinal?' on':''}">${x.isFinal?'確定':'仮'}</span>${x.cost?yen(x.cost):'<span class="faint">原価なし</span>'}${x.after>0?`<div class="sz-after">確定後に追加 ${yen(x.after)}</div>`:''}${x.redo.total>0?`<div class="sz-redo">やり直し ${yen(x.redo.total)}${x.redo.minutes?'・'+(Math.round(x.redo.minutes/6)/10)+'h':''}</div>`:''}<div class="sz-parts"><span><em>労務費</em>${Math.round(x.labor).toLocaleString('ja-JP')}<small>${Math.round((Number(x.p.minutes)||0)/6)/10}h</small></span>${COST_KINDS.map(k=>{ const v=Math.round(Number((x.p.k||{})[k])||0); const cls=v>0?'':(costNoneSet(x.c).has(k)?' zero-ok':' zero-miss'); return `<span class="${cls.trim()}"><em>${COST_LABEL[k]}</em>${v.toLocaleString('ja-JP')}</span>`; }).join('')}${(()=>{ const v=Math.round(Number((x.p.k||{})['やり直し'])||0); return `<span class="${v>0?'redo':''}"><em>やり直し</em>${v.toLocaleString('ja-JP')}</span>`; })()}</div></td>`
       +`<td class="num${x.gp!=null&&x.gp<0?' bad':''}">${x.gp!=null?ym(x.gp):'—'}</td>`
@@ -9624,7 +9631,7 @@ const Cases = (function(){
   // ===== 案件タブ：登録 / 一覧 / 完了 / アーカイブ / 管理 =====
   function render(){
     const _tc=todoCount();
-    const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['cal','カレンダー'],['saisan','採算'],['done','完了'],['kill','見送り'],['arch','アーカイブ'],['manage','管理']];
+    const tabs=[['list','一覧'],['todo','要対応'+(_tc?' '+_tc:'')],['cal','カレンダー'],['saisan','採算'],['done','完了'],['kill','見送り'],['stop','中止'],['arch','アーカイブ'],['manage','管理']];
     // 大見出し：名前・検索（名前はポータルと同じ。日付は出さない＝10/16 揃え）
     const head=`<div class="scr-head"><h1>案件管理</h1>`
       +`<input class="scr-search" id="casesSearch" placeholder="案件名・得意先・担当で検索" value="${esc(_q)}" oninput="Cases.search(this.value)">`
@@ -9658,9 +9665,10 @@ const Cases = (function(){
       pane.innerHTML=`<div class="fv-sum">${deptChips(base)}</div>`+bar+(rows.length?caseTodoList(rows):'<div class="cases-empty">対応待ちの案件はありません</div>');
       return;
     }
-    if(t==='list') rows=rows.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
+    if(t==='list') rows=rows.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り'&&c.status!=='中止');
     else if(t==='done') rows=rows.filter(c=>!_arch(c.archived)&&c.status==='完了');
     else if(t==='kill') rows=rows.filter(c=>!_arch(c.archived)&&c.status==='見送り');
+    else if(t==='stop') rows=rows.filter(c=>!_arch(c.archived)&&!!c.cancel);   // 中止（キャンセル料あり／なし）。事務所が「中止にする」で付けた物（10/26）
     else if(t==='arch') rows=rows.filter(c=>_arch(c.archived));
     if(t==='manage'){
       if(_stf==='__arch') rows=rows.filter(c=>_arch(c.archived));
@@ -9672,7 +9680,7 @@ const Cases = (function(){
     if(_qexp && (t==='list'||t==='manage')) rows=rows.filter(c=>QuoteAge.tier(QuoteAge.days(c.created_at))==='exp' && c.status==='見積中');
     if(_childf) rows=rows.filter(c=>{ const ks=_children[String(c.id)]||[];
       if(_childf==='__term') return ks.some(k=>cRank(k)===4);
-      if(_childf==='__active') return ks.some(k=>k.status!=='見送り'&&cRank(k)>=1&&cRank(k)<4);
+      if(_childf==='__active') return ks.some(k=>k.status!=='見送り'&&k.status!=='中止'&&cRank(k)>=1&&cRank(k)<4);
       const p=_childf.split(':'); return ks.some(k=>k.dept===p[0]&&k.status===p[1]); });
     const q=_q.trim().toLowerCase();
     if(q) rows=rows.filter(c=>['name','client','contact','our_person','order_no','estimate_no'].some(k=>String(c[k]||'').toLowerCase().includes(q)));
@@ -9727,7 +9735,7 @@ const Cases = (function(){
       const stop=' onclick="event.stopPropagation()"';
       const kids=(_children[String(c.id)]||[]).slice().sort((a,b)=>dord(a.dept)-dord(b.dept));
       const badges=kids.length
-        ? kids.map(k=>{const st=k.status||'';const cl=st==='見送り'?'is-kill':(st==='見積中'||st==='受注')?'is-wait':(st==='完成'||DONE_ST[st])?'is-done':'is-active';return `<span class="cchip-pair"><span class="cchip-dept">${DEPT[k.dept]?DEPT[k.dept].n:k.dept}</span><span class="cchip cchip-${k.dept} ${cl}">${esc(st||'—')}</span></span>`;}).join('')   // 部門と状態は別の札（10/15 iller「部門と状態を分ける」）   // 色は工数と同じ：灰＝見積中・受注、緑＝進行中・製作中など、青＝完成・出荷済・終了・納品済
+        ? kids.map(k=>{const st=k.status||'';const cl=(st==='見送り'||st==='中止')?'is-kill':(st==='見積中'||st==='受注')?'is-wait':(st==='完成'||DONE_ST[st])?'is-done':'is-active';return `<span class="cchip-pair"><span class="cchip-dept">${DEPT[k.dept]?DEPT[k.dept].n:k.dept}</span><span class="cchip cchip-${k.dept} ${cl}">${esc(st||'—')}</span></span>`;}).join('')   // 部門と状態は別の札（10/15 iller「部門と状態を分ける」）   // 色は工数と同じ：灰＝見積中・受注、緑＝進行中・製作中など、青＝完成・出荷済・終了・納品済
         : '<span class="cdept-none">—</span>';
       h+=`<tr${archd?' class="arch"':''} data-cid="${id}" onclick="Cases.openEdit('${id}')" style="cursor:pointer">`
         +`<td><div class="ct-main">${esc(dispName(c.client,c.name))}${QuoteAge.forCase(c)}</div><div class="ct-sub">${fmtD(c.created_at)}</div></td>`
@@ -9735,7 +9743,7 @@ const Cases = (function(){
         +`<td><div class="ct-main">${esc(c.client||'')}</div>${c.our_person?`<div class="ct-sub">${esc(c.our_person)}</div>`:''}</td>`
         +`<td class="ct-no"><div class="ct-main">${esc(c.order_no||'')}</div><div class="ct-sub">${esc(c.estimate_no||'')}</div></td>`
         +`<td style="text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap">${(c.amount&&Number(c.amount)>0)?'¥'+Number(c.amount).toLocaleString():''}</td>`
-        +`<td class="ct-st"${stop}><select class="case-st-sel" data-st="${esc(c.status||'')}" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select><label class="ct-inv" title="伝票"><input type="checkbox" class="sw" ${_inv(c.invoiced)?'checked':''} onchange="Cases.toggleInv('${id}')"><span>伝票</span></label></td>`
+        +`<td class="ct-st"${stop}>${c.status==='中止'?'<span class="case-st-stop">中止</span>':`<select class="case-st-sel" data-st="${esc(c.status||'')}" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select>`}${c.cancel==='あり'?'<span class="case-cancel">キャンセル料</span>':''}<label class="ct-inv" title="伝票"><input type="checkbox" class="sw" ${_inv(c.invoiced)?'checked':''} onchange="Cases.toggleInv('${id}')"><span>伝票</span></label></td>`
         +`<td class="ct-ops" style="white-space:nowrap"${stop}>${archd?`<button class="act-btn" onclick="Cases.unarchive('${id}')">戻す</button>`:`<button class="act-btn ct-more" title="アーカイブへ" onclick="Cases.archive('${id}')">⋯</button>`}${manage?` <button class="act-btn del" onclick="Cases.del('${id}')">削除</button>`:''}</td>`
         +`</tr>`;
     });
@@ -9834,10 +9842,27 @@ const Cases = (function(){
     _costs=_costs.filter(r=>String(r.id)!==String(id)); renderCosts();
     if(!String(id).startsWith('tmp_')) fireAndForget({dept:'cases',action:'delete_cost',id});
   }
-  function openEdit(id){ const c=_find(id); if(!c)return; _editId=id;
+  // 中止（10/26 iller「事務所の処理で」）：編集画面の「中止にする」→ キャンセル料なし／あり。子は全部「中止」、予約のレンタル品は外れる（GAS v141）
+  let _cancelAsk=false, _cancelBusy=false;
+  function renderCancel(c){ const el=$('ce_cancel'); if(!el||!c)return;
+    if(c.cancel){ el.innerHTML='<span class="lbl">中止（キャンセル料'+esc(c.cancel)+'）</span><button type="button" onclick="Cases.uncancel()">中止を取り消す</button>'; return; }
+    el.innerHTML=_cancelAsk
+      ? '<button type="button" class="go" onclick="Cases.cancel(\'なし\')">キャンセル料なし</button><button type="button" class="go" onclick="Cases.cancel(\'あり\')">キャンセル料あり</button><button type="button" onclick="Cases.cancelAsk(false)">やめる</button>'
+      : '<button type="button" class="go" onclick="Cases.cancelAsk(true)">中止にする</button>'; }
+  function cancelAsk(on){ _cancelAsk=!!on; renderCancel(_find(_editId)); }
+  function applyCancel(kind){ const c=_find(_editId); if(!c||_cancelBusy)return null;
+    _cancelBusy=true; setTimeout(()=>{_cancelBusy=false},1500); _cancelAsk=false;
+    const kids=_children[String(c.id)]||[];
+    if(kind){ kids.forEach(k=>{ if(k.status!=='見送り') k.status='中止'; }); logStatus(c,c.status,kind==='なし'?'中止':c.status); if(kind==='なし') c.status='中止'; else if(c.status!=='完了') c.status='受注'; }
+    else { kids.forEach(k=>{ if(k.status==='中止') k.status='受注'; }); if(c.status==='中止') c.status='受注'; }
+    c.cancel=kind; fireAndForget({dept:'cases',action:'cancel',id:c.id,cancel:kind}); _invalidateDepts();
+    Norm.setSel($('ce_status'),c.status); renderCancel(c); render(); setTimeout(moneyFetch,8000); return c; }
+  function cancel(kind){ if(!applyCancel(kind))return; toast(kind==='あり'?'中止にしました（キャンセル料あり）':'中止にしました'); }
+  function uncancel(){ if(!confirm('中止を取り消して、明細を「受注」に戻しますか？\n外したレンタル品は戻りません。'))return; if(!applyCancel(''))return; toast('中止を取り消しました'); }
+  function openEdit(id){ const c=_find(id); if(!c)return; _editId=id; _cancelAsk=false;
     _costs=[]; _hours=null; renderCosts(); loadCosts(id);
     $('ce_name').value=c.name||''; $('ce_client').value=c.client||''; $('ce_contact').value=c.contact||''; $('ce_our_person').value=c.our_person||'';
-    $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; $('ce_status').value=CASE_ST.indexOf(c.status)>=0?c.status:'受注'; $('ce_qa').innerHTML=QuoteAge.forCase(c); $('ce_note').value=c.note||''; $('ce_target_date').value=String(c.target_date||'').slice(0,10); $('ce_amount').value=(c.amount===''||c.amount==null)?'':c.amount;
+    $('ce_estimate_no').value=c.estimate_no||''; $('ce_order_no').value=c.order_no||''; Norm.setSel($('ce_status'),c.status||'受注'); renderCancel(c); $('ce_qa').innerHTML=QuoteAge.forCase(c); $('ce_note').value=c.note||''; $('ce_target_date').value=String(c.target_date||'').slice(0,10); $('ce_amount').value=(c.amount===''||c.amount==null)?'':c.amount;
     const kids=_children[String(id)]||[];
     $('ce_children').innerHTML = kids.length
       ? kids.map(k=>`<button type="button" class="ce-child" onclick="Cases.jumpChild('${k.dept}','${esc(String(k.id))}')"><span class="ce-cdept ce-${k.dept}">${DEPT[k.dept]?DEPT[k.dept].n:k.dept}</span><span class="ce-cname">${esc(k.project||'(無題)')}</span><span class="ce-cst">${esc(k.status||'')}</span><span class="ce-cgo">開く →</span></button>`).join('')
@@ -10104,7 +10129,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, cancel, uncancel, cancelAsk, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal };
 })();
 
 // ===== 発注（2026-10-19）：発注書を書く（記入者・宛先・明細・納期・納品先・備考）→ シート purchase_orders に未発注。2026-10-21 v134：発注書は注文するだけ、原価明細には流さない（案件は注文番号＝受注番号のため） → ① 案件と区分 → ② 発注書を開いて発注る → ③ 発注済（案件を付けていれば原価明細へ）
@@ -10134,7 +10159,7 @@ const Po = (function(){
     const typing=document.activeElement&&/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)&&document.activeElement.closest('#view-po');
     if(!typing) render();
   }
-  const liveCases=()=>_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り');
+  const liveCases=()=>_cases.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り'&&c.status!=='中止');
   const caseLabel=c=>(c.order_no?'#'+c.order_no+' ':'')+dispName(c.client,c.name);
   const SENDERS=['遠藤未来','河村有貴','岸田沙織','岸田平','三好智依'];   // 発注者（発注書を出す人）の候補。iller 10/23「遠藤 河村 沙織 平 三好」
   const poNo=p=>p.order_no||(p.po_no?'KT-'+String(p.po_no).padStart(4,'0'):String(p.id||''));   // 注文番号：案件があれば受注番号、無ければ通し番号 KT-0001（2026-10-22 iller「KT-◯◯みたいな」。v138 より前は P… の id）
