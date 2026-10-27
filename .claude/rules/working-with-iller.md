@@ -20,3 +20,4 @@ description: iller との仕事の進め方（口調・判断・デプロイ作�
 ## 検証・見せ方
 - 変更後は preview（`python3 -m http.server`、`.claude/launch.json` の "spa" 設定）で検証 → コンソールエラー無しを確認 → push。
 - **iller に視覚物を見せる時は `show_widget`**（チャットに表示される）。`preview_screenshot` は自分の検証専用で **iller には見えない** — 「スクショ出した」は通じない。
+- **iller が見ている画面を iller の指示で直した物（並び・名前・寄せ・隠す程度）は commit したらそのまま push**（10/27「そのくらい push しとくって決めなかったか？」）。「push」を待つのは、作りを変える物・データの扱いが変わる物・iller がまだ見ていない新しい機能だけ。
