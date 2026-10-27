@@ -1832,8 +1832,8 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 @media(min-width:1200px) and (pointer:fine),(min-width:1200px) and (orientation:landscape){
   .hdr-inner{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;overflow:visible;padding-left:36px;padding-right:36px}   /* 端に寄せない（10/27 iller「画面の一番端って好きじゃない」） */
   .nav-zone{display:flex;align-items:center;gap:2px;min-width:0}
-  .nav-left{justify-content:flex-start}
-  .nav-right{justify-content:flex-end}
+  .nav-left{justify-content:flex-end;padding-right:28px}   /* 端に広げず HOME の両側に寄せる（10/27 iller「センターに寄せた方がいい」） */
+  .nav-right{justify-content:flex-start;padding-left:28px}
   .nav-right #refreshBtn{margin-left:10px}
 }
 /* 細い PC の窓（10/15 iller「Mac の画面を占領したくない」）：ナビは詰めて横に流す。右で切れないように（10/27 ナビが「アルコールチェック」で長くなったので 1,400→1,560） */
@@ -4436,8 +4436,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-27 17:36';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1298;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-27 17:41';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1299;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
