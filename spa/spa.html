@@ -1890,11 +1890,11 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
    .scr-head を display:contents でほどき、親を flex にして 見出し・日付・サブタブ・検索 を並べ、中身（.app／#casesPane）は次の行に */
 @media(min-width:481px) and (pointer:fine),(min-width:481px) and (orientation:landscape){
   /* 畳む画面の一覧（画面を足したらここに。中身の入れ物は .app か .main か #casesPane） */
-  #view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-daily,#view-wb,#view-po,#view-check,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
-  #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#view-inv>.scr-head,#view-veh>.scr-head,#view-qual>.scr-head,#view-ot>.scr-head,#view-daily>.scr-head,#view-wb>.scr-head,#view-po>.scr-head,#view-check>.scr-head,#casesBody>.scr-head{display:contents}
-  #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head h1,#view-labor>.scr-head h1,#view-inv>.scr-head h1,#view-veh>.scr-head h1,#view-qual>.scr-head h1,#view-ot>.scr-head h1,#view-daily>.scr-head h1,#view-wb>.scr-head h1,#view-po>.scr-head h1,#view-check>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
-  #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head .scr-sub,#view-labor>.scr-head .scr-sub,#view-inv>.scr-head .scr-sub,#view-veh>.scr-head .scr-sub,#view-qual>.scr-head .scr-sub,#view-ot>.scr-head .scr-sub,#view-daily>.scr-head .scr-sub,#view-wb>.scr-head .scr-sub,#view-po>.scr-head .scr-sub,#view-check>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
-  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#view-inv>.sub-tabs,#view-veh>.sub-tabs,#view-qual>.sub-tabs,#view-ot>.sub-tabs,#view-daily>.sub-tabs,#view-wb>.sub-tabs,#view-po>.sub-tabs,#view-check>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
+  #view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-daily,#view-wb,#view-po,#casesBody{display:flex;flex-wrap:wrap;align-items:center;column-gap:12px}
+  #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#view-inv>.scr-head,#view-veh>.scr-head,#view-qual>.scr-head,#view-ot>.scr-head,#view-daily>.scr-head,#view-wb>.scr-head,#view-po>.scr-head,#casesBody>.scr-head{display:contents}
+  #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head h1,#view-labor>.scr-head h1,#view-inv>.scr-head h1,#view-veh>.scr-head h1,#view-qual>.scr-head h1,#view-ot>.scr-head h1,#view-daily>.scr-head h1,#view-wb>.scr-head h1,#view-po>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
+  #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head .scr-sub,#view-labor>.scr-head .scr-sub,#view-inv>.scr-head .scr-sub,#view-veh>.scr-head .scr-sub,#view-qual>.scr-head .scr-sub,#view-ot>.scr-head .scr-sub,#view-daily>.scr-head .scr-sub,#view-wb>.scr-head .scr-sub,#view-po>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
+  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#view-inv>.sub-tabs,#view-veh>.sub-tabs,#view-qual>.sub-tabs,#view-ot>.sub-tabs,#view-daily>.sub-tabs,#view-wb>.sub-tabs,#view-po>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
   #view-prod>.scr-head .scr-search,#view-proj>.scr-head .scr-search,#view-sales>.scr-head .scr-search,#view-labor>.scr-head .scr-search,#view-inv>.scr-head .scr-search,#view-veh>.scr-head .scr-search,#view-qual>.scr-head .scr-search,#view-ot>.scr-head .scr-search,#view-daily>.scr-head .scr-search,#view-wb>.scr-head .scr-search,#view-po>.scr-head .scr-search,#casesBody>.scr-head .scr-search{order:3;margin:12px 16px 0 0;width:200px}
   #view-prod>.app,#view-proj>.app,#view-sales>.app,#view-labor>.app,#view-inv>.main,#view-veh>.app,#view-qual>#qualBody,#view-ot>.app,#view-daily>.app,#view-wb>#wbBody,#view-po>.app,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
   #view-qual>.scr-head .scr-search{margin-left:auto}   /* 資格にはサブタブが無いので検索を右端へ */
@@ -2229,10 +2229,6 @@ tr:hover td{background:rgba(10,132,255,.04)}
 .pm-btn.on{background:var(--text);color:#fff}
 .portal-footer{color:var(--text-faint)}
 /* 日報「自分で書く」：白いかたまいを 3 つ（日付と名前／今日の記録／追加する）。行は 1 行 1 項目、札は左・値は右 */
-/* 点検（10/27）：点呼・リフト点検・カードを 1 画面のタブに。中の 3 画面は作りそのまま、見出しだけ親の「点検」に */
-#view-check>section{order:4;flex:1 1 100%;min-width:0;min-height:0;width:100%}   /* 畳んだ時は見出し・タブの次の行に（他の画面の .app と同じ order） */
-#view-check>section>.scr-head{display:none}
-#view-check>.sub-tabs{padding-top:0}
 #view-daily .app{padding:10px 16px 60px}
 #view-daily #writeView,#view-daily #viewView{max-width:760px;margin:0 auto}   /* 自分の記録の画面（日報・時間外・今日）は 760px 中央（10/15 揃え） */
 #view-daily .card{background:transparent;border:none;border-radius:0;padding:0;box-shadow:none;margin:0}
@@ -2452,7 +2448,10 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <button class="nav-link" id="navOt" onclick="App.nav('ot')">時間外</button>
     <button class="nav-link" id="navCal" onclick="App.nav('cal')">予定</button>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navCheck" onclick="App.nav('check')">点検</button>
+    <button class="nav-link" id="navAlcohol" onclick="App.nav('alcohol')">点呼</button>
+    <button class="nav-link" id="navForklift" onclick="App.nav('forklift')">リフト点検</button>
+    <span class="nav-div"></span>
+    <button class="nav-link" id="navCard" onclick="App.nav('card')">カード</button>
     <div class="nav-spacer"></div>
     <span class="nav-div"></span>
     <button class="nav-link" id="navCases" onclick="App.nav('cases')">案件</button>
@@ -3740,7 +3739,9 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
         <a class="portal-card" data-app="daily" onclick="App.nav('daily')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">日報</div></div></a>
         <a class="portal-card" data-app="ot" onclick="App.nav('ot')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="portal-card-body"><div class="portal-card-title">時間外ボード</div></div></a>
         <a class="portal-card" data-app="cal" onclick="App.nav('cal')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h3M13 14h3M8 17.5h3"/></svg></div><div class="portal-card-body"><div class="portal-card-title">スケジュール</div></div></a>
-        <a class="portal-card" data-app="check" onclick="App.nav('check')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5 11-12"/></svg></div><div class="portal-card-body"><div class="portal-card-title">点検</div></div></a>
+        <a class="portal-card" data-app="alcohol" onclick="App.nav('alcohol')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5 11-12"/></svg></div><div class="portal-card-body"><div class="portal-card-title">アルコールチェック</div></div></a>
+        <a class="portal-card" data-app="forklift" onclick="App.nav('forklift')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V9h6l2 3h2"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="13" cy="18.5" r="1.6"/><path d="M17 17V5"/><path d="M17 17h5M17 12h4"/></svg></div><div class="portal-card-body"><div class="portal-card-title">フォークリフト点検</div></div></a>
+        <a class="portal-card" data-app="card" onclick="App.nav('card')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10.5h18"/></svg></div><div class="portal-card-body"><div class="portal-card-title">カード</div></div></a>
       </div></div>
       <div class="portal-grp"><div class="portal-cap">仕事</div><div class="portal-rows">
         <a class="portal-card" data-app="cases" onclick="App.nav('cases')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L13 14l-4 1 1-4z"/></svg></div><div class="portal-card-body"><div class="portal-card-title">案件管理</div></div></a>
@@ -3766,6 +3767,12 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 <section id="view-cal" class="hidden">
   <div class="scr-head"><h1>スケジュール</h1></div>
   <div class="cal-wrap" id="calBody"></div>
+</section>
+
+<section id="view-card" class="hidden">
+  <div class="scr-head"><h1>カード</h1></div>
+  <div class="card-wrap"><div id="cardBody"></div></div>
+  <div id="cardToast" class="card-toast"></div>
 </section>
 
 <!-- ===== 発注 section（2026-10-19）：発注書を書く（誰でも）＋未発注の処理（事務所） ===== -->
@@ -3942,14 +3949,6 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 </section>
 
 
-<!-- ===== 点検（2026-10-27）：アルコールチェック・フォークリフト点検・カードを 1 画面のタブに。中の 3 画面は作りそのまま（CSS も JS も #view-alcohol などのまま）、見出しだけ親に ===== -->
-<section id="view-check" class="hidden">
-  <div class="scr-head"><h1>点検</h1></div>
-  <div class="sub-tabs" id="checkTabs">
-    <button class="sub-tab on" data-t="alcohol" onclick="Check.go('alcohol')">アルコールチェック</button>
-    <button class="sub-tab" data-t="forklift" onclick="Check.go('forklift')">フォークリフト点検</button>
-    <button class="sub-tab" data-t="card" onclick="Check.go('card')">カード</button>
-  </div>
 <section id="view-alcohol" class="hidden">
 <style>
 #view-alcohol *{margin:0;padding:0;box-sizing:border-box}
@@ -4420,12 +4419,6 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <div class="toast" id="fk_toast"></div>
 </section>
-<section id="view-card" class="hidden">
-  <div class="scr-head"><h1>カード</h1></div>
-  <div class="card-wrap"><div id="cardBody"></div></div>
-  <div id="cardToast" class="card-toast"></div>
-</section>
-</section>
 
 <div class="loading-overlay hidden" id="loader"><div class="spin"></div><br>読み込み中...</div>
 <div class="toast" id="toast"></div>
@@ -4477,8 +4470,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-27 15:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1287;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-27 16:41';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1288;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -11112,23 +11105,6 @@ const Qual = (function(){
   return{loadAll:loadAll,render:render,init:init,openMo:openMo,closeMo:closeMo,saveMo:saveMo,moPick:moPick,moRemove:moRemove};
 })();
 
-// ===== 点検（2026-10-27）：アルコールチェック・フォークリフト点検・カードの親。タブを切り替えるだけで、データの読み込みは App._load がタブごとに持つ =====
-const Check=(function(){
-  const TABS=['alcohol','forklift','card'];
-  let tab='alcohol';
-  function show(t){
-    if(TABS.indexOf(t)<0) t='alcohol';
-    tab=t;
-    TABS.forEach(k=>{ const r=App.reg(k); const s=document.getElementById(r.section); if(s) s.classList.toggle('hidden',k!==t); });
-    document.querySelectorAll('#checkTabs .sub-tab').forEach(b=>b.classList.toggle('on',b.getAttribute('data-t')===t));
-    App._load(t);
-  }
-  function go(t){ show(t); }
-  async function loadAll(){ await App.reg(tab).ns().loadAll(); }   // softRefresh・更新ボタン＝見えているタブだけ
-  function init(){}
-  return { loadAll, init, show, go, get tab(){ return tab; } };
-})();
-
 const App = {
   current:null,
   // アプリ登録：ここに {key, ns(IIFE), sectionId, navId, zone, kiosk} を足すだけで全機構が回る（単一情報源）
@@ -11142,16 +11118,15 @@ const App = {
     {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv',zone:'office'},
     {key:'veh',  ns:()=>Veh,  section:'view-veh',  nav:'navVeh',zone:'office'},
     {key:'qual', ns:()=>Qual, section:'view-qual', nav:'navQual',zone:'office'},
-    {key:'card', ns:()=>Card, section:'view-card', parent:'check'},   // 点検のタブ（10/27）。parent＝親の画面を開いてタブを選ぶ。nav・zone は親が持つ
+    {key:'card', ns:()=>Card, section:'view-card', nav:'navCard',zone:'shared',dispZone:'office',kiosk:true},
     {key:'wb',   ns:()=>Wb,   section:'view-wb',   nav:'navWb',zone:'office'},
     {key:'sales',ns:()=>Sales,section:'view-sales',nav:'navSales',zone:'office'},
     {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor',zone:'office'},
     {key:'daily',ns:()=>Daily,section:'view-daily',nav:'navDaily',zone:'field',kiosk:true},
     {key:'ot',   ns:()=>Ot,   section:'view-ot',   nav:'navOt',zone:'field'},
     {key:'cal',  ns:()=>Cal,  section:'view-cal',  nav:'navCal',zone:'shared'},
-    {key:'alcohol',ns:()=>Alc,section:'view-alcohol',parent:'check'},
-    {key:'forklift',ns:()=>Fork,section:'view-forklift',parent:'check'},
-    {key:'check',ns:()=>Check,section:'view-check',nav:'navCheck',zone:'office',kiosk:true},   // 点検（10/27）：上の 3 つをタブで持つ親。?go=alcohol などは今までどおり効く
+    {key:'alcohol',ns:()=>Alc,section:'view-alcohol',nav:'navAlcohol',zone:'office',kiosk:true},
+    {key:'forklift',ns:()=>Fork,section:'view-forklift',nav:'navForklift',zone:'office',kiosk:true},
     {key:'portal',ns:()=>Portal,section:'view-portal',nav:'navHome'},
   ],
   /* REGのzone/kioskをナビとポータルカードにdata属性として注入（起動時1回）。HTML側の手書き属性を廃止し二重管理をなくす */
@@ -11171,15 +11146,11 @@ const App = {
   _loaded:{},
   _loading:{},
   reg(name){ return this.REG.find(r=>r.key===name); },
-  // タブを持つ画面（点検）は、表示中のタブの key で _loaded／_loadedAt を見る（10/27）
-  _eff(n){ const r=this.reg(n); const a=r&&r.ns(); return (a&&a.tab)?a.tab:n; },
   async nav(name){
-    let sub=null; { const r0=this.reg(name); if(r0&&r0.parent){ sub=name; name=r0.parent; } }   // alcohol/forklift/card → 親の「点検」を開いてそのタブへ（10/27）
     const _r=this.reg(name); if(_r&&!this._allowed(name)) name='portal';
-    if(this.current===name){ const a=this.reg(name).ns(); if(sub&&a.show) a.show(sub); return; }
-    // 全sectionのdisplay切替＋ナビ.on切替（登録ぶん全部回す＝0秒）。親の中のタブ画面は親（Check.show）が出し入れする
+    if(this.current===name) return;
+    // 全sectionのdisplay切替＋ナビ.on切替（登録ぶん全部回す＝0秒）
     this.REG.forEach(r=>{
-      if(r.parent)return;
       $(r.section).classList.toggle('hidden', r.key!==name);
       const nv=$(r.nav); if(nv) nv.classList.toggle('on', r.key===name);
     });
@@ -11191,11 +11162,7 @@ const App = {
     // サブタブを最初のタブにリセット（行って戻ると直前のサブタブが残る問題の対策）
     resetSubTab(name);
 
-    { const app=this.reg(name).ns(); if(app.show){ app.show(sub||app.tab); return; } }   // タブを持つ画面：読み込みはタブごと（Check.show → App._load）
-    await this._load(name);
-  },
-  // 遅延ロード：初回だけ。_loading ガードで二重発火防止（nav から切り出し、点検のタブも同じ道を通る。10/27）
-  async _load(name){
+    // 遅延ロード：初回だけ。_loading ガードで二重発火防止
     const app = this.reg(name).ns();
     if(!this._loaded[name] && !this._loading[name]){
       this._loading[name]=true;
@@ -11224,7 +11191,7 @@ const App = {
   STALE_MS:90*1000,
   _loadedAt:{},
   softRefresh(){
-    const name=this._eff(this.current); if(!name||name==='portal')return;
+    const name=this.current; if(!name||name==='portal')return;
     if(!this._loaded[name]||this._loading[name]||_bgBusy)return;
     if(document.visibilityState!=='visible')return;
     if(Date.now()-(this._loadedAt[name]||0)<this.STALE_MS)return;
@@ -11237,10 +11204,10 @@ const App = {
   },
   /* 「前回のデータを表示中」の小さな表示。控えで描いた画面が、裏の取り直しで最新になるまで出す（古い数字を最新だと思わせない） */
   _stale:{},
-  staleNote(){ const el=document.getElementById('dataStale'); if(el) el.classList.toggle('hidden', !this._stale[this._eff(this.current)]); },
+  staleNote(){ const el=document.getElementById('dataStale'); if(el) el.classList.toggle('hidden', !this._stale[this.current]); },
   // 更新：今表示中のアプリだけ再取得（裏アプリのGASは叩かない＝SEQ-011全停止対策）
   async refreshCurrent(){
-    const name=this._eff(this.current);
+    const name=this.current;
     const app=this.reg(name).ns();
     this._loading[name]=true;
     const n0=DataCache.puts();
