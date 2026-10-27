@@ -1519,49 +1519,6 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-card-body{text-align:center}
 .portal-card-title{font-size:13px;font-weight:600;color:var(--text)}
 .portal-modeswitch{display:flex;align-items:center;gap:8px;justify-content:center;font-size:12px;color:var(--text-dim);margin:0 0 20px}
-/* 予定（画面「予定」、LINE WORKS のカレンダー、dept=cal、2026-10-08／見た目 10-09）：人を縦に、その人の予定を横にチップで */
-#view-cal{padding:18px 14px 120px}
-#view-cal .cal-wrap{max-width:760px;margin:0 auto}
-#view-cal .cal-hd{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap}
-#view-cal .cal-title{display:flex;align-items:flex-end;gap:12px}
-#view-cal .cal-big{font-size:44px;font-weight:800;letter-spacing:-.02em;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
-#view-cal .cal-big .sl{font-weight:400;color:var(--text-faint);margin:0 2px}
-#view-cal .cal-sub{padding-bottom:3px}
-#view-cal .cal-sub .dw{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
-#view-cal .cal-sub .dw.sat{color:#2563eb}#view-cal .cal-sub .dw.sun{color:var(--red)}
-#view-cal .cal-now{font-size:11px;font-weight:700;color:#fff;background:var(--accent);border-radius:999px;padding:2px 8px}
-#view-cal .cal-sub .st{font-size:12px;color:var(--text-faint);margin-top:3px}
-#view-cal .cal-nav{display:flex;align-items:center;gap:6px}
-#view-cal .cal-week{display:flex;align-items:center;gap:3px;background:var(--surface3);border-radius:12px;padding:3px}
-#view-cal .cal-btn{border:1px solid var(--border);background:var(--surface);border-radius:9px;padding:9px 10px;font-size:13px;cursor:pointer;line-height:1;color:var(--text)}
-#view-cal .cal-btn:disabled{opacity:.35;cursor:default}
-#view-cal .cal-day{display:flex;flex-direction:column;align-items:center;gap:1px;width:44px;padding:5px 0 4px;border:1px solid transparent;border-radius:9px;background:transparent;cursor:pointer;line-height:1.1;color:var(--text)}
-#view-cal .cal-day:hover{background:var(--surface)}
-#view-cal .cal-day .w{font-size:10px;color:var(--text-dim)}
-#view-cal .cal-day .d{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
-#view-cal .cal-day.sat .w{color:#2563eb}
-#view-cal .cal-day.sun .w{color:var(--red)}
-#view-cal .cal-day.today{border-color:var(--accent)}
-#view-cal .cal-day.sel{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 6px rgba(59,130,246,.35)}
-#view-cal .cal-day.sel .w{color:#fff}
-#view-cal .cal-today{font-size:13px;padding:9px 10px;margin-left:4px}
-#view-cal .cal-card{background:var(--surface);border:1px solid var(--border-light);border-radius:14px;box-shadow:0 1px 3px rgba(16,24,40,.06);overflow:hidden}
-#view-cal table{width:100%;border-collapse:collapse;font-size:14px}
-#view-cal td{padding:7px 10px;border-top:1px solid var(--border-light);vertical-align:top;line-height:1.7}
-#view-cal tr:first-child td{border-top:none}
-#view-cal tr.none td{padding:8px 10px}
-#view-cal td.n{white-space:nowrap;width:1%;font-weight:600;padding-right:18px}
-#view-cal tr.none td.n{font-weight:500;color:var(--text-dim)}
-#view-cal td.d{color:var(--text-faint);line-height:1.9}
-#view-cal tr.none td{background:var(--surface2)}
-#view-cal .pc-chip{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:2px 9px;margin:2px 6px 2px 0}
-#view-cal .pc-chip b{font-weight:700;color:var(--accent);margin-right:6px;font-variant-numeric:tabular-nums}
-#view-cal .pc-chip.all{background:var(--accent-dim);border-color:transparent}
-#view-cal .pc-chip.all b{color:var(--accent)}
-#view-cal .pc-chip.off{color:var(--text-faint);background:transparent;border:1px dashed var(--border)}
-#view-cal .pc-chip.off b{color:var(--text-faint)}
-#view-cal .pc-msg{font-size:13px;color:var(--text-faint);padding:8px}
-@media(max-width:480px),(orientation:portrait) and (pointer:coarse){#view-cal{padding:12px 10px 120px}#view-cal .cal-hd{gap:10px}#view-cal .cal-big{font-size:36px}#view-cal .cal-day{width:36px;padding:4px 0 3px}#view-cal .cal-day .d{font-size:14px}#view-cal .cal-btn{padding:8px 6px}#view-cal .cal-today{display:none}#view-cal td{display:block;border-top:none}#view-cal td.n{padding:8px 10px 0;border-top:1px solid var(--border-light)}#view-cal tr:first-child td.n{border-top:none}#view-cal td.d,#view-cal td.c{padding:0 10px 8px}#view-cal tr.none td.n{padding:6px 10px 0}#view-cal tr.none td.d{padding:0 10px 6px}}
 .pm-btn{padding:6px 16px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font:600 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);cursor:pointer}
 .pm-btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .portal-footer{margin-top:48px;font-size:11px;color:var(--text-faint)}
@@ -1884,7 +1841,6 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .scr-head .scr-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
 .scr-head .scr-search::placeholder{color:var(--text-dim)}
 /* 見出しを足した画面（10/16）：中身の入れ物の端にそろえる */
-#view-cal>.scr-head{padding:0 2px 10px}   /* 日報・時間外と同じく見出しは左端、中身は 760 中央 */
 #view-card>.scr-head{max-width:1820px;margin:0 auto;padding:18px 20px 0;box-sizing:border-box}
 /* PC・横画面では見出しとサブタブを 1 行に畳む（4 段も頭があると一覧の始まりが遅い。iller 2026-10-15「スタートが遅れるのが嫌」）。
    .scr-head を display:contents でほどき、親を flex にして 見出し・日付・サブタブ・検索 を並べ、中身（.app／#casesPane）は次の行に */
@@ -1899,12 +1855,12 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   #view-prod>.app,#view-proj>.app,#view-sales>.app,#view-labor>.app,#view-inv>.main,#view-veh>.app,#view-qual>#qualBody,#view-ot>.app,#view-daily>.app,#view-wb>#wbBody,#view-po>.app,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
   #view-qual>.scr-head .scr-search{margin-left:auto}   /* 資格にはサブタブが無いので検索を右端へ */
   #view-wb>.wb-hint,#view-wb>.wb-tip,#view-wb>.wb-modal{order:5}
-  #view-cal>.scr-head h1,#view-alcohol>.scr-head h1,#view-forklift>.scr-head h1,#view-card>.scr-head h1{font-size:24px}   /* PC の見出しはどの画面も 24px */
+  #view-alcohol>.scr-head h1,#view-forklift>.scr-head h1,#view-card>.scr-head h1{font-size:24px}   /* PC の見出しはどの画面も 24px */
   /* 自分の記録の画面（日報・時間外の申告・スケジュール）は、見出しごと 760 の列に入れて真ん中に。見出しだけ左端に離れていた（10/16 iller「めっちゃ変」） */
   /* 一覧・ボード・表の画面も端にくっつけない：左右に 16px 足し、広い画面では 1,820 幅で真ん中（点呼・リフトと同じ。10/16 iller「画面いっぱいすぎる」） */
   #view-cases,#view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb{max-width:1820px;margin-left:auto;margin-right:auto;box-sizing:border-box}
   @media(min-width:1101px){#view-cases,#view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb{padding-left:16px;padding-right:16px}}   /* 細い窓では足さない（案件の表が収まらなくなる） */
-  #view-daily,#view-cal,#view-ot:has(#staffView:not([style*="none"])){max-width:792px;margin-left:auto;margin-right:auto}
+  #view-daily,#view-ot:has(#staffView:not([style*="none"])){max-width:792px;margin-left:auto;margin-right:auto}
   #view-cases .sub-tabs{padding-top:12px}
   .gantt-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .gantt-top .fv-sum{margin-bottom:0}
@@ -2148,15 +2104,6 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 #view-ot .week-label{white-space:nowrap}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){#view-ot>.scr-head .scr-search{display:none}#view-ot .week-bar{gap:8px}#view-ot .week-btn{padding:7px 10px;font-size:12px}}   /* 携帯の時間外に検索は要らない（名前は下で選ぶ） */
 /* 今日・いないカード：かたまいの縁と影を外す、ボタンは灰のチップ、名前のタイルは灰（選ぶと青） */
-#view-cal .cal-card{border:none;box-shadow:none;border-radius:12px}
-#view-cal .cal-hd{flex-direction:column;align-items:flex-start;gap:10px}   /* 帯は常に見出しの下（読み込み中だけ横に並んで、読み終わると下に落ちる段差があった。10/15 iller） */
-#view-cal .cal-nav{flex:0 0 auto}
-#view-cal .cal-sub .st{min-height:1.2em}
-#view-cal .cal-card.is-loading{opacity:.35;transition:opacity .2s}   /* .loading だと共通の「読み込み中…」（中央寄せ・余白）とかち合う */
-#view-cal .cal-btn{border:none;background:var(--surface3);border-radius:8px}
-#view-cal .cal-week{background:var(--surface3)}
-#view-cal .cal-day.sel{box-shadow:none}
-#view-cal .cal-big{font-weight:700}
 .card-pane{border:none;box-shadow:none;border-radius:14px}
 .card-pane .cp-title{font-weight:600;border-bottom:0.5px solid var(--border-light)}
 .card-pane .cp-title .cp-sub{margin-left:auto;font-size:12px;font-weight:400;color:var(--text-faint)}
@@ -2446,7 +2393,6 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <button class="nav-link home-link on" id="navHome" onclick="App.nav('portal')"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</button>
     <button class="nav-link" id="navDaily" onclick="App.nav('daily')">日報</button>
     <button class="nav-link" id="navOt" onclick="App.nav('ot')">時間外</button>
-    <button class="nav-link" id="navCal" onclick="App.nav('cal')">予定</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navAlcohol" onclick="App.nav('alcohol')">点呼</button>
     <button class="nav-link" id="navForklift" onclick="App.nav('forklift')">リフト点検</button>
@@ -3738,7 +3684,6 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <div class="portal-grp"><div class="portal-cap">毎日の記録</div><div class="portal-rows">
         <a class="portal-card" data-app="daily" onclick="App.nav('daily')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">日報</div></div></a>
         <a class="portal-card" data-app="ot" onclick="App.nav('ot')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="portal-card-body"><div class="portal-card-title">時間外ボード</div></div></a>
-        <a class="portal-card" data-app="cal" onclick="App.nav('cal')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h3M13 14h3M8 17.5h3"/></svg></div><div class="portal-card-body"><div class="portal-card-title">スケジュール</div></div></a>
         <a class="portal-card" data-app="alcohol" onclick="App.nav('alcohol')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5 11-12"/></svg></div><div class="portal-card-body"><div class="portal-card-title">アルコールチェック</div></div></a>
         <a class="portal-card" data-app="forklift" onclick="App.nav('forklift')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V9h6l2 3h2"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="13" cy="18.5" r="1.6"/><path d="M17 17V5"/><path d="M17 17h5M17 12h4"/></svg></div><div class="portal-card-body"><div class="portal-card-title">フォークリフト点検</div></div></a>
         <a class="portal-card" data-app="card" onclick="App.nav('card')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10.5h18"/></svg></div><div class="portal-card-body"><div class="portal-card-title">カード</div></div></a>
@@ -3763,11 +3708,6 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   </div>
 </section>
 
-<!-- ===== 今日の予定（LINE WORKS のカレンダー） section ===== -->
-<section id="view-cal" class="hidden">
-  <div class="scr-head"><h1>スケジュール</h1></div>
-  <div class="cal-wrap" id="calBody"></div>
-</section>
 
 <section id="view-card" class="hidden">
   <div class="scr-head"><h1>カード</h1></div>
@@ -4470,8 +4410,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-27 16:41';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1288;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-27 16:42';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1289;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9318,56 +9258,6 @@ const Portal = (function(){
   return { loadAll, init };
 })();
 
-// ===== 今日の予定（画面「今日」、2026-10-08）=====
-// 全員の今日の LINE WORKS カレンダーを GAS（dept=cal）が読んで返す。人を縦、その人の予定を横にチップで。
-// loadAll は App.nav の初回と softRefresh（90秒）で呼ばれる。GAS 側で5分控えているので端末が多くても軽い。
-const Cal = (function(){
-  // 日付は ◀ ▶ で前後に動かせる（10/8 iller）。GAS は date= を受けて前後 3 日分をまとめて読み、日ごとに 5 分控える。
-  // 端末側は一度見た日を mem に持ち、前後 1 日を先読みする＝◀ ▶ は即表示、裏で取り直し（10/9 iller「動かすと遅い」）。softRefresh は選んだ日のまま取り直す。
-  let cal=null, calErr='', date=fmtD(new Date()), mem={}, lastCal=null;   // lastCal＝直前に出していた日（読み込み中はこれを薄く出して、押したのが伝わるように）
-  function fmtD(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-  function shift(d,n){ const x=new Date(d+'T00:00:00'); x.setDate(x.getDate()+n); return fmtD(x); }
-  async function fetchDay(d){ const r=await fetch(API+'?dept=cal&action=today&date='+d); const j=await r.json(); if(j&&j.success) mem[d]=j; return j; }
-  async function loadAll(){
-    const want=date;
-    try{ const j=await fetchDay(want); if(want!==date)return; if(j&&j.success){ cal=j; calErr=''; } else calErr=(j&&j.error)||'err'; }
-    catch(e){ if(want!==date)return; calErr='net'; }
-    render(); prefetch();
-  }
-  // 帯の先頭＝今日を基準に 7 日刻みで、選んだ日を含む窓の先頭（今日より前なら昨日までの 7 日、…）
-  function winStart(d){ const t=new Date(fmtD(new Date())+'T00:00:00'), x=new Date(d+'T00:00:00'); const k=Math.floor((x-t)/86400000/7); t.setDate(t.getDate()+k*7); return t; }
-  // 先読みは帯に出ている週だけ（10/15 に前後の週まで広げたら LINE WORKS の 429 に当たった＝28 人 × 21 日を一度に叩いた。元に戻す）
-  function prefetch(){ const w0=winStart(date); const ds=[fmtD(w0)]; for(let i=1;i<7;i++){ const x=new Date(w0); x.setDate(w0.getDate()+i); ds.push(fmtD(x)); } ds.forEach(d=>{ if(d!==date&&!mem[d]) fetchDay(d).catch(()=>{}); }); }
-  function go(d){ if(cal)lastCal=cal; date=d; calErr=''; cal=mem[date]||null; render(); loadAll(); }
-  function move(n){ go(shift(date,n)); }
-  function today(){ go(fmtD(new Date())); }
-  function render(){
-    const el=document.getElementById('calBody'); if(!el)return;
-    const todayS=fmtD(new Date()), isToday=date===todayS, d=new Date(date+'T00:00:00');
-    const DOW=['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'];
-    // 日付の帯：今日から 7 日（過去はほぼ要らない＝iller 10/9）。◀ ▶ で 7 日ずつ送る。今日は枠、選んだ日は塗り
-    const w0=winStart(date);
-    const chips=[0,1,2,3,4,5,6].map(i=>{ const x=new Date(w0); x.setDate(w0.getDate()+i); const ds=fmtD(x), dw=x.getDay();
-      return `<button class="cal-day${ds===date?' sel':''}${ds===todayS?' today':''}${dw===6?' sat':dw===0?' sun':''}" onclick="Cal.go('${ds}')"><span class="w">${'日月火水木金土'[dw]}</span><span class="d">${x.getDate()}</span></button>`; }).join('');
-    const n=cal?cal.people.filter(p=>p.items&&p.items.length).length:0, all=cal?cal.people.length:0;
-    const hd=`<div class="cal-hd">
-      <div class="cal-title"><div class="cal-big">${d.getMonth()+1}<span class="sl">/</span>${d.getDate()}</div><div class="cal-sub"><div class="dw${d.getDay()===6?' sat':d.getDay()===0?' sun':''}">${DOW[d.getDay()]}${isToday?'<span class="cal-now">今日</span>':''}</div><div class="st">${cal?`予定のある人 ${n} / ${all}　・　${esc(cal.updated||'')} 時点`:(calErr?'取れませんでした':'読み込み中…')}</div></div></div>
-      <div class="cal-nav"><button class="cal-btn" onclick="Cal.move(-7)" title="前の 7 日">◀</button><div class="cal-week">${chips}</div><button class="cal-btn" onclick="Cal.move(7)" title="次の 7 日">▶</button><button class="cal-btn cal-today" onclick="Cal.today()"${isToday?' disabled':''}>今日に戻る</button></div>
-    </div>`;
-    if(!cal&&calErr){ el.innerHTML=hd+'<div class="pc-msg">予定を取れませんでした</div>'; return; }
-    const src=cal||lastCal;   // 読み込み中は直前の日を薄く
-    if(!src){ el.innerHTML=hd; return; }
-    // 予定のある人を並び順のまま、無い人は末尾に一行でまとめる（iller 10/9）
-    const has=src.people.filter(p=>p.items&&p.items.length), none=src.people.filter(p=>!(p.items&&p.items.length));
-    const rows=has.map(p=>{
-      const cs=p.items.map(it=>{ const t=it.allDay?'終日':(it.s||'')+(it.e?'–'+it.e:''); return `<span class="pc-chip${it.off?' off':it.allDay?' all':''}"><b>${esc(t)}</b>${esc(it.t)}</span>`; }).join('');
-      return `<tr class="has"><td class="n">${esc(p.name)}</td><td class="c">${cs}</td></tr>`;
-    }).join('')+(none.length?`<tr class="none"><td class="n">予定なし</td><td class="d">${none.map(p=>esc(p.name)).join('　')}</td></tr>`:'');
-    el.innerHTML=hd+`<div class="cal-card${cal?'':' is-loading'}"><table>${rows||'<tr class="none"><td class="n">—</td><td class="d">予定のある人はいません</td></tr>'}</table></div>`;
-  }
-  function init(){}
-  return { loadAll, render, init, move, today, go };
-})();
 
 /* ========================================================================
    App.nav：画面切替＋遅延ロード機構（SPAの心臓部）
@@ -11124,7 +11014,6 @@ const App = {
     {key:'labor',ns:()=>Labor,section:'view-labor',nav:'navLabor',zone:'office'},
     {key:'daily',ns:()=>Daily,section:'view-daily',nav:'navDaily',zone:'field',kiosk:true},
     {key:'ot',   ns:()=>Ot,   section:'view-ot',   nav:'navOt',zone:'field'},
-    {key:'cal',  ns:()=>Cal,  section:'view-cal',  nav:'navCal',zone:'shared'},
     {key:'alcohol',ns:()=>Alc,section:'view-alcohol',nav:'navAlcohol',zone:'office',kiosk:true},
     {key:'forklift',ns:()=>Fork,section:'view-forklift',nav:'navForklift',zone:'office',kiosk:true},
     {key:'portal',ns:()=>Portal,section:'view-portal',nav:'navHome'},

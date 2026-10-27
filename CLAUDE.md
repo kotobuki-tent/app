@@ -76,7 +76,9 @@ Operational constraints and how-tos live in dedicated `.claude/` files (loaded a
 - **`.claude/rules/working-with-iller.md`** — tone, judgment, deploy/commit conventions, how to show iller visuals (`show_widget`, not `preview_screenshot`).
 - **`.claude/skills/gas-update`** — the procedure to change & deploy the GAS backend (`Code.gs`): edit → JavaScriptCore syntax-check → paste into Apps Script → redeploy only for web-handler changes. Includes the real-vs-backup-project tell-tale and the "never change the API URL" rule.
 
-### 今日の予定（画面「今日」, dept=cal, 2026-10-08）
+### 今日の予定（画面「今日」, dept=cal, 2026-10-08 — **SPA の画面は 2026-10-27 に削除**）
+
+**2026-10-27 iller「スケジュールって使ってないからいらない」→ 画面（`view-cal`・nav `navCal`・ポータルの札・IIFE `Cal`・CSS）を SPA から全部消した。GAS の `dept=cal`（`handleCalGet`、LW_* のスクリプトプロパティ）はそのまま残っている＝呼ぶ画面が無いだけ。以下は消す前の記録。**
 
 画面「今日」（IIFE `Cal`、`view-cal`、nav `navCal`、zone shared、ポータルに「今日の予定」カード）に、全員の今日の LINE WORKS カレンダーを出す（人を縦、予定を横にチップ。終日→時刻順、休み系は灰色、予定なしは「—」）。GAS `handleCalGet` が LINE WORKS のサービスアカウント（JWT RS256、Client App「SEQUENCE LAB」、scope `user.read calendar.read`）で全員の `/users/{id}/calendar/events` を `fetchAll` で読み、CacheService に 5 分控える。鍵はスクリプトプロパティ `LW_CLIENT_ID` / `LW_CLIENT_SECRET` / `LW_SERVICE_ACCOUNT` / `LW_PRIVATE_KEY`（1行の鍵は区切りが「¥n」でも読める `lwPem_`）。`?dept=cal&action=keycheck` は鍵の形の診断（中身は返さない）。SPA 側は `Cal.loadAll`（softRefresh で 90 秒ごとに取り直す）。最初はポータルの一番上に置いたが iller「トップに載せることはない」→ 別タブに（10/8）。人は staff の active、LINE WORKS に居ない人は出ない。**並びは LINE WORKS Admin のメンバー一覧と同じ**（10/16 作り直し：役員〔職級 社長〜常務＝`LW_EXEC_LEVELS`〕→代表組織の組織長→役職→職級→フリガナ。順は Code.gs の `LW_POS_ORDER`／`LW_LEVEL_ORDER` に手書き＝Admin で役職・職級を変えたらここも直す。Code.gs v112）。LINE WORKS の作り（10/16）：組織＝寿テント・役員・幹部・生産部・企画制作部・施工写真・総務部（組織にはトークの部屋が付く＝切ると中身が消える）、役職＝代表取締役/取締役/執行役員/統括部長/部長/課長/主任、職級＝社長〜常務（役員）と執行役員だけ、利用権限タイプ＝社員/パート。staff シートの dept は 生産部/企画制作部/総務部。
 
