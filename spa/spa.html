@@ -2238,6 +2238,11 @@ tr:hover td{background:rgba(10,132,255,.04)}
 #view-daily .af-btns{display:flex;gap:10px;padding:12px 16px 14px;border-top:0.5px solid var(--border-light);margin:0}
 #view-daily .af-cancel{background:var(--surface3);border:none;color:var(--text);border-radius:10px;font-weight:500}
 #view-daily .af-save{border-radius:10px;font-weight:600;font-size:15px}
+/* PC・横画面：ボタンは横長にせず右寄せ（発注依頼の「発注依頼を出す」と同じ大きさ、10/28）*/
+@media(min-width:481px) and (pointer:fine),(min-width:481px) and (orientation:landscape){
+  #view-daily .af-btns{justify-content:flex-end}
+  #view-daily .af-cancel,#view-daily .af-save{flex:none;padding:10px 22px;font-size:14px;border-radius:8px}
+}
 #view-daily .entry-add-btn{background:var(--accent);border:none;color:#fff;border-radius:12px;padding:14px;font:600 15px/1 'Hiragino Sans','Noto Sans JP',sans-serif;margin:0}
 #view-daily .entry-add-btn:hover{background:#0071e3;color:#fff}
 /* 日報「みんなの日報」：人別の箱も白いかたまいに */
@@ -4437,8 +4442,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-27 17:58';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1304;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 08:37';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1305;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
