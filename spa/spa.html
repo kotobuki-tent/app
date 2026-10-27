@@ -1812,6 +1812,17 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .nav-link:hover{color:var(--text);background:var(--surface3)}
 .nav-link.on{background:var(--surface3);color:var(--text);font-weight:600}
 .nav-link.on::after{display:none}
+/* ナビの列（10/27 iller「まとめるものと単独で置くもの」）：台帳▾＝工数・在庫・車両・資格、記録▾＝時間外・予定ボード・アルコールチェック・リフト点検・カード。
+   列は fixed で出す（.hdr-inner が横送り＝overflow の時に切れないように）。開いている画面が列の中なら列の名前が .on の色になる */
+.nav-dd{position:relative;display:flex;align-items:center}
+.nav-dd-btn{gap:3px}
+.nav-dd-btn .nav-chev{margin-left:1px;opacity:.6}
+.nav-dd:has(.nav-dd-menu .nav-link.on)>.nav-dd-btn{background:var(--surface3);color:var(--text);font-weight:600}
+.nav-dd.open>.nav-dd-btn{background:var(--surface3);color:var(--text)}
+.nav-dd-menu{display:none;position:fixed;z-index:300;flex-direction:column;gap:2px;min-width:168px;padding:6px;background:var(--surface);border:0.5px solid var(--border-light);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06)}
+.nav-dd.open>.nav-dd-menu{display:flex}
+.nav-dd-menu .nav-link{width:100%;justify-content:flex-start;height:32px;padding:0 10px;font-size:13px}
+.nav-dd-menu .nav-link.on::after{display:none}
 .nav-div{height:16px;background:var(--border-light);margin:0 4px}
 .nav-link .nav-ic{width:15px;height:15px;margin-right:5px;flex-shrink:0}
 /* 細い PC の窓（10/15 iller「Mac の画面を占領したくない」）：ナビは詰めて横に流す。右で切れないように（10/27 ナビが「アルコールチェック」で長くなったので 1,400→1,560） */
@@ -2400,17 +2411,20 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <button class="nav-link" id="navPo" onclick="App.nav('po')">発注</button>
     <span class="nav-div"></span>
     <button class="nav-link" id="navDaily" onclick="App.nav('daily')">日報</button>
-    <button class="nav-link" id="navOt" onclick="App.nav('ot')">時間外</button>
-    <button class="nav-link" id="navWb" onclick="App.nav('wb')">ボード</button>
     <span class="nav-div"></span>
-    <button class="nav-link" id="navLabor" onclick="App.nav('labor')">工数</button>
-    <button class="nav-link" id="navInv" onclick="App.nav('inv')">在庫</button>
-    <button class="nav-link" id="navVeh" onclick="App.nav('veh')">車両</button>
-    <button class="nav-link" id="navQual" onclick="App.nav('qual')">資格</button>
-    <span class="nav-div"></span>
-    <button class="nav-link" id="navAlcohol" onclick="App.nav('alcohol')">アルコールチェック</button>
-    <button class="nav-link" id="navForklift" onclick="App.nav('forklift')">リフト点検</button>
-    <button class="nav-link" id="navCard" onclick="App.nav('card')">カード</button>
+    <div class="nav-dd"><button type="button" class="nav-link nav-dd-btn" onclick="App.dd(this)">台帳<svg class="nav-chev" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><div class="nav-dd-menu">
+      <button class="nav-link" id="navLabor" onclick="App.nav('labor')">工数</button>
+      <button class="nav-link" id="navInv" onclick="App.nav('inv')">在庫</button>
+      <button class="nav-link" id="navVeh" onclick="App.nav('veh')">車両</button>
+      <button class="nav-link" id="navQual" onclick="App.nav('qual')">資格</button>
+    </div></div>
+    <div class="nav-dd"><button type="button" class="nav-link nav-dd-btn" onclick="App.dd(this)">記録<svg class="nav-chev" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><div class="nav-dd-menu">
+      <button class="nav-link" id="navOt" onclick="App.nav('ot')">時間外</button>
+      <button class="nav-link" id="navWb" onclick="App.nav('wb')">予定ボード</button>
+      <button class="nav-link" id="navAlcohol" onclick="App.nav('alcohol')">アルコールチェック</button>
+      <button class="nav-link" id="navForklift" onclick="App.nav('forklift')">リフト点検</button>
+      <button class="nav-link" id="navCard" onclick="App.nav('card')">カード</button>
+    </div></div>
     <div class="nav-spacer"></div>
     <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
   </div>
@@ -4406,8 +4420,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-27 17:19';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1293;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-27 17:26';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1294;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -11031,7 +11045,11 @@ const App = {
   _loaded:{},
   _loading:{},
   reg(name){ return this.REG.find(r=>r.key===name); },
+  // ナビの列（台帳▾・記録▾）の開け閉め（10/27）。列は fixed なので、開く時にボタンの位置から置く。外を押すか画面を変えたら閉じる
+  dd(btn){ const box=btn.parentElement, open=box.classList.contains('open'); this.ddClose(); if(open)return; const r=btn.getBoundingClientRect(), menu=box.querySelector('.nav-dd-menu'); menu.style.top=(r.bottom+6)+'px'; menu.style.left=Math.max(8,Math.min(r.left,window.innerWidth-180))+'px'; box.classList.add('open'); },
+  ddClose(){ document.querySelectorAll('.nav-dd.open').forEach(b=>b.classList.remove('open')); },
   async nav(name){
+    this.ddClose();
     const _r=this.reg(name); if(_r&&!this._allowed(name)) name='portal';
     if(this.current===name) return;
     // 全sectionのdisplay切替＋ナビ.on切替（登録ぶん全部回す＝0秒）
@@ -11133,6 +11151,8 @@ const Ver=(function(){
 })();
 // 端末が表示に戻った時（タブレットのスリープ明け・タブ切替・アプリ復帰）も同じルールで取り直す
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') App.softRefresh(); });
+document.addEventListener('click',e=>{ if(!e.target.closest('.nav-dd')) App.ddClose(); });   // ナビの列は外を押したら閉じる（10/27）
+window.addEventListener('resize',()=>App.ddClose());
 window.addEventListener('focus',()=>App.softRefresh());
 window.addEventListener('pageshow',()=>App.softRefresh());
 setInterval(()=>{ if(document.visibilityState==='visible') moneyFetch(); },5*60*1000);   // ¥バッジは従来どおり5分
