@@ -2565,6 +2565,15 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
 #view-ot .week-bar{justify-content:flex-start;gap:6px;max-width:none;margin:0;padding:4px 0 12px}
 #view-ot .week-btn{padding:6px 11px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif}
 #view-ot .week-label{flex:none;font-size:15px;font-weight:600;min-width:150px;text-align:center}
+/* 一覧の行の「⋯」メニュー（10/28）：案件・在庫・車両で同じ部品 */
+.row-more{position:relative;display:inline-block}
+.row-more>.row-btn{background:none;border:none;color:var(--text-faint);font-size:18px;line-height:1;padding:2px 8px;cursor:pointer;border-radius:6px}
+.row-more>.row-btn:hover,.row-more.open>.row-btn{color:var(--accent);background:var(--surface3)}
+.row-menu{display:none;position:fixed;z-index:300;flex-direction:column;gap:2px;min-width:150px;padding:6px;background:var(--surface);border:0.5px solid var(--border-light);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06)}
+.row-more.open>.row-menu{display:flex}
+.row-menu>a,.row-menu>button{display:block;width:100%;text-align:left;margin:0;padding:0 10px;border:none;background:none;border-radius:8px;font:400 14px/32px 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);cursor:pointer;text-decoration:none;white-space:nowrap}
+.row-menu>a:hover,.row-menu>button:hover{background:var(--surface3);color:var(--text);text-decoration:none}
+.row-menu>.del-link,.row-menu>.del,.row-menu>.del-link:hover,.row-menu>.del:hover{color:var(--red)}
 
 /* ===== ボタンを 2 種類に（10/16）：大事な操作＝青の塗り、それ以外＝灰の地。枠線・点線の枠はやめる。表の中の「編集」などの文字のボタンはそのまま ===== */
 .slog-btn,.staff-btn,.mny-btn,.date-add-btn,.rental-add-btn,.af-cancel,.mo-foot .arch-btn,.mo-foot .cancel,.week-btn,.btn.gray{background:var(--surface3);border:none;color:var(--text);border-radius:8px}
@@ -2766,8 +2775,6 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     #view-cases .tbl-wrap td:nth-of-type(4){display:none}
     #view-cases .tbl-wrap td:nth-of-type(7){order:6;flex:1 1 100%;display:flex;justify-content:flex-end;margin-top:2px}
     #view-cases .tbl-wrap td:nth-of-type(7) .act-btn{font-size:12px;padding:4px 10px;background:var(--surface3);border-radius:7px;color:var(--text)}
-    #view-cases .tbl-wrap td:nth-of-type(7) .ct-more{font-size:12px}
-    #view-cases .tbl-wrap td:nth-of-type(7) .ct-more::after{content:' アーカイブへ'}
     #view-cases .tbl-foot{border:none;padding:8px 2px}
   }
   #view-cases td .cdept-none{color:var(--text-faint)}
@@ -4610,8 +4617,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 14:18';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1319;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 14:27';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1320;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -6852,10 +6859,10 @@ const Inv = (function(){
       <td><strong>${esc(i.item_name)}</strong></td>
       <td>${i.total_qty}</td>
       <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${esc(i.notes)}</td>
-      <td><div class="tbl-actions">
+      <td><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu">
         <a class="edit-link" onclick="Inv.editItem('${i.id}')">編集</a>
         <a class="del-link" onclick="Inv.deleteItem('${i.id}','${esc(i.item_name)}')">削除</a>
-      </div></td>
+      </div></div></td>
     </tr>`).join('');
   }
   function openItemMo(data){
@@ -6941,11 +6948,11 @@ const Inv = (function(){
       <td>${dateJP(r.date_end)}</td>
       <td>${esc(r.client_name)}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
-      <td><div class="tbl-actions">
+      <td><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu">
         <a class="edit-link" onclick="Inv.openSplit('${r.id}')">分割</a>
         <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
         <a class="del-link" onclick="Inv.toDiscardList('${r.id}')">廃棄リストへ</a>
-      </div></td>
+      </div></div></td>
     </tr>`).join('');
   }
 
@@ -6963,10 +6970,10 @@ const Inv = (function(){
       <td>${dateJP(r.date_end)}</td>
       <td>${esc(r.client_name)}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
-      <td><div class="tbl-actions">
+      <td><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu">
         <a class="edit-link" onclick="Inv.unDiscard('${r.id}')">戻す</a>
         <a class="del-link" onclick="Inv.discardRental('${r.id}')">廃棄を確定</a>
-      </div></td>
+      </div></div></td>
     </tr>`).join('');
   }
 
@@ -7004,11 +7011,11 @@ const Inv = (function(){
       <td>${dateJP(r.date_end)}</td>
       <td>${esc(r.client_name)}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
-      <td><div class="tbl-actions">
+      <td><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu">
         <a class="edit-link" onclick="Inv.openSplit('${r.id}')">分割</a>
         <a class="edit-link" onclick="Inv.editRental('${r.id}')">編集</a>
         <a class="del-link" onclick="Inv.deleteRental('${r.id}')">削除</a>
-      </div></td>
+      </div></div></td>
     </tr>`}).join('');
   }
   function populateItemSelect(){
@@ -7526,7 +7533,7 @@ const Veh = (function(){
         if(c.key==='plate'&&v)v=plateLine(v);
         h+=`<td>${esc(v)}</td>`;
       });
-      h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Veh.editVehicle('${d.id}')">編集</button></td></tr>`;
+      h+=`<td onclick="event.stopPropagation()"><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu"><button type="button" onclick="Veh.editVehicle('${d.id}')">編集</button></div></div></td></tr>`;
     });
     h+='</tbody></table></div>';
     el.innerHTML=h;
@@ -9842,7 +9849,7 @@ const Cases = (function(){
         +`<td class="ct-no"><div class="ct-main">${esc(c.order_no||'')}</div><div class="ct-sub">${esc(c.estimate_no||'')}</div></td>`
         +`<td style="text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap">${(c.amount&&Number(c.amount)>0)?'¥'+Number(c.amount).toLocaleString():''}</td>`
         +`<td class="ct-st"${stop}>${c.status==='中止'?'<span class="case-st-stop">中止</span>':`<select class="case-st-sel" data-st="${esc(c.status||'')}" onchange="Cases.setStatus('${id}',this.value)">${CASE_ST.map(s=>`<option${c.status===s?' selected':''}>${s}</option>`).join('')}</select>`}${c.cancel==='あり'?'<span class="case-cancel">キャンセル料</span>':''}<label class="ct-inv" title="伝票"><input type="checkbox" class="sw" ${_inv(c.invoiced)?'checked':''} onchange="Cases.toggleInv('${id}')"><span>伝票</span></label></td>`
-        +`<td class="ct-ops" style="white-space:nowrap"${stop}>${archd?`<button class="act-btn" onclick="Cases.unarchive('${id}')">戻す</button>`:`<button class="act-btn ct-more" title="アーカイブへ" onclick="Cases.archive('${id}')">⋯</button>`}${manage?` <button class="act-btn del" onclick="Cases.del('${id}')">削除</button>`:''}</td>`
+        +`<td class="ct-ops" style="white-space:nowrap"${stop}><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu">${archd?`<button type="button" onclick="Cases.unarchive('${id}')">戻す</button>`:`<button type="button" onclick="Cases.archive('${id}')">アーカイブへ</button>`}${manage?`<button type="button" class="del" onclick="Cases.del('${id}')">削除</button>`:''}</div></div></td>`
         +`</tr>`;
     });
     h+=`</tbody></table><div class="tbl-foot"><span>${rows.length} 件</span></div></div>`;
@@ -11350,6 +11357,13 @@ const Ver=(function(){
 // 端末が表示に戻った時（タブレットのスリープ明け・タブ切替・アプリ復帰）も同じルールで取り直す
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') App.softRefresh(); });
 document.addEventListener('click',e=>{ if(!e.target.closest('.nav-dd')) App.ddClose(); });   // ナビの列は外を押したら閉じる（10/27）
+// 一覧の行の「⋯」（10/28）：案件・在庫・車両で同じ。ボタンの下に小さなメニュー（fixed）、外を押すか項目を押したら閉じる
+const RowMenu={
+  open(btn){ const box=btn.parentElement, was=box.classList.contains('open'); this.close(); if(was)return; const menu=box.querySelector('.row-menu'); box.classList.add('open'); const r=btn.getBoundingClientRect(), w=menu.offsetWidth||150, h=menu.offsetHeight||40; let top=r.bottom+6; if(top+h>window.innerHeight-8) top=Math.max(8,r.top-6-h); menu.style.top=top+'px'; menu.style.left=Math.max(8,Math.min(r.right-w,window.innerWidth-w-8))+'px'; menu.onclick=()=>RowMenu.close(); },
+  close(){ document.querySelectorAll('.row-more.open').forEach(b=>b.classList.remove('open')); }
+};
+document.addEventListener('click',e=>{ if(!e.target.closest('.row-more')) RowMenu.close(); });
+window.addEventListener('resize',()=>RowMenu.close());
 window.addEventListener('resize',()=>App.ddClose());
 window.addEventListener('focus',()=>App.softRefresh());
 window.addEventListener('pageshow',()=>App.softRefresh());
