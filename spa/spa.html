@@ -2548,6 +2548,19 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
 #view-cases .cal-grid .cal-cell.sat,#view-cases .cal-grid .cal-cell.sun,#view-cases .cal-grid .cal-cell.hol{background:#fafafa}
 #view-cases .cal-grid .cal-cell.today{background:rgba(10,132,255,.06)}
 #view-cases .cal-grid .cal-rlabel{border-bottom:0.5px solid #f0f0f3}
+#v_gantt .gt-nav{gap:6px;margin:0;align-items:center}
+#v_gantt .gt-nav button{padding:6px 11px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;border-radius:8px}
+#v_gantt .gt-range{font-size:15px;font-weight:600;min-width:150px;text-align:center;white-space:nowrap;color:var(--text)}
+#v_gantt .days>div{padding:4px 0 3px;color:var(--text-dim)}
+#v_gantt .days .dm{display:block;width:max-content;margin:0 auto;font-size:13px;font-weight:600;color:var(--text);padding:0 5px;min-width:19px;height:19px;line-height:19px;border-radius:999px;box-sizing:border-box}
+#v_gantt .days .dw{font-size:10px;color:var(--text-dim);padding:0 2px}
+#v_gantt .days>div.sat,#v_gantt .days>div.sun,#v_gantt .days>div.hol{background:#fafafa;color:var(--text-dim)}
+#v_gantt .days>div.sat .dm,#v_gantt .days>div.sun .dm{color:var(--text)}
+#v_gantt .days>div.sat .dw{color:var(--text-faint)}
+#v_gantt .days>div.sun .dw,#v_gantt .days>div.hol .dw,#v_gantt .days>div.hol .dm{color:var(--red)}
+#v_gantt .days>div.today{background:rgba(10,132,255,.06);color:var(--text-dim)}
+#v_gantt .days>div.today .dm{display:block;background:var(--accent);color:#fff;padding:0 5px;line-height:19px}
+#v_gantt .days>div.mstart,#v_gantt .bg>div.mstart{border-left:1px solid var(--border)}
 
 /* ===== ボタンを 2 種類に（10/16）：大事な操作＝青の塗り、それ以外＝灰の地。枠線・点線の枠はやめる。表の中の「編集」などの文字のボタンはそのまま ===== */
 .slog-btn,.staff-btn,.mny-btn,.date-add-btn,.rental-add-btn,.af-cancel,.mo-foot .arch-btn,.mo-foot .cancel,.week-btn,.btn.gray{background:var(--surface3);border:none;color:var(--text);border-radius:8px}
@@ -3398,9 +3411,9 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <div id="v_gantt">
       <div class="fv-sum" id="ganttChips"></div>
       <div class="gt-controls">
-        <label>開始 <input type="date" id="gt_d0" onchange="Inv.renderGantt()"></label>
-        <label>日数 <select id="gt_dn" onchange="Inv.renderGantt()"><option>14</option><option selected>31</option><option>62</option><option>92</option></select></label>
-        <span class="gt-nav"><button type="button" onclick="Inv.ganttMove(-7)">← 1週</button><button type="button" onclick="Inv.ganttToday()">今日</button><button type="button" onclick="Inv.ganttMove(7)">1週 →</button></span>
+        <span class="gt-nav"><button type="button" onclick="Inv.ganttMove(-7)">◀</button><span class="gt-range" id="gt_range"></span><button type="button" onclick="Inv.ganttMove(7)">▶</button><button type="button" onclick="Inv.ganttToday()">今日</button></span>
+        <input type="date" id="gt_d0" class="hidden" onchange="Inv.renderGantt()">
+        <select id="gt_dn" onchange="Inv.renderGantt()"><option value="14">2週間</option><option value="31" selected>1か月</option><option value="62">2か月</option><option value="92">3か月</option></select>
       </div>
       <div id="ganttOut" class="gt-wrap"></div>
       <div class="gt-legend"><span><i class="lg est"></i>仮押さえ</span><span><i class="lg res"></i>予約</span><span><i class="lg out"></i>貸出中</span><span><i class="lg mnt"></i>メンテ中</span><span><i class="lg dsp"></i>廃棄予定</span></div>
@@ -4593,8 +4606,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 14:05';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1315;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 14:13';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1316;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -7157,7 +7170,7 @@ const Inv = (function(){
   const GT_OUT=['貸出中','メンテ中','廃棄予定'];
   const GT_HOL={'2025-01-01':'元日','2025-01-13':'成人の日','2025-02-11':'建国記念の日','2025-02-23':'天皇誕生日','2025-02-24':'振替休日','2025-03-20':'春分の日','2025-04-29':'昭和の日','2025-05-03':'憲法記念日','2025-05-04':'みどりの日','2025-05-05':'こどもの日','2025-05-06':'振替休日','2025-07-21':'海の日','2025-08-11':'山の日','2025-09-15':'敬老の日','2025-09-23':'秋分の日','2025-10-13':'スポーツの日','2025-11-03':'文化の日','2025-11-23':'勤労感謝の日','2025-11-24':'振替休日','2026-01-01':'元日','2026-01-12':'成人の日','2026-02-11':'建国記念の日','2026-02-23':'天皇誕生日','2026-03-20':'春分の日','2026-04-29':'昭和の日','2026-05-03':'憲法記念日','2026-05-04':'みどりの日','2026-05-05':'こどもの日','2026-05-06':'振替休日','2026-07-20':'海の日','2026-08-11':'山の日','2026-09-21':'敬老の日','2026-09-22':'国民の休日','2026-09-23':'秋分の日','2026-10-12':'スポーツの日','2026-11-03':'文化の日','2026-11-23':'勤労感謝の日','2027-01-01':'元日','2027-01-11':'成人の日','2027-02-11':'建国記念の日','2027-02-23':'天皇誕生日','2027-03-21':'春分の日','2027-03-22':'振替休日','2027-04-29':'昭和の日','2027-05-03':'憲法記念日','2027-05-04':'みどりの日','2027-05-05':'こどもの日','2027-07-19':'海の日','2027-08-11':'山の日','2027-09-20':'敬老の日','2027-09-23':'秋分の日','2027-10-11':'スポーツの日','2027-11-03':'文化の日','2027-11-23':'勤労感謝の日'};
   function gtYmd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-  function gtCls(d,t){const s=gtYmd(d),w=d.getDay();return (s===t?'today':GT_HOL[s]?'hol':w===6?'sat':w===0?'sun':'')+(s===ganttSel?' sel':'')}
+  function gtCls(d,t){const s=gtYmd(d),w=d.getDay();return (s===t?'today':GT_HOL[s]?'hol':w===6?'sat':w===0?'sun':'')+(s===ganttSel?' sel':'')+(d.getDate()===1?' mstart':'')}
   function ganttPick(ds){ganttSel=(ganttSel===ds?'':ds);renderGantt()}
   function gtOverdue(r){return GT_OUT.indexOf(r.status)>=0&&String(r.date_end||'').slice(0,10)<todayStr()}
   function gtBarCls(r){const st=r.status||'';if(st==='貸出中')return'out';if(st==='メンテ中')return'mnt';if(st==='廃棄予定')return'dsp';if(st==='予約')return projStatus[r.client_name]==='見積中'?'est':'res';return'oth'}
@@ -7171,6 +7184,7 @@ const Inv = (function(){
     const d0=new Date($('gt_d0').value+'T00:00:00'),N=Number($('gt_dn').value)||31;
     const days=[];for(let i=0;i<N;i++){const d=new Date(d0);d.setDate(d.getDate()+i);days.push(d)}
     const t=todayStr(),dstr=days.map(gtYmd);
+    const gr=$('gt_range');if(gr){const e=days[N-1];gr.textContent=`${d0.getFullYear()}年 ${d0.getMonth()+1}/${d0.getDate()} 〜 ${e.getMonth()+1}/${e.getDate()}`}
     // カテゴリチップ：件数＝この期間に動きのある品の数
     const cats=getAllCategories(),cnt={};let moving=0;
     items.forEach(i=>{if(gtRowsOf(i,dstr,N).length){cnt[i.category]=(cnt[i.category]||0)+1;moving++}});
@@ -7179,7 +7193,7 @@ const Inv = (function(){
       cats.forEach(c=>{ch+=`<div class="fv-si${ganttCat===c?' on':''}" data-f="${esc(c)}" onclick="Inv.setGanttCat('${esc(c)}')"><div class="n">${cnt[c]||0}</div><div class="l">${esc(c)}</div></div>`});
       chipEl.innerHTML=ch}
     const grid='repeat('+N+',1fr)';
-    let h=`<div class="gt"><div class="hd name"><b>品目</b><span class="tot">保有</span></div><div class="hd tl"><div class="days" style="grid-template-columns:${grid}">`+days.map(d=>{const s=gtYmd(d);return `<div class="${gtCls(d,t)}" title="${GT_HOL[s]||''} クリックでこの日の残を全品に表示" onclick="Inv.ganttPick('${s}')"><span class="dw">${GT_HOL[s]||dow[d.getDay()]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`}).join('')+'</div></div>';
+    let h=`<div class="gt"><div class="hd name"><b>品目</b><span class="tot">保有</span></div><div class="hd tl"><div class="days" style="grid-template-columns:${grid}">`+days.map(d=>{const s=gtYmd(d);return `<div class="${gtCls(d,t)}" title="${GT_HOL[s]||''} クリックでこの日の残を全品に表示" onclick="Inv.ganttPick('${s}')"><span class="dm">${d.getDate()===1?(d.getMonth()+1)+'/1':d.getDate()}</span><span class="dw">${GT_HOL[s]||dow[d.getDay()]}</span></div>`}).join('')+'</div></div>';
     let last='',shown=0;
     const sorted=items.slice().sort((a,b)=>{const ia=CAT_PRIORITY.indexOf(a.category),ib=CAT_PRIORITY.indexOf(b.category);const ra=ia<0?CAT_PRIORITY.length:ia,rb=ib<0?CAT_PRIORITY.length:ib;if(ra!==rb)return ra-rb;const c=String(a.category).localeCompare(String(b.category),'ja');if(c)return c;return String(a.item_name).localeCompare(String(b.item_name),'ja')});
     sorted.filter(i=>!ganttCat||i.category===ganttCat).forEach(it=>{
