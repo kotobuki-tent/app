@@ -2044,6 +2044,7 @@ table.jobs th{background:transparent;font-weight:500;color:var(--text-faint);bor
 table.jobs td{padding:13px 16px;border-bottom:none;border-top:0.5px solid #f0f0f3;font-size:14px}   /* 他の一覧（案件・在庫・車両）と同じ 14px（10/28） */
 table.jobs .ct-main{font-size:14px;color:var(--text)}
 table.jobs td:first-child{white-space:normal;min-width:160px}   /* 細い窓では案件名を折り返す（10/15） */
+#projDoneView td:first-child,#projArchivedView td:first-child,#prodArchive td:first-child,#prodArchived td:first-child,#salesArchivedView td:first-child,#archiveView td:first-child{white-space:normal;min-width:220px}   /* 終了・アーカイブの表も案件名を折り返して右端（ステータス）が切れないように（10/28 iller） */
 table.jobs .ct-sub{font-size:12px;color:var(--text-faint);margin-top:2px;font-variant-numeric:tabular-nums}
 table.jobs .ct-no .ct-main{font-variant-numeric:tabular-nums}
 table.jobs tr:hover td{background:rgba(10,132,255,.04)}
@@ -4620,8 +4621,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 14:30';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1321;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 14:33';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1322;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
