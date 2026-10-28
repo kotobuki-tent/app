@@ -3040,7 +3040,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <div class="ce-cancel" id="ce_cancel"></div>
       <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="ce_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="ce_order_no"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>社内納期（目標・仮）<span class="ce-target-note">顧客の納期ではない／カレンダーに点線で表示</span></label><input type="date" id="ce_target_date"></div></div>
-      <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　案件につき 1 つ</label><input type="number" id="ce_amount" min="0" step="1"></div></div>
+      <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）</label><input type="number" id="ce_amount" min="0" step="1"></div></div>
       <div class="mo-row full"><div class="mo-field"><label>備考</label><textarea id="ce_note"></textarea></div></div>
       </div><div class="ce-col">
       <div class="mo-field"><label>この案件の明細（生産・企画・販売）</label><div id="ce_children" class="ce-children"></div><div id="ce_adddept" class="ce-adddept"></div><div id="ce_rentals"></div></div>
@@ -4555,8 +4555,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 13:25';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1313;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 13:35';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1314;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9958,7 +9958,7 @@ const Cases = (function(){
         <div class="mo-row full"><div class="mo-field"><label>案件名 *</label><input id="cf_project"></div></div>
         <div class="mo-row pair"><div class="mo-field f7"><label>担当者</label><input id="cf_our_person" list="caseStaffList"></div><div class="mo-field f3"><label>ステータス</label><select id="cf_status"><option>見積中</option><option selected>受注</option><option>見送り</option></select></div></div>
         <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="cf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="cf_order_no"></div></div>
-        <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）　案件につき 1 つ</label><input type="number" id="cf_case_amount" min="0" step="1"></div></div>
+        <div class="mo-row full"><div class="mo-field"><label>金額（円・税抜）</label><input type="number" id="cf_case_amount" min="0" step="1"></div></div>
       </div>
       <div class="cases-hint">担当部門を選択（複数可）。製作と施工の両方を行う案件は両方にチェック。</div>
 
