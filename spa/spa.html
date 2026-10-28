@@ -2510,6 +2510,44 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
 :is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-edit-body .mo-foot{margin:0 -16px;padding:12px 16px 14px;border-top:0.5px solid var(--border-light)}
 #view-poreq .po-panel:has(>#poReqForm){background:transparent;box-shadow:none;padding:0}
 :is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-row:has(>.mo-field>#xf_rentalPanel){background:#fff;border-radius:12px;padding:12px 16px;margin-bottom:14px}
+/* ===== カレンダーの見出しをそろえる（10/28、iller「カレンダーを同じものにできるか」）：企画制作のスケジュールと案件のカレンダーを予定ボードと同じ形に＝日付を大きく・曜日（祝日名）を下に小さく、今日は青い丸と薄い青の列、土日祝は薄い灰の列、月の変わり目に線、操作は ◀ 期間 ▶ 今日。見出しの列が本体より広かったずれ（flex の min-width）も直す ===== */
+.gantt-dates,.gantt-bars{min-width:0}
+.gantt-date-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0 3px;line-height:1.15;color:var(--text-dim);border-right:0.5px solid #f0f0f3;font-weight:400}
+.gantt-date-cell .dm{display:block;font-size:13px;font-weight:600;color:var(--text);padding:0 5px;min-width:19px;height:19px;line-height:19px;border-radius:999px;box-sizing:border-box}
+.gantt-date-cell .dow{display:block;font-size:10px;margin:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px;color:var(--text-dim)}
+.gantt-date-cell.sat,.gantt-date-cell.sun,.gantt-date-cell.holiday{background:#fafafa;color:var(--text-dim)}
+.gantt-date-cell.sat .dow{color:var(--text-faint)}
+.gantt-date-cell.sat .dm{color:var(--text)}
+.gantt-date-cell.sun .dow,.gantt-date-cell.holiday .dow,.gantt-date-cell.holiday .dm{color:var(--red)}
+.gantt-date-cell.today{background:rgba(10,132,255,.06);color:var(--text-dim)}
+.gantt-date-cell.today .dm{background:var(--accent);color:#fff}
+.gantt-date-cell.mstart,.gantt-bar-cell.mstart{border-left:1px solid var(--border)}
+.gantt-bar-cell.sat,.gantt-bar-cell.sun,.gantt-bar-cell.holiday{background:#fafafa}
+.gantt-bar-cell.today{background:rgba(10,132,255,.06)}
+.gantt-nav{align-items:center;gap:6px}
+.gantt-nav button{border:none;background:var(--surface3);border-radius:8px;padding:6px 11px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text)}
+.gantt-nav button:hover{background:#dededf;color:var(--text)}
+.gantt-range{font-size:15px;font-weight:600;min-width:150px;text-align:center;white-space:nowrap}
+#view-cases .cal-controls .cal-nav{align-items:center;gap:6px}
+#view-cases .cal-controls .cal-nav button{border:none;background:var(--surface3);border-radius:8px;padding:6px 11px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text)}
+#view-cases .cal-controls .cal-nav button:hover{background:#dededf}
+#view-cases .cal-controls .cal-range{font-size:15px;font-weight:600;min-width:150px;text-align:center;white-space:nowrap}
+#view-cases .cal-controls .cal-period{border:none;background:var(--surface3);border-radius:8px;padding:7px 11px;font-weight:500}
+#view-cases div.cal-scroll{border:none;border-radius:12px}
+#view-cases .cal-grid .cal-corner{border-bottom:0.5px solid var(--border-light)}
+#view-cases .cal-grid .cal-dhd{padding:4px 0 3px;line-height:1.15;color:var(--text-dim);font-size:10px;font-weight:400;border-bottom:0.5px solid var(--border-light);border-left:0.5px solid #f0f0f3;background:var(--surface)}
+#view-cases .cal-grid .cal-dhd b{display:block;width:max-content;margin:0 auto;font-size:13px;font-weight:600;color:var(--text);padding:0 5px;min-width:19px;height:19px;line-height:19px;border-radius:999px;box-sizing:border-box}
+#view-cases .cal-grid .cal-dhd i{display:block;font-size:10px;font-style:normal;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
+#view-cases .cal-grid .cal-dhd.sat,#view-cases .cal-grid .cal-dhd.sun,#view-cases .cal-grid .cal-dhd.hol{background:#fafafa;color:var(--text-dim)}
+#view-cases .cal-grid .cal-dhd.sat i{color:var(--text-faint)}
+#view-cases .cal-grid .cal-dhd.sun i,#view-cases .cal-grid .cal-dhd.hol i,#view-cases .cal-grid .cal-dhd.hol b{color:var(--red)}
+#view-cases .cal-grid .cal-dhd.today{background:rgba(10,132,255,.06);color:var(--text-dim);font-weight:400}
+#view-cases .cal-grid .cal-dhd.today b{background:var(--accent);color:#fff}
+#view-cases .cal-grid .cal-dhd.mstart,#view-cases .cal-grid .cal-cell.mstart{border-left:1px solid var(--border)}
+#view-cases .cal-grid .cal-cell{border-bottom:0.5px solid #f0f0f3;border-left:0.5px solid #f0f0f3}
+#view-cases .cal-grid .cal-cell.sat,#view-cases .cal-grid .cal-cell.sun,#view-cases .cal-grid .cal-cell.hol{background:#fafafa}
+#view-cases .cal-grid .cal-cell.today{background:rgba(10,132,255,.06)}
+#view-cases .cal-grid .cal-rlabel{border-bottom:0.5px solid #f0f0f3}
 
 /* ===== ボタンを 2 種類に（10/16）：大事な操作＝青の塗り、それ以外＝灰の地。枠線・点線の枠はやめる。表の中の「編集」などの文字のボタンはそのまま ===== */
 .slog-btn,.staff-btn,.mny-btn,.date-add-btn,.rental-add-btn,.af-cancel,.mo-foot .arch-btn,.mo-foot .cancel,.week-btn,.btn.gray{background:var(--surface3);border:none;color:var(--text);border-radius:8px}
@@ -4555,8 +4593,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 13:35';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1314;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 14:05';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1315;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4942,6 +4980,7 @@ function centerActiveNav(){
    名前空間（移植フェーズで各アプリの data/view/render/loadAll 等を流し込む）
    骨組み段階ではロード機構の検証用に最小限だけ実装
    ======================================================================== */
+const JP_HOL={'2025-01-01':'元日','2025-01-13':'成人の日','2025-02-11':'建国記念の日','2025-02-23':'天皇誕生日','2025-02-24':'振替休日','2025-03-20':'春分の日','2025-04-29':'昭和の日','2025-05-03':'憲法記念日','2025-05-04':'みどりの日','2025-05-05':'こどもの日','2025-05-06':'振替休日','2025-07-21':'海の日','2025-08-11':'山の日','2025-09-15':'敬老の日','2025-09-23':'秋分の日','2025-10-13':'スポーツの日','2025-11-03':'文化の日','2025-11-23':'勤労感謝の日','2025-11-24':'振替休日','2026-01-01':'元日','2026-01-12':'成人の日','2026-02-11':'建国記念の日','2026-02-23':'天皇誕生日','2026-03-20':'春分の日','2026-04-29':'昭和の日','2026-05-03':'憲法記念日','2026-05-04':'みどりの日','2026-05-05':'こどもの日','2026-05-06':'振替休日','2026-07-20':'海の日','2026-08-11':'山の日','2026-09-21':'敬老の日','2026-09-22':'国民の休日','2026-09-23':'秋分の日','2026-10-12':'スポーツの日','2026-11-03':'文化の日','2026-11-23':'勤労感謝の日','2027-01-01':'元日','2027-01-11':'成人の日','2027-02-11':'建国記念の日','2027-02-23':'天皇誕生日','2027-03-21':'春分の日','2027-03-22':'振替休日','2027-04-29':'昭和の日','2027-05-03':'憲法記念日','2027-05-04':'みどりの日','2027-05-05':'こどもの日','2027-07-19':'海の日','2027-08-11':'山の日','2027-09-20':'敬老の日','2027-09-23':'秋分の日','2027-10-11':'スポーツの日','2027-11-03':'文化の日','2027-11-23':'勤労感謝の日'};   // 祝日（案件カレンダー用。在庫の GT_HOL と同じ表）
 const Prod = (function(){
   // ===== 生産の状態（旧グローバル変数→IIFE内ローカルに隔離） =====
   let prodData=[];
@@ -5594,7 +5633,8 @@ const Proj = (function(){
   function initVehicleChecks(){VH_PHASES.forEach(phase=>{const el=$('xf_vh_'+phase);if(!el)return;el.innerHTML=VEHICLES.map(v=>`<label><input type="checkbox" value="${v}">${v}</label>`).join('')})}
   function getVehiclesFromPhase(phase){const cbs=$('xf_vh_'+phase).querySelectorAll('input:checked');return Array.from(cbs).map(cb=>cb.value).join(',')}
   function setVehiclesForPhase(phase,val){const vs=val?String(val).split(',').map(s=>s.trim()):[];$('xf_vh_'+phase).querySelectorAll('input').forEach(cb=>{cb.checked=vs.includes(cb.value)})}
-  function ganttDateHeaders(dates){let h='';dates.forEach(d=>{const ds=dateStr(d);const isT=ds===dateStr(today);const dn=d.getDay();const hol=HOLIDAYS[ds];let cls='gantt-date-cell';if(isT)cls+=' today';if(dn===0||hol)cls+=' holiday';else if(dn===6)cls+=' sat';h+=`<div class="${cls}"><span class="dow">${hol||dow[dn]}</span><span class="dm">${d.getMonth()+1}/${d.getDate()}</span></div>`});return h}
+  function ganttCellCls(d){const ds=dateStr(d);const dn=d.getDay();const hol=HOLIDAYS[ds];let c='';if(ds===dateStr(today))c+=' today';if(hol)c+=' holiday';else if(dn===0)c+=' sun';else if(dn===6)c+=' sat';if(d.getDate()===1)c+=' mstart';return c}
+  function ganttDateHeaders(dates){let h='';dates.forEach(d=>{const ds=dateStr(d);const dn=d.getDay();const hol=HOLIDAYS[ds];const dlab=d.getDate()===1?`${d.getMonth()+1}/1`:`${d.getDate()}`;h+=`<div class="gantt-date-cell${ganttCellCls(d)}"><span class="dm">${dlab}</span><span class="dow">${hol||dow[dn]}</span></div>`});return h}
 
   // ===== データ読み込み（loadAll本物化：project+rentals+inventoryの3本。rentals/inventoryはviewProj/ganttで即使うため起動時取得） =====
   async function loadProj(){try{const r=await fetch(API+'?action=read&dept=project');const j=await r.json();if(j.success){const arr=Norm.proj(Array.isArray(j.data)?j.data.slice().reverse():[]);projData=Pending.apply('project','',mergeWithTmp(arr,projData,r=>String(r.project||'')+'|'+String(r.estimate_no||'')));detectStatusChanges()}}catch(e){toast('企画制作データ取得エラー',true)}}
@@ -5812,7 +5852,8 @@ const Proj = (function(){
     });
     h+='</div>';
     // 週移動ボタン（チップと同じ行の右端。iller「スタートが遅れるのが嫌」2026-10-15）
-    h+='<div class="gantt-controls"><div class="gantt-nav"><button onclick="Proj.ganttMove(-7)">← 1週</button><button onclick="Proj.ganttToday()">今日</button><button onclick="Proj.ganttMove(7)">1週 →</button></div>';
+    const gEnd=new Date(ganttStart);gEnd.setDate(gEnd.getDate()+ganttDays-1);
+    h+=`<div class="gantt-controls"><div class="gantt-nav"><button onclick="Proj.ganttMove(-7)">◀</button><span class="gantt-range">${ganttStart.getFullYear()}年 ${ganttStart.getMonth()+1}/${ganttStart.getDate()} 〜 ${gEnd.getMonth()+1}/${gEnd.getDate()}</span><button onclick="Proj.ganttMove(7)">▶</button><button onclick="Proj.ganttToday()">今日</button></div>`;
     h+=`<select onchange="Proj.setGanttDays(this.value)"><option value="14"${ganttDays===14?' selected':''}>2週間</option><option value="21"${ganttDays===21?' selected':''}>3週間</option><option value="28"${ganttDays===28?' selected':''}>4週間</option><option value="42"${ganttDays===42?' selected':''}>6週間</option></select>`;
     h+=`</div></div>`;
     // 現場セクション
@@ -5839,7 +5880,7 @@ const Proj = (function(){
       dates.forEach(dt=>{const ds=dateStr(dt);
       const c=usage[v][ds]||0;
       const isT=dateStr(dt)===dateStr(today);
-      h+=`<div class="gantt-bar-cell${isT?' today':''}" style="display:flex;align-items:center;justify-content:center">`;
+      h+=`<div class="gantt-bar-cell${ganttCellCls(dt)}" style="display:flex;align-items:center;justify-content:center">`;
       if(c>=2)h+=`<span style="font-size:12px;font-weight:700;color:#fff;background:var(--red);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center">${c}</span>`;
       else if(c===1)h+=`<span style="font-size:10px;color:var(--text-faint)">${c}</span>`;
       h+='</div>'});
@@ -5867,7 +5908,7 @@ const Proj = (function(){
       h+=`<span class="prj-sub">${dateRange}</span></div><div class="gantt-bars">`;
       // 1 案件＝1 本の帯（最初の日〜最後の日）。色は 現場＝青／レンタル＝緑／製作＝紫、現場の本番日だけ帯の中を濃く。
       // 工程ごとの細切れは 10/15 iller「やたら青くて縦長の資格がぽんぽん並んでるだけで見にくい」でやめた（見本 企画スケジュール_2026-10-15 の形に）
-      dates.forEach(dt=>{const isT=dateStr(dt)===dateStr(today);h+=`<div class="gantt-bar-cell${isT?' today':''}"></div>`});
+      dates.forEach(dt=>{h+=`<div class="gantt-bar-cell${ganttCellCls(dt)}"></div>`});
       if(allDates.length){
         const N=dates.length, day0=dates[0];
         const idx=x=>Math.round((new Date(x.getFullYear(),x.getMonth(),x.getDate())-new Date(day0.getFullYear(),day0.getMonth(),day0.getDate()))/864e5);
@@ -9550,6 +9591,7 @@ const Cases = (function(){
       h+='</div>'; }
     return h+'</div>';
   }
+  function calCls(d){ const ds=dateStr(d), wd=d.getDay(), hol=JP_HOL[ds]; return (ds===dateStr(today)?' today':'')+(hol?' hol':wd===0?' sun':wd===6?' sat':'')+(d.getDate()===1?' mstart':''); }
   function calMove(n){ if(!_calStart)calInit(); _calStart.setDate(_calStart.getDate()+n); render(); }
   function calToday(){ calInit(); render(); }
   function calSetDays(v){ _calDays=+v; render(); }
@@ -9565,16 +9607,17 @@ const Cases = (function(){
     rows.sort((a,b)=>Math.min.apply(null,a.evs.map(e=>+e.date))-Math.min.apply(null,b.evs.map(e=>+e.date)));
     const wlbl=['日','月','火','水','木','金','土'];
     let h=`<div class="fv-sum">${deptChips()}</div>`;
-    h+='<div class="cal-controls"><div class="cal-nav"><button onclick="Cases.calMove(-7)">◀ 1週</button><button onclick="Cases.calToday()">今日</button><button onclick="Cases.calMove(7)">1週 ▶</button></div>';
+    const cEnd=new Date(_calStart);cEnd.setDate(cEnd.getDate()+_calDays-1);
+    h+=`<div class="cal-controls"><div class="cal-nav"><button onclick="Cases.calMove(-7)">◀</button><span class="cal-range">${_calStart.getFullYear()}年 ${_calStart.getMonth()+1}/${_calStart.getDate()} 〜 ${cEnd.getMonth()+1}/${cEnd.getDate()}</span><button onclick="Cases.calMove(7)">▶</button><button onclick="Cases.calToday()">今日</button></div>`;
     h+=`<select class="cal-period" onchange="Cases.calSetDays(this.value)"><option value="7"${_calDays===7?' selected':''}>1週</option><option value="14"${_calDays===14?' selected':''}>2週</option><option value="28"${_calDays===28?' selected':''}>4週</option></select></div>`;
     h+=`<div class="cal-scroll"><div class="cal-grid" style="grid-template-columns:190px repeat(${_calDays},minmax(46px,1fr))">`;
     h+='<div class="cal-corner"></div>';
-    dates.forEach(d=>{ const isT=dateStr(d)===dateStr(today); const wd=d.getDay(); h+=`<div class="cal-dhd${isT?' today':''}${wd===0?' sun':''}${wd===6?' sat':''}">${d.getMonth()+1}/${d.getDate()}<br><span>${wlbl[wd]}</span></div>`; });
+    dates.forEach(d=>{ const wd=d.getDay(), dn=d.getDate(), hol=JP_HOL[dateStr(d)]; h+=`<div class="cal-dhd${calCls(d)}"><b>${dn===1?(d.getMonth()+1)+'/1':dn}</b><i>${hol?esc(hol):wlbl[wd]}</i></div>`; });
     if(!rows.length){ h+='<div class="cal-empty" style="grid-column:1/-1">この期間に動く案件はありません</div>'; }
     rows.forEach(r=>{ const id=esc(r.c.id);
       h+=`<div class="cal-rlabel" onclick="Cases.openEdit('${id}')">${deptBadges(r.c.id)}<span class="cal-rname">${esc(r.c.name||'(無題)')}</span></div>`;
       dates.forEach(d=>{ const ds=dateStr(d); const isT=ds===dateStr(today); const evs=r.evs.filter(e=>dateStr(e.date)===ds);
-        h+=`<div class="cal-cell${isT?' today':''}" onclick="Cases.openEdit('${id}')">`;
+        h+=`<div class="cal-cell${calCls(d)}" onclick="Cases.openEdit('${id}')">`;
         evs.forEach(e=>{ h+=`<span class="cal-ev${e.tentative?' tentative':''}" style="background:${e.c}">${e.t}</span>`; });
         h+='</div>'; }); });
     h+='</div></div>';
