@@ -2443,6 +2443,74 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
 }
 @media(prefers-reduced-motion:reduce){.sec-in,.mo-bg.mo-in,.mo-bg.mo-in .mo{animation:none}}
 
+/* ===== 入力の行（10/28、iller「APPLE を追求して」）：登録／編集の窓（生産・企画制作・販売・案件・発注依頼）も日報と同じ「札が左・値が右・枠なし」の行。灰の地に白いかたまり、行の間は細い線 ===== */
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-row{display:flex;flex-direction:column;flex-wrap:nowrap;gap:0;margin:0;padding:0 16px;background:#fff}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-row+.mo-row{border-top:0.5px solid var(--border-light)}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-row:not(.mo-row+.mo-row){border-radius:12px 12px 0 0}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-row:not(:has(+.mo-row)){border-radius:0 0 12px 12px;margin-bottom:14px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-row:not(.mo-row+.mo-row):not(:has(+.mo-row)){border-radius:12px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-row:not(:has(>.mo-field>:is(input:not([type=hidden]),select,textarea))){background:transparent;padding:0;border:none;border-radius:0}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field:has(>:is(input:not([type=hidden]),select,textarea)){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;min-height:48px;flex:none;min-width:0;margin:0}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-row .mo-field+.mo-field{border-top:0.5px solid var(--border-light)}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) :not(.mo-row)>.mo-field:has(>:is(input:not([type=hidden]),select,textarea)){background:#fff;border-radius:12px;padding:0 16px;margin-bottom:14px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field:has(>:is(input:not([type=hidden]),select,textarea))>label{font-size:15px;font-weight:400;color:var(--text);flex:0 0 auto;letter-spacing:0;margin:0}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field>label .ce-target-note{display:block;margin:2px 0 0;font-size:11px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field>input,:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field>select{flex:1;min-width:0;width:auto;min-height:0;border:none;border-radius:0;background:transparent;padding:12px 0;font:400 15px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;text-align:right;color:var(--accent);appearance:none;-webkit-appearance:none;box-shadow:none}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field>select{text-align-last:right;padding-right:0}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field>input[type=date]{flex:0 0 auto;width:auto}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field>input::placeholder{color:var(--text-faint)}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field>input:focus,:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field>select:focus,:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field>textarea:focus{outline:none;box-shadow:none;border-color:transparent}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field:has(>textarea:not([hidden])){flex-direction:column;align-items:stretch;gap:2px;padding-top:10px;padding-bottom:6px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field:has(>textarea:not([hidden]))>label{font-size:12px;font-weight:500;color:var(--text-faint)}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field>textarea{border:none;border-radius:0;background:transparent;padding:4px 0;min-height:56px;font:400 15px/1.5 'Hiragino Sans','Noto Sans JP',sans-serif;box-shadow:none;width:100%}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-field.cf-hide{display:none}
+/* 区切りの小見出し（日程・材料・仕入 など）＝日報の「みんなの日報」の見出しと同じ小さい灰 */
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .phase-hd{font-size:12px;font-weight:500;color:var(--text-faint);margin:0;padding:4px 16px 6px;border:none}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .phase-hd span{font-size:11px!important}
+/* 日付の組（搬入日・設営日…）は 1 つの白いかたまり */
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) :has(>.date-phase-block){background:#fff;border-radius:12px;padding:12px 16px 4px;margin-bottom:14px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .date-phase-label{font-size:13px;font-weight:400;color:var(--text-dim)}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .date-item input[type=date]{border:none;background:var(--surface3);border-radius:8px;font-size:14px}
+/* レンタルの切り替え＝1 行の右にスイッチ */
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .type-toggle{justify-content:space-between;min-height:48px;padding:0 16px;background:#fff;border:none;border-radius:12px;margin-bottom:14px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .type-toggle>label{order:1;font-size:15px;font-weight:400}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .type-toggle>input{order:3}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .type-toggle .hint{display:none}
+/* 案件登録（ページ）：白い札をやめて窓と同じ地に */
+#view-cases #casesPane .cases-card{background:transparent;border:none;padding:0;margin:0}
+#view-cases #casesPane .cases-card.off{opacity:1}
+#view-cases #casesPane .cases-sec-hd{display:flex;align-items:center;min-height:48px;padding:0 16px;margin:0 0 14px;background:#fff;border-radius:12px;font-weight:400}
+#view-cases #casesPane .cases-card:has(.cf-hide:not(.hidden)) .cases-sec-hd{margin-bottom:14px}
+#view-cases #casesPane .cf-toggle{flex:1;justify-content:space-between;font-size:15px;font-weight:400}
+#view-cases #casesPane .cf-toggle input{order:2}
+#view-cases #casesPane .cases-hint{padding:0 16px;margin:-6px 0 14px}
+#view-cases #casesPane .cf-typeseg{display:flex;gap:2px;padding:3px;border-radius:10px;background:var(--surface3);margin-bottom:14px}
+#view-cases #casesPane .cf-typeseg button{flex:1;height:30px;padding:0;border:none;border-radius:7px;background:transparent;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim)}
+#view-cases #casesPane .cf-typeseg button.on{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
+#view-cases #casesPane select.cf-delsel{display:block;width:100%;max-width:none;background:#fff;border:none;border-radius:12px;padding:12px 16px;margin-bottom:14px;font-size:15px;color:var(--accent)}
+#view-cases #casesPane #cfBlockHost{background:#fff;border-radius:12px;padding:12px 16px;margin-bottom:14px}
+#view-cases #casesPane .cases-foot .save{padding:11px 22px;font:600 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif}
+/* 発注依頼・発注書の窓：.po-f も同じ行 */
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-edit-body{display:block;background:#fff;border-radius:12px;padding:0 16px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;min-height:48px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f+.po-f{border-top:0.5px solid var(--border-light)}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f>label{font-size:15px;color:var(--text);flex:0 0 auto}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f>input,:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f>select{flex:1;min-width:0;border:none;border-radius:0;background:transparent;padding:12px 0;font-size:15px;text-align:right;color:var(--accent);appearance:none;-webkit-appearance:none}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f>select{text-align-last:right}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f>input:focus,:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f>select:focus,:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-pick input:focus,:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-item input:focus{outline:none;box-shadow:none}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f .po-pick{flex:1;min-width:0}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f .po-pick input{border:none;background:transparent;padding:12px 24px 12px 0;font-size:15px;text-align:right;color:var(--accent)}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f .po-pick-arr{right:0}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f .po-pick-it{text-align:left}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f .po-inline{flex:1;justify-content:flex-end;padding:8px 0}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f .po-inline input{flex:0 1 220px;border:none;background:var(--surface3);border-radius:8px;padding:8px 10px;font-size:14px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f:has(.po-item-hd){flex-direction:column;align-items:stretch;gap:0;padding:10px 0 8px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-f:has(.po-item-hd)>label{font-size:12px;font-weight:500;color:var(--text-faint)}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-item input{border:none;background:var(--surface3);border-radius:6px;padding:8px 10px;font-size:14px}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .po-edit-body .mo-foot{margin:0 -16px;padding:12px 16px 14px;border-top:0.5px solid var(--border-light)}
+#view-poreq .po-panel:has(>#poReqForm){background:transparent;box-shadow:none;padding:0}
+:is(.mo-bg.fm .mo,#caseEditBg .mo,#poEditBg .mo,#view-poreq,#casesPane) .mo-row:has(>.mo-field>#xf_rentalPanel){background:#fff;border-radius:12px;padding:12px 16px;margin-bottom:14px}
+
 /* ===== ボタンを 2 種類に（10/16）：大事な操作＝青の塗り、それ以外＝灰の地。枠線・点線の枠はやめる。表の中の「編集」などの文字のボタンはそのまま ===== */
 .slog-btn,.staff-btn,.mny-btn,.date-add-btn,.rental-add-btn,.af-cancel,.mo-foot .arch-btn,.mo-foot .cancel,.week-btn,.btn.gray{background:var(--surface3);border:none;color:var(--text);border-radius:8px}
 .slog-btn:hover,.staff-btn:hover,.mny-btn:hover,.date-add-btn:hover,.rental-add-btn:hover,.af-cancel:hover,.mo-foot .arch-btn:hover,.mo-foot .cancel:hover,.week-btn:hover,.btn.gray:hover{background:#dededf;color:var(--text);border:none}
@@ -4487,8 +4555,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 09:31';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1311;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 12:30';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1312;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
