@@ -4621,8 +4621,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 14:33';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1322;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 14:34';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1323;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -5382,7 +5382,7 @@ const Prod = (function(){
     items.forEach(d=>{const dl=parseD(d.deadline);
       const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';
       const chk=d.invoiced==='TRUE'||d.invoiced===true;
-      h+='<tr data-id="'+d.id+'" onclick="Prod.editProd(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" '+(chk?'checked':'')+' onchange="Prod.toggleInvoiced(\''+d.id+'\',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Prod.editProd(\''+d.id+'\')">編集</button> <button class="act-btn" onclick="Prod.archiveProd(\''+d.id+'\')">アーカイブへ</button></td></tr>'});
+      h+='<tr data-id="'+d.id+'" onclick="Prod.editProd(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" '+(chk?'checked':'')+' onchange="Prod.toggleInvoiced(\''+d.id+'\',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu"><button type="button" onclick="Prod.editProd(\''+d.id+'\')">編集</button><button type="button" onclick="Prod.archiveProd(\''+d.id+'\')">アーカイブへ</button></div></div></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}render()}});
   }
@@ -5405,7 +5405,7 @@ const Prod = (function(){
     items.forEach(d=>{const dl=parseD(d.deadline);
       const dlStr=dl?((dl.getMonth()+1)+'/'+dl.getDate()+'（'+dow[dl.getDay()]+'）'):'';
       const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
-      h+='<tr data-id="'+d.id+'" onclick="Prod.editProd(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" '+(chk?'checked':'')+' onchange="Prod.toggleInvoiced(\''+d.id+'\',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Prod.unarchiveProd(\''+d.id+'\')">アーカイブ解除</button></td></tr>'});
+      h+='<tr data-id="'+d.id+'" onclick="Prod.editProd(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+dlStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" '+(chk?'checked':'')+' onchange="Prod.toggleInvoiced(\''+d.id+'\',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu"><button type="button" onclick="Prod.unarchiveProd(\''+d.id+'\')">アーカイブ解除</button></div></div></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-acol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.acol;if(archiveSort.col===c)archiveSort.asc=!archiveSort.asc;else{archiveSort.col=c;archiveSort.asc=true}render()}});
   }
@@ -6015,7 +6015,7 @@ const Proj = (function(){
     items.forEach(d=>{const ed=getEndDate(d);
       const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';
       const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
-      h+='<tr data-id="'+d.id+'" onclick="Proj.editProj(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" '+(chk?'checked':'')+' onchange="Proj.toggleProjInvoiced(\''+d.id+'\',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Proj.editProj(\''+d.id+'\')">編集</button> <button class="act-btn" onclick="Proj.archiveProj(\''+d.id+'\')">アーカイブへ</button></td></tr>'});
+      h+='<tr data-id="'+d.id+'" onclick="Proj.editProj(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" '+(chk?'checked':'')+' onchange="Proj.toggleProjInvoiced(\''+d.id+'\',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu"><button type="button" onclick="Proj.editProj(\''+d.id+'\')">編集</button><button type="button" onclick="Proj.archiveProj(\''+d.id+'\')">アーカイブへ</button></div></div></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-dcol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.dcol;if(projDoneSort.col===c)projDoneSort.asc=!projDoneSort.asc;else{projDoneSort.col=c;projDoneSort.asc=true}render()}});
   }
@@ -6038,7 +6038,7 @@ const Proj = (function(){
     items.forEach(d=>{const ed=getEndDate(d);
       const edStr=ed?((ed.getMonth()+1)+'/'+ed.getDate()+'（'+dow[ed.getDay()]+'）'):'';
       const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
-      h+='<tr data-id="'+d.id+'" onclick="Proj.editProj(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" '+(chk?'checked':'')+' onchange="Proj.toggleProjInvoiced(\''+d.id+'\',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><button class="act-btn" onclick="Proj.unarchiveProj(\''+d.id+'\')">アーカイブ解除</button></td></tr>'});
+      h+='<tr data-id="'+d.id+'" onclick="Proj.editProj(\''+d.id+'\')" style="cursor:pointer"><td>'+esc(d.project)+'</td><td>'+esc(d.our_person||'')+'</td><td>'+esc(d.estimate_no||'')+'</td><td>'+esc(d.order_no||'')+'</td><td>'+esc(d.client||'')+'</td><td>'+esc(d.person||'')+'</td><td>'+edStr+'</td><td>'+esc(d.status)+'</td><td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" '+(chk?'checked':'')+' onchange="Proj.toggleProjInvoiced(\''+d.id+'\',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td><td onclick="event.stopPropagation()"><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu"><button type="button" onclick="Proj.unarchiveProj(\''+d.id+'\')">アーカイブ解除</button></div></div></td></tr>'});
     h+='</tbody></table></div>';el.innerHTML=h;
     el.querySelectorAll('th[data-dcol]').forEach(th=>{th.onclick=()=>{const c=th.dataset.dcol;if(projDoneSort.col===c)projDoneSort.asc=!projDoneSort.asc;else{projDoneSort.col=c;projDoneSort.asc=true}render()}});
   }
@@ -8024,7 +8024,7 @@ const Sales = (function(){
       });
       const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
       h+=`<td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" ${chk?'checked':''} onchange="Sales.toggleInvoiced('${esc(d.id)}',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td>`;
-      h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Sales.openMo('${esc(d.id)}')">編集</button></td>`;
+      h+=`<td onclick="event.stopPropagation()"><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu"><button type="button" onclick="Sales.openMo('${esc(d.id)}')">編集</button></div></div></td>`;
       h+='</tr>';
     });}
     h+='</tbody></table></div>';
@@ -8064,7 +8064,7 @@ const Sales = (function(){
       });
       const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
       h+=`<td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" ${chk?'checked':''} onchange="Sales.toggleInvoiced('${esc(d.id)}',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td>`;
-      h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Sales.openMo('${esc(d.id)}')">編集</button> <button class="act-btn" onclick="Sales.archiveSales('${esc(d.id)}')">アーカイブへ</button></td>`;
+      h+=`<td onclick="event.stopPropagation()"><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu"><button type="button" onclick="Sales.openMo('${esc(d.id)}')">編集</button><button type="button" onclick="Sales.archiveSales('${esc(d.id)}')">アーカイブへ</button></div></div></td>`;
       h+='</tr>';
     });}
     h+='</tbody></table></div>';
@@ -8103,7 +8103,7 @@ const Sales = (function(){
       });
       const chk=String(d.invoiced||'').toUpperCase()==='TRUE';
       h+=`<td style="text-align:center" onclick="event.stopPropagation()"><input type="checkbox" class="sw" ${chk?'checked':''} onchange="Sales.toggleInvoiced('${esc(d.id)}',this.checked,this)" style="width:18px;height:18px;cursor:pointer"></td>`;
-      h+=`<td onclick="event.stopPropagation()"><button class="act-btn" onclick="Sales.unarchiveSales('${esc(d.id)}')">アーカイブ解除</button></td>`;
+      h+=`<td onclick="event.stopPropagation()"><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu"><button type="button" onclick="Sales.unarchiveSales('${esc(d.id)}')">アーカイブ解除</button></div></div></td>`;
       h+='</tr>';
     });}
     h+='</tbody></table></div>';
