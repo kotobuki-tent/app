@@ -1926,7 +1926,7 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   #view-cases,#view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb,#view-daily,#view-po,#view-poreq,#view-alcohol,#view-forklift,#view-card{max-width:1820px;margin-left:auto;margin-right:auto;box-sizing:border-box}   /* 全画面同じ幅（10/28 iller「画面幅いっぱいのやつとそうでないのと中央にあるのと左にあるのと」）*/
   @media(min-width:1101px){#view-cases,#view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb,#view-daily,#view-po,#view-poreq,#view-alcohol,#view-forklift,#view-card{padding-left:16px;padding-right:16px}}   /* 細い窓では足さない（案件の表が収まらなくなる） */
   /* PC は中身の幅を 1400 に固定（10/28 iller「これ以上広げない、縮めない、決まったサイズが欲しい」）：広い窓では真ん中、狭い窓では縮めずに横スクロール。タブレット（coarse）は今まで通り伸び縮み */
-  @media(pointer:fine){#view-cases,#view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb,#view-daily,#view-po,#view-poreq,#view-alcohol,#view-forklift,#view-card{width:var(--pc-w,1400px);max-width:var(--pc-w,1400px);padding-left:16px;padding-right:16px}}   /* 試し用：spa.html?w=1500 で幅を変えて覚える、?w=0 で 1400 に戻す（10/28 iller「試すんだよ俺が気に入るサイズを」）*/
+  @media(pointer:fine){#view-cases,#view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb,#view-daily,#view-po,#view-poreq,#view-alcohol,#view-forklift,#view-card{width:var(--pc-w,1500px);max-width:var(--pc-w,1500px);padding-left:16px;padding-right:16px}}   /* 既定 1500（10/28 iller「1500だな」）。spa.html?w=1600 で試して覚える、?w=0 で既定に戻す */
   #view-cases .sub-tabs{padding-top:12px}
   .gantt-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .gantt-top .fv-sum{margin-bottom:0}
@@ -4654,8 +4654,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 15:41';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1331;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 16:05';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1332;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
