@@ -4061,6 +4061,34 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-wb .wb-note{border-radius:6px;font-weight:500}
 #view-wb .wb-save{background:var(--accent)}
 #view-wb .wb-pick.sel{background:var(--accent);border-color:var(--accent)}
+/* 予定ボードの窓も他の窓と同じ形（10/28）：灰の地に白いかたまり、札が左・値が右・枠なし、メモと対象は札を上に小さく */
+#view-wb .wb-mcard{background:#f2f2f7;border-radius:18px;padding-bottom:4px;box-shadow:0 24px 70px rgba(0,0,0,.22)}
+#view-wb .wb-mhead{border-bottom:none;padding:20px 20px 12px;font-size:19px;font-weight:700}
+#view-wb .wb-mrow{margin:0 16px;padding:0 16px;background:#fff;min-height:48px;gap:12px;justify-content:space-between}
+#view-wb .wb-mrow+.wb-mrow{border-top:0.5px solid var(--border-light)}
+#view-wb .wb-mhead+.wb-mrow{border-radius:12px 12px 0 0}
+#view-wb .wb-mrow:has(+.wb-macts){border-radius:0 0 12px 12px}
+#view-wb .wb-mrow.col{flex-direction:column;align-items:stretch;gap:4px;padding:10px 16px 12px}
+#view-wb .wb-mrow.col:has(>.wb-head),#view-wb .wb-mrow.col:has(>.wb-cats){flex-direction:row;align-items:center;gap:12px;padding:0 16px;min-height:48px}
+#view-wb .wb-mlab{font-size:15px;font-weight:400;color:var(--text);min-width:0;white-space:nowrap}
+#view-wb .wb-mrow.col .wb-mlab{font-size:12px;font-weight:500;color:var(--text-faint);white-space:normal}
+#view-wb .wb-mrow.col:has(>.wb-head) .wb-mlab,#view-wb .wb-mrow.col:has(>.wb-cats) .wb-mlab{font-size:15px;font-weight:400;color:var(--text)}
+#view-wb .wb-mperson{font-size:15px;font-weight:600;text-align:right}
+#view-wb .wb-mrow>.wb-mlab+.wb-date{margin-left:auto}
+#view-wb .wb-date{border:none;background:transparent;padding:12px 0;font-size:15px;color:var(--accent)}
+#view-wb .wb-head{border:none;background:transparent;padding:12px 0;font-size:15px;text-align:right;color:var(--accent);flex:1;width:auto;min-width:0}
+#view-wb .wb-ta{border:none;background:transparent;padding:4px 0;font-size:15px;min-height:56px}
+#view-wb .wb-head:focus,#view-wb .wb-ta:focus,#view-wb .wb-date:focus{outline:none}
+#view-wb .wb-cats{justify-content:flex-end;padding:8px 0}
+#view-wb .wb-mcat{border:none;background:var(--surface3);font-weight:500;padding:6px 13px}
+#view-wb .wb-picklist{padding:4px 0 2px}
+#view-wb .wb-pick{border:none;background:var(--surface3);border-radius:8px;padding:8px 14px;font-size:14px}
+#view-wb .wb-pick:hover{background:#dededf}
+#view-wb .wb-pick.sel{background:var(--accent);color:#fff}
+#view-wb .wb-macts{padding:14px 20px 16px}
+#view-wb .wb-del{border:none;background:transparent;color:var(--red);padding:8px 10px;font-weight:600}
+#view-wb .wb-cancel{border:none;background:var(--surface3);border-radius:10px;padding:11px 20px;font-weight:600;font-size:14px}
+#view-wb .wb-save{border-radius:10px;padding:11px 20px;font-weight:600;font-size:14px}
 #view-wb .wb-addmore{border-color:var(--accent);color:var(--accent)}
 #view-wb .wb-rb:hover{color:var(--accent)}
 </style>
@@ -4621,8 +4649,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 14:34';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1323;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 14:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1324;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
