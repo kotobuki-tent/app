@@ -1861,6 +1861,11 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .nav-seg>.nav-link,.nav-seg>.nav-dd>.nav-dd-btn{height:28px;border-radius:7px;padding:0 10px}
 .nav-seg>.nav-link:hover,.nav-seg>.nav-dd>.nav-dd-btn:hover{background:rgba(0,0,0,.05);color:var(--text)}
 .nav-seg>.nav-link.on,.nav-seg>.nav-dd:has(.nav-dd-menu .nav-link.on)>.nav-dd-btn,.nav-seg>.nav-dd.open>.nav-dd-btn{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
+/* 溝の中の区切り（10/28 iller「区切りが欲しい」）：項目の間に細い縦線。選んでいる白いピルの両隣は消す（macOS と同じ） */
+.nav-seg{gap:3px}
+.nav-seg>*+*{position:relative}
+.nav-seg>*+*::before{content:'';position:absolute;left:-2px;top:50%;height:14px;width:1px;transform:translateY(-50%);background:rgba(0,0,0,.14);pointer-events:none}
+.nav-seg>.nav-link.on::before,.nav-seg>.nav-link.on+*::before,.nav-seg>.nav-dd:has(.nav-dd-menu .nav-link.on)::before,.nav-seg>.nav-dd:has(.nav-dd-menu .nav-link.on)+*::before,.nav-seg>.nav-dd.open::before,.nav-seg>.nav-dd.open+*::before{display:none}
 .nav-link.home-link{margin:0 4px}
 /* ナビの 3 つの区画（10/27 iller「単独は左寄せ、HOME は真ん中固定、リストは右寄せ」）：grid の 1fr｜auto｜1fr で、窓の幅が変わっても HOME は常に真ん中。
    1,200 幅未満は区画をほどいて（display:contents）今までどおり 1 列で横に流す */
@@ -4482,8 +4487,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 09:02';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1310;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 09:31';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1311;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
