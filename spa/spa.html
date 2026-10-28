@@ -4610,8 +4610,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 14:15';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1317;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 14:17';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1318;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9096,6 +9096,8 @@ const Wb = (function(){
   function catOf(k){ return CATS.find(c=>c.k===k)||CATS[2]; }
   // 最上段に固定の「会社予定」行（wb_peopleには置かない仮想行。名前変更・削除・並べ替え不可）
   const WB_COMPANY='会社予定', WB_CO_ID='__co__';
+  // 固定行（10/28 iller「生産部と企画制作部も固定の欄作って」）：会社予定・生産部・企画制作部。wb_people には置かない仮想行
+  const WB_FIXED=[{id:WB_CO_ID,name:WB_COMPANY},{id:'__prod__',name:'生産部'},{id:'__proj__',name:'企画制作部'}], WB_FIXED_NAMES=WB_FIXED.map(f=>f.name);
   let notes=[], people=[], staff=[], _busy=false, _edit={}, _tombN=new Set(), _tombP=new Set(), _tombKey=new Set();
   let _newSel=new Set(), _newCat='その他';
   // 本日基準のローリング表示：前WB_BACK日＋当日＋先WB_FWD日＝計21日(3週)。送りはWB_STEP日（1週=7）
@@ -9162,7 +9164,7 @@ const Wb = (function(){
       // 同名は1行に潰す＋「会社予定」はwb_peopleに置かない（固定行として描画）。サーバの余分な行は自動削除
       const seenName=new Set();
       sP=sP.filter(p=>{
-        const dup = p.name===WB_COMPANY || seenName.has(p.name);
+        const dup = WB_FIXED_NAMES.includes(p.name) || seenName.has(p.name);
         if(dup){ if(!isTmp(p.id) && !_tombP.has(String(p.id))){ fire({action:'del_person', id:p.id}); _tombP.add(String(p.id)); } return false; }
         seenName.add(p.name); return true;
       });
@@ -9240,7 +9242,7 @@ const Wb = (function(){
     }
     h+=`</div>`;
     // 行：先頭に「会社予定」を固定、以降に人
-    const rows=[{id:WB_CO_ID, name:WB_COMPANY, fixed:true}].concat(people);
+    const rows=WB_FIXED.map(f=>({id:f.id, name:f.name, fixed:true})).concat(people);
     rows.forEach((p,idx)=>{
       const mine=lanesFor(p.name, start, N);
       const rowH = mine.lanes * 32 + 8;
@@ -9271,7 +9273,7 @@ const Wb = (function(){
     el.innerHTML=h;
   }
 
-  function personName(pid){ return pid===WB_CO_ID ? WB_COMPANY : ((people.find(x=>x.id===pid)||{}).name||''); }
+  function personName(pid){ const f=WB_FIXED.find(x=>x.id===pid); return f ? f.name : ((people.find(x=>x.id===pid)||{}).name||''); }
   function openCell(pid, ds){
     const nm=personName(pid); if(!nm)return;
     _edit={ id:'', person:nm, date_from:ds, date_to:ds, category:'その他', head:'', memo:'' };
@@ -9305,7 +9307,7 @@ const Wb = (function(){
     const m=document.getElementById('wbNewModal'); if(!m)return;
     _newSel=new Set(); _newCat='その他';
     const boardNames=people.map(p=>p.name);
-    const cand=[WB_COMPANY].concat(boardNames, staff.filter(n=>!boardNames.includes(n)));   // 先頭は固定行の会社予定
+    const cand=WB_FIXED_NAMES.concat(boardNames, staff.filter(n=>!boardNames.includes(n)));   // 先頭は固定行（会社予定・生産部・企画制作部）
     document.getElementById('wbnNames').innerHTML=cand.length
       ? cand.map(n=>`<button type="button" class="wb-pick" data-n="${esc(n)}" onclick="Wb.newToggle('${esc(n)}')">${esc(n)}</button>`).join('')
       : '<div class="wb-pick-empty">候補がありません（staff未取得）</div>';
@@ -9332,7 +9334,7 @@ const Wb = (function(){
     if(guard())return;
     const stamp=Date.now(); let mx=people.reduce((a,p)=>Math.max(a,p.sort||0),0);
     names.forEach((name,i)=>{
-      if(name!==WB_COMPANY && !people.some(p=>p.name===name)){   // 板に無い人は自動で行追加（会社予定は固定行なので追加しない）
+      if(!WB_FIXED_NAMES.includes(name) && !people.some(p=>p.name===name)){   // 板に無い人は自動で行追加（固定行は追加しない）
         fire({action:'add_person', name});
         people.push({id:'tmpP_'+stamp+'_'+i, name, sort:++mx});
       }
