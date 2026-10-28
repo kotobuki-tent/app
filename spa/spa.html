@@ -1235,7 +1235,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .today-date{font-size:18px;font-weight:700;color:var(--text)}
 #view-daily .app{padding:16px}
 /* 自分で書く＝フォームなので狭く中央（広いPCで間延びさせない）。みんなの日報は.appフル幅を使う */
-#view-daily #writeView{max-width:760px;margin:0 auto}
+#view-daily #writeView{max-width:760px;margin:0}
 /* みんなの日報：人別カードを幅まかせの多段（事務所PC=2〜3列／縦画面・スマホ=自動1列）。未記入/休み/メッセージ(.card)は全幅 */
 #dailyViewContent{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;align-items:start}
 #dailyViewContent>.card{grid-column:1/-1;margin-bottom:0}
@@ -1530,7 +1530,7 @@ table.jobs tr:last-child td{border-bottom:none}
 .portal-grid.mode-floor .portal-card[data-app="proj"]{order:4}
 
 /* いないカード持ち出し（点呼・リフトと同じキオスク型） */
-.card-wrap{max-width:1820px;margin:0 auto;padding:20px}
+.card-wrap{padding:16px}
 .card-panes{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;align-items:start}
 .card-pane{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:0 22px 20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .card-pane .cp-title{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;padding:18px 0 14px;margin-bottom:18px;border-bottom:1px solid var(--border-light);position:sticky;top:0;background:var(--surface);z-index:5}
@@ -1906,7 +1906,6 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .scr-head .scr-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
 .scr-head .scr-search::placeholder{color:var(--text-dim)}
 /* 見出しを足した画面（10/16）：中身の入れ物の端にそろえる */
-#view-card>.scr-head{max-width:1820px;margin:0 auto;padding:18px 20px 0;box-sizing:border-box}
 /* PC・横画面では見出しとサブタブを 1 行に畳む（4 段も頭があると一覧の始まりが遅い。iller 2026-10-15「スタートが遅れるのが嫌」）。
    .scr-head を display:contents でほどき、親を flex にして 見出し・日付・サブタブ・検索 を並べ、中身（.app／#casesPane）は次の行に */
 @media(min-width:481px) and (pointer:fine),(min-width:481px) and (orientation:landscape){
@@ -1923,9 +1922,8 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   #view-alcohol>.scr-head h1,#view-forklift>.scr-head h1,#view-card>.scr-head h1{font-size:24px}   /* PC の見出しはどの画面も 24px */
   /* 自分の記録の画面（日報・時間外の申告・スケジュール）は、見出しごと 760 の列に入れて真ん中に。見出しだけ左端に離れていた（10/16 iller「めっちゃ変」） */
   /* 一覧・ボード・表の画面も端にくっつけない：左右に 16px 足し、広い画面では 1,820 幅で真ん中（点呼・リフトと同じ。10/16 iller「画面いっぱいすぎる」） */
-  #view-cases,#view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb{max-width:1820px;margin-left:auto;margin-right:auto;box-sizing:border-box}
-  @media(min-width:1101px){#view-cases,#view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb{padding-left:16px;padding-right:16px}}   /* 細い窓では足さない（案件の表が収まらなくなる） */
-  #view-daily,#view-ot:has(#staffView:not([style*="none"])){max-width:792px;margin-left:auto;margin-right:auto}
+  #view-cases,#view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb,#view-daily,#view-po,#view-poreq,#view-alcohol,#view-forklift,#view-card{max-width:1820px;margin-left:auto;margin-right:auto;box-sizing:border-box}   /* 全画面同じ幅（10/28 iller「画面幅いっぱいのやつとそうでないのと中央にあるのと左にあるのと」）*/
+  @media(min-width:1101px){#view-cases,#view-prod,#view-proj,#view-sales,#view-labor,#view-inv,#view-veh,#view-qual,#view-ot,#view-wb,#view-daily,#view-po,#view-poreq,#view-alcohol,#view-forklift,#view-card{padding-left:16px;padding-right:16px}}   /* 細い窓では足さない（案件の表が収まらなくなる） */
   #view-cases .sub-tabs{padding-top:12px}
   .gantt-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .gantt-top .fv-sum{margin-bottom:0}
@@ -2136,10 +2134,10 @@ table.jobs tr:hover td{background:rgba(10,132,255,.04)}
 .v-card .v-status{border-radius:999px;font-weight:500}
 /* 時間外：週の帯は透明、ボタンは灰のチップ、日の行は白い角丸、時刻のチップは灰（選ぶと緑）、管理の表は白地に灰の見出し */
 #view-ot .app{padding:6px 16px 24px}
-#view-ot .week-bar{background:transparent;border:none;box-shadow:none;padding:4px 0 12px;max-width:760px;margin:0 auto}   /* 中身が短いのに画面いっぱいだった（10/15 iller「長くね？」）。中央に */
+#view-ot .week-bar{background:transparent;border:none;box-shadow:none;padding:4px 0 12px;max-width:760px;margin:0}   /* 中身が短いのに画面いっぱいだった（10/15 iller「長くね？」）。中央に */
 #view-ot .app:has(#staffView[style*="none"]) .week-bar,#view-ot .app:has(#staffView[style*="none"]) .request-banner{max-width:none}   /* 管理タブは表が幅いっぱいなので、週の帯も幅いっぱいに（10/16） */
-#view-ot .staff-section{max-width:760px;margin:0 auto}
-#view-ot .request-banner{max-width:760px;margin-left:auto;margin-right:auto}
+#view-ot .staff-section{max-width:760px;margin:0}
+#view-ot .request-banner{max-width:760px;margin-left:0;margin-right:0}
 #view-ot .week-btn{background:var(--surface3);border:none;border-radius:8px;padding:7px 12px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text)}
 #view-ot .week-btn:hover{background:#dededf}
 #view-ot .week-label{font-weight:600;font-size:14px}
@@ -2243,7 +2241,7 @@ tr:hover td{background:rgba(10,132,255,.04)}
 .portal-footer{color:var(--text-faint)}
 /* 日報「自分で書く」：白いかたまいを 3 つ（日付と名前／今日の記録／追加する）。行は 1 行 1 項目、札は左・値は右 */
 #view-daily .app{padding:10px 16px 60px}
-#view-daily #writeView,#view-daily #viewView{max-width:760px;margin:0 auto}   /* 自分の記録の画面（日報・時間外・今日）は 760px 中央（10/15 揃え） */
+#view-daily #writeView,#view-daily #viewView{max-width:760px;margin:0}   /* 自分の記録の画面（日報・時間外・発注依頼）は 760px、左寄せ＝他の画面と同じ左端（10/28） */
 #view-daily .card{background:transparent;border:none;border-radius:0;padding:0;box-shadow:none;margin:0}
 #view-daily .card-head{background:var(--surface);border-radius:12px;margin:0 0 18px;padding:0;gap:0;flex-direction:column;align-items:stretch;overflow:hidden}
 #view-daily .dr-date,#view-daily .dr-who{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;min-height:48px;font:400 15px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);margin:0}
@@ -2640,8 +2638,9 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 <!-- ===== 資格（免許・技能講習の台帳 dept=qual） ===== -->
 <section id="view-qual" class="hidden">
 <style>
-  #view-qual{padding:0;box-sizing:border-box}
+  #view-qual{padding-top:0;padding-bottom:0;box-sizing:border-box}
   #qualBody{padding:6px 16px 24px}
+  #wbBody{padding:6px 16px 24px}   /* 予定ボードの中身も他の画面の .app と同じ余白（10/28） */
   #view-qual .qual-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;max-width:1360px}
   #view-qual .qual-card{background:var(--surface);border:none;border-radius:12px;padding:14px 16px;cursor:pointer;transition:.15s;box-shadow:none}
   #view-qual .qual-card:hover{box-shadow:0 0 0 2px var(--border-light)}
@@ -2824,7 +2823,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .sz-parts .redo{color:#a32d2d}        /* やり直しの金額＝赤 */
   /* 発注（独立画面、2026-10-19） */
   #view-po .app{padding:6px 16px 24px}   /* 他の一覧画面と同じ作り：見出し・サブタブ・検索を 1 行に畳み、中身は横いっぱい（10/23 iller「他と揃えて」） */
-  #view-poreq .po-wrap{max-width:760px;margin:0 auto;padding:12px 16px 40px}   /* 自分で書く画面は 日報・時間外 と同じ 760 中央 */
+  #view-poreq .po-wrap{max-width:792px;margin:0;padding:12px 16px 40px}   /* 自分で書く画面は 日報・時間外 と同じ 760 中央 */
   #view-poreq .pr-steps{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px;font-size:14px;font-weight:600}
   #view-poreq .pr-steps span{background:var(--surface2);border-radius:999px;padding:6px 14px}
   #view-poreq .pr-steps i{font-style:normal;color:var(--text-faint)}
@@ -3943,7 +3942,8 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 <!-- ===== 予定ボード（ホワイトボード） section ===== -->
 <section id="view-wb" class="hidden">
 <style>
-#view-wb{padding:12px 12px 120px}
+#view-wb{padding:12px 0 120px}
+@media(min-width:1101px){#view-wb{padding-left:16px;padding-right:16px}}   /* 他の画面と同じ横の余白（10/28） */
 #view-wb .wb-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 #view-wb .wb-nav{display:flex;align-items:center;gap:6px}
 #view-wb .wb-mbtn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:5px 11px;font-size:15px;cursor:pointer;line-height:1}
@@ -4033,7 +4033,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 }
 /* 2026-10-15 Apple 風（この画面の style は土台より後に来るので、上書きはここに置く） */
 /* ホワイトボード：白いかたまい・縦線は髪の毛・週末は薄灰・今日は青の丸、ボタンは灰のチップと青 1 つ */
-#view-wb{padding:0 0 120px}
+#view-wb{padding-top:0;padding-bottom:120px}
 #view-wb>#wbBody,#view-wb>.wb-hint{padding-left:16px;padding-right:16px}
 #view-wb .wb-top{margin:8px 0 10px}
 #view-wb .wb-mbtn,#view-wb .wb-today{border:none;background:var(--surface3);border-radius:8px;color:var(--text)}
@@ -4133,7 +4133,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-alcohol *{margin:0;padding:0;box-sizing:border-box}
 #view-alcohol{font-size:16px;scrollbar-gutter:stable}
 #view-alcohol{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
-#view-alcohol .kiosk{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;max-width:1820px;margin:0 auto;padding:20px;align-items:start}
+#view-alcohol .kiosk{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;padding:16px;align-items:start}
 #view-alcohol .dnav{display:flex;align-items:center;gap:6px}
 #view-alcohol .dnav input[type=date]{flex:1}
 #view-alcohol .dnav-btn{flex:0 0 auto;width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
@@ -4257,7 +4257,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-alcohol .toast.err{background:var(--red);color:#fff}
 @media(max-width:840px),(orientation:portrait) and (pointer:coarse){#view-alcohol .kiosk{grid-template-columns:1fr}}
 /* 見出し（10/16）：この画面は中の余白を全部 0 にしているので、ここで戻す。端はパネルにそろえる */
-#view-alcohol>.scr-head{max-width:1820px;margin:0 auto;padding:18px 20px 0}
+#view-alcohol>.scr-head{padding:18px 16px 0}   /* * の padding:0 で消えていた見出しの余白を他の画面と同じに（10/28） */
 #view-alcohol>.scr-head .scr-sub{padding-bottom:4px}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){#view-alcohol>.scr-head{padding:14px 16px 0}}
 /* スマホ（幅480px以下）だけ：運転者のボタン一覧を日報と同じセレクト式にしてコンパクトに。PC・事務所前タブレット（縦置き27インチ＝幅は480pxより広い）は従来のボタン一覧のまま */
@@ -4445,7 +4445,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-forklift *{margin:0;padding:0;box-sizing:border-box}
 #view-forklift{font-size:16px;scrollbar-gutter:stable}
 #view-forklift{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-#view-forklift .kiosk{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;max-width:1820px;margin:0 auto;padding:20px;align-items:start}
+#view-forklift .kiosk{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;padding:16px;align-items:start}
 #view-forklift .dnav{display:flex;align-items:center;gap:6px}
 #view-forklift .dnav input[type=date]{flex:1}
 #view-forklift .dnav-btn{flex:0 0 auto;width:42px;height:46px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-size:18px;color:var(--text-dim);cursor:pointer}
@@ -4547,7 +4547,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-forklift .toast.err{background:var(--red);color:#fff}
 @media(max-width:860px),(orientation:portrait) and (pointer:coarse){#view-forklift .kiosk{grid-template-columns:1fr}#view-forklift .ckwrap{grid-template-columns:1fr}}
 /* 見出し（10/16）：この画面は中の余白を全部 0 にしているので、ここで戻す。端はパネルにそろえる */
-#view-forklift>.scr-head{max-width:1820px;margin:0 auto;padding:18px 20px 0}
+#view-forklift>.scr-head{padding:18px 16px 0}
 #view-forklift>.scr-head .scr-sub{padding-bottom:4px}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){#view-forklift>.scr-head{padding:14px 16px 0}}
 /* 2026-10-15 Apple 風（この画面の style は土台より後なので上書きはここ） */
@@ -4649,8 +4649,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 14:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1324;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 14:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1325;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
