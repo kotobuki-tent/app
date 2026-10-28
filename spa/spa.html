@@ -528,7 +528,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .prj-cards{display:none}
 .prj-cards .prj-group-label{font-size:13px;font-weight:700;color:var(--text-dim);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .prj-cards .prj-group-label:first-child{margin-top:4px}
-.gantt-bars{display:flex;flex:1;position:relative}
+.gantt-bars{display:flex;flex:1;position:relative;overflow:hidden}   /* 帯の文字が右端からはみ出して表が横に伸びないように（10/28） */
 .gantt-bar-cell{flex:1;min-width:44px;border-right:1px solid var(--surface3);position:relative;overflow:hidden;min-height:52px}
 .gantt-bar-cell.today{background:rgba(59,111,216,.04)}
 .gantt-bar{position:absolute;top:4px;bottom:4px;border-radius:4px;left:2px;right:2px;z-index:2}
@@ -1914,7 +1914,7 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   #view-prod>.scr-head,#view-proj>.scr-head,#view-sales>.scr-head,#view-labor>.scr-head,#view-inv>.scr-head,#view-veh>.scr-head,#view-qual>.scr-head,#view-ot>.scr-head,#view-daily>.scr-head,#view-wb>.scr-head,#view-po>.scr-head,#casesBody>.scr-head{display:contents}
   #view-prod>.scr-head h1,#view-proj>.scr-head h1,#view-sales>.scr-head h1,#view-labor>.scr-head h1,#view-inv>.scr-head h1,#view-veh>.scr-head h1,#view-qual>.scr-head h1,#view-ot>.scr-head h1,#view-daily>.scr-head h1,#view-wb>.scr-head h1,#view-po>.scr-head h1,#casesBody>.scr-head h1{order:0;margin:12px 0 0 16px;font-size:24px}
   #view-prod>.scr-head .scr-sub,#view-proj>.scr-head .scr-sub,#view-sales>.scr-head .scr-sub,#view-labor>.scr-head .scr-sub,#view-inv>.scr-head .scr-sub,#view-veh>.scr-head .scr-sub,#view-qual>.scr-head .scr-sub,#view-ot>.scr-head .scr-sub,#view-daily>.scr-head .scr-sub,#view-wb>.scr-head .scr-sub,#view-po>.scr-head .scr-sub,#casesBody>.scr-head .scr-sub{order:1;margin-top:14px;padding:0}
-  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#view-inv>.sub-tabs,#view-veh>.sub-tabs,#view-qual>.sub-tabs,#view-ot>.sub-tabs,#view-daily>.sub-tabs,#view-wb>.sub-tabs,#view-po>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 0 0 6px}
+  #view-prod>.sub-tabs,#view-proj>.sub-tabs,#view-sales>.sub-tabs,#view-labor>.sub-tabs,#view-inv>.sub-tabs,#view-veh>.sub-tabs,#view-qual>.sub-tabs,#view-ot>.sub-tabs,#view-daily>.sub-tabs,#view-wb>.sub-tabs,#view-po>.sub-tabs,#casesBody>.sub-tabs{order:2;flex:1 1 auto;padding:12px 6px 0 6px}
   #view-prod>.scr-head .scr-search,#view-proj>.scr-head .scr-search,#view-sales>.scr-head .scr-search,#view-labor>.scr-head .scr-search,#view-inv>.scr-head .scr-search,#view-veh>.scr-head .scr-search,#view-qual>.scr-head .scr-search,#view-ot>.scr-head .scr-search,#view-daily>.scr-head .scr-search,#view-wb>.scr-head .scr-search,#view-po>.scr-head .scr-search,#casesBody>.scr-head .scr-search{order:3;margin:12px 16px 0 0;width:200px}
   #view-prod>.app,#view-proj>.app,#view-sales>.app,#view-labor>.app,#view-inv>.main,#view-veh>.app,#view-qual>#qualBody,#view-ot>.app,#view-daily>.app,#view-wb>#wbBody,#view-po>.app,#casesBody>#casesPane{order:4;flex:1 1 100%;min-width:0;width:100%}   /* min-width:0 が無いとガントの日付列の最小幅まで広がって週移動が画面の外に出る */
   #view-qual>.scr-head .scr-search{margin-left:auto}   /* 資格にはサブタブが無いので検索を右端へ */
@@ -4651,8 +4651,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 14:55';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1326;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 14:59';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1327;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
