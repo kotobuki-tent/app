@@ -2569,6 +2569,20 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
 #v_gantt .days>div.today .dm{display:block;background:var(--accent);color:#fff;padding:0 5px;line-height:19px}
 #v_gantt .days>div.mstart,#v_gantt .bg>div.mstart{border-left:1px solid var(--border)}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){#v_gantt .days .dm{min-width:0;padding:0 2px;font-size:12px}}
+/* ===== ケータイ（幅 480 以下、10/28 iller「ケータイで見るのに情報量多すぎ」）：出すのは 日報・時間外・生産（工場ボード）・企画制作（ボード）・発注依頼・アルコールチェック・リフト点検 の 7 つ。入口は LINE WORKS のリッチメニュー（日報・フルメニュー・時間外・生産部・アルコールチェック・企画制作部）。タブレット（480 より広い）は今まで通り ===== */
+@media(max-width:480px){
+  .portal-card:not([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift]){display:none!important}
+  .portal-grp:not(:has(.portal-card:is([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift]))){display:none!important}
+  #navCases,#navSales,#navPo,#navWb,#navCard,#navLabor,#navInv,#navVeh,#navQual{display:none!important}
+  .nav-dd:has(#navLabor){display:none!important}
+  #prodTabs .sub-tab[data-view=archive],#prodTabs .sub-tab[data-view=fabric],#prodTabs .staff-btn,#prodTabs .mny-btn,#prodTabs .slog-btn{display:none!important}
+  #projTabs .sub-tab[data-view=gantt],#projTabs .sub-tab[data-view=projDone],#projTabs .mny-btn,#projTabs .slog-btn{display:none!important}
+  #otTabs .sub-tab:nth-of-type(2){display:none!important}
+  /* カードは 案件名・担当・納期（日程）だけ */
+  #view-prod .fv-card .tag.eno,#view-prod .fv-card .tag.loc,#view-prod .fv-card .tag.st,#view-prod .fv-card .sub-info,#view-prod .fv-card .badge.fig{display:none!important}
+  #view-proj .prj-card .pc-eno,#view-proj .prj-card .pc-status{display:none!important}
+  #view-proj .fv-card .tag.eno,#view-proj .fv-card .tag.loc,#view-proj .fv-card .tag.st,#view-proj .fv-card .tag.tp-rental,#view-proj .fv-card .tag.tp-make{display:none!important}
+}
 /* 携帯の窓（10/28）：案件編集の 社内納期 は注記を消して日付が収まるように、予定ボードの 期間 は札を上に 2 段 */
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){
   #caseEditBg .mo .mo-field>label .ce-target-note{display:none}
@@ -4663,8 +4677,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-28 17:13';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1333;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-28 17:34';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1334;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9534,7 +9548,7 @@ function resetSubTab(name){
   if(!tabsId)return;
   const container=document.getElementById(tabsId);
   if(!container)return;
-  const first=container.querySelector('.sub-tab');
+  const first=[...container.querySelectorAll('.sub-tab')].find(b=>b.offsetParent!==null)||container.querySelector('.sub-tab');   // 隠れているタブは飛ばす（ケータイ 10/28）
   if(first)first.click();
 }
 
@@ -11290,7 +11304,9 @@ const App = {
   CASES_WOFF_ALLOW:['岸田平','岸田沙織','岸田博己','三好智依','牧田亮介','畑智之','森下達哉'],
   denied:[],
   setWoffDenied(){ const u=window.__woffUser; if(!u||!u.name){ this.denied=[]; return; } const n=String(u.name).replace(/\s|　/g,''); this.denied=this.CASES_WOFF_ALLOW.indexOf(n)>=0?[]:['cases']; },
-  _allowed(key){ if(key==='portal')return true; if(this.denied.indexOf(key)>=0)return false; const r=this.reg(key); if(this.mode==='kiosk') return !!(r&&r.kiosk); return !r||!r.zone||this.allowedZones().indexOf(r.zone)>=0; },
+  PHONE_KEYS:['daily','ot','prod','proj','poreq','alcohol','forklift'],   // ケータイ（幅 480 以下）で出す画面＝日報・時間外・生産・企画制作・発注依頼・アルコールチェック・リフト点検（10/28 iller）
+  isPhone(){ return window.matchMedia('(max-width:480px)').matches; },
+  _allowed(key){ if(key==='portal')return true; if(this.denied.indexOf(key)>=0)return false; if(this.isPhone()&&this.mode!=='kiosk'&&this.PHONE_KEYS.indexOf(key)<0)return false; const r=this.reg(key); if(this.mode==='kiosk') return !!(r&&r.kiosk); return !r||!r.zone||this.allowedZones().indexOf(r.zone)>=0; },
   applyMode(){ const kiosk=this.mode==='kiosk', allow=this.allowedZones(); document.querySelectorAll('[data-zone]').forEach(b=>{ const show=kiosk?b.hasAttribute('data-kiosk'):allow.indexOf(b.getAttribute('data-zone'))>=0; b.classList.toggle('hidden',!show); }); this.denied.forEach(k=>{ const r=this.reg(k); if(!r)return; [$(r.nav), document.querySelector('.portal-card[data-app="'+k+'"]')].forEach(el=>{ if(el) el.classList.add('hidden'); }); }); document.querySelectorAll('.pm-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-m')===this.mode));
     const pg=document.querySelector('.portal-grid'); if(pg) pg.classList.toggle('mode-floor',this.mode==='floor'); // 現場モードだけ現場アイコンを使用頻度順に
     const inner=document.querySelector('.hdr-inner'); if(inner){ const kids=[...inner.children]; kids.forEach((el,i)=>{ if(!el.classList.contains('nav-div'))return; let has=false; for(let j=i+1;j<kids.length;j++){ const k=kids[j]; if(k.classList.contains('nav-div')||k.classList.contains('nav-spacer')||k.id==='refreshBtn')break; if(k.classList.contains('nav-link')&&!k.classList.contains('hidden')){has=true;break;} } el.classList.toggle('hidden',!has); }); } },
