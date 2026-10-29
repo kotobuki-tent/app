@@ -2585,6 +2585,30 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
   #otTabs .sub-tab:nth-of-type(2){display:none!important}
   #prodTabs,#projTabs,#otTabs{display:none!important}   /* 10/29 iller「この『ボード』とか『工場ボード』いらないだろ」＝タブが 1 つしか残らないので帯ごと消す（resetSubTab が data-view を押す） */
   #view-daily .date-nav{flex-wrap:nowrap;gap:6px}#view-daily .date-nav button{padding:8px 8px;font-size:12px;white-space:nowrap;flex:0 0 auto}#view-daily .date-nav input[type=date]{flex:1 1 0;min-width:0;padding:7px 6px;font-size:16px}#view-daily .date-nav .date-label{display:none}   /* 10/29 日付の行を 1 行に（年月日の文字は日付の欄と二重なので消す） */
+  /* ===== iOS 26 風（10/29 iller「それでいこう」）：下に浮いたナビ、大見出し＋灰の 1 行、札は 1 つの塊に細い線、ポータルの右に状態 ===== */
+  .hdr{display:none!important}
+  body{padding-top:0;padding-bottom:96px}
+  #phoneTab{position:fixed;left:16px;right:16px;bottom:18px;height:62px;border-radius:31px;background:rgba(255,255,255,.78);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);box-shadow:0 8px 30px rgba(0,0,0,.12),inset 0 0 0 .5px rgba(255,255,255,.8);display:flex;align-items:center;justify-content:space-around;padding:0 6px;z-index:300}
+  #phoneTab button{border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;font:400 10px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-faint);width:60px;padding:0;cursor:pointer}
+  #phoneTab button.on{color:var(--accent)}
+  #phoneTab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  #phoneTab button.on svg{stroke-width:2.2}
+  .scr-head h1,.portal-logo{font-size:34px;font-weight:600;letter-spacing:-.5px;line-height:1.15}
+  .scr-head{padding:16px 16px 0;row-gap:2px}
+  .scr-head .scr-sub,.portal-sub2{font-size:15px;color:var(--text-faint);margin:0 0 10px;width:100%;padding:0}
+  html.in-woff .portal-wrap{padding-top:16px}
+  .portal-head{display:block;padding:0 16px;margin-bottom:12px}
+  .portal-logo{margin:0;max-width:none;width:auto;display:block}
+  .portal-card .portal-st{font-size:15px;color:var(--text-faint);white-space:nowrap;margin-left:8px}
+  .portal-card .portal-st.red{color:var(--red)}
+  .portal-card-body{flex:1;min-width:0}
+  .portal-card::after{margin-left:4px}
+  :is(#view-prod,#view-proj) .fv-grp-hd{margin:14px 12px 6px}
+  :is(#view-prod,#view-proj) .fv-cards{display:block;background:var(--surface);border-radius:14px;overflow:hidden}
+  :is(#view-prod,#view-proj) .fv-card{border-radius:0;border-bottom:0.5px solid var(--border-light);padding:12px 14px;box-shadow:none;gap:6px}
+  :is(#view-prod,#view-proj) .fv-card:last-child{border-bottom:none}
+  :is(#view-prod,#view-proj) .fv-card.s-完成::after{top:10px;right:-30px;width:110px;font-size:10px;line-height:18px}
+  :is(#view-prod,#view-proj) .fv-card.s-完成{background:var(--surface)}
   .scr-search{display:none!important}   /* 10/29 iller「検索いらなくね」＝ケータイでは検索欄を出さない（切り替えで勝手にフォーカスして画面が拡大していた） */
   /* カードは 案件名・担当・納期（日程）だけ */
   #view-prod .fv-card .tag.eno,#view-prod .fv-card .tag.loc,#view-prod .fv-card .tag.st,#view-prod .fv-card .sub-info,#view-prod .fv-card .badge.fig{display:none!important}
@@ -3930,21 +3954,21 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 <section id="view-portal">
   <div class="portal-wrap">
     <div class="portal-head">
-      <div class="portal-logo">業務管理</div>
+      <div class="portal-logo">業務管理</div><div class="portal-sub2 hidden" id="portalSub"></div>
       <!-- 端末モード（フル／現場／点検）は 2026-10-15 に廃止（iller「要らない」）。全端末フル固定。REG の zone/kiosk は残してあるが使っていない -->
     </div>
     <div class="portal-list">
       <div class="portal-grp"><div class="portal-cap">仕事</div><div class="portal-rows">
         <a class="portal-card" data-app="cases" onclick="App.nav('cases')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L13 14l-4 1 1-4z"/></svg></div><div class="portal-card-body"><div class="portal-card-title">案件管理</div></div></a>
-        <a class="portal-card" data-app="prod" onclick="App.nav('prod')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V11l6 3.5V11l6 3.5V8l6 4.5V21z"/><path d="M2.5 21h19"/></svg></div><div class="portal-card-body"><div class="portal-card-title">生産管理</div></div></a>
-        <a class="portal-card" data-app="proj" onclick="App.nav('proj')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11l10-5 10 5"/><path d="M2 11h20"/><path d="M2.5 11v9M21.5 11v9"/></svg></div><div class="portal-card-body"><div class="portal-card-title">企画制作</div></div></a>
+        <a class="portal-card" data-app="prod" onclick="App.nav('prod')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V11l6 3.5V11l6 3.5V8l6 4.5V21z"/><path d="M2.5 21h19"/></svg></div><div class="portal-card-body"><div class="portal-card-title">生産管理</div></div><span class="portal-st hidden" data-st="prod"></span></a>
+        <a class="portal-card" data-app="proj" onclick="App.nav('proj')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11l10-5 10 5"/><path d="M2 11h20"/><path d="M2.5 11v9M21.5 11v9"/></svg></div><div class="portal-card-body"><div class="portal-card-title">企画制作</div></div><span class="portal-st hidden" data-st="proj"></span></a>
         <a class="portal-card" data-app="sales" onclick="App.nav('sales')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l7-7h7v7l-7 7z"/><circle cx="14.5" cy="9.5" r="1.3"/></svg></div><div class="portal-card-body"><div class="portal-card-title">販売管理</div></div></a>
-        <a class="portal-card" data-app="poreq" onclick="App.nav('poreq')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 11v6M9 14h6"/></svg></div><div class="portal-card-body"><div class="portal-card-title">発注依頼</div></div></a>
+        <a class="portal-card" data-app="poreq" onclick="App.nav('poreq')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 11v6M9 14h6"/></svg></div><div class="portal-card-body"><div class="portal-card-title">発注依頼</div></div><span class="portal-st hidden" data-st="poreq"></span></a>
         <a class="portal-card" data-app="po" onclick="App.nav('po')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">発注</div></div></a>
       </div></div>
       <div class="portal-grp"><div class="portal-cap">毎日</div><div class="portal-rows">
-        <a class="portal-card" data-app="daily" onclick="App.nav('daily')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">日報</div></div></a>
-        <a class="portal-card" data-app="ot" onclick="App.nav('ot')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="portal-card-body"><div class="portal-card-title">時間外ボード</div></div></a>
+        <a class="portal-card" data-app="daily" onclick="App.nav('daily')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">日報</div></div><span class="portal-st hidden" data-st="daily"></span></a>
+        <a class="portal-card" data-app="ot" onclick="App.nav('ot')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="portal-card-body"><div class="portal-card-title">時間外ボード</div></div><span class="portal-st hidden" data-st="ot"></span></a>
         <a class="portal-card" data-app="wb" onclick="App.nav('wb')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M3 9h18M9 9v8M15 9v8"/><path d="M8 21l4-4 4 4"/></svg></div><div class="portal-card-body"><div class="portal-card-title">予定ボード</div></div></a>
       </div></div>
       <div class="portal-grp"><div class="portal-cap">台帳</div><div class="portal-rows">
@@ -3954,8 +3978,8 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
         <a class="portal-card" data-app="qual" onclick="App.nav('qual')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M9 13.5L7.5 21l4.5-2.5L16.5 21 15 13.5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">資格台帳</div></div></a>
       </div></div>
       <div class="portal-grp"><div class="portal-cap">現場の記録</div><div class="portal-rows">
-        <a class="portal-card" data-app="alcohol" onclick="App.nav('alcohol')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5 11-12"/></svg></div><div class="portal-card-body"><div class="portal-card-title">アルコールチェック</div></div></a>
-        <a class="portal-card" data-app="forklift" onclick="App.nav('forklift')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V9h6l2 3h2"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="13" cy="18.5" r="1.6"/><path d="M17 17V5"/><path d="M17 17h5M17 12h4"/></svg></div><div class="portal-card-body"><div class="portal-card-title">フォークリフト点検</div></div></a>
+        <a class="portal-card" data-app="alcohol" onclick="App.nav('alcohol')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5 11-12"/></svg></div><div class="portal-card-body"><div class="portal-card-title">アルコールチェック</div></div><span class="portal-st hidden" data-st="alcohol"></span></a>
+        <a class="portal-card" data-app="forklift" onclick="App.nav('forklift')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V9h6l2 3h2"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="13" cy="18.5" r="1.6"/><path d="M17 17V5"/><path d="M17 17h5M17 12h4"/></svg></div><div class="portal-card-body"><div class="portal-card-title">フォークリフト点検</div></div><span class="portal-st hidden" data-st="forklift"></span></a>
         <a class="portal-card" data-app="card" onclick="App.nav('card')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10.5h18"/></svg></div><div class="portal-card-body"><div class="portal-card-title">カード</div></div></a>
       </div></div>
     </div>
@@ -4708,6 +4732,13 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 <div class="toast" id="fk_toast"></div>
 </section>
 
+<nav id="phoneTab" class="hidden">
+  <button data-key="portal" onclick="App.nav('portal')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z"/></svg>ホーム</button>
+  <button data-key="daily" onclick="App.nav('daily')"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>日報</button>
+  <button data-key="ot" onclick="App.nav('ot')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>時間外</button>
+  <button data-key="prod" onclick="App.nav('prod')"><svg viewBox="0 0 24 24"><path d="M3 21V11l6 3.5V11l6 3.5V8l6 4.5V21z"/><path d="M2.5 21h19"/></svg>生産</button>
+  <button data-key="proj" onclick="App.nav('proj')"><svg viewBox="0 0 24 24"><path d="M2 11l10-5 10 5"/><path d="M2 11h20"/><path d="M2.5 11v9M21.5 11v9"/></svg>企画</button>
+</nav>
 <div class="loading-overlay hidden" id="loader"><div class="spin"></div><br>読み込み中...</div>
 <div class="toast" id="toast"></div>
 <div id="ctoastEl" class="center-toast"></div>
@@ -4758,8 +4789,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 11:01';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1373;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 11:08';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1374;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -5031,12 +5062,12 @@ function updateMoneyBadges(){document.querySelectorAll('.mny-btn').forEach(b=>{b
 // 5 分ごと＋発注画面の loadAll から。GET は控えを使わない。
 const PoBadge=(function(){
   let _n=-1;
-  function set(n){ n=Number(n)||0; if(n===_n)return; _n=n;
+  function set(n){ n=Number(n)||0; if(n===_n)return; _n=n; try{ if(typeof App!=='undefined'&&App.current==='portal')App.portalStatus(); }catch(e){}
     const nv=document.getElementById('navPo'); if(nv){ let b=nv.querySelector('.nav-cnt'); if(n>0){ if(!b){ b=document.createElement('span'); b.className='nav-cnt'; nv.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
     const ic=document.querySelector('.portal-card[data-app="po"] .portal-card-icon'); if(ic){ let b=ic.querySelector('.portal-cnt'); if(n>0){ if(!b){ b=document.createElement('span'); b.className='portal-cnt'; ic.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
   }
   function fetchCount(){ if(typeof App!=='undefined'&&App.denied.indexOf('po')>=0) return; return fetch(API+'?dept=po&action=list&status=依頼&nocache='+Date.now()).then(r=>r.json()).then(j=>{ if(j&&j.success) set((j.data||[]).length); }).catch(()=>{}); }
-  return { set, fetchCount };
+  return { set, fetchCount, get:()=>Math.max(_n,0) };
 })();
 function moneyFetch(){
   if(typeof App!=='undefined'&&App.denied.indexOf('cases')>=0) return Promise.resolve(null);   // 同上
@@ -5751,6 +5782,7 @@ requestAnimationFrame(()=>{$('prodViewBg').scrollTop=0;const _mo=$('prodViewBg')
 
   // ===== expose（onclick等から呼ぶ17関数＋nav用loadAll/render/init） =====
   return {
+    count:()=>prodData.filter(d=>!['見積中','見送り','出荷済','中止'].includes(d.status)).length,   // ポータルの右（10/29）
     fabSearch, openFabIn, addFabInRow, saveFabIn, openFabOut, saveFabOut, openFabAdj, saveFabAdj, openFabHist, closeFabMo, delFabRow,
     loadAll, render, init,
     openSlog, closeSlog, clearSlog,
@@ -6783,6 +6815,7 @@ const Proj = (function(){
 
   // ===== expose（onclick等から呼ぶ関数＋nav用loadAll/render/init＋ガントsetter） =====
   return {
+    count:()=>projData.filter(d=>!['終了','完了','見送り','中止'].includes(d.status)).length,   // ポータルの右（10/29）
     loadAll, render, init,
     openSlog, closeSlog, clearSlog,
     openProjMo, closeProjMo, editProj, saveProj, delProj, toggleProjType, addToCase,
@@ -8937,6 +8970,7 @@ const Daily = (function(){
   }
 
   return {
+    todayState:()=>{ const w=(function(){try{return localStorage.getItem('daily_who')||''}catch(e){return ''}})(); if(!w)return ''; const d=new Date(), ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); return allReports.some(r=>String(r.employee_no)===String(w)&&String(r.date)===ds)?'記入済':'未記入'; },   // ポータルの右（10/29）
     loadAll, init,
     onWhoChange, onWriteDateChange, setWriteDateToday,
     onAfProjChange, onAfWorkChange, openAddForm, closeAddForm,
@@ -10900,7 +10934,7 @@ async function exportCsv(){
 function reloadAll(){boot();toast('更新しました');}
   function loadAll(){ return boot(); }
   function init(){}
-  return { loadAll, init, clearSel, segPick, onAlcoholChange, addInstr, toggleDetail, onFaceChange, record, shiftDay, goToday, exportCsv, closeEdit, delRecord, saveEdit, selectDriver, toggleExtra, onDriverSel, openEdit, delById, loadDay, reloadAll };
+  return { loadAll, init, clearSel, segPick, onAlcoholChange, addInstr, toggleDetail, onFaceChange, record, shiftDay, goToday, exportCsv, closeEdit, delRecord, saveEdit, selectDriver, toggleExtra, onDriverSel, openEdit, delById, loadDay, reloadAll , myState:()=>{ const me=window.__woffUser&&window.__woffUser.name; if(!me)return ''; const k=x=>String(x||'').replace(/[\s\u3000]/g,''); const mine=records.filter(r=>k(r.driver)===k(me)&&r.date===todayStr()); const pre=mine.find(r=>r.phase==='運転前'), post=mine.find(r=>r.phase==='運転後'); return post?'運転後 '+(post.time||''):pre?'運転前 '+(pre.time||''):''; } };
 })();
 const Fork=(function(){
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
@@ -11180,7 +11214,7 @@ function reloadAll(){boot();toast('更新しました');}
   function setMemo(n,v){ if(itemState[n]) itemState[n].memo=v; }
   function loadAll(){ return boot(); }
   function init(){}
-  return { loadAll, init, setMemo, selectMachine, selectInspector, toggleExtraIns, setItem, record, shiftDay, loadDay, goToday, exportCsv, delById, reloadAll };
+  return { loadAll, init, setMemo, selectMachine, selectInspector, toggleExtraIns, setItem, record, shiftDay, loadDay, goToday, exportCsv, delById, reloadAll, todayState:()=>{ const done=MACHINES.filter(m=>records.some(r=>r.machine===m.id)).map(m=>m.id.replace('フォークリフト','')); return done.length?done.join(' ')+' 済':''; } };
 })();
 // キオスク用ディープリンク：?go=画面 を mode-strip 前に捕捉（事務所前=alcohol/倉庫=forklift のアイコン用）
 // ?go=daily 直指定に加え、LINE WORKS WOFFがパス（…/woff/<ID>/daily）を ?woff.state=/daily に変換して渡してくる形も受ける
@@ -11380,6 +11414,17 @@ const App = {
   /* REGのzone/kioskをナビとポータルカードにdata属性として注入（起動時1回）。HTML側の手書き属性を廃止し二重管理をなくす */
   // 上のナビにポータルと同じアイコンを付ける（10/16 iller。アイコンの正本はポータルのカード＝ここから写す）
   injectNavIcons(){ this.REG.forEach(r=>{ const nv=$(r.nav), sv=document.querySelector('.portal-card[data-app="'+r.key+'"] svg'); if(!nv||!sv||nv.querySelector('.nav-ic'))return; const c=sv.cloneNode(true); c.setAttribute('width','15'); c.setAttribute('height','15'); c.classList.add('nav-ic'); nv.insertBefore(c,nv.firstChild); }); },
+  // ポータルの右の状態（10/29）：読めている画面の数だけ。日付の 1 行はいつも
+  portalStatus(){
+    const sub=$('portalSub'); if(sub){ const d=new Date(); sub.textContent=['日','月','火','水','木','金','土'][d.getDay()]+'曜日 '+(d.getMonth()+1)+'月'+d.getDate()+'日'; sub.classList.toggle('hidden', !this.isPhone()); }
+    const put=(k,txt,red)=>{ const el=document.querySelector('.portal-card[data-app="'+k+'"] .portal-st'); if(!el)return; el.textContent=txt||''; el.classList.toggle('hidden', !txt||!this.isPhone()); el.classList.toggle('red', !!red); };
+    try{ put('prod', typeof Prod!=='undefined'&&Prod.count?Prod.count():''); }catch(e){}
+    try{ put('proj', typeof Proj!=='undefined'&&Proj.count?Proj.count():''); }catch(e){}
+    try{ const n=PoBadge.get?PoBadge.get():0; put('poreq', n>0?'依頼 '+n:''); }catch(e){}
+    try{ const t=typeof Daily!=='undefined'&&Daily.todayState?Daily.todayState():''; put('daily', t, t==='未記入'); }catch(e){}
+    try{ put('alcohol', typeof Alc!=='undefined'&&Alc.myState?Alc.myState():''); }catch(e){}
+    try{ put('forklift', typeof Fork!=='undefined'&&Fork.todayState?Fork.todayState():''); }catch(e){}
+  },
   injectZones(){ this.REG.forEach(r=>{ const z=r.dispZone||r.zone; if(!z)return; [$(r.nav), document.querySelector('.portal-card[data-app="'+r.key+'"]')].forEach(el=>{ if(!el)return; el.setAttribute('data-zone',z); if(r.kiosk)el.setAttribute('data-kiosk',''); }); }); },
   mode:'full',   // 端末モードは 2026-10-15 に廃止（iller「要らない」）。全端末フル固定。以前の localStorage spa_mode は読まない
   allowedZones(){ return this.mode==='floor' ? ['field','shared'] : ['field','shared','office']; },
@@ -11409,6 +11454,7 @@ const App = {
       const nv=$(r.nav); if(nv) nv.classList.toggle('on', r.key===name);
     });
     this.current=name;
+    { const pt=$('phoneTab'); if(pt){ pt.classList.toggle('hidden', !(this.isPhone()&&this.mode!=='kiosk')); pt.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.key===name)); } if(name==='portal') this.portalStatus(); }   // iOS 風（10/29）
     { const _s=$(this.reg(name).section); if(_s){ _s.classList.remove('sec-in'); void _s.offsetWidth; _s.classList.add('sec-in'); clearTimeout(_s._secT); _s._secT=setTimeout(()=>_s.classList.remove('sec-in'),260); } }   // 切り替えは 0.15 秒の薄いフェード（10/16）。動きが止まる端末でも 0.26 秒で必ず外す＝透明のまま残らない
     this.staleNote();
     centerActiveNav();
