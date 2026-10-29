@@ -229,7 +229,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 }
 .fv-sum{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}   /* 2026-09-17 iller「フィルターがでかすぎる」→ PC もピル型（スマホ版と同じ形）で高さを1/2以下に */
 .fv-flt-mb{display:none}
-.tmp-badge{display:inline-block;font-size:10px;font-weight:500;color:#fff;background:#94a3b8;padding:2px 8px;border-radius:10px;margin-left:6px;letter-spacing:.02em;vertical-align:middle}
+.tmp-badge{display:inline-block;font-size:10px;font-weight:500;color:var(--text-dim);background:var(--surface3);padding:2px 8px;border-radius:10px;margin-left:6px;letter-spacing:.02em;vertical-align:middle}
 .stale-badge{display:inline-block;font-size:11px;font-weight:500;color:#c0392b;background:#fdeaea;border:1px solid #f1b9b3;padding:2px 8px;border-radius:6px;margin-left:6px;white-space:nowrap;vertical-align:middle;cursor:help}
 /* 見積の経過（2026-09-24 iller）：見積書の有効期限は最長1ヶ月。見積中のまま 2週=黄・3週=橙・31日〜=赤。状態が動いた時にだけ消える */
 .qa-badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:6px;margin-left:6px;white-space:nowrap;vertical-align:middle;cursor:help}
@@ -257,7 +257,7 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .fv-card .badge.urgent{color:var(--red);background:var(--red-dim)}
 .fv-card .badge.thisweek{color:var(--orange);background:var(--orange-dim)}
 .fv-card .badge.twoweeks{color:var(--accent);background:var(--accent-dim)}
-.fv-card .badge.dup{color:#fff;background:var(--red)}
+.fv-card .badge.dup{color:var(--red);background:var(--red-dim)}
 .fv-card .meta{font-size:12px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
 .fv-card .tag{font-size:11px;padding:2px 7px;border-radius:5px;font-weight:500}
 .fv-card .tag.loc{color:var(--cyan);background:var(--cyan-dim)}
@@ -1394,14 +1394,14 @@ table.jobs tr:last-child td{border-bottom:none}
 .time-chip.selected{background:var(--green-dim);color:var(--green);border-color:transparent}
 .time-chip.holiday-chip{border-color:#fbbf24;min-width:64px}
 .time-chip.holiday-chip:hover{border-color:var(--orange);color:var(--orange)}
-.time-chip.holiday-chip.selected{background:var(--orange);color:#fff;border-color:var(--orange)}
+.time-chip.holiday-chip.selected{background:var(--orange-dim);color:var(--orange);border-color:transparent}
 .day-clear{font:500 11px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--red);background:none;border:none;cursor:pointer;padding:4px 8px}
 .day-clear:hover{text-decoration:underline}
 .admin-section{padding:16px}
 .admin-tools{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.ov-header{display:grid;grid-template-columns:100px repeat(var(--cols),1fr);background:#1e293b;color:#fff;font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif}
+.ov-header{display:grid;grid-template-columns:100px repeat(var(--cols),1fr);background:var(--surface3);color:var(--text);font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif}
 .ov-header .ov-cell{padding:10px 8px;text-align:center}
-.ov-header .ov-cell.today-col{background:#334155}
+.ov-header .ov-cell.today-col{background:var(--accent-dim)}
 .ov-header .ov-cell.holiday-col{background:#92400e}
 .ov-row{display:grid;grid-template-columns:100px repeat(var(--cols),1fr);border-bottom:1px solid var(--border)}
 .ov-row:last-child{border-bottom:none}
@@ -2159,7 +2159,7 @@ table.jobs tr:hover td{background:rgba(85,80,180,.04)}
 #view-ot .time-chip:hover{background:#dededf;color:var(--text)}
 #view-ot .time-chip.selected{background:var(--green-dim);color:var(--green);box-shadow:none}
 #view-ot .time-chip.holiday-chip{background:#faeeda;color:#854f0b}
-#view-ot .time-chip.holiday-chip.selected{background:var(--orange);color:#fff}
+#view-ot .time-chip.holiday-chip.selected{background:var(--orange-dim);color:var(--orange)}
 #view-ot .admin-tools .av-add{background:var(--surface3);border:none;color:var(--text);border-radius:8px;padding:8px 14px;font-weight:500}
 #view-ot .overview-grid{gap:0;border:none;border-radius:12px;box-shadow:none}
 #view-ot .ov-header{background:var(--surface);color:var(--text-faint);font-weight:500;border-bottom:0.5px solid var(--border-light)}
@@ -3016,7 +3016,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .ce-children{display:flex;flex-direction:column;gap:6px;margin-top:4px}
   #view-cases .ce-child{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);cursor:pointer;font:inherit}
   #view-cases .ce-child:hover{border-color:var(--accent)}
-  #view-cases .ce-cdept{flex:0 0 auto;font-size:11px;font-weight:500;color:#fff;background:var(--text-dim);border-radius:5px;padding:3px 8px}
+  #view-cases .ce-cdept{flex:0 0 auto;font-size:11px;font-weight:500;color:var(--text-dim);background:var(--surface3);border-radius:5px;padding:3px 8px}
   #view-cases .ce-cdept.ce-production{background:#d99a00}
   #view-cases .ce-cdept.ce-project{background:#5a9e3a}
   #view-cases .ce-cdept.ce-sales{background:#c763b0}
@@ -3044,7 +3044,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .ce-hours .t{font-weight:500;font-variant-numeric:tabular-nums}
   #view-cases .ce-hours .by{color:var(--text-dim);font-size:12px}
   #view-cases .ce-sum{display:flex;align-items:baseline;gap:10px;padding:9px 12px;border-top:1px solid var(--border-light);font-size:13px;flex-wrap:wrap;background:var(--surface2)}
-  #view-cases .ce-sum .k{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:500;background:var(--text);color:#fff}
+  #view-cases .ce-sum .k{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:500;background:var(--surface3);color:var(--text)}
   #view-cases .ce-sum .t{font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
   #view-cases .ce-sum .by{color:var(--text-dim);font-size:12px}
   #view-cases .ce-sum.bad .t{color:#a32d2d}
@@ -3063,10 +3063,10 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .ce-add-production:hover{border-color:#d99a00;color:#d99a00}
   #view-cases .ce-add-project:hover{border-color:#5a9e3a;color:#5a9e3a}
   #view-cases .ce-add-sales:hover{border-color:#c763b0;color:#c763b0}
-  #view-cases .cdept{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:5px;font-size:11px;font-weight:500;color:#fff;margin-right:3px}
-  #view-cases .cdept-production{background:#d99a00}
-  #view-cases .cdept-project{background:#5a9e3a}
-  #view-cases .cdept-sales{background:#c763b0}
+  #view-cases .cdept{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:5px;font-size:11px;font-weight:500;margin-right:3px}
+  #view-cases .cdept-production{background:#fbf3e0;color:#9a6c00}
+  #view-cases .cdept-project{background:#eaf3de;color:#3b6d11}
+  #view-cases .cdept-sales{background:#f9eaf5;color:#8e3f7c}
   #view-cases .cdept-none{color:var(--text-faint)}
   #view-cases .fv-si.cl-tgl{border-left:3px solid #999}
   #view-cases .fv-si.cl-tgl.off{opacity:.4;text-decoration:line-through}
@@ -4015,7 +4015,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-wb .wb-dh.hol b{color:#dc2626}
 #view-wb .wb-dh.hol i{color:#dc2626;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
 #view-wb .wb-cell.hol{background:#fdf6f6}
-#view-wb .wb-dh.today b{color:#fff;background:#f59e0b;border-radius:50%;width:19px;height:19px;line-height:19px;margin:0 auto;display:block}
+#view-wb .wb-dh.today b{color:var(--orange);background:var(--orange-dim);border-radius:50%;width:19px;height:19px;line-height:19px;margin:0 auto;display:block}
 #view-wb .wb-dh.mstart,#view-wb .wb-cell.mstart{border-left:2px solid #c3cbd6}
 /* 本日の列を丸ごとハイライト（薄い色＋両脇に控えめなオレンジの縦線） */
 #view-wb .wb-dh.today,#view-wb .wb-cell.today{background:#FFF7E6;box-shadow:inset 1px 0 rgba(245,158,11,.35),inset -1px 0 rgba(245,158,11,.35)}
@@ -4754,8 +4754,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 09:49';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1355;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 09:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1356;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -6043,7 +6043,7 @@ const Proj = (function(){
       const c=usage[v][ds]||0;
       const isT=dateStr(dt)===dateStr(today);
       h+=`<div class="gantt-bar-cell${ganttCellCls(dt)}" style="display:flex;align-items:center;justify-content:center">`;
-      if(c>=2)h+=`<span style="font-size:12px;font-weight:500;color:#fff;background:var(--red);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center">${c}</span>`;
+      if(c>=2)h+=`<span style="font-size:12px;font-weight:500;color:var(--red);background:var(--red-dim);border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center">${c}</span>`;
       else if(c===1)h+=`<span style="font-size:10px;color:var(--text-faint)">${c}</span>`;
       h+='</div>'});
       h+='</div></div>'});
