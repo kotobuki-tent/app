@@ -4608,6 +4608,48 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-forklift>.scr-head{padding:18px 16px 0}
 #view-forklift>.scr-head .scr-sub{padding-bottom:4px}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){#view-forklift>.scr-head{padding:14px 16px 0}}
+/* 10/29 ケータイ（480px 以下）：アルコールチェックと同じ作りに（iller「フォークリフト点検も同じように」）。太字と塗りをやめ、札は薄い地に濃い文字。事務所前のタブレットは従来のまま */
+@media(max-width:480px){
+  html #view-forklift .pane{padding:0 16px 16px}
+  html #view-forklift .pane h2{font:600 17px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;padding:14px 0 10px;margin-bottom:0;flex-wrap:wrap;gap:6px 10px}
+  html #view-forklift .gl{font:400 13px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);letter-spacing:0;margin:14px 0 8px}
+  html #view-forklift .ngrid{gap:8px}
+  html #view-forklift .namebtn{font:500 15px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;padding:12px 6px;border-radius:12px}
+  html #view-forklift #fk_machineGrid .namebtn{min-height:0;gap:4px}
+  html #view-forklift #fk_machineGrid .mname{font-size:15px;font-weight:500}
+  html #view-forklift .namebtn .sub{font-size:11px;font-weight:400;margin-top:0}
+  html #view-forklift .namebtn.sel{background:var(--accent-dim);color:var(--accent)}
+  html #view-forklift .namebtn.sel .sub{color:var(--accent)}
+  html #view-forklift .mst{font-size:11px;font-weight:500;padding:3px 10px}
+  html #view-forklift .mst.ng{background:var(--red-dim);color:var(--red)}
+  html #view-forklift #fk_machineGrid .namebtn.sel .mst.todo{background:rgba(255,255,255,.7);color:var(--red)}
+  html #view-forklift .inspgrid{grid-template-columns:repeat(3,1fr);gap:8px}
+  html #view-forklift .inspgrid .namebtn{padding:11px 4px;font-size:14px}
+  html #view-forklift .btn-rec{height:52px;font:600 17px/1 'Hiragino Sans','Noto Sans JP',sans-serif;border-radius:12px;letter-spacing:0;margin-top:12px}
+  html #view-forklift .btn-rec.ng{background:var(--red-dim);color:var(--red)}
+  html #view-forklift .summary{margin-top:10px;padding:10px 14px;border:none;border-radius:10px}
+  html #view-forklift .summary .s-txt{font-size:14px;font-weight:500}
+  html #view-forklift .ckwrap .gl-span{font-weight:500;font-size:13px}
+  html #view-forklift .ck-item{padding:9px 10px;border-radius:10px}
+  html #view-forklift .ck-label{font-size:14px;font-weight:400}
+  html #view-forklift .ck-seg button{font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;width:44px;padding:8px 0}
+  html #view-forklift .ck-seg .ck-ok.on{background:var(--green-dim);color:var(--green)}
+  html #view-forklift .ck-seg .ck-ng.on{background:var(--red-dim);color:var(--red)}
+  html #view-forklift .daydate{font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim)}
+  html #view-forklift .frec-grid{grid-template-columns:1fr;gap:8px;margin-top:8px}
+  html #view-forklift .frec-card{padding:10px 12px;border-radius:10px}
+  html #view-forklift .frc-mc{font-size:15px;font-weight:500}
+  html #view-forklift .frc-jd{font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:4px 10px}
+  html #view-forklift .frc-jd.ng{background:var(--red-dim)}
+  html #view-forklift .frc-meta{font-size:13px;font-weight:400;margin-top:4px}
+  html #view-forklift .frc-del{font-weight:400}
+  html #view-forklift .fk-sum{font-size:12px}
+  html #view-forklift .fk-hist td.ng{font-weight:500}
+  html #view-forklift .divider{margin:14px 0}
+  html #view-forklift .csvbar,html #view-forklift .csvbar+.note,html #view-forklift .divider+h2:last-of-type{display:none}
+  html #view-forklift .field label{font-weight:500}
+  html #view-forklift .moretoggle{font:400 13px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim)}
+}
 /* 2026-10-15 Apple 風（この画面の style は土台より後なので上書きはここ） */
 #view-forklift .pane{border:none;box-shadow:none;border-radius:14px}
 #view-forklift .pane h2{font-weight:600;border-bottom:0.5px solid var(--border-light)}
@@ -4707,8 +4749,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 09:29';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1346;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 09:32';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1347;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
