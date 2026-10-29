@@ -1671,10 +1671,10 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 /* PC（マウス）：点呼・リフトのタブレット用の巨大ボタンは普通の大きさで右寄せ（10/28 iller「節操なさすぎ」）。タブレット（タッチ）はそのまま */
 @media(min-width:481px) and (pointer:fine){
-  html #view-alcohol .commit{justify-content:flex-end;gap:10px;margin-top:16px}
-  html #view-alcohol .commit button{flex:0 0 auto;height:auto;padding:11px 24px;border-radius:8px;font:500 15px/1 'Hiragino Sans','Noto Sans JP',sans-serif;letter-spacing:0;flex-direction:row;gap:8px}
+  html #view-alcohol .commit{gap:10px;margin-top:16px}
+  html #view-alcohol .commit button{flex:1;height:52px;padding:0 24px;border-radius:12px;font:500 17px/1 'Hiragino Sans','Noto Sans JP',sans-serif;letter-spacing:0;flex-direction:row;gap:8px}
   html #view-alcohol .commit button small{font-size:12px;font-weight:500;letter-spacing:0}
-  html #view-forklift .btn-rec{display:block;width:auto;margin:14px 0 0 auto;height:auto;padding:11px 24px;border-radius:8px;font:500 15px/1 'Hiragino Sans','Noto Sans JP',sans-serif;letter-spacing:0}
+  html #view-forklift .btn-rec{display:block;width:100%;margin:12px 0 0;height:52px;padding:0;border-radius:12px;font:500 17px/1 'Hiragino Sans','Noto Sans JP',sans-serif;letter-spacing:0}   /* 10/29 ケータイと同じ（iller「なんで揃えないの」） */
 }
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
@@ -4233,10 +4233,10 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-alcohol #detailBox.open{display:block}
 #view-alcohol .hide{display:none!important}
 #view-alcohol .commit{display:flex;gap:16px;margin-top:14px}
-#view-alcohol .commit button{flex:1;height:72px;border:none;border-radius:16px;font:500 20px/1.2 'Noto Sans JP';cursor:pointer;letter-spacing:.04em;transition:.12s;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+#view-alcohol .commit button{flex:1;height:52px;border:none;border-radius:12px;font:500 17px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;letter-spacing:0;transition:.12s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 #view-alcohol .commit button small{font-size:15px;font-weight:500;opacity:.8;letter-spacing:.1em}
-#view-alcohol .commit .pre{background:var(--text)}   /* 10/29 iller「趣味悪い」：塗りの藍＋黒をやめて 黒＋白（黒縁）に */
-#view-alcohol .commit .post{background:var(--surface);color:var(--text);box-shadow:inset 0 0 0 2px var(--text)}
+#view-alcohol .commit .pre{background:var(--accent-dim);color:var(--accent)}   /* 10/29 ケータイと同じ（iller「なんで揃えないの」） */
+#view-alcohol .commit .post{background:var(--surface3);color:var(--text);box-shadow:none}
 #view-alcohol .commit button:active{transform:scale(.97)}
 #view-alcohol .commit button:disabled{background:var(--surface3);color:var(--text-faint);cursor:not-allowed}
 #view-alcohol .daydate{font-size:14px;font-weight:500;color:var(--text-dim)}
@@ -4525,12 +4525,12 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-forklift .mst.ok{background:var(--green-dim,#e6f6ee);color:#0d7a42}
 #view-forklift .mst.ng{background:var(--red-dim);color:var(--red)}
 #view-forklift .mst.todo{background:var(--red-dim);color:var(--red)}
-#view-forklift #fk_machineGrid .namebtn.sel .mst.todo{background:rgba(255,255,255,.25);color:#fff}
-#view-forklift #fk_machineGrid .namebtn.sel .sub{color:#cfe0fb}
+#view-forklift #fk_machineGrid .namebtn.sel .mst.todo{background:var(--red-dim);color:var(--red)}
+#view-forklift #fk_machineGrid .namebtn.sel .sub{color:var(--accent)}
 #view-forklift .namebtn:hover{border-color:var(--accent);background:var(--accent-dim)}
 #view-forklift .namebtn.sel{background:var(--accent-dim);color:var(--accent);border-color:transparent;box-shadow:0 4px 12px rgba(85,80,180,.3)}
 #view-forklift .namebtn .sub{display:block;font-size:12px;font-weight:500;color:var(--text-faint);margin-top:4px}
-#view-forklift .namebtn.sel .sub{color:#cfe0fb}
+#view-forklift .namebtn.sel .sub{color:var(--accent)}
 #view-forklift .inspgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
 #view-forklift .inspgrid .namebtn{padding:8px}
 #view-forklift .moretoggle{font-size:13px;font-weight:500;color:var(--accent);cursor:pointer;display:inline-block;margin:6px 2px}
@@ -4552,9 +4552,9 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-forklift .ck-memo{width:100%;margin:8px 0 4px;padding:11px 13px;border:1px solid var(--red);border-radius:9px;font:400 15px/1.4 'Noto Sans JP';background:var(--red-dim)}
 #view-forklift .ck-memo:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 4px rgba(220,38,38,.08)}
 #view-forklift .ck-hint{padding:24px;text-align:center;color:var(--text-faint);font-size:14px}
-#view-forklift .summary{display:flex;align-items:center;gap:12px;margin-top:14px;padding:14px 16px;border-radius:12px;background:var(--green-dim,#e6f6ee);border:1px solid var(--green)}
-#view-forklift .summary.ng{background:var(--red-dim);border-color:var(--red)}
-#view-forklift .summary .s-txt{flex:1;font-size:15px;font-weight:500;color:var(--green)}
+#view-forklift .summary{display:flex;align-items:center;gap:12px;margin-top:10px;padding:10px 14px;border-radius:10px;background:var(--green-dim,#e6f6ee);border:none}
+#view-forklift .summary.ng{background:var(--red-dim)}
+#view-forklift .summary .s-txt{flex:1;font-size:14px;font-weight:500;color:var(--green)}
 #view-forklift .summary.ng .s-txt{color:var(--red)}
 #view-forklift .btn-rec{width:100%;margin-top:14px;height:60px;border:none;border-radius:14px;font:500 18px/1 'Noto Sans JP';color:var(--accent);background:var(--accent-dim);cursor:pointer;letter-spacing:.04em}
 #view-forklift .btn-rec.ng{background:var(--red-dim);color:var(--red)}
@@ -4755,8 +4755,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 09:55';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1357;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 09:58';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1358;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
