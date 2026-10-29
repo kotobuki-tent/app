@@ -1843,7 +1843,7 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 /* HOME はどの画面でも目立つように（10/27 iller「home じゃないの選んでる時に home が目立たなくなる」）：常に灰のピル、ポータルの時は黒 */
 .nav-link.home-link{background:var(--surface);color:var(--text);font-weight:500;padding:0 14px;box-shadow:0 0 0 1px var(--border)}   /* 選んでいる画面の灰のピルと見分くように白地＋枠 */
 .nav-link.home-link:hover{background:var(--surface3)}
-.nav-link.home-link.on{background:var(--text);color:#fff}
+.nav-link.home-link.on{background:#d4d4d9;color:var(--text)}
 /* ナビの列（10/27 iller「まとめるものと単独で置くもの」）：台帳▾＝工数・在庫・車両・資格、記録▾＝時間外・予定ボード・アルコールチェック・リフト点検・カード。
    列は fixed で出す（.hdr-inner が横送り＝overflow の時に切れないように）。開いている画面が列の中なら列の名前が .on の色になる */
 .nav-dd{position:relative;display:flex;align-items:center}
@@ -1898,7 +1898,7 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .sub-tabs{background:transparent;padding:14px 16px 6px;gap:6px}
 .sub-tab{background:var(--surface3);color:var(--text);font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:8px 13px;border-radius:8px}
 .sub-tab:hover{background:#dededf;color:var(--text)}
-.sub-tab.on{background:var(--text);color:#fff}
+.sub-tab.on{background:#d4d4d9;color:var(--text)}
 .subtab-search{background:var(--surface3);border:none;border-radius:9px;padding:8px 12px;font-size:13px;width:200px}
 .subtab-search:focus{outline:none;background:#fff;box-shadow:0 0 0 3px var(--accent-dim)}
 /* 画面の大見出し（見本 PC_2026-10-15）：左に名前、横に薄い数、右に検索 */
@@ -1938,10 +1938,10 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .fv-sum{gap:8px;margin-bottom:14px}
 .fv-si{background:var(--surface3);border:1px solid transparent;color:var(--text);padding:6px 12px;box-shadow:none}
 .fv-si:hover{border-color:transparent;background:#dededf}
-.fv-si.on{background:var(--text);border-color:var(--text);color:#fff}
+.fv-si.on{background:#d4d4d9;border-color:transparent;color:var(--text)}
 .fv-si .n{font-size:13px;font-weight:500}
 .fv-si .l{font-size:13px;font-weight:500;color:inherit}
-.fv-si.on .l,.fv-si.on .n{color:#fff}
+.fv-si.on .l,.fv-si.on .n{color:var(--text)}
 /* 表の足元：件数 */
 .tbl-foot{display:flex;justify-content:space-between;padding:10px 16px;color:var(--text-faint);font-size:12px;border-top:0.5px solid var(--border-light)}
 /* ボード（生産の工場ボード・企画のボード）：数は白いタイル、段の見出しは色の点、カードは白い角丸で縁取り無し（見本 工場ボード_2026-10-15） */
@@ -2111,10 +2111,10 @@ table.jobs tr:hover td{background:rgba(85,80,180,.04)}
 .summary-bar{gap:8px;margin-bottom:14px}
 .sum-item{display:inline-flex;align-items:center;gap:6px;background:var(--surface3);border:1px solid transparent;border-radius:999px;padding:6px 12px;min-width:0;box-shadow:none;text-align:left;color:var(--text)}
 .sum-item:hover{border-color:transparent;background:#dededf}
-.sum-item.on{background:var(--text);border-color:var(--text);color:#fff}
+.sum-item.on{background:#d4d4d9;border-color:transparent;color:var(--text)}
 .sum-item .n{font-size:13px;font-weight:500;line-height:1;order:2;color:inherit}
 .sum-item .l{font-size:13px;font-weight:500;line-height:1;margin:0;order:1;color:inherit}
-.sum-item.on .n,.sum-item.on .l{color:#fff}
+.sum-item.on .n,.sum-item.on .l{color:var(--text)}
 .sum-item.danger:not(.on) .n{color:var(--red)}
 .sum-item.warn:not(.on) .n{color:var(--orange)}
 .alert-section{margin-bottom:22px}
@@ -2244,7 +2244,7 @@ tr:hover td{background:rgba(85,80,180,.04)}
 .portal-card:hover .portal-card-icon{background:#fafafa}
 .portal-modeswitch{margin-bottom:26px}
 .pm-btn{background:var(--surface3);border:none;color:var(--text);border-radius:8px;padding:6px 12px;font:500 12px/1 'Hiragino Sans','Noto Sans JP',sans-serif}
-.pm-btn.on{background:var(--text);color:#fff}
+.pm-btn.on{background:#d4d4d9;color:var(--text)}
 .portal-footer{color:var(--text-faint)}
 /* 日報「自分で書く」：白いかたまいを 3 つ（日付と名前／今日の記録／追加する）。行は 1 行 1 項目、札は左・値は右 */
 #view-daily .app{padding:10px 16px 60px}
@@ -2833,7 +2833,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .sz-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 14px}
   #view-cases .sz-sp{flex:1 1 12px}
   #view-cases .sz-chip{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 13px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
-  #view-cases .sz-chip.on{background:var(--text);border-color:var(--text);color:#fff}
+  #view-cases .sz-chip.on{background:#d4d4d9;border-color:transparent;color:var(--text)}
   #view-cases .sz-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 14px}
   #view-cases .sz-card{background:var(--surface);border-radius:12px;padding:12px 14px;min-width:0}
   #view-cases .sz-card .k{font-size:13px;color:var(--text-dim)}
@@ -2883,7 +2883,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   :is(#view-po,#view-poreq,#poEditBg) .po-panel-hd .sp{flex:1}
   :is(#view-po,#view-poreq,#poEditBg) .po-months{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
   :is(#view-po,#view-poreq,#poEditBg) .sz-chip{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 13px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
-  :is(#view-po,#view-poreq,#poEditBg) .sz-chip.on{background:var(--text);border-color:var(--text);color:#fff}
+  :is(#view-po,#view-poreq,#poEditBg) .sz-chip.on{background:#d4d4d9;border-color:transparent;color:var(--text)}
   :is(#view-po,#view-poreq,#poEditBg) .po-panel .po-new{margin:0;padding:11px 20px;font-size:14px}
   :is(#view-po,#view-poreq,#poEditBg) .po-panel .po-card{background:var(--surface2);box-shadow:none;border:1px solid var(--border-light)}
   :is(#view-po,#view-poreq,#poEditBg) .po-panel .po-tblwrap{border:1px solid var(--border-light)}
@@ -2902,14 +2902,14 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   :is(#view-po,#view-poreq,#poEditBg) .po-inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   :is(#view-po,#view-poreq,#poEditBg) .po-inline input{flex:1}
   :is(#view-po,#view-poreq,#poEditBg) .po-tg{border:1px solid var(--border);background:var(--surface2);border-radius:999px;padding:7px 14px;font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text);cursor:pointer}
-  :is(#view-po,#view-poreq,#poEditBg) .po-tg.on{background:var(--text);border-color:var(--text);color:#fff}
+  :is(#view-po,#view-poreq,#poEditBg) .po-tg.on{background:#d4d4d9;border-color:transparent;color:var(--text)}
   :is(#view-po,#view-poreq,#poEditBg) .po-item-hd,:is(#view-po,#view-poreq,#poEditBg) .po-item{display:grid;grid-template-columns:1fr 90px 70px 110px 32px;gap:6px;align-items:center}
   :is(#view-po,#view-poreq,#poEditBg) .po-item-hd{font-size:11px;color:var(--text-faint);padding:2px 0}
   :is(#view-po,#view-poreq,#poEditBg) .po-item{padding:3px 0}
   :is(#view-po,#view-poreq,#poEditBg) .po-item input.n{text-align:right}
   :is(#view-po,#view-poreq,#poEditBg) .po-item-ft{display:flex;justify-content:space-between;align-items:center;padding-top:6px;font-size:14px}
   :is(#view-po,#view-poreq,#poEditBg) .po-item-ft b{font-variant-numeric:tabular-nums;margin-left:8px}
-  :is(#view-po,#view-poreq,#poEditBg) .po-submit{border:none;border-radius:10px;background:var(--text);color:#fff;padding:11px 22px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
+  :is(#view-po,#view-poreq,#poEditBg) .po-submit{border:none;border-radius:10px;background:var(--accent-dim);color:var(--accent);padding:11px 22px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
   :is(#view-po,#view-poreq,#poEditBg) .po-card{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.3fr) 170px 200px;gap:16px;background:var(--surface);border-radius:12px;padding:14px 16px;margin-bottom:10px;align-items:start}
   :is(#view-po,#view-poreq,#poEditBg) .po-vendor{font-size:15px;font-weight:500}
   :is(#view-po,#view-poreq,#poEditBg) .po-items{font-size:14px;margin:4px 0}
@@ -2936,7 +2936,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   :is(#view-po,#view-poreq,#poEditBg) .po-kind{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
   :is(#view-po,#view-poreq,#poEditBg) .po-sender{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:500 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);max-width:100%}
   :is(#view-po,#view-poreq,#poEditBg) .po-btn{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:999px;padding:8px 16px;font:500 13px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
-  :is(#view-po,#view-poreq,#poEditBg) .po-btn.dark{background:var(--text);border-color:var(--text);color:#fff}
+  :is(#view-po,#view-poreq,#poEditBg) .po-btn.dark{background:#d4d4d9;border-color:transparent;color:var(--text)}
   :is(#view-po,#view-poreq,#poEditBg) .po-new{display:inline-block;border:none;border-radius:10px;background:var(--accent-dim);color:var(--accent);padding:20px 32px;font:500 16px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer;margin:6px 0 6px}
   :is(#view-po,#view-poreq,#poEditBg) .po-kind-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:11px;font-weight:500;background:var(--surface3);color:var(--text-dim)}
   :is(#view-po,#view-poreq,#poEditBg) .po-case-tag{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500;background:var(--accent-dim);color:var(--accent)}
@@ -3132,7 +3132,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .cal-und-card:hover{border-color:var(--accent)}
   #view-cases .cal-und-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #view-cases .cal-und-st{font-size:11px;color:var(--text-dim);flex-shrink:0}
-  #view-cases .cf-chip.dept.on{background:var(--text);border-color:var(--text)}
+  #view-cases .cf-chip.dept.on{background:#d4d4d9;border-color:transparent}
   </style>
   <div id="casesBody" style="padding:0 0 80px"></div>
   <datalist id="caseStaffList"></datalist>
@@ -4756,8 +4756,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 10:02';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1360;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 10:04';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1361;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
