@@ -3337,7 +3337,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <div class="type-toggle">
       <input type="checkbox" class="sw" id="xf_is_rental" onclick="Proj.toggleProjType()">
       <label>レンタル（貸出・返却のみ）</label>
-      <span class="hint">オンにすると設営関連の項目が無効になります</span>
+      
     </div>
     <div class="mo-row full"><div class="mo-field"><label>担当者</label><input id="xf_our_person"></div></div>
     <div class="mo-row pair"><div class="mo-field"><label>見積番号</label><input id="xf_estimate_no"></div><div class="mo-field"><label>受注番号</label><input id="xf_order_no"></div></div>
@@ -3515,7 +3515,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <div class="mo-row full"><div class="mo-field">
         <label>案件 / 顧客名</label>
         <div style="display:flex;gap:8px">
-          <select id="xf_r_project" style="flex:1" onchange="Inv.onProjectSelect()"><option value="">案件を選択（任意）</option></select>
+          <select id="xf_r_project" style="flex:1" onchange="Inv.onProjectSelect()"><option value="">案件を選択</option></select>
           <input id="xf_r_client" style="flex:1" placeholder="または顧客名を入力">
         </div>
       </div></div>
@@ -3821,7 +3821,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
           </div>
           <div class="af-field hidden" id="afProjCustomWrap">
             <label>案件名（自由記述）</label>
-            <input type="text" id="afProjCustom" placeholder="例: 清掃、研修、社内雑務...">
+            <input type="text" id="afProjCustom">
           </div>
           <div class="af-row">
             <div class="af-field" style="flex:2">
@@ -3830,12 +3830,12 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
             </div>
             <div class="af-field" style="flex:1">
               <label>時間（分）</label>
-              <input type="number" id="afMinutes" min="0" step="5" placeholder="例: 120">
+              <input type="number" id="afMinutes" min="0" step="5">
             </div>
           </div>
           <div class="af-field hidden" id="afWorkCustomWrap">
             <label>作業内容（自由記述）</label>
-            <input type="text" id="afWorkCustom" placeholder="例: 研修、会議、その他の作業...">
+            <input type="text" id="afWorkCustom">
           </div>
           <div class="af-btns">
             <button class="af-cancel" onclick="Daily.closeAddForm()">キャンセル</button>
@@ -3913,7 +3913,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <p style="font:400 13px/1.6 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);margin-bottom:12px">この週に時間外募集のメッセージを表示します。従業員側に表示されます。</p>
       <div class="mo-row full"><div class="mo-field">
         <label>メッセージ</label>
-        <textarea id="reqMessage" placeholder="例：今週納期が厳しいので、少しでも残れる方はご協力お願いします"></textarea>
+        <textarea id="reqMessage"></textarea>
       </div></div>
       <div class="mo-foot">
         <button class="cancel" onclick="Ot.closeReqModal()">キャンセル</button>
@@ -4383,7 +4383,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     </div>
 
     <div id="alcOnBlock" class="hide">
-      <div class="field"><label>測定値（mg/L）</label><input id="f_value" type="number" step="0.01" min="0" inputmode="decimal" placeholder="例: 0.15"></div>
+      <div class="field"><label>測定値（mg/L）</label><input id="f_value" type="number" step="0.01" min="0" inputmode="decimal"></div>
       <div class="field"><label>指示事項</label>
         <div class="chips">
           <button type="button" onclick="Alc.addInstr('運転禁止')">運転禁止</button>
@@ -4400,7 +4400,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <span class="detail-toggle" onclick="Alc.toggleDetail()">＋ 詳細（車両・確認者・検知器・対面・指示）</span>
     <div id="detailBox">
       <div class="row2">
-        <div class="field"><label>車両（任意）</label><select id="f_vehicle"><option value="">－</option></select></div>
+        <div class="field"><label>車両</label><select id="f_vehicle"><option value="">－</option></select></div>
         <div class="field"><label>確認者</label><select id="f_checker"></select></div>
       </div>
       <div class="row2">
@@ -4417,7 +4417,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
           </div>
         </div>
       </div>
-      <div class="field hide" id="methodField"><label>対面以外の具体的方法</label><input id="f_method" placeholder="例: 電話＋検知器の写真確認"></div>
+      <div class="field hide" id="methodField"><label>対面以外の具体的方法</label><input id="f_method"></div>
       <div class="field"><label>その他・備考</label><input id="f_note"></div>
     </div>
 
@@ -4466,7 +4466,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
         <button type="button" data-v="有" onclick="Alc.segPick('m_alcohol',this)">有</button>
       </div>
     </div>
-    <div class="field"><label>測定値（mg/L）</label><input id="m_value" type="number" step="0.01" min="0" inputmode="decimal" placeholder="例: 0.15"></div>
+    <div class="field"><label>測定値（mg/L）</label><input id="m_value" type="number" step="0.01" min="0" inputmode="decimal"></div>
     <div class="field"><label>確認者</label><select id="m_checker"></select></div>
     <div class="field"><label>検知器の使用</label>
       <div class="seg" id="m_detector">
@@ -4755,8 +4755,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 10:21';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1366;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 10:22';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1367;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -6942,7 +6942,7 @@ const Inv = (function(){
   }
   function populateProjectSelect(){
     const sel=$('xf_r_project');if(!sel)return;
-    sel.innerHTML='<option value="">案件を選択（任意）</option>'+projects.map(p=>`<option value="${esc(p.project||p.client||'')}">${esc(p.project||p.client||'')}</option>`).join('');
+    sel.innerHTML='<option value="">案件を選択</option>'+projects.map(p=>`<option value="${esc(p.project||p.client||'')}">${esc(p.project||p.client||'')}</option>`).join('');
   }
   function onProjectSelect(){if($('xf_r_project').value)$('xf_r_client').value=$('xf_r_project').value}
 
