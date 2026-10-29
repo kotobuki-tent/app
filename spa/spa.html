@@ -1671,10 +1671,10 @@ table.jobs tr:last-child td{border-bottom:none}
 }
 /* PC（マウス）：点呼・リフトのタブレット用の巨大ボタンは普通の大きさで右寄せ（10/28 iller「節操なさすぎ」）。タブレット（タッチ）はそのまま */
 @media(min-width:481px) and (pointer:fine){
-  html #view-alcohol .commit{gap:10px;margin-top:16px}
-  html #view-alcohol .commit button{flex:1;height:52px;padding:0 24px;border-radius:12px;font:500 17px/1 'Hiragino Sans','Noto Sans JP',sans-serif;letter-spacing:0;flex-direction:row;gap:8px}
+  html #view-alcohol .commit{justify-content:flex-end;gap:10px;margin-top:16px}
+  html #view-alcohol .commit button{flex:0 0 auto;height:auto;padding:11px 24px;border-radius:8px;font:500 15px/1 'Hiragino Sans','Noto Sans JP',sans-serif;letter-spacing:0;flex-direction:row;gap:8px}   /* 10/29 iller「揃えるのは色」＝幅は 10/28 の右寄せのまま */
   html #view-alcohol .commit button small{font-size:12px;font-weight:500;letter-spacing:0}
-  html #view-forklift .btn-rec{display:block;width:100%;margin:12px 0 0;height:52px;padding:0;border-radius:12px;font:500 17px/1 'Hiragino Sans','Noto Sans JP',sans-serif;letter-spacing:0}   /* 10/29 ケータイと同じ（iller「なんで揃えないの」） */
+  html #view-forklift .btn-rec{display:block;width:auto;margin:14px 0 0 auto;height:auto;padding:11px 24px;border-radius:8px;font:500 15px/1 'Hiragino Sans','Noto Sans JP',sans-serif;letter-spacing:0}
 }
 
 /* ===== モバイル(@media 480px)共通微調整 ===== */
@@ -4757,8 +4757,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 10:11';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1363;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 10:18';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1364;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
