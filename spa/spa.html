@@ -1904,6 +1904,7 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 b,strong{font-weight:500}   /* 10/29 太字は使わない（iller） */
 /* 画面の大見出し（見本 PC_2026-10-15）：左に名前、横に薄い数、右に検索 */
 .scr-head{display:flex;align-items:flex-end;gap:14px;padding:18px 16px 0;flex-wrap:wrap}
+.scr-head .scr-cnt{display:none}
 .scr-head h1{font-size:28px;font-weight:600;letter-spacing:-.4px;margin:0;line-height:1.1}
 .scr-head .scr-sub{color:var(--text-faint);font-size:13px;padding-bottom:4px}
 .scr-head .scr-search{margin-left:auto;background:#fff;border:1px solid var(--border);border-radius:9px;padding:8px 12px 8px 32px;font:400 14px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;width:280px;appearance:none;-webkit-appearance:none;color:var(--text);background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235a6270' stroke-width='2.2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='m20 20-3.5-3.5'/></svg>");background-repeat:no-repeat;background-position:10px center}   /* 検索窓は白＋枠＋虫眼鏡で目立たせる（iller 2026-10-21「検索窓が目立たなさすぎ」） */
@@ -2596,6 +2597,7 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
   .scr-head h1,.portal-logo{font-size:34px;font-weight:600;letter-spacing:-.5px;line-height:1.15}
   .scr-head{padding:16px 16px 0;row-gap:2px}
   .scr-head .scr-sub,.portal-sub2{font-size:15px;color:var(--text-faint);margin:0 0 10px;width:100%;padding:0}
+  .scr-head .scr-cnt{display:block;font-size:15px;color:var(--text-faint);margin:0 0 6px;width:100%}
   html.in-woff .portal-wrap{padding-top:16px}
   .portal-head{display:block;padding:0 16px;margin-bottom:12px}
   .portal-logo{margin:0;max-width:none;width:auto;display:block}
@@ -4789,8 +4791,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 11:08';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1374;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 11:23';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1375;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -5495,6 +5497,7 @@ const Prod = (function(){
     h+='</div>';
     // 段の見出し＝色の点＋名前＋件数、カード＝白い角丸に 納期は左・残り日数は右で太く（見本 工場ボード_2026-10-15。段で分かるので「納期迫る」等の札はやめた）
     const groups=[{label:'納期迫る・超過',dot:'r',items:filtered.filter(d=>d._urgN<=0)},{label:'今週中',dot:'o',items:filtered.filter(d=>d._urgN===1)},{label:'2週間以内',dot:'b',items:filtered.filter(d=>d._urgN===2)},{label:'それ以降',dot:'g',items:filtered.filter(d=>d._urgN===3)},{label:'納期未定',dot:'g',items:filtered.filter(d=>d._urgN===999)}];
+    scrCnt('view-prod', items.length+' 件'+groups.slice(0,2).filter(g=>g.items.length).map(g=>'・'+g.label.replace('・超過','')+' '+g.items.length).join(''));   // ケータイの見出しの下の 1 行（10/29）
     groups.forEach(g=>{if(!g.items.length)return;
       h+=`<div class="fv-grp"><div class="fv-grp-hd"><span class="dot ${g.dot}"></span><b>${g.label}</b><span>${g.items.length} 件</span></div><div class="fv-cards">`;
       g.items.forEach(d=>{const dl=parseD(d.deadline);
@@ -5995,6 +5998,7 @@ const Proj = (function(){
       {label:'それ以降',dot:'g',items:filtered.filter(d=>d._urgN===3)},
       {label:'日程未定',dot:'g',items:filtered.filter(d=>d._urgN===999)}
     ];
+    scrCnt('view-proj', items.length+' 件'+groups.slice(0,3).filter(g=>g.items.length).map(g=>'・'+g.label.replace('（未終了）','')+' '+g.items.length).join(''));   // ケータイの見出しの下の 1 行（10/29）
     groups.forEach(g=>{if(!g.items.length)return;
       h+=`<div class="fv-grp"><div class="fv-grp-hd"><span class="dot ${g.dot}"></span><b>${g.label}</b><span>${g.items.length} 件</span></div><div class="fv-cards">`;
       g.items.forEach(d=>{
@@ -9658,6 +9662,7 @@ const Portal = (function(){
    ======================================================================== */
 // 各アプリのナビ切替時、サブタブを「最初のタブ」にリセットする
 // 行って戻ると直前に開いていたサブタブが残ったままになる問題の対策
+function scrCnt(secId,txt){ const hd=document.querySelector('#'+secId+'>.scr-head'); if(!hd)return; let el=hd.querySelector('.scr-cnt'); if(!el){ el=document.createElement('div'); el.className='scr-cnt'; hd.appendChild(el); } el.textContent=txt||''; }   // 見出しの下の灰の 1 行（ケータイだけ CSS で表示、10/29）
 function resetSubTab(name){
   const tabsId={prod:'prodTabs',proj:'projTabs',sales:'salesTabs',labor:'laborTabs',veh:'vTabs',daily:'dailyTabs',ot:'otTabs',inv:'invTabs'}[name];
   if(!tabsId)return;
@@ -11414,6 +11419,21 @@ const App = {
   /* REGのzone/kioskをナビとポータルカードにdata属性として注入（起動時1回）。HTML側の手書き属性を廃止し二重管理をなくす */
   // 上のナビにポータルと同じアイコンを付ける（10/16 iller。アイコンの正本はポータルのカード＝ここから写す）
   injectNavIcons(){ this.REG.forEach(r=>{ const nv=$(r.nav), sv=document.querySelector('.portal-card[data-app="'+r.key+'"] svg'); if(!nv||!sv||nv.querySelector('.nav-ic'))return; const c=sv.cloneNode(true); c.setAttribute('width','15'); c.setAttribute('height','15'); c.classList.add('nav-ic'); nv.insertBefore(c,nv.firstChild); }); },
+  // ポータルの右の状態を埋めるために、まだ読んでいない画面を裏で順に読む（ケータイ・ポータルを開いた 1 秒後、10/29）。控えがあれば即、最新は裏で
+  async portalPrefetch(){
+    if(this._prefetching)return; this._prefetching=true;
+    try{
+      for(const key of ['daily','alcohol','forklift','prod','proj']){
+        if(this.current!=='portal')break;
+        if(this._loaded[key]||this._loading[key]||!this._allowed(key))continue;
+        const app=this.reg(key).ns(); this._loading[key]=true; let fromCache=false;
+        try{ DataCache.begin(); try{ await app.loadAll(); }finally{ fromCache=DataCache.end(); } this._loaded[key]=true; this._loadedAt[key]=fromCache?0:Date.now(); if(fromCache)this._stale[key]=true; }
+        catch(e){}
+        finally{ this._loading[key]=false; }
+        if(this.current==='portal')this.portalStatus();
+      }
+    }finally{ this._prefetching=false; }
+  },
   // ポータルの右の状態（10/29）：読めている画面の数だけ。日付の 1 行はいつも
   portalStatus(){
     const sub=$('portalSub'); if(sub){ const d=new Date(); sub.textContent=['日','月','火','水','木','金','土'][d.getDay()]+'曜日 '+(d.getMonth()+1)+'月'+d.getDate()+'日'; sub.classList.toggle('hidden', !this.isPhone()); }
@@ -11454,7 +11474,7 @@ const App = {
       const nv=$(r.nav); if(nv) nv.classList.toggle('on', r.key===name);
     });
     this.current=name;
-    { const pt=$('phoneTab'); if(pt){ pt.classList.toggle('hidden', !(this.isPhone()&&this.mode!=='kiosk')); pt.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.key===name)); } if(name==='portal') this.portalStatus(); }   // iOS 風（10/29）
+    { const pt=$('phoneTab'); if(pt){ pt.classList.toggle('hidden', !(this.isPhone()&&this.mode!=='kiosk')); pt.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.key===name)); } if(name==='portal'){ this.portalStatus(); if(this.isPhone()&&this.mode!=='kiosk') setTimeout(()=>this.portalPrefetch(),1000); } }   // iOS 風（10/29）
     { const _s=$(this.reg(name).section); if(_s){ _s.classList.remove('sec-in'); void _s.offsetWidth; _s.classList.add('sec-in'); clearTimeout(_s._secT); _s._secT=setTimeout(()=>_s.classList.remove('sec-in'),260); } }   // 切り替えは 0.15 秒の薄いフェード（10/16）。動きが止まる端末でも 0.26 秒で必ず外す＝透明のまま残らない
     this.staleNote();
     centerActiveNav();
