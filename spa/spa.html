@@ -4221,7 +4221,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-alcohol .chips button:hover{border-color:var(--accent);color:var(--accent)}
 #view-alcohol .chips button:active{transform:scale(.96)}
 #view-alcohol #alcOnBlock{border-left:3px solid var(--red);padding-left:13px;margin:2px 0 14px}
-#view-alcohol .detail-toggle{font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;display:inline-block;margin:6px 0 12px}
+#view-alcohol .detail-toggle{font-size:13px;font-weight:700;color:var(--text-dim);cursor:pointer;display:inline-block;margin:6px 0 12px}
 #view-alcohol .detail-toggle:hover{text-decoration:underline}
 #view-alcohol #detailBox{display:none}
 #view-alcohol #detailBox.open{display:block}
@@ -4229,8 +4229,8 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #view-alcohol .commit{display:flex;gap:16px;margin-top:14px}
 #view-alcohol .commit button{flex:1;height:172px;border:none;border-radius:18px;font:800 37px/1.2 'Noto Sans JP';cursor:pointer;letter-spacing:.04em;transition:.12s;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
 #view-alcohol .commit button small{font-size:15px;font-weight:700;opacity:.8;letter-spacing:.1em}
-#view-alcohol .commit .pre{background:var(--accent)}
-#view-alcohol .commit .post{background:var(--text)}
+#view-alcohol .commit .pre{background:var(--text)}   /* 10/29 iller「趣味悪い」：塗りの藍＋黒をやめて 黒＋白（黒縁）に */
+#view-alcohol .commit .post{background:var(--surface);color:var(--text);box-shadow:inset 0 0 0 2px var(--text)}
 #view-alcohol .commit button:active{transform:scale(.97)}
 #view-alcohol .commit button:disabled{background:var(--surface3);color:var(--text-faint);cursor:not-allowed}
 #view-alcohol .daydate{font-size:14px;font-weight:700;color:var(--text-dim)}
@@ -4300,7 +4300,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-alcohol .drvsel{display:flex;align-items:center;gap:10px;margin:0 0 14px}
   #view-alcohol .drvsel label{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
   #view-alcohol .drvsel select{flex:1;min-width:0;font:700 17px/1.2 'Noto Sans JP';padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text)}
-  #view-alcohol .drvsel select.sel{border-color:var(--accent);background:var(--accent-dim)}
+  #view-alcohol .drvsel select.sel{border-color:var(--border);background:var(--surface)}
   #view-alcohol .ngrid,#view-alcohol .moretoggle,#view-alcohol .selbar{display:none}
   /* 記録ボタンもスマホでは控えめに（タブレット用の巨大ボタンはそのまま） */
   html #view-alcohol .commit{gap:10px;margin-top:10px}
@@ -4684,8 +4684,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 09:22';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1343;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 09:24';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1344;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
