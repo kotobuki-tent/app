@@ -1972,7 +1972,7 @@ b,strong{font-weight:500}   /* 10/29 太字は使わない（iller） */
 .fv-card .tag.st.st-完成{background:var(--accent-dim);color:var(--accent)}   /* 完成は青（工数・案件と同じ。10/15 揃え） */
 .fv-card .tag.st.st-入荷済,.fv-card .tag.st.st-納品済{background:var(--accent-dim);color:var(--accent)}
 /* 完成はカードそのものを薄い緑に（納期未定の段でも見落とさないように。2026-10-15 iller） */
-.factory-view .fv-card.s-完成{background:#eaf3de}
+.factory-view .fv-card.s-完成{background:#eaf3de;box-shadow:inset 0 0 0 1px #b7d78c}   /* 10/29 iller「緑のが境界が見にくい」＝緑の縁 */
 .factory-view .fv-card.s-完成 .tag.st{background:#fff;color:var(--accent)}
 .factory-view .fv-card.s-完成 .tag.person,.factory-view .fv-card.s-完成 .tag.eno{background:rgba(255,255,255,.7)}
 .fv-card .dl{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;color:var(--text);margin:0}   /* 10/15 iller「納期がもっと濃く、もうちょっとだけ大きく」13→14・灰→黒 */
@@ -4756,8 +4756,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 10:33';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1370;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 10:36';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1371;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
