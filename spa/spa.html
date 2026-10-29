@@ -1763,6 +1763,8 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-daily .member-group h3{background:linear-gradient(90deg,var(--accent-dim),transparent);border-left:3px solid var(--accent)}
 #view-daily .status-section.status-notwritten{background:var(--red-dim);border-radius:12px}
 #view-daily .status-item{border-radius:10px}
+#view-daily .status-item .act-btn{color:var(--text-dim);border-color:transparent;background:transparent}   /* 10/29 欠勤にする：23 行並ぶので灰に（押せば効く） */
+#view-daily .status-item .act-btn:hover{color:var(--text)}
 /* みんなの日報：横画面は表で一覧（1行=1作業・人ごとにまとめ）。縦画面はカード風に畳む */
 #view-daily .dv-tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 #view-daily .dv-tbl{width:100%;border-collapse:collapse;font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
@@ -4752,8 +4754,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 09:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1353;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 09:47';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1354;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8855,7 +8857,7 @@ const Daily = (function(){
     const me=getWho();const viewIsOffDay=isOffDay(viewingDate);
     let h='';
     if(notWritten.length>0&&!viewIsOffDay){
-      h+=`<div class="card status-section status-notwritten"><h3 style="margin:0 0 10px 0;color:var(--red);font-size:15px;display:flex;align-items:center;gap:8px"><span>未記入</span><span style="background:var(--red);color:#fff;font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px">${notWritten.length}人</span><span style="color:var(--text-faint);font-size:11px;font-weight:400">（50音順）</span></h3><div class="status-list">`;
+      h+=`<div class="card status-section status-notwritten"><h3 style="margin:0 0 10px 0;color:var(--red);font-size:15px;display:flex;align-items:center;gap:8px"><span>未記入</span><span style="background:#fff;color:var(--red);font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px">${notWritten.length}人</span><span style="color:var(--text-faint);font-size:11px;font-weight:400">（50音順）</span></h3><div class="status-list">`;
       notWritten.forEach(s=>{h+=`<div class="status-item"><span class="si-name">${esc(s.name)}</span><span class="si-dept">${esc(s.dept||'')}</span><button class="act-btn" onclick="Daily.markAbsent('${esc(s.employee_no)}','${esc(s.name)}')">欠勤にする</button></div>`});
       h+=`</div></div>`;
     }
