@@ -4319,6 +4319,29 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   html #view-alcohol .rc-del{display:none}
   /* 月次CSV出力はスマホでは不要（PC/タブレットのみ） */
   html #view-alcohol .csvsec{display:none}
+  /* 10/29 iller「ここがもう全体的に絶望的」→ 日報と同じ作りに：行＝左に項目・右に値、太字と塗りをやめる */
+  html #view-alcohol .pane{padding:0 16px 16px}
+  html #view-alcohol .pane h2{font:600 17px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;padding:14px 0 10px;margin-bottom:0;flex-wrap:wrap;gap:6px 10px}
+  html #view-alcohol .drvsel{justify-content:space-between;gap:12px;margin:0;padding:12px 0;border-bottom:0.5px solid var(--border-light)}
+  html #view-alcohol .drvsel label{font:400 15px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text)}
+  html #view-alcohol .drvsel select{flex:0 1 auto;max-width:70%;font:500 17px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--accent);border:none;background:transparent;padding:0 22px 0 0;text-align:right;text-align-last:right;direction:rtl;appearance:none;-webkit-appearance:none;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='m7 9 5-5 5 5M7 15l5 5 5-5'/></svg>") no-repeat right center}
+  html #view-alcohol .drvsel select.sel{border:none;background-color:transparent}
+  html #view-alcohol .fldrow{justify-content:space-between;gap:12px;margin:0;padding:10px 0;border-bottom:0.5px solid var(--border-light)}
+  html #view-alcohol .fldrow>label{font:400 15px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text)}
+  html #view-alcohol .alc2{padding:3px;gap:3px;border-radius:10px}
+  html #view-alcohol .alc2 button{font:500 15px/1 'Hiragino Sans','Noto Sans JP',sans-serif;padding:8px 20px;border-radius:8px}
+  html #view-alcohol .alc2 button[data-v="無"].on{background:var(--green-dim);color:var(--green)}
+  html #view-alcohol .alc2 button[data-v="有"].on{background:var(--red-dim);color:var(--red)}
+  html #view-alcohol .detail-toggle{font:400 13px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim);margin:12px 0 4px}
+  html #view-alcohol .commit{gap:10px;margin-top:14px}
+  html #view-alcohol .commit button{height:52px;font:600 17px/1 'Hiragino Sans','Noto Sans JP',sans-serif;border-radius:12px;letter-spacing:0}
+  html #view-alcohol .commit .pre{background:var(--accent-dim);color:var(--accent)}
+  html #view-alcohol .commit .post{background:var(--surface3);color:var(--text);box-shadow:none}
+  html #view-alcohol .daydate{font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-dim)}
+  html #view-alcohol .almgr{flex-basis:100%;font:400 12px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-faint);margin:0}
+  html #view-alcohol .rec-card{margin-top:8px}
+  html #view-alcohol .rc-name{font-weight:500}
+  html #view-alcohol .seg button,html #view-alcohol .field label{font-weight:500}
 }
 /* 2026-10-15 Apple 風（この画面の style は土台より後なので上書きはここ） */
 #view-alcohol .pane{border:none;box-shadow:none;border-radius:14px}
@@ -4684,8 +4707,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 09:26';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1345;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 09:29';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1346;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
