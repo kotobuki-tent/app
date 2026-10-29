@@ -2011,9 +2011,9 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .gantt-bar-cell{border-right:0.5px solid #f0f0f3;min-height:56px}
 .gantt-bar-cell.today{background:rgba(85,80,180,.06)}
 .gantt-bar{top:16px;bottom:16px;border-radius:6px}
-.gantt-bar.load_in{background:#9ec5f0}
-.gantt-bar.setup{background:#5aa0e6}
-.gantt-bar.event{background:#1f6fd0}
+.gantt-bar.load_in{background:#e6f1fb}
+.gantt-bar.setup{background:#b5d4f4}
+.gantt-bar.event{background:#85b7eb}
 .gantt-bar.teardown{background:#8fa9c4}
 .gantt-bar.rental_out{background:#1d9e75}
 .gantt-bar.rental_return{background:#6cc3a6}
@@ -2025,14 +2025,14 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 .gantt-row-label .prj-sub b{font-weight:500;color:var(--text);flex:0 0 auto}
 .gantt-row-label .prj-sub .prj-cl{overflow:hidden;text-overflow:ellipsis;min-width:0}
 .gantt-row-label .prj-status{font-size:10px;padding:1px 7px;border-radius:999px;margin:0;flex:0 0 auto}
-.gantt-span{position:absolute;top:16px;height:24px;border-radius:7px;font-size:12px;line-height:24px;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:2px;font-weight:500;color:#fff;z-index:2;cursor:pointer}
-.gantt-span.b{background:#378add}
-.gantt-span.t{background:#1d9e75}
-.gantt-span.p{background:#7f77dd}
+.gantt-span{position:absolute;top:16px;height:24px;border-radius:7px;font-size:12px;line-height:24px;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:2px;font-weight:500;z-index:2;cursor:pointer}
+.gantt-span.b{background:#e6f1fb;color:#185fa5}
+.gantt-span.t{background:#e1f5ee;color:#0f6e56}
+.gantt-span.p{background:#eeedfe;color:#534ab7}
 .gantt-span.st-見積中{opacity:.45}
 .gantt-span.cut-l{border-top-left-radius:0;border-bottom-left-radius:0;margin-left:0}
 .gantt-span.cut-r{border-top-right-radius:0;border-bottom-right-radius:0}
-.gantt-span .gb-ev{position:absolute;top:0;bottom:0;background:rgba(0,0,0,.22)}
+.gantt-span .gb-ev{position:absolute;top:0;bottom:0;background:rgba(24,95,165,.18)}
 .gantt-span span{position:relative;z-index:1}
 .gantt-span.narrow{overflow:visible;text-overflow:clip}
 .gantt-span.narrow span{position:absolute;left:100%;top:0;margin-left:6px;color:var(--text);font-size:12px;white-space:nowrap}
@@ -3109,11 +3109,11 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .cal-dhd.sat{color:var(--accent)}
   #view-cases .cal-rlabel{position:sticky;left:0;z-index:2;background:var(--surface);display:flex;align-items:center;gap:5px;padding:7px 8px;border-bottom:1px solid var(--border);cursor:pointer;overflow:hidden}
   #view-cases .cal-rlabel:hover{background:#f4f4f5}
-  #view-cases .cal-dept{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:4px;color:#fff;font-size:10px;font-weight:500;flex-shrink:0}
+  #view-cases .cal-dept{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:4px;font-size:10px;font-weight:500;flex-shrink:0}
   #view-cases .cal-rname{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #view-cases .cal-cell{min-height:34px;border-bottom:1px solid var(--border);border-left:1px solid #eee;padding:3px;display:flex;flex-direction:column;gap:2px;cursor:pointer}
   #view-cases .cal-cell.today{background:#f5faff}
-  #view-cases .cal-ev{color:#fff;border-radius:3px;text-align:center;padding:2px 0;font-size:10px;font-weight:500;white-space:nowrap}
+  #view-cases .cal-ev{border-radius:3px;text-align:center;padding:2px 0;font-size:10px;font-weight:500;white-space:nowrap}
   #view-cases .cal-ev.tentative{background:transparent!important;color:#7c7f86;border:1px dashed #9aa0a6;padding:1px 0}
   #view-cases .cal-legend i.tentative{background:transparent;border:1px dashed #9aa0a6;border-radius:3px}
   #view-cases .ce-target-note{font-size:11px;font-weight:400;color:var(--text-dim);margin-left:8px}
@@ -4754,8 +4754,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-29 09:47';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1354;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-29 09:49';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1355;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9668,7 +9668,8 @@ const Cases = (function(){
   function caseProgress(id){ const ks=(_children[String(id)]||[]).filter(k=>k.status!=='見送り'&&k.status!=='中止'); if(!ks.length)return -1; return Math.min.apply(null, ks.map(cRank)); }
   function caseDepts(id){ const s={}; (_children[String(id)]||[]).forEach(k=>s[k.dept]=1); return s; }
   // 案件の部門バッジ（生/企/販）。日程未定リストとカレンダー行ラベルで共用。
-  function deptBadges(id){ const dps=caseDepts(id); return DEPTS.filter(d=>dps[d.k]).map(d=>`<span class="cal-dept" style="background:${d.c}">${d.s}</span>`).join(''); }
+  function tint(hex,a){ a=a||0.13; const n=parseInt(String(hex).replace('#',''),16); if(isNaN(n))return hex; const r=n>>16&255,g=n>>8&255,b=n&255; return `rgb(${Math.round(255*(1-a)+r*a)},${Math.round(255*(1-a)+g*a)},${Math.round(255*(1-a)+b*a)})`; }   // 色を白で薄めた地（10/29）
+  function deptBadges(id){ const dps=caseDepts(id); return DEPTS.filter(d=>dps[d.k]).map(d=>`<span class="cal-dept" style="background:${tint(d.c)};color:${d.c}">${d.s}</span>`).join(''); }
   function caseDeptKey(id){ const d=caseDepts(id); return ((d.production?'1':'')+(d.project?'2':'')+(d.sales?'3':''))||'9'; }
   // ===== 要対応（ステータス放置）検知 =====
   function _lastD(s){ if(!s)return null; let m=null; String(s).split(',').forEach(x=>{const d=parseD(x.trim()); if(d&&(!m||d>m))m=d;}); return m; }
@@ -9784,10 +9785,10 @@ const Cases = (function(){
       h+=`<div class="cal-rlabel" onclick="Cases.openEdit('${id}')">${deptBadges(r.c.id)}<span class="cal-rname">${esc(r.c.name||'(無題)')}</span></div>`;
       dates.forEach(d=>{ const ds=dateStr(d); const isT=ds===dateStr(today); const evs=r.evs.filter(e=>dateStr(e.date)===ds);
         h+=`<div class="cal-cell${calCls(d)}" onclick="Cases.openEdit('${id}')">`;
-        evs.forEach(e=>{ h+=`<span class="cal-ev${e.tentative?' tentative':''}" style="background:${e.c}">${e.t}</span>`; });
+        evs.forEach(e=>{ h+=`<span class="cal-ev${e.tentative?' tentative':''}" style="background:${tint(e.c)};color:${e.c}">${e.t}</span>`; });   // 10/29 薄い地＋色文字（iller「この death な色」）
         h+='</div>'; }); });
     h+='</div></div>';
-    h+='<div class="cal-legend">'+CAL_EV.map(e=>`<span><i style="background:${e.c}"></i>${e.t}</span>`).join('')+'<span><i style="background:#7b6ef0"></i>貸出</span><span><i style="background:#9a7b50"></i>返却</span><span><i class="tentative"></i>目標(社内/仮)</span></div>';
+    h+='<div class="cal-legend">'+CAL_EV.map(e=>`<span><i style="background:${tint(e.c)};border:1px solid ${e.c}"></i>${e.t}</span>`).join('')+'<span><i style="background:'+tint('#7b6ef0')+';border:1px solid #7b6ef0"></i>貸出</span><span><i style="background:'+tint('#9a7b50')+';border:1px solid #9a7b50"></i>返却</span><span><i class="tentative"></i>目標(社内/仮)</span></div>';
     h+=undatedHtml();
     pane.innerHTML=h;
   }
