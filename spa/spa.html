@@ -4799,8 +4799,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-30 17:57';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1386;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-30 18:10';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1387;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9709,7 +9709,8 @@ const Cases = (function(){
   function unmBadge(){ const nv=document.getElementById('navCases'); if(!nv) return; let b=nv.querySelector('.nav-cnt'); const n=_unm.length; if(n>0){ if(!b){ b=document.createElement('span'); b.className='nav-cnt'; nv.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
   function unmList(){ if(!_unm.length) return '';
     const W=['日','月','火','水','木','金','土'], f=d=>{ const x=new Date(d+'T00:00:00'); return (x.getMonth()+1)+'/'+x.getDate()+'（'+W[x.getDay()]+'）'; };
-    return `<div class="todo-cal"><div class="todo-cal-hd">予定にあるが案件なし</div>`+_unm.map((e,i)=>`<div class="todo-cal-row"><span class="tc-d">${f(e.sd)}${e.ed>e.sd?'〜'+f(e.ed):''}</span><span class="tc-t">${esc(e.t)}</span><span class="tc-w">${esc((e.who||[]).join('・'))}</span><button class="todo-btn open" onclick="Cases.newFromCal(${i})">登録</button></div>`).join('')+`</div>`; }
+    return `<div class="todo-cal"><div class="todo-cal-hd">予定にあるが案件なし</div>`+_unm.map((e,i)=>`<div class="todo-cal-row"><span class="tc-d">${f(e.sd)}${e.ed>e.sd?'〜'+f(e.ed):''}</span><span class="tc-t">${esc(e.t)}</span><span class="tc-w">${esc((e.who||[]).join('・'))}</span><button class="todo-btn open" onclick="Cases.newFromCal(${i})">登録</button><button class="todo-btn" onclick="Cases.ignoreCal(${i})">消す</button></div>`).join('')+`</div>`; }
+  function ignoreCal(i){ const e=_unm[i]; if(!e||!e.k) return; _unm.splice(i,1); unmBadge(); render(); fetch(API,{method:'POST',mode:'no-cors',body:JSON.stringify({dept:'cal',action:'ignore',key:e.k})}).catch(()=>{}); }   // 事務所が見て案件ありと分かった予定を外す（全端末で共有、GAS のスクリプトプロパティ）
   function newFromCal(i){ const e=_unm[i]; if(!e) return; _tab='form'; render(); const p=$('cf_project'), o=$('cf_our_person'); if(p) p.value=e.t; if(o&&e.who&&e.who.length===1) o.value=e.who[0]; if(p) p.focus(); }
   let _profit={}, _profitAt=0, _szPeriod='', _szDept='';
    // 全案件の原価 {case_id:{cost,minutes,labor}}（dept=cases&action=profit）。採算タブが使う（10/19）
@@ -10436,7 +10437,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, cancel, uncancel, cancelAsk, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal, newFromCal, loadUnm };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, cancel, uncancel, cancelAsk, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal, newFromCal, loadUnm, ignoreCal };
 })();
 
 // ===== 発注（2026-10-19）：発注書を書く（記入者・宛先・明細・納期・納品先・備考）→ シート purchase_orders に未発注。2026-10-21 v134：発注書は注文するだけ、原価明細には流さない（案件は注文番号＝受注番号のため） → ① 案件と区分 → ② 発注書を開いて発注る → ③ 発注済（案件を付けていれば原価明細へ）
