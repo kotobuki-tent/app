@@ -4799,8 +4799,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-30 17:52';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1385;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-30 17:57';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1386;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9702,7 +9702,8 @@ const Cases = (function(){
   const _deepTab=(function(){ try{ const t=new URLSearchParams(location.search).get('tab'); return ['list','todo','cal','saisan','done','kill','arch','manage'].includes(t)?t:''; }catch(e){ return ''; } })();   // ?go=cases&tab=po＝発注書の通知のリンク（2026-10-19）
   let _cases=[], _tab=_deepTab||'list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='', _qexp=false;   // _qexp＝「期限切れ」チップで絞り込み中
   let _unm=[], _unmAt=0;   // 予定にあるが案件なし（LINE WORKS の終日の予定で、生きている案件・現場に当たらない物。dept=cal action=unmatched、2026-10-30 iller「気が付きたい（事務所）」）
-  function loadUnm(){ if(Date.now()-_unmAt<4*60*1000) return; _unmAt=Date.now();
+  function loadUnm(){ if(typeof DataCache!=='undefined'&&DataCache.reading()){ setTimeout(loadUnm,100); return; }   // 初回の「前回のデータ」の窓の中では取らない（古い予定を出さない）
+    if(Date.now()-_unmAt<4*60*1000) return; _unmAt=Date.now();
     fetch(API+'?dept=cal&action=unmatched').then(r=>r.json()).then(j=>{ if(!j||!j.success) return; _unm=j.items||[]; unmBadge();
       const typing=document.activeElement&&document.activeElement.id==='casesSearch'; if(_tab==='todo'&&!typing&&App.current==='cases') render(); }).catch(()=>{}); }
   function unmBadge(){ const nv=document.getElementById('navCases'); if(!nv) return; let b=nv.querySelector('.nav-cnt'); const n=_unm.length; if(n>0){ if(!b){ b=document.createElement('span'); b.className='nav-cnt'; nv.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
