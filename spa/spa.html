@@ -2796,6 +2796,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .cchip.is-active{background:#eaf3de;color:#3b6d11}
   #view-cases .cchip.is-done{background:var(--accent-dim);color:var(--accent)}
   #view-cases .cchip.is-kill{background:#f1efe8;color:#9a9890;text-decoration:line-through}
+  #view-cases .c-new{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:6px;margin-right:6px;vertical-align:middle;color:var(--red);background:var(--red-dim)}
   #view-cases .case-st-sel{appearance:none;-webkit-appearance:none;border:none;border-radius:999px;padding:4px 22px 4px 10px;font:500 12px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface3) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236e6e73' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 8px center;color:var(--text)}
   /* 状態の色は 1 本：灰＝まだ／緑＝動いている／青＝終わった（10/15 揃え 2） */
   #view-cases .case-st-sel[data-st="見積中"]{background-color:#f1efe8;color:#5f5e5a}
@@ -4792,8 +4793,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-30 12:03';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1379;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-30 13:30';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1382;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10027,7 +10028,7 @@ const Cases = (function(){
         ? kids.map(k=>{const st=k.status||'';const cl=(st==='見送り'||st==='中止')?'is-kill':(st==='見積中'||st==='受注')?'is-wait':(st==='完成'||DONE_ST[st])?'is-done':'is-active';return `<span class="cchip-pair"><span class="cchip-dept cchip-dept-${k.dept}">${DEPT[k.dept]?DEPT[k.dept].n:k.dept}</span><span class="cchip cchip-${k.dept} ${cl}">${esc(st||'—')}</span></span>`;}).join('')   // 部門と状態は別の札（10/15 iller「部門と状態を分ける」）   // 色は工数と同じ：灰＝見積中・受注、緑＝進行中・製作中など、青＝完成・出荷済・終了・納品済
         : '<span class="cdept-none">—</span>';
       h+=`<tr${archd?' class="arch"':''} data-cid="${id}" onclick="Cases.openEdit('${id}')" style="cursor:pointer">`
-        +`<td><div class="ct-main">${esc(bareName(c.client,c.name))}${QuoteAge.forCase(c)}</div><div class="ct-sub">${fmtD(c.created_at)}</div></td>`   // 一覧は得意先の列が別にあるので案件名だけ（10/28 iller「二重になるし折り返すし」）
+        +`<td><div class="ct-main">${kids.length||archd?'':'<span class="c-new">新規</span>'}${esc(bareName(c.client,c.name))}${QuoteAge.forCase(c)}</div><div class="ct-sub">${fmtD(c.created_at)}</div></td>`   // 一覧は得意先の列が別にあるので案件名だけ（10/28 iller「二重になるし折り返すし」）。明細がまだ無い案件（ESPERANTO で入った見積書など）は先頭に赤の「新規」（10/30 iller「新しく登録されたことがわかればいい。先頭に赤いバッジ」）
         +`<td class="ct-dept">${badges}</td>`
         +`<td><div class="ct-main">${esc(c.client||'')}</div>${c.our_person?`<div class="ct-sub">${esc(c.our_person)}</div>`:''}</td>`
         +`<td class="ct-no"><div class="ct-main">${esc(c.order_no||'')}</div><div class="ct-sub">${esc(c.estimate_no||'')}</div></td>`
