@@ -3111,6 +3111,12 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .todo-bulkbar .tb-txt{font-size:13px;color:var(--text)}
   #view-cases .todo-bulk-btn{padding:9px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--accent-dim);color:var(--accent);font:500 13px/1 inherit;cursor:pointer;white-space:nowrap}
   #view-cases .todo-bulk-btn:hover{filter:brightness(.95)}
+  #view-cases .todo-cal{border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:12px 16px;margin-bottom:14px}   /* 予定にあるが案件なし（10/30） */
+  #view-cases .todo-cal-hd{font-size:14px;font-weight:500;color:#c0392b;margin-bottom:6px}
+  #view-cases .todo-cal-row{display:flex;align-items:center;gap:14px;padding:7px 0;border-top:1px solid var(--border);font-size:14px}
+  #view-cases .todo-cal-row .tc-d{flex:0 0 auto;color:var(--text-dim);font-variant-numeric:tabular-nums}
+  #view-cases .todo-cal-row .tc-t{flex:1 1 auto;color:var(--text);min-width:0}
+  #view-cases .todo-cal-row .tc-w{flex:0 0 auto;color:var(--text-dim);font-size:13px}
   #view-cases .todo-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-top:4px}
   #view-cases .todo-card{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
   #view-cases .todo-name{font-size:15px;font-weight:500;color:var(--text);cursor:pointer;display:inline-block}
@@ -4793,8 +4799,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-10-30 13:33';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1383;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-10-30 17:40';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1384;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9695,6 +9701,15 @@ const Cases = (function(){
   const DEPT=Object.fromEntries(DEPTS.map((d,i)=>[d.k,{s:d.s,n:d.n,c:d.c,o:i}]));
   const _deepTab=(function(){ try{ const t=new URLSearchParams(location.search).get('tab'); return ['list','todo','cal','saisan','done','kill','arch','manage'].includes(t)?t:''; }catch(e){ return ''; } })();   // ?go=cases&tab=po＝発注書の通知のリンク（2026-10-19）
   let _cases=[], _tab=_deepTab||'list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='', _qexp=false;   // _qexp＝「期限切れ」チップで絞り込み中
+  let _unm=[], _unmAt=0;   // 予定にあるが案件なし（LINE WORKS の終日の予定で、生きている案件・現場に当たらない物。dept=cal action=unmatched、2026-10-30 iller「気が付きたい（事務所）」）
+  function loadUnm(){ if(Date.now()-_unmAt<4*60*1000) return; _unmAt=Date.now();
+    fetch(API+'?dept=cal&action=unmatched').then(r=>r.json()).then(j=>{ if(!j||!j.success) return; _unm=j.items||[]; unmBadge();
+      const typing=document.activeElement&&document.activeElement.id==='casesSearch'; if(_tab==='todo'&&!typing&&App.current==='cases') render(); }).catch(()=>{}); }
+  function unmBadge(){ const nv=document.getElementById('navCases'); if(!nv) return; let b=nv.querySelector('.nav-cnt'); const n=_unm.length; if(n>0){ if(!b){ b=document.createElement('span'); b.className='nav-cnt'; nv.appendChild(b); } b.textContent=n; } else if(b) b.remove(); }
+  function unmList(){ if(!_unm.length) return '';
+    const W=['日','月','火','水','木','金','土'], f=d=>{ const x=new Date(d+'T00:00:00'); return (x.getMonth()+1)+'/'+x.getDate()+'（'+W[x.getDay()]+'）'; };
+    return `<div class="todo-cal"><div class="todo-cal-hd">予定にあるが案件なし</div>`+_unm.map((e,i)=>`<div class="todo-cal-row"><span class="tc-d">${f(e.sd)}${e.ed>e.sd?'〜'+f(e.ed):''}</span><span class="tc-t">${esc(e.t)}</span><span class="tc-w">${esc((e.who||[]).join('・'))}</span><button class="todo-btn open" onclick="Cases.newFromCal(${i})">登録</button></div>`).join('')+`</div>`; }
+  function newFromCal(i){ const e=_unm[i]; if(!e) return; _tab='form'; render(); const p=$('cf_project'), o=$('cf_our_person'); if(p) p.value=e.t; if(o&&e.who&&e.who.length===1) o.value=e.who[0]; if(p) p.focus(); }
   let _profit={}, _profitAt=0, _szPeriod='', _szDept='';
    // 全案件の原価 {case_id:{cost,minutes,labor}}（dept=cases&action=profit）。採算タブが使う（10/19）
   // 完了タブの得意先トグル（大口客を隠して残りを見やすく）。非表示中のキーをlocalStorageに保持
@@ -9740,7 +9755,7 @@ const Cases = (function(){
     if(td && td<t && !terminal && !doneOverdue) out.push({lv:'mid',t:'社内納期超過',d:'社内の目標日(仮)を過ぎてる。納品/完了したか確認'});
     return out;
   }
-  function todoCount(){ return _cases.filter(c=>caseFlags(c).length>0).length; }
+  function todoCount(){ return _cases.filter(c=>caseFlags(c).length>0).length+_unm.length; }   // ＋予定にあるが案件なし（10/30）
   function caseTodoList(rows){
     const dord=d=>DEPT[d]?DEPT[d].o:9, DONE_ST={'出荷済':1,'終了':1,'完了':1,'納品済':1};
     let h='<div class="todo-wrap">';
@@ -9855,6 +9870,7 @@ const Cases = (function(){
     // 検索ボックスに入力中なら描き直さない（フォーカスと入力が飛ぶため。データは更新済みで次の操作から反映）
     const typing=document.activeElement&&document.activeElement.id==='casesSearch';
     if(_tab!=='form' && !typing) render();
+    loadUnm();   // 予定にあるが案件なし（裏で取り、届いたら要対応を描き直す。5 分に 1 回まで）
   }
   const _arch=v=>v===true||v==='true'||v==='TRUE';
   const _inv =v=>v===true||v==='true'||v==='TRUE';
@@ -9952,7 +9968,7 @@ const Cases = (function(){
       if(_deptf) rows=rows.filter(c=>caseDepts(c.id)[_deptf]);
       const settled=_cases.filter(c=>!_arch(c.archived)&&c.status==='完了'&&_inv(c.invoiced)).length;
       const bar = settled ? `<div class="todo-bulkbar"><span class="tb-txt">締め待ち（現場が完了済・伝票済）が <b>${settled}件</b>。アーカイブで片付けられます。</span><button class="todo-bulk-btn" onclick="Cases.archiveSettled()">締め待ち ${settled}件を一括アーカイブ</button></div>` : '';
-      pane.innerHTML=`<div class="fv-sum">${deptChips(base)}</div>`+bar+(rows.length?caseTodoList(rows):'<div class="cases-empty">対応待ちの案件はありません</div>');
+      pane.innerHTML=`<div class="fv-sum">${deptChips(base)}</div>`+unmList()+bar+(rows.length?caseTodoList(rows):(_unm.length?'':'<div class="cases-empty">対応待ちの案件はありません</div>'));   // 先頭に「予定にあるが案件なし」（10/30）
       return;
     }
     if(t==='list') rows=rows.filter(c=>!_arch(c.archived)&&c.status!=='完了'&&c.status!=='見送り'&&c.status!=='中止');
@@ -10419,7 +10435,7 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, cancel, uncancel, cancelAsk, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal };
+  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, cancel, uncancel, cancelAsk, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal, newFromCal, loadUnm };
 })();
 
 // ===== 発注（2026-10-19）：発注書を書く（記入者・宛先・明細・納期・納品先・備考）→ シート purchase_orders に未発注。2026-10-21 v134：発注書は注文するだけ、原価明細には流さない（案件は注文番号＝受注番号のため） → ① 案件と区分 → ② 発注書を開いて発注る → ③ 発注済（案件を付けていれば原価明細へ）
@@ -11583,6 +11599,7 @@ window.addEventListener('focus',()=>App.softRefresh());
 window.addEventListener('pageshow',()=>App.softRefresh());
 setInterval(()=>{ if(document.visibilityState==='visible') moneyFetch(); },5*60*1000);   // ¥バッジは従来どおり5分
 setInterval(()=>{ if(document.visibilityState==='visible') PoBadge.fetchCount(); },5*60*1000);   // 未発注の発注書の件数も 5 分
+setInterval(()=>{ try{ if(document.visibilityState==='visible'&&App.denied.indexOf('cases')<0&&!App.isPhone()) Cases.loadUnm(); }catch(e){} },5*60*1000);   // 予定にあるが案件なし も 5 分（GAS 側は 10 分控え）
 
 // 初期表示：各アプリの init（イベント配線）→ ポータル（入口）を開く
 window.addEventListener('load', async ()=>{
@@ -11599,6 +11616,7 @@ window.addEventListener('load', async ()=>{
   App.nav((_deepGo && App.reg(_deepGo)) ? _deepGo : 'portal');
   setTimeout(()=>{moneyFetch()},2500);   // ¥バッジ（案件積み上げ総額）の初期値
   setTimeout(()=>{PoBadge.fetchCount()},3000);   // 未発注の発注書の件数の初期値
+  setTimeout(()=>{ try{ if(App.denied.indexOf('cases')<0&&!App.isPhone()) Cases.loadUnm(); }catch(e){} },4000);   // 予定にあるが案件なし の件数（案件ナビの赤い丸）2026-10-30
   // Service Worker登録（同一オリジンの静的ファイル＝spa.html本体をキャッシュから即表示し、裏で最新を取得）。
   // 従来はregister.htmlだけが登録していたので、LINE WORKSやスマホで開く端末には無かった。失敗しても何もしない
   try{ if('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js').catch(()=>{}); }catch(e){}
