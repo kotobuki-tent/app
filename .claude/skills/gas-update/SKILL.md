@@ -70,5 +70,5 @@ Chrome で Apps Script を操作する手順は 10 月末から Claude 側の安
 
 - 作業フォルダ `~/dev/gas/`（`clasp clone` したもの。`.clasp.json`＝scriptId、`appsscript.json`、`コード.js`＝エディタの Code.gs）。リポジトリ外。
 - **手順**：正本（iCloud `GAS/Code.gs`）を直して jsc で構文チェック → `~/dev/gas/deploy.sh "説明"`。中身＝正本を `コード.js` に写す → `clasp push -f` → `clasp deploy -i AKfycbwD5F1r…（既存の Web アプリ、URL 不変） -d "説明"` → `clasp deployments` で `@N` が増えたことを見る。
-- **`clasp deploy` は Claude が打っても同じ分類器に止められる**（自分の許可設定を書き換えるのも「自己改変」で止まる）。なので deploy.sh は **iller が端末で打つ**（Claude が「打って」と言う）。`.claude/settings.local.json` の allow に `"Bash(clasp *)"` を iller が足せば Claude が打てるようになる見込み（未確認）。
+- `.claude/settings.local.json`（git 管理外）の allow に `"Bash(clasp *)"` と `"Bash(~/dev/gas/deploy.sh *)"` が入っている（10/30 iller が足した。Claude は自分の許可を書き換えられない）。**これで Claude が `~/dev/gas/deploy.sh "説明"` を打てる**（確認済み、@152）。止められたら iller にこの枠を出して実行ボタンを押してもらう。
 - 確認は `clasp deployments`（`@150` のように版が出る）。古い版のまま＝デプロイされていない。
