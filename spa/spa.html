@@ -1034,6 +1034,7 @@ html.in-woff #v_gantt .gt .hd{top:0}
   #adminView td:nth-of-type(7)::before{content:'車検満了'}
   #adminView td:nth-of-type(8)::before{content:'自賠責満了'}
   #adminView td:nth-of-type(9)::before{content:'任意保険満了'}
+  #adminView .tbl-person td:nth-of-type(n+2)::before{content:attr(data-label)}
   #adminView td:nth-of-type(10)::before{content:'操作'}
   #adminView td:empty{display:none}
   #adminView td .act-btn{padding:8px 12px;font-size:13px;background:var(--surface2);border-radius:6px;margin-right:4px}
@@ -4799,8 +4800,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-04 18:20';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1395;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-05 11:22';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1396;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -7447,6 +7448,7 @@ const Veh = (function(){
   let curView='dash';
   let adminSort={col:null,asc:true};
   let adminStatusFilter=null;
+  let adminPersons=false;   // 管理の表：false＝車両、true＝人のカード
   let dashFilter='';
   let currentViewId=null;
   const DEFAULTS={shaken:60,jibaiseki:60,hoken:60,oil_km:5000,oil_days:180};
@@ -7705,11 +7707,15 @@ const Veh = (function(){
   // ===== 管理テーブル =====
   function renderAdmin(){
     const el=$('adminView');
-    let items=vehicleData.filter(v=>!isPerson(v));
+    const vehs=vehicleData.filter(v=>!isPerson(v)), persons=vehicleData.filter(isPerson);
+    let items=adminPersons?persons.slice():vehs.slice();
     if(adminSort.col)items.sort((a,b)=>{let va=String(a[adminSort.col]||'').toLowerCase(),vb=String(b[adminSort.col]||'').toLowerCase();return va<vb?(adminSort.asc?-1:1):va>vb?(adminSort.asc?1:-1):0});
-    const cols=[{key:'name',label:'車種'},{key:'plate',label:'ナンバー'},{key:'type',label:'名称'},{key:'length',label:'全長'},{key:'width',label:'全幅'},{key:'height',label:'全高'},{key:'shaken_date',label:'車検満了'},{key:'jibaiseki_date',label:'自賠責満了'},{key:'hoken_date',label:'任意保険満了'}];
-    let h=`<div class="fv-sum"><div class="fv-si on"><div class="n">${items.length}</div><div class="l">全車両</div></div><div class="fv-si"><div class="n">${vehicleData.filter(isPerson).length}</div><div class="l">人のカード</div></div><button class="av-add" style="margin-left:auto" onclick="Veh.openVMo()">+ 車両登録</button></div>`;
-    h+='<div class="tbl-wrap"><table><thead><tr>';
+    // 人のカード（2026-11-05、iller「人のカードって編集できないんだっけ」）：札を押すと表が人のカードに切り替わる＝行クリックで編集
+    const cols=adminPersons
+      ?[{key:'name',label:'名前'}].concat(CHIP_ORDER.map(k=>({key:k,label:CARD_LABEL[k]}))).concat([{key:'notes',label:'備考'}])
+      :[{key:'name',label:'車種'},{key:'plate',label:'ナンバー'},{key:'type',label:'名称'},{key:'length',label:'全長'},{key:'width',label:'全幅'},{key:'height',label:'全高'},{key:'shaken_date',label:'車検満了'},{key:'jibaiseki_date',label:'自賠責満了'},{key:'hoken_date',label:'任意保険満了'}];
+    let h=`<div class="fv-sum"><div class="fv-si${adminPersons?'':' on'}" data-adm="veh"><div class="n">${vehs.length}</div><div class="l">全車両</div></div><div class="fv-si${adminPersons?' on':''}" data-adm="person"><div class="n">${persons.length}</div><div class="l">人のカード</div></div><button class="av-add" style="margin-left:auto" onclick="Veh.openVMo()">+ 車両登録</button></div>`;
+    h+=`<div class="tbl-wrap"><table${adminPersons?' class="tbl-person"':''}><thead><tr>`;
     cols.forEach(c=>{const a=adminSort.col===c.key?(adminSort.asc?'▲':'▼'):'';h+=`<th data-col="${c.key}">${c.label}<span class="arrow">${a}</span></th>`});
     h+='<th>操作</th></tr></thead><tbody>';
     items.forEach(d=>{
@@ -7718,14 +7724,14 @@ const Veh = (function(){
         let v=d[c.key]||'';
         if(c.key.endsWith('_date')&&v)v=dateJP(v);
         if(c.key==='plate'&&v)v=plateLine(v);
-        h+=`<td>${esc(v)}</td>`;
+        h+=`<td data-label="${esc(c.label)}">${esc(v)}</td>`;
       });
       h+=`<td onclick="event.stopPropagation()"><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu"><button type="button" onclick="Veh.editVehicle('${d.id}')">編集</button></div></div></td></tr>`;
     });
     h+='</tbody></table></div>';
     el.innerHTML=h;
     el.querySelectorAll('th[data-col]').forEach(th=>{th.onclick=()=>{const c=th.dataset.col;if(adminSort.col===c)adminSort.asc=!adminSort.asc;else{adminSort.col=c;adminSort.asc=true}render()}});
-    el.querySelectorAll('.fv-si[data-st]').forEach(chip=>{chip.onclick=()=>{const v=chip.dataset.st;adminStatusFilter=v||null;render()}});
+    el.querySelectorAll('.fv-si[data-adm]').forEach(chip=>{chip.onclick=()=>{adminPersons=chip.dataset.adm==='person';adminSort={col:null,asc:true};render()}});
   }
   function unifiedSearch(q){
     q=String(q||'').toLowerCase();
