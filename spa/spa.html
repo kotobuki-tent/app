@@ -1777,7 +1777,8 @@ table.jobs tr:last-child td{border-bottom:none}
 #view-daily .dv-me{color:var(--accent);font-size:11px;font-weight:500;margin-left:5px}
 #view-daily .dv-empmeta{color:var(--text-dim);font-size:12px;margin-left:10px}
 #view-daily .dv-proj{font-weight:500;color:var(--text);width:100%;min-width:200px}
-#view-daily .dv-proj.dv-free{color:var(--text-dim)} /* 自由記述の案件（project_type=other）は灰字 2026-11-06 */
+#view-daily .dv-proj.dv-free{color:var(--text-dim)} /* 自由記述の案件（project_type=other）は灰字＋札 2026-11-06 */
+#view-daily .dv-free-tag{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:9px;background:#e4e4e8;color:var(--text-dim);font-size:11px;font-weight:400;vertical-align:1px}
 #view-daily .dv-work{padding-right:28px}
 #view-daily .dv-note{color:var(--text-faint);font-size:12px;font-style:italic;margin-top:2px;font-weight:400}
 #view-daily .dv-work{color:var(--accent);font-weight:500;white-space:nowrap}
@@ -4801,8 +4802,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-06 08:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1397;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-06 08:54';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1398;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8939,7 +8940,7 @@ const Daily = (function(){
         const isTmp=String(e.id).startsWith('tmp_');const editable=isMe&&!isTmp;
         const editBtn=editable?`<button class="act-btn dv-edit" onclick="Daily.gotoEditFromView('${esc(e.id)}','${esc(e.date||'')}')">編集</button>`:'';
         const note=e.note?`<div class="dv-note">${esc(e.note)}</div>`:'';
-        dvRows+=`<tr class="dv-row"><td class="dv-proj${e.project_type==='other'?' dv-free':''}" data-l="案件">${esc(e.project_name||'(案件不明)')}${note}</td><td class="dv-work" data-l="作業">${esc(e.work||e.action||'')}</td><td class="dv-min" data-l="時間">${mins?mins+'分':''}</td><td class="dv-actc">${editBtn}</td></tr>`;
+        dvRows+=`<tr class="dv-row"><td class="dv-proj${e.project_type==='other'?' dv-free':''}" data-l="案件">${esc(e.project_name||'(案件不明)')}${e.project_type==='other'?'<span class="dv-free-tag">自由記述</span>':''}${note}</td><td class="dv-work" data-l="作業">${esc(e.work||e.action||'')}</td><td class="dv-min" data-l="時間">${mins?mins+'分':''}</td><td class="dv-actc">${editBtn}</td></tr>`;
       });
     });
     if(dvRows) h+=`<div class="dv-tblwrap"><table class="dv-tbl"><thead><tr><th>案件</th><th>作業</th><th class="r">時間</th><th></th></tr></thead><tbody>${dvRows}</tbody></table></div>`;
