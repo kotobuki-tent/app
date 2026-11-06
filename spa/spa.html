@@ -2999,6 +2999,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   #view-cases .ce-final-x{border:none;background:none;color:var(--text-faint);font-size:11px;cursor:pointer;text-decoration:underline}
   #view-cases .sz-kinds{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px 6px;margin-top:5px}
   #view-cases .sz-tbl td.cost{white-space:normal}
+  #view-cases .sz-tbl td.fin{box-shadow:inset 4px 0 0 var(--green)}   /* 原価を確定した行＝左端に緑の縦線（11/6 iller。確定のピルはそのまま） */
   #view-cases .sz-k{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:1px 7px;border-radius:999px;white-space:nowrap}
   #view-cases .sz-k{border:none;font-family:inherit;cursor:default}
   #view-cases .sz-k.ok{background:#eaf3de;color:#3b6d11}
@@ -4802,8 +4803,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-06 09:02';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1403;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-06 11:20';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1404;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -9928,7 +9929,7 @@ const Cases = (function(){
       +'</div>';
     const who=c=>{ const d=DEPTS.filter(x=>caseDepts(c.id)[x.k]).map(x=>x.n).join('・'); return esc([d,c.our_person].filter(Boolean).join('　')); };
     const row=(x,extra)=>`<tr data-cid="${esc(x.c.id)}" onclick="Cases.openEdit('${esc(x.c.id)}')"${extra?' class="dim"':''}>`
-      +`<td><div class="ct-main">${esc(dispName(x.c.client,x.c.name))}${x.c.cancel==='あり'?'<span class="case-cancel">キャンセル料</span>':''}</div><div class="ct-sub">${who(x.c)}</div></td>`
+      +`<td${x.isFinal?' class="fin"':''}><div class="ct-main">${esc(dispName(x.c.client,x.c.name))}${x.c.cancel==='あり'?'<span class="case-cancel">キャンセル料</span>':''}</div><div class="ct-sub">${who(x.c)}</div></td>`
       +`<td class="num">${x.sales?yen(x.sales):'<span class="faint">金額なし</span>'}</td>`
       +`<td class="num cost"><span class="sz-fin${x.isFinal?' on':''}">${x.isFinal?'確定':'仮'}</span>${x.cost?yen(x.cost):'<span class="faint">原価なし</span>'}${x.after>0?`<div class="sz-after">確定後に追加 ${yen(x.after)}</div>`:''}${x.redo.total>0?`<div class="sz-redo">やり直し ${yen(x.redo.total)}${x.redo.minutes?'・'+(Math.round(x.redo.minutes/6)/10)+'h':''}</div>`:''}<div class="sz-parts"><span><em>労務費</em>${Math.round(x.labor).toLocaleString('ja-JP')}<small>${Math.round((Number(x.p.minutes)||0)/6)/10}h</small></span>${COST_KINDS.map(k=>{ const v=Math.round(Number((x.p.k||{})[k])||0); const cls=v>0?'':(costNoneSet(x.c).has(k)?' zero-ok':' zero-miss'); return `<span class="${cls.trim()}"><em>${COST_LABEL[k]}</em>${v.toLocaleString('ja-JP')}</span>`; }).join('')}${(()=>{ const v=Math.round(Number((x.p.k||{})['やり直し'])||0); return `<span class="${v>0?'redo':''}"><em>やり直し</em>${v.toLocaleString('ja-JP')}</span>`; })()}</div></td>`
       +`<td class="num${x.gp!=null&&x.gp<0?' bad':''}">${x.gp!=null?ym(x.gp):'—'}</td>`
