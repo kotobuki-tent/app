@@ -155,6 +155,25 @@ html.in-woff .portal-wrap{justify-content:flex-start;padding:16px 12px;min-heigh
 .hdr-btn:hover{color:#4a0e1f;border-color:rgba(255,255,255,.5)}
 #refreshBtn{background:var(--accent-dim);color:var(--accent);border-color:transparent;font-weight:500}   /* 2026-09-17 iller「リロードのボタンを色で目立たせて」 */
 #refreshBtn:hover{background:var(--accent-dim);color:var(--accent);border-color:transparent}
+/* 横断検索（11/6） */
+.find-mo{max-width:640px;padding:14px}
+.find-mo input{width:100%;height:44px;border:1px solid var(--border);border-radius:10px;padding:0 14px;font:400 16px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);box-sizing:border-box;outline:none;-webkit-appearance:none}
+.find-mo input:focus{border-color:var(--accent)}
+#findList{margin-top:8px;max-height:70vh;overflow:auto}
+.find-row{display:flex;gap:12px;align-items:center;padding:10px 8px;border-radius:8px;cursor:pointer}
+.find-row+.find-row{border-top:1px solid var(--border-light)}
+.find-row:hover{background:var(--surface2)}
+.find-row.arch{opacity:.55}
+.find-kind{flex:0 0 auto;font-size:12px;font-weight:500;padding:2px 8px;border-radius:999px;min-width:2.5em;text-align:center}
+.find-kind.k-cases{background:var(--accent-dim);color:var(--accent)}
+.find-kind.k-production{background:#fbf3e0;color:#9a6c00}
+.find-kind.k-project{background:#eaf3de;color:#3b6d11}
+.find-kind.k-sales{background:#f9eaf5;color:#8e3f7c}
+.find-txt{min-width:0}
+.find-t{font-size:15px;line-height:1.3}
+.find-s{font-size:12px;color:var(--text-dim);margin-top:2px}
+.find-empty{padding:14px 8px;color:var(--text-dim);font-size:13px}
+@media(max-width:480px){#findBtn{display:none}}
 .nav-spacer{flex:1}
 .nav-right{display:contents}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){
@@ -2698,6 +2717,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
         <button class="nav-link" id="navQual" onclick="App.nav('qual')">資格</button>
       </div></div>
       </div>
+      <button class="hdr-btn" id="findBtn" onclick="Find.open()">検索</button>
       <button class="hdr-btn" id="refreshBtn">↻ 更新</button>
     </div>
   </div>
@@ -4021,6 +4041,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   <div class="po-wrap"><div id="poReqBody"><div class="po-empty">読み込み中...</div></div></div>
 </section>
 <!-- 発注書のモーダル（発注・発注依頼の両方から開く。section の外＝どちらの画面でも見える） -->
+<div class="mo-bg" id="findBg" onclick="if(event.target===this)Find.close()"><div class="mo find-mo"><input id="findInp" type="search" placeholder="案件名・得意先・番号" autocomplete="off" oninput="Find.input(this.value)" onkeydown="Find.key(event)"><div id="findList"></div></div></div>
 <div class="mo-bg" id="poEditBg"><div class="mo" style="max-width:760px"><h2 id="poe_title">発注書</h2><div id="poEditBody"></div></div></div>
 
 <!-- ===== 予定ボード（ホワイトボード） section ===== -->
@@ -4804,8 +4825,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-06 17:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1408;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-06 18:02';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1409;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4934,7 +4955,9 @@ function dispName(client,name){const n=String(name||'');let c=String(client||'')
   const LF=/\s*(株式会社|有限会社|合同会社|合資会社|合名会社|一般社団法人|公益社団法人|一般財団法人|公益財団法人|社団法人|財団法人|特定非営利活動法人|NPO法人|ＮＰＯ法人|学校法人|医療法人|社会福祉法人|宗教法人|独立行政法人|国立大学法人|地方独立行政法人|㈱|㈲|\(株\)|（株）|\(有\)|（有）)\s*/g;   // 法人格はどこにあっても落とす（10/15 iller。「TSP太陽株式会社 東京営業」→「TSP太陽 東京営業」）
   c=c.replace(LF,' ').replace(/\s+/g,' ').trim();
   return (/[／/]/.test(n)||!c)?n:c+'／'+n;}   // 区切りは全角「／」も半角「/」も
-function NZ(v){return String(v||'').normalize('NFKC').toLowerCase().replace(/[\s\u3000]/g,'');}   // 検索の揃え：全角半角・大小・空白の違いを吸う（11/6 iller「緩くしとかないと」）。全画面の検索がこれを通す
+function NZ(v){return String(v||'').normalize('NFKC').toLowerCase().replace(/[\s\u3000]/g,'').replace(/[\u30a1-\u30f6]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0x60));}   // 検索の揃え：全角半角・大小・空白・カタカナ／ひらがなの違いを吸う（11/6 iller「緩くしとかないと」「全部ほしい」）。全画面の検索がこれを通す
+function NZQ(q){return String(q||'').split(/[\s\u3000]+/).map(NZ).filter(Boolean);}   // 空白区切り＝全部含む行だけ（AND）
+function NZHit(text,q){const t=Array.isArray(q)?q:NZQ(q); if(!t.length)return true; const n=NZ(text); return t.every(x=>n.includes(x));}
 function bareName(client,name){const n=String(name||'');const m=n.match(/^([^／/]+)[／/]/);if(!m)return n;const head=m[1].replace(/\s+/g,'').normalize('NFKC');const c=String(client||'').trim().normalize('NFKC');if(!c||!head)return n;const LF=/\s*(株式会社|有限会社|合同会社|合資会社|合名会社|一般社団法人|公益社団法人|一般財団法人|公益財団法人|社団法人|財団法人|特定非営利活動法人|NPO法人|ＮＰＯ法人|学校法人|医療法人|社会福祉法人|宗教法人|独立行政法人|国立大学法人|地方独立行政法人|㈱|㈲|\(株\)|（株）|\(有\)|（有）)\s*/g;const sc=c.replace(LF,'').replace(/\s+/g,'');const cc=c.replace(/\s+/g,'');return (cc.startsWith(head)||sc===head||(sc&&head.startsWith(sc))||(head.length>=2&&sc.startsWith(head)))?n.slice(m[0].length).trim():n}   // 得意先の欄が別にある一覧で、名前の頭の「得意先／」を外す（10/28 iller「二重になる」）。頭が得意先と合わない「／」は触らない
 const vr=(label,val)=>`<div class="view-row"><div class="view-label">${label}</div><div class="view-val">${esc(val||'')}</div></div>`;
 const $=id=>document.getElementById(id);
@@ -5394,7 +5417,7 @@ const Prod = (function(){
   function fabSearch(q){ fabQ=String(q||'').trim(); renderFabric(); }
   function renderFabric(){
     const el=$('fabList'); if(!el)return;
-    const rows=fab.filter(x=>!fabQ||NZ(x.item).includes(NZ(fabQ)));
+    const rows=fab.filter(x=>NZHit(x.item,fabQ));
     const inStock=fab.filter(x=>x.meters>0);
     const total=fab.reduce((s,x)=>s+(Number(x.amount)||0),0);
     $('fabSum').innerHTML=`<div class="fv-si on"><div class="n">${inStock.length}</div><div class="l">品番</div></div><div class="fv-si"><div class="n">${fabY(total)}</div><div class="l">在庫の金額</div></div>`;
@@ -5539,11 +5562,11 @@ const Prod = (function(){
     el.querySelectorAll('.fv-card').forEach(c=>{c.onclick=()=>viewProd(c.dataset.id)});
   }
   function unifiedSearch(q){
-    q=NZ(q);
+    q=NZQ(q);
     const view=document.querySelector('#prodFactory:not(.hidden), #prodArchive:not(.hidden)');
     if(!view)return;
     view.querySelectorAll('.fv-card, tbody tr').forEach(el=>{
-      el.style.display=NZ(el.textContent).includes(q)?'':'none';
+      el.style.display=NZHit(el.textContent,q)?'':'none';
     });
   }
 
@@ -6171,11 +6194,11 @@ const Proj = (function(){
     return h;
   }
   function unifiedSearch(q){
-    q=NZ(q);
+    q=NZQ(q);
     const view=document.querySelector('#projGantt:not(.hidden), #projBoard:not(.hidden), #projDoneView:not(.hidden)');
     if(!view)return;
     view.querySelectorAll('.gantt-row[data-id], .prj-card[data-id], .fv-card[data-id], tbody tr').forEach(el=>{
-      el.style.display=NZ(el.textContent).includes(q)?'':'none';
+      el.style.display=NZHit(el.textContent,q)?'':'none';
     });
   }
 
@@ -7001,14 +7024,14 @@ const Inv = (function(){
   function onProjectSelect(){if($('xf_r_project').value)$('xf_r_client').value=$('xf_r_project').value}
 
   function unifiedSearch(q){
-    q=NZ(q);
+    q=NZQ(q);
     const view=document.querySelector('#v_items:not(.hidden), #v_rentals:not(.hidden), #v_maint:not(.hidden), #v_gantt:not(.hidden)');
     if(!view)return;
     view.querySelectorAll('tbody tr').forEach(el=>{
-      el.style.display=NZ(el.textContent).includes(q)?'':'none';
+      el.style.display=NZHit(el.textContent,q)?'':'none';
     });
     // ガント：品名セルとその右の帯（隣の要素）をセットで隠す。品名・現場名・状態で検索
-    view.querySelectorAll('.gt .name[data-k]').forEach(el=>{const tl=el.nextElementSibling;const hit=NZ(el.textContent+' '+(tl?tl.textContent:'')).includes(q);el.style.display=hit?'':'none';if(tl)tl.style.display=hit?'':'none';});
+    view.querySelectorAll('.gt .name[data-k]').forEach(el=>{const tl=el.nextElementSibling;const hit=NZHit(el.textContent+' '+(tl?tl.textContent:''),q);el.style.display=hit?'':'none';if(tl)tl.style.display=hit?'':'none';});
   }
 
   // ===== タブ切替（inv独自：v_items/v_rentals/v_maint/v_gantt/v_discard を出し分け） =====
@@ -7739,10 +7762,10 @@ const Veh = (function(){
     el.querySelectorAll('.fv-si[data-adm]').forEach(chip=>{chip.onclick=()=>{adminPersons=chip.dataset.adm==='person';adminSort={col:null,asc:true};render()}});
   }
   function unifiedSearch(q){
-    q=NZ(q);
+    q=NZQ(q);
     const view=document.querySelector('#dashView:not(.hidden), #adminView:not(.hidden), #settingsView:not(.hidden)');
     if(!view)return;
-    view.querySelectorAll('tbody tr').forEach(r=>{r.style.display=NZ(r.textContent).includes(q)?'':'none';});
+    view.querySelectorAll('tbody tr').forEach(r=>{r.style.display=NZHit(r.textContent,q)?'':'none';});
   }
 
   // ===== 車両詳細（stToggle/stOpts→vStToggle/vStOpts） =====
@@ -8169,23 +8192,23 @@ const Sales = (function(){
   }
   function setBoardFilter(v){boardFilter=v;renderBoard()}
   function unifiedSearch(q){
-    q=NZ(q);
+    q=NZQ(q);
     const view=document.querySelector('#boardView:not(.hidden), #archiveView:not(.hidden), #salesAdminView:not(.hidden)');
     if(!view)return;
-    view.querySelectorAll('.fv-card, tbody tr').forEach(el=>{el.style.display=NZ(el.textContent).includes(q)?'':'none'});
+    view.querySelectorAll('.fv-card, tbody tr').forEach(el=>{el.style.display=NZHit(el.textContent,q)?'':'none'});
   }
   function boardCardFilter(q){
-    boardSearch=q;q=NZ(q);
-    $('boardView').querySelectorAll('.fv-card').forEach(c=>{c.style.display=NZ(c.textContent).includes(q)?'':'none'});
+    boardSearch=q;q=NZQ(q);
+    $('boardView').querySelectorAll('.fv-card').forEach(c=>{c.style.display=NZHit(c.textContent,q)?'':'none'});
   }
 
   // ===== 管理（adminView→salesAdminView） =====
   function renderAdmin(){
     const el=$('salesAdminView');
     let items=allEntries.filter(e=>!ARCHIVE_ST.includes(e.status));
-    const kw=NZ(adminSearch);
+    const kw=NZQ(adminSearch);
     if(adminStatusFilter)items=items.filter(e=>e.status===adminStatusFilter);
-    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.person||'')+' '+String(e.order_no||'')+' '+String(e.estimate_no||''));return NZ(blob).includes(kw)});
+    if(kw.length)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.person||'')+' '+String(e.order_no||'')+' '+String(e.estimate_no||''));return NZHit(blob,kw)});
     const stCnt={};ALL_ST.forEach(s=>stCnt[s]=0);
     allEntries.filter(e=>!ARCHIVE_ST.includes(e.status)).forEach(e=>{if(stCnt[e.status]!==undefined)stCnt[e.status]++});
     items.sort((a,b)=>{
@@ -8231,8 +8254,8 @@ const Sales = (function(){
   function renderArchive(){
     const el=$('archiveView');
     let items=allEntries.filter(e=>ARCHIVE_ST.includes(String(e.status||'').trim()) && String(e.archived||'').toUpperCase()!=='TRUE');
-    const kw=NZ(archiveSearch);
-    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||''));return NZ(blob).includes(kw)});
+    const kw=NZQ(archiveSearch);
+    if(kw.length)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||''));return NZHit(blob,kw)});
     items.sort((a,b)=>{
       let va=a[archiveSort.col],vb=b[archiveSort.col];
       const ea=va==null||va==='',eb=vb==null||vb==='';
@@ -8270,8 +8293,8 @@ const Sales = (function(){
   function renderSalesArchived(){
     const el=$('salesArchivedView');
     let items=allEntries.filter(e=>String(e.archived||'').toUpperCase()==='TRUE');
-    const kw=NZ(archiveSearch);
-    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||''));return NZ(blob).includes(kw)});
+    const kw=NZQ(archiveSearch);
+    if(kw.length)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||''));return NZHit(blob,kw)});
     items.sort((a,b)=>{
       let va=a[archiveSort.col],vb=b[archiveSort.col];
       const ea=va==null||va==='',eb=vb==null||vb==='';
@@ -8542,7 +8565,7 @@ const Labor = (function(){
 
   // ===== テーブル描画 =====
   function renderTable(){
-    const kw=NZ($('laborPcSearch')?$('laborPcSearch').value:'');
+    const kw=NZQ($('laborPcSearch')?$('laborPcSearch').value:'');
     const isArchive=currentView==='archive';
     const isLaborArc=currentView==='archived';
     const isLA=j=>String(j.labor_archived||'').toUpperCase()==='TRUE';
@@ -8554,7 +8577,7 @@ const Labor = (function(){
       if(isLaborArc){if(!isLA(j))return false}
       else if(isArchive){if(j.status!=='出荷済'||isLA(j))return false}
       else{if(j.status==='出荷済'||isLA(j))return false;if(stFilter&&j.status!==stFilter)return false}
-      if(kw){const target=NZ(j.project+' '+j.order_no+' '+j.estimate_no);if(!target.includes(kw))return false}
+      if(!NZHit(j.project+' '+j.order_no+' '+j.estimate_no,kw))return false;
       return true;
     });
     const stOrder=isArchive?stOrderArchive:stOrderActive;
@@ -8978,10 +9001,10 @@ const Daily = (function(){
     setTimeout(()=>editEntry(id),100);
   }
   function unifiedSearch(q){
-    q=NZ(q);
+    q=NZQ(q);
     const view=document.querySelector('#writeView:not(.hidden), #viewView:not(.hidden)');
     if(!view)return;
-    view.querySelectorAll('.saved-entry, .member-entry, .status-item').forEach(el=>{el.style.display=NZ(el.textContent).includes(q)?'':'none'});
+    view.querySelectorAll('.saved-entry, .member-entry, .status-item').forEach(el=>{el.style.display=NZHit(el.textContent,q)?'':'none'});
   }
 
   // ===== init =====
@@ -9170,10 +9193,10 @@ requestAnimationFrame(()=>{$('reqModalBg').scrollTop=0;const _mo=$('reqModalBg')
     setTimeout(()=>{_savingReq=false},1500);
   }
   function unifiedSearch(q){
-    q=NZ(q);
+    q=NZQ(q);
     const v=document.querySelector('#staffView[style*="block"], #otAdminView[style*="block"]')||$('staffView');
     if(!v)return;
-    v.querySelectorAll('.ov-row, .day-row, .staff-list-item').forEach(el=>{el.style.display=NZ(el.textContent).includes(q)?'':'none'});
+    v.querySelectorAll('.ov-row, .day-row, .staff-list-item').forEach(el=>{el.style.display=NZHit(el.textContent,q)?'':'none'});
   }
 
   function init(){
@@ -9711,6 +9734,7 @@ const Cases = (function(){
   ];
   const DEPT=Object.fromEntries(DEPTS.map((d,i)=>[d.k,{s:d.s,n:d.n,c:d.c,o:i}]));
   const _deepTab=(function(){ try{ const t=new URLSearchParams(location.search).get('tab'); return ['list','todo','cal','saisan','done','kill','arch','manage'].includes(t)?t:''; }catch(e){ return ''; } })();   // ?go=cases&tab=po＝発注書の通知のリンク（2026-10-19）
+  let _raw={production:[],project:[],sales:[]};
   let _cases=[], _tab=_deepTab||'list', _q='', _sort={col:'__prog',asc:false}, _stf='', _editId='', _children={}, _deptf='', _staff=[], _childf='', _qexp=false;   // _qexp＝「期限切れ」チップで絞り込み中
   let _unm=[], _unmAt=0;   // 予定にあるが案件なし（LINE WORKS の終日の予定で、生きている案件・現場に当たらない物。dept=cal action=unmatched、2026-10-30 iller「気が付きたい（事務所）」）
   function loadUnm(){ if(typeof DataCache!=='undefined'&&DataCache.reading()){ setTimeout(loadUnm,100); return; }   // 初回の「前回のデータ」の窓の中では取らない（古い予定を出さない）
@@ -9878,7 +9902,9 @@ const Cases = (function(){
       const dl=$('caseStaffList'); if(dl) dl.innerHTML=_staff.map(s=>`<option value="${esc(s.name)}">`).join('');
       _children={};
       const add=(dept,rows)=>{(rows||[]).forEach(r=>{const cid=String(r.case_id||'').trim(); if(!cid)return; (_children[cid]=_children[cid]||[]).push({dept,id:r.id,project:r.project,status:r.status,invoiced:r.invoiced,deadline:r.deadline,start_date:r.start_date,type:r.type,date_load_in:r.date_load_in,date_setup:r.date_setup,date_event:r.date_event,date_teardown:r.date_teardown,date_rental_out:r.date_rental_out,date_rental_return:r.date_rental_return,date_delivery:r.date_delivery,date_make_start:r.date_make_start,date_make_end:r.date_make_end});});};
-      add('production',Pending.apply('production','',(od&&od.data)||[])); add('project',Pending.apply('project','',Norm.proj((pj&&pj.data)||[]))); add('sales',Pending.apply('sales','',(sl&&sl.data)||[]));
+      const _od=Pending.apply('production','',(od&&od.data)||[]), _pj=Pending.apply('project','',Norm.proj((pj&&pj.data)||[])), _sl=Pending.apply('sales','',(sl&&sl.data)||[]);
+      _raw={production:_od,project:_pj,sales:_sl};   // 横断検索（Find）が読む
+      add('production',_od); add('project',_pj); add('sales',_sl);
     }catch(e){}
     // 検索ボックスに入力中なら描き直さない（フォーカスと入力が飛ぶため。データは更新済みで次の操作から反映）
     const typing=document.activeElement&&document.activeElement.id==='casesSearch';
@@ -10001,8 +10027,8 @@ const Cases = (function(){
       if(_childf==='__term') return ks.some(k=>cRank(k)===4);
       if(_childf==='__active') return ks.some(k=>k.status!=='見送り'&&k.status!=='中止'&&cRank(k)>=1&&cRank(k)<4);
       const p=_childf.split(':'); return ks.some(k=>k.dept===p[0]&&k.status===p[1]); });
-    const q=NZ(_q);
-    if(q) rows=rows.filter(c=>['name','client','contact','our_person','order_no','estimate_no'].some(k=>NZ(c[k]).includes(q)));
+    const q=NZQ(_q);
+    if(q.length) rows=rows.filter(c=>NZHit(['name','client','contact','our_person','order_no','estimate_no'].map(k=>c[k]||'').join(' '),q));
     if(_sort.col==='__prog') rows.sort((a,b)=>((_sort.asc?1:-1)*(caseProgress(a.id)-caseProgress(b.id)))||String(b.created_at||'').localeCompare(String(a.created_at||'')));
     else if(_sort.col==='__dept') rows.sort((a,b)=>(_sort.asc?1:-1)*caseDeptKey(a.id).localeCompare(caseDeptKey(b.id)));
     else if(_sort.col==='__cost'||_sort.col==='__gp'||_sort.col==='__gpr') rows.sort((a,b)=>{ const k={__cost:'cost',__gp:'gp',__gpr:'rate'}[_sort.col]; const pa=profitOf(a),pb=profitOf(b); const va=pa&&pa[k]!=null?pa[k]:null, vb=pb&&pb[k]!=null?pb[k]:null; if(va==null&&vb==null)return 0; if(va==null)return 1; if(vb==null)return -1; return (_sort.asc?1:-1)*(va-vb); });
@@ -10106,7 +10132,7 @@ const Cases = (function(){
     if(kids.length)_invalidateDepts();
     toast('削除しました'); render();
   }
-  function search(v){ _q=v; const qq=NZ(v); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||NZ(tr.textContent).includes(qq))?'':'none'; }); }
+  function search(v){ _q=v; const qq=NZQ(v); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=NZHit(tr.textContent,qq)?'':'none'; }); }
   function sortBy(col){ if(_sort.col===col)_sort.asc=!_sort.asc; else {_sort.col=col;_sort.asc=true;} render(); }
   function setStf(v){ _stf=(_stf===v?'':v); render(); }
   // ---- 原価明細（原価の材料・外注・経費、2026-10-17）。案件の編集モーダルで 1 行ずつ。労務費は日報の工数から別に出す
@@ -10448,11 +10474,46 @@ const Cases = (function(){
   }
 
   function init(){}
-  return { loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, cancel, uncancel, cancelAsk, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal, newFromCal, loadUnm, ignoreCal };
+  return { all:()=>({cases:_cases,..._raw}), loaded:()=>_cases.length>0, loadAll, render, init, tab, toggle, setJType, setRdeliv, setPdeliv, addDate, save, setStatus, toggleInv, archive, unarchive, del, search, sortBy, setStf, openEdit, closeEdit, saveEdit, cancel, uncancel, cancelAsk, addCost, delCost, refreshRentals, addRentalRow, defaultRentalDates, _blockRowsOk, openSlog, closeSlog, jumpChild, setDeptf, setChildf, toggleCl, addDept, archiveSettled, calMove, calToday, calSetDays, toggleUnd, moneySum, setQexp, setSzPeriod, setSzDept, toggleCostNone, setCostFinal, newFromCal, loadUnm, ignoreCal };
 })();
 
 // ===== 発注（2026-10-19）：発注書を書く（記入者・宛先・明細・納期・納品先・備考）→ シート purchase_orders に未発注。2026-10-21 v134：発注書は注文するだけ、原価明細には流さない（案件は注文番号＝受注番号のため） → ① 案件と区分 → ② 発注書を開いて発注る → ③ 発注済（案件を付けていれば原価明細へ）
 // iller「案件になんでもかんでも乗っけすぎ」「あっちこっち行ったり来たり」＝案件管理から出して独立した画面に。書く欄も同じ画面（hatchu.html は 10/19 に廃止＝部長も PC でここから書く）
+// ===== 横断検索（2026-11-06 iller「全部ほしい」）：ヘッダの「検索」で 案件・生産・企画制作・販売 を一度に探す。
+// データは Cases.loadAll が取っている cases/orders/projects/sales（未取得なら取る）。行を押すとその画面へ行って編集を開く。
+const Find=(function(){
+  const $=id=>document.getElementById(id);
+  const _arch=v=>v===true||v==='true'||v==='TRUE';
+  let _q='', _busy=false;
+  const KIND={cases:'案件',production:'生産',project:'企画',sales:'販売'};
+  const KEYS=['name','client','contact','our_person','person','order_no','estimate_no','project','venue','supplier','notes','note','status'];
+  async function open(){ $('findBg').classList.add('show'); const inp=$('findInp'); inp.value=_q; setTimeout(()=>{ inp.focus(); inp.select(); },30);
+    if(!Cases.loaded()&&!_busy){ _busy=true; $('findList').innerHTML='<div class="find-empty">読み込み中...</div>'; try{ await Cases.loadAll(); }catch(e){} _busy=false; }
+    render(); }
+  function close(){ $('findBg').classList.remove('show'); }
+  function input(v){ _q=v; render(); }
+  function key(e){ if(e.key==='Escape'){ close(); return; } if(e.key==='Enter'){ const r=$('findList').querySelector('.find-row'); if(r) r.click(); } }
+  function render(){ const box=$('findList'); const t=NZQ(_q); if(!t.length){ box.innerHTML=''; return; }
+    const d=Cases.all(); const out=[];
+    const push=(kind,r,title,sub)=>{ if(NZHit(KEYS.map(k=>r[k]||'').join(' '),t)) out.push({kind,id:r.id,title,sub:sub.filter(Boolean).join('　'),arch:_arch(r.archived)}); };
+    const day=v=>v?String(v).slice(0,10):'';
+    (d.cases||[]).forEach(c=>push('cases',c,dispName(c.client,c.name),[c.order_no?'#'+c.order_no:'',c.status,c.our_person]));
+    (d.production||[]).forEach(r=>push('production',r,bareName(r.client,r.project),[r.client,r.status,r.deadline?'納期 '+day(r.deadline):'']));
+    (d.project||[]).forEach(r=>push('project',r,bareName(r.client,r.project),[r.client,r.venue,r.status,r.date_event?'本番 '+day(r.date_event):'']));
+    (d.sales||[]).forEach(r=>push('sales',r,bareName(r.client,r.project),[r.client,r.status]));
+    if(!out.length){ box.innerHTML='<div class="find-empty">見つかりません</div>'; return; }
+    out.sort((a,b)=>(a.arch?1:0)-(b.arch?1:0));   // 生きている物を先に、アーカイブは後ろ
+    const show=out.slice(0,60);
+    box.innerHTML=show.map(x=>`<div class="find-row${x.arch?' arch':''}" onclick="Find.go('${x.kind}','${esc(String(x.id))}')"><span class="find-kind k-${x.kind}">${KIND[x.kind]}</span><div class="find-txt"><div class="find-t">${esc(x.title)}</div><div class="find-s">${esc(x.sub)}${x.arch?'　アーカイブ':''}</div></div></div>`).join('')
+      +(out.length>show.length?`<div class="find-empty">${out.length} 件のうち ${show.length} 件</div>`:'');
+  }
+  async function go(kind,id){ close(); if(kind==='cases'){ try{ await App.nav('cases'); }catch(e){} Cases.openEdit(id); return; }
+    const key={production:'prod',project:'proj',sales:'sales'}[kind]; try{ await App.nav(key); }catch(e){}
+    try{ if(kind==='production')Prod.editProd(id); else if(kind==='project')Proj.editProj(id); else Sales.openMo(id); }catch(e){} }
+  return {open,close,input,key,go};
+})();
+window.Find=Find;
+
 const Po = (function(){
   const KINDS=['材料','外注','経費'];
   let _pos=[], _posAt=0, _cases=[], _staff=[], _busy=false, _tab='req', _q='', _ym='';   // _tab：req＝依頼、doc＝発注書、sent＝発注済（三段、2026-10-23）   // _ym：発注済一覧の月（''＝全部）2026-10-22   // _tab：open＝未発注、sent＝発注済一覧（2026-10-22 iller「発注済一覧を作って」）
@@ -10522,7 +10583,7 @@ const Po = (function(){
   }
   function tab(t){ _tab=t; render(); }
   function month(m){ _ym=m; render(); }
-  function search(v){ _q=v||''; const q=NZ(_q); document.querySelectorAll('#view-po .po-tbl tbody tr,#view-po .po-card').forEach(tr=>{ tr.style.display=(!q||NZ(tr.textContent).includes(q))?'':'none'; }); }   // 見出し行の検索＝どの段でも効く（10/23）
+  function search(v){ _q=v||''; const q=NZQ(_q); document.querySelectorAll('#view-po .po-tbl tbody tr,#view-po .po-card').forEach(tr=>{ tr.style.display=NZHit(tr.textContent,q)?'':'none'; }); }   // 見出し行の検索＝どの段でも効く（10/23）
   function assign(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(!el)return; const v=el.querySelector('.po-case').value.trim(), kind=el.querySelector('.po-kind').value; const c=caseOf(v);
     if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
     p.kind=kind; if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=v; p.order_no=''; }
@@ -11415,8 +11476,8 @@ const Qual = (function(){
     closeMo(); render();
   }
   function applySearch(){
-    const v=NZ($('qualSearch').value);
-    document.querySelectorAll('#qualBody [data-name]').forEach(n=>{n.style.display=(!v||NZ(n.dataset.name).includes(v))?'':'none'});
+    const v=NZQ($('qualSearch').value);
+    document.querySelectorAll('#qualBody [data-name]').forEach(n=>{n.style.display=NZHit(n.dataset.name,v)?'':'none'});
   }
   function init(){
     $('qualSearch').addEventListener('input',applySearch);
