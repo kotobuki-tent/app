@@ -4804,8 +4804,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-06 15:38';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1407;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-06 17:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1408;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4934,6 +4934,7 @@ function dispName(client,name){const n=String(name||'');let c=String(client||'')
   const LF=/\s*(株式会社|有限会社|合同会社|合資会社|合名会社|一般社団法人|公益社団法人|一般財団法人|公益財団法人|社団法人|財団法人|特定非営利活動法人|NPO法人|ＮＰＯ法人|学校法人|医療法人|社会福祉法人|宗教法人|独立行政法人|国立大学法人|地方独立行政法人|㈱|㈲|\(株\)|（株）|\(有\)|（有）)\s*/g;   // 法人格はどこにあっても落とす（10/15 iller。「TSP太陽株式会社 東京営業」→「TSP太陽 東京営業」）
   c=c.replace(LF,' ').replace(/\s+/g,' ').trim();
   return (/[／/]/.test(n)||!c)?n:c+'／'+n;}   // 区切りは全角「／」も半角「/」も
+function NZ(v){return String(v||'').normalize('NFKC').toLowerCase().replace(/[\s\u3000]/g,'');}   // 検索の揃え：全角半角・大小・空白の違いを吸う（11/6 iller「緩くしとかないと」）。全画面の検索がこれを通す
 function bareName(client,name){const n=String(name||'');const m=n.match(/^([^／/]+)[／/]/);if(!m)return n;const head=m[1].replace(/\s+/g,'').normalize('NFKC');const c=String(client||'').trim().normalize('NFKC');if(!c||!head)return n;const LF=/\s*(株式会社|有限会社|合同会社|合資会社|合名会社|一般社団法人|公益社団法人|一般財団法人|公益財団法人|社団法人|財団法人|特定非営利活動法人|NPO法人|ＮＰＯ法人|学校法人|医療法人|社会福祉法人|宗教法人|独立行政法人|国立大学法人|地方独立行政法人|㈱|㈲|\(株\)|（株）|\(有\)|（有）)\s*/g;const sc=c.replace(LF,'').replace(/\s+/g,'');const cc=c.replace(/\s+/g,'');return (cc.startsWith(head)||sc===head||(sc&&head.startsWith(sc))||(head.length>=2&&sc.startsWith(head)))?n.slice(m[0].length).trim():n}   // 得意先の欄が別にある一覧で、名前の頭の「得意先／」を外す（10/28 iller「二重になる」）。頭が得意先と合わない「／」は触らない
 const vr=(label,val)=>`<div class="view-row"><div class="view-label">${label}</div><div class="view-val">${esc(val||'')}</div></div>`;
 const $=id=>document.getElementById(id);
@@ -5393,7 +5394,7 @@ const Prod = (function(){
   function fabSearch(q){ fabQ=String(q||'').trim(); renderFabric(); }
   function renderFabric(){
     const el=$('fabList'); if(!el)return;
-    const rows=fab.filter(x=>!fabQ||String(x.item).toLowerCase().includes(fabQ.toLowerCase()));
+    const rows=fab.filter(x=>!fabQ||NZ(x.item).includes(NZ(fabQ)));
     const inStock=fab.filter(x=>x.meters>0);
     const total=fab.reduce((s,x)=>s+(Number(x.amount)||0),0);
     $('fabSum').innerHTML=`<div class="fv-si on"><div class="n">${inStock.length}</div><div class="l">品番</div></div><div class="fv-si"><div class="n">${fabY(total)}</div><div class="l">在庫の金額</div></div>`;
@@ -5538,11 +5539,11 @@ const Prod = (function(){
     el.querySelectorAll('.fv-card').forEach(c=>{c.onclick=()=>viewProd(c.dataset.id)});
   }
   function unifiedSearch(q){
-    q=(q||'').toLowerCase();
+    q=NZ(q);
     const view=document.querySelector('#prodFactory:not(.hidden), #prodArchive:not(.hidden)');
     if(!view)return;
     view.querySelectorAll('.fv-card, tbody tr').forEach(el=>{
-      el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
+      el.style.display=NZ(el.textContent).includes(q)?'':'none';
     });
   }
 
@@ -6170,11 +6171,11 @@ const Proj = (function(){
     return h;
   }
   function unifiedSearch(q){
-    q=(q||'').toLowerCase();
+    q=NZ(q);
     const view=document.querySelector('#projGantt:not(.hidden), #projBoard:not(.hidden), #projDoneView:not(.hidden)');
     if(!view)return;
     view.querySelectorAll('.gantt-row[data-id], .prj-card[data-id], .fv-card[data-id], tbody tr').forEach(el=>{
-      el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
+      el.style.display=NZ(el.textContent).includes(q)?'':'none';
     });
   }
 
@@ -7000,14 +7001,14 @@ const Inv = (function(){
   function onProjectSelect(){if($('xf_r_project').value)$('xf_r_client').value=$('xf_r_project').value}
 
   function unifiedSearch(q){
-    q=(q||'').toLowerCase();
+    q=NZ(q);
     const view=document.querySelector('#v_items:not(.hidden), #v_rentals:not(.hidden), #v_maint:not(.hidden), #v_gantt:not(.hidden)');
     if(!view)return;
     view.querySelectorAll('tbody tr').forEach(el=>{
-      el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
+      el.style.display=NZ(el.textContent).includes(q)?'':'none';
     });
     // ガント：品名セルとその右の帯（隣の要素）をセットで隠す。品名・現場名・状態で検索
-    view.querySelectorAll('.gt .name[data-k]').forEach(el=>{const tl=el.nextElementSibling;const hit=(el.textContent+' '+(tl?tl.textContent:'')).toLowerCase().includes(q);el.style.display=hit?'':'none';if(tl)tl.style.display=hit?'':'none';});
+    view.querySelectorAll('.gt .name[data-k]').forEach(el=>{const tl=el.nextElementSibling;const hit=NZ(el.textContent+' '+(tl?tl.textContent:'')).includes(q);el.style.display=hit?'':'none';if(tl)tl.style.display=hit?'':'none';});
   }
 
   // ===== タブ切替（inv独自：v_items/v_rentals/v_maint/v_gantt/v_discard を出し分け） =====
@@ -7738,10 +7739,10 @@ const Veh = (function(){
     el.querySelectorAll('.fv-si[data-adm]').forEach(chip=>{chip.onclick=()=>{adminPersons=chip.dataset.adm==='person';adminSort={col:null,asc:true};render()}});
   }
   function unifiedSearch(q){
-    q=String(q||'').toLowerCase();
+    q=NZ(q);
     const view=document.querySelector('#dashView:not(.hidden), #adminView:not(.hidden), #settingsView:not(.hidden)');
     if(!view)return;
-    view.querySelectorAll('tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';});
+    view.querySelectorAll('tbody tr').forEach(r=>{r.style.display=NZ(r.textContent).includes(q)?'':'none';});
   }
 
   // ===== 車両詳細（stToggle/stOpts→vStToggle/vStOpts） =====
@@ -8168,23 +8169,23 @@ const Sales = (function(){
   }
   function setBoardFilter(v){boardFilter=v;renderBoard()}
   function unifiedSearch(q){
-    q=String(q||'').toLowerCase();
+    q=NZ(q);
     const view=document.querySelector('#boardView:not(.hidden), #archiveView:not(.hidden), #salesAdminView:not(.hidden)');
     if(!view)return;
-    view.querySelectorAll('.fv-card, tbody tr').forEach(el=>{el.style.display=el.textContent.toLowerCase().includes(q)?'':'none'});
+    view.querySelectorAll('.fv-card, tbody tr').forEach(el=>{el.style.display=NZ(el.textContent).includes(q)?'':'none'});
   }
   function boardCardFilter(q){
-    boardSearch=q;q=String(q||'').toLowerCase();
-    $('boardView').querySelectorAll('.fv-card').forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(q)?'':'none'});
+    boardSearch=q;q=NZ(q);
+    $('boardView').querySelectorAll('.fv-card').forEach(c=>{c.style.display=NZ(c.textContent).includes(q)?'':'none'});
   }
 
   // ===== 管理（adminView→salesAdminView） =====
   function renderAdmin(){
     const el=$('salesAdminView');
     let items=allEntries.filter(e=>!ARCHIVE_ST.includes(e.status));
-    const kw=adminSearch.trim().toLowerCase();
+    const kw=NZ(adminSearch);
     if(adminStatusFilter)items=items.filter(e=>e.status===adminStatusFilter);
-    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.person||'')+' '+String(e.order_no||'')+' '+String(e.estimate_no||'')).toLowerCase();return blob.includes(kw)});
+    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.person||'')+' '+String(e.order_no||'')+' '+String(e.estimate_no||''));return NZ(blob).includes(kw)});
     const stCnt={};ALL_ST.forEach(s=>stCnt[s]=0);
     allEntries.filter(e=>!ARCHIVE_ST.includes(e.status)).forEach(e=>{if(stCnt[e.status]!==undefined)stCnt[e.status]++});
     items.sort((a,b)=>{
@@ -8230,8 +8231,8 @@ const Sales = (function(){
   function renderArchive(){
     const el=$('archiveView');
     let items=allEntries.filter(e=>ARCHIVE_ST.includes(String(e.status||'').trim()) && String(e.archived||'').toUpperCase()!=='TRUE');
-    const kw=archiveSearch.trim().toLowerCase();
-    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||'')).toLowerCase();return blob.includes(kw)});
+    const kw=NZ(archiveSearch);
+    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||''));return NZ(blob).includes(kw)});
     items.sort((a,b)=>{
       let va=a[archiveSort.col],vb=b[archiveSort.col];
       const ea=va==null||va==='',eb=vb==null||vb==='';
@@ -8269,8 +8270,8 @@ const Sales = (function(){
   function renderSalesArchived(){
     const el=$('salesArchivedView');
     let items=allEntries.filter(e=>String(e.archived||'').toUpperCase()==='TRUE');
-    const kw=archiveSearch.trim().toLowerCase();
-    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||'')).toLowerCase();return blob.includes(kw)});
+    const kw=NZ(archiveSearch);
+    if(kw)items=items.filter(e=>{const blob=(String(e.client||'')+' '+String(e.project||'')+' '+String(e.supplier||'')+' '+String(e.notes||'')+' '+String(e.our_person||'')+' '+String(e.order_no||''));return NZ(blob).includes(kw)});
     items.sort((a,b)=>{
       let va=a[archiveSort.col],vb=b[archiveSort.col];
       const ea=va==null||va==='',eb=vb==null||vb==='';
@@ -8541,7 +8542,7 @@ const Labor = (function(){
 
   // ===== テーブル描画 =====
   function renderTable(){
-    const kw=($('laborPcSearch')?$('laborPcSearch').value:'').trim().toLowerCase();
+    const kw=NZ($('laborPcSearch')?$('laborPcSearch').value:'');
     const isArchive=currentView==='archive';
     const isLaborArc=currentView==='archived';
     const isLA=j=>String(j.labor_archived||'').toUpperCase()==='TRUE';
@@ -8553,7 +8554,7 @@ const Labor = (function(){
       if(isLaborArc){if(!isLA(j))return false}
       else if(isArchive){if(j.status!=='出荷済'||isLA(j))return false}
       else{if(j.status==='出荷済'||isLA(j))return false;if(stFilter&&j.status!==stFilter)return false}
-      if(kw){const target=(j.project+' '+j.order_no+' '+j.estimate_no).toLowerCase();if(!target.includes(kw))return false}
+      if(kw){const target=NZ(j.project+' '+j.order_no+' '+j.estimate_no);if(!target.includes(kw))return false}
       return true;
     });
     const stOrder=isArchive?stOrderArchive:stOrderActive;
@@ -8977,10 +8978,10 @@ const Daily = (function(){
     setTimeout(()=>editEntry(id),100);
   }
   function unifiedSearch(q){
-    q=String(q||'').toLowerCase();
+    q=NZ(q);
     const view=document.querySelector('#writeView:not(.hidden), #viewView:not(.hidden)');
     if(!view)return;
-    view.querySelectorAll('.saved-entry, .member-entry, .status-item').forEach(el=>{el.style.display=el.textContent.toLowerCase().includes(q)?'':'none'});
+    view.querySelectorAll('.saved-entry, .member-entry, .status-item').forEach(el=>{el.style.display=NZ(el.textContent).includes(q)?'':'none'});
   }
 
   // ===== init =====
@@ -9169,10 +9170,10 @@ requestAnimationFrame(()=>{$('reqModalBg').scrollTop=0;const _mo=$('reqModalBg')
     setTimeout(()=>{_savingReq=false},1500);
   }
   function unifiedSearch(q){
-    q=String(q||'').toLowerCase();
+    q=NZ(q);
     const v=document.querySelector('#staffView[style*="block"], #otAdminView[style*="block"]')||$('staffView');
     if(!v)return;
-    v.querySelectorAll('.ov-row, .day-row, .staff-list-item').forEach(el=>{el.style.display=el.textContent.toLowerCase().includes(q)?'':'none'});
+    v.querySelectorAll('.ov-row, .day-row, .staff-list-item').forEach(el=>{el.style.display=NZ(el.textContent).includes(q)?'':'none'});
   }
 
   function init(){
@@ -10000,8 +10001,8 @@ const Cases = (function(){
       if(_childf==='__term') return ks.some(k=>cRank(k)===4);
       if(_childf==='__active') return ks.some(k=>k.status!=='見送り'&&k.status!=='中止'&&cRank(k)>=1&&cRank(k)<4);
       const p=_childf.split(':'); return ks.some(k=>k.dept===p[0]&&k.status===p[1]); });
-    const q=_q.trim().toLowerCase();
-    if(q) rows=rows.filter(c=>['name','client','contact','our_person','order_no','estimate_no'].some(k=>String(c[k]||'').toLowerCase().includes(q)));
+    const q=NZ(_q);
+    if(q) rows=rows.filter(c=>['name','client','contact','our_person','order_no','estimate_no'].some(k=>NZ(c[k]).includes(q)));
     if(_sort.col==='__prog') rows.sort((a,b)=>((_sort.asc?1:-1)*(caseProgress(a.id)-caseProgress(b.id)))||String(b.created_at||'').localeCompare(String(a.created_at||'')));
     else if(_sort.col==='__dept') rows.sort((a,b)=>(_sort.asc?1:-1)*caseDeptKey(a.id).localeCompare(caseDeptKey(b.id)));
     else if(_sort.col==='__cost'||_sort.col==='__gp'||_sort.col==='__gpr') rows.sort((a,b)=>{ const k={__cost:'cost',__gp:'gp',__gpr:'rate'}[_sort.col]; const pa=profitOf(a),pb=profitOf(b); const va=pa&&pa[k]!=null?pa[k]:null, vb=pb&&pb[k]!=null?pb[k]:null; if(va==null&&vb==null)return 0; if(va==null)return 1; if(vb==null)return -1; return (_sort.asc?1:-1)*(va-vb); });
@@ -10105,7 +10106,7 @@ const Cases = (function(){
     if(kids.length)_invalidateDepts();
     toast('削除しました'); render();
   }
-  function search(v){ _q=v; const qq=v.trim().toLowerCase(); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||tr.textContent.toLowerCase().includes(qq))?'':'none'; }); }
+  function search(v){ _q=v; const qq=NZ(v); document.querySelectorAll('#casesPane tbody tr').forEach(tr=>{ tr.style.display=(!qq||NZ(tr.textContent).includes(qq))?'':'none'; }); }
   function sortBy(col){ if(_sort.col===col)_sort.asc=!_sort.asc; else {_sort.col=col;_sort.asc=true;} render(); }
   function setStf(v){ _stf=(_stf===v?'':v); render(); }
   // ---- 原価明細（原価の材料・外注・経費、2026-10-17）。案件の編集モーダルで 1 行ずつ。労務費は日報の工数から別に出す
@@ -10521,7 +10522,7 @@ const Po = (function(){
   }
   function tab(t){ _tab=t; render(); }
   function month(m){ _ym=m; render(); }
-  function search(v){ _q=v||''; const q=_q.trim().toLowerCase(); document.querySelectorAll('#view-po .po-tbl tbody tr,#view-po .po-card').forEach(tr=>{ tr.style.display=(!q||tr.textContent.toLowerCase().includes(q))?'':'none'; }); }   // 見出し行の検索＝どの段でも効く（10/23）
+  function search(v){ _q=v||''; const q=NZ(_q); document.querySelectorAll('#view-po .po-tbl tbody tr,#view-po .po-card').forEach(tr=>{ tr.style.display=(!q||NZ(tr.textContent).includes(q))?'':'none'; }); }   // 見出し行の検索＝どの段でも効く（10/23）
   function assign(id){ const p=_pos.find(x=>String(x.id)===String(id)); if(!p)return; const el=document.querySelector(`#view-po .po-card[data-id="${CSS.escape(String(id))}"]`); if(!el)return; const v=el.querySelector('.po-case').value.trim(), kind=el.querySelector('.po-kind').value; const c=caseOf(v);
     if(String(id).startsWith('tmp_')){ toast('保存中です。しばらくしてから操作してください',true); return; }
     p.kind=kind; if(c){ p.case_id=c.id; p.case_name=dispName(c.client,c.name); p.order_no=c.order_no||''; } else { p.case_id=''; p.case_name=v; p.order_no=''; }
@@ -11414,8 +11415,8 @@ const Qual = (function(){
     closeMo(); render();
   }
   function applySearch(){
-    const v=($('qualSearch').value||'').trim().toLowerCase();
-    document.querySelectorAll('#qualBody [data-name]').forEach(n=>{n.style.display=(!v||n.dataset.name.toLowerCase().includes(v))?'':'none'});
+    const v=NZ($('qualSearch').value);
+    document.querySelectorAll('#qualBody [data-name]').forEach(n=>{n.style.display=(!v||NZ(n.dataset.name).includes(v))?'':'none'});
   }
   function init(){
     $('qualSearch').addEventListener('input',applySearch);
