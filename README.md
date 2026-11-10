@@ -31,7 +31,7 @@ SPA本体（`spa/spa.html`）に15画面を統合。1ファイルで全機能完
 | 資格 | 免許・技能講習・特別教育の保有台帳（人×資格、マスタ選択式で表記ゆれ防止） |
 | ボード | 予定ボード（物理ホワイトボードのデジタル版、人×日グリッド） |
 
-旧来の単独HTML（各画面のMPA版・ACFL単独アプリ等12ファイル）は廃止し、純粋にSPAへ一本化済み。残る単独ページは `register.html`（スマホ特化の商品追加専用ツール）のみ。アルコールチェック（点呼）・フォークリフト点検（リフト）・いないカード（カード）はSPAに内包され、据え置きタブレットへは `?go=alcohol` / `?go=forklift` / `?go=card` のディープリンク＋`?mode=kiosk`（または `full`）で配布する。
+旧来の単独HTML（各画面のMPA版・ACFL単独アプリ等12ファイル）は廃止し、純粋にSPAへ一本化済み。単独ページは無い（`register.html`＝スマホの商品追加ツールは 2026-11-10 に削除。認証を必須にした 9/17 から動いていなかった）。アルコールチェック（点呼）・フォークリフト点検（リフト）・いないカード（カード）はSPAに内包され、据え置きタブレットへは `?go=alcohol` / `?go=forklift` / `?go=card` のディープリンク＋`?mode=kiosk`（または `full`）で配布する。
 
 ヘッダー：`HOME｜日報｜時間外 │ 点呼 リフト │ カード  [spacer]  案件 │ 生産 企画制作 販売 │ 工数 │ 在庫 │ 車両 │ 資格 │ ボード  [↻更新]`
 
@@ -220,7 +220,7 @@ GAS（`Code.gs`）に運用系の関数を同梱。**ソースの正本は iClou
 - **SPA構成**：HTML / CSS / JavaScript（フレームワークなし）、`spa/spa.html` 1ファイルに15画面のIIFE名前空間を統合、Appレジストリ（key/ns/section/nav/zone）で画面切替・遅延ロード・自動更新・端末モードを管理
 - **画面切替**：ページ遷移なし、初回ロード後は2回目以降ほぼ0秒で切替
 - **PWA**：`spa/manifest.json`＋PWA用メタタグでホーム画面アイコン化、`display:standalone`で全画面表示
-- **キャッシュ戦略**：`spa.html` は同一オリジンの static として Service Worker が **stale-while-revalidate** で配信（2026-09-03〜。キャッシュを即返し、裏で最新を取得して次回に反映＝デプロイは開き直し1回分遅れて届く）。GAS/Drive 等の API は `NO_CACHE_PATTERNS` で絶対にキャッシュしない。プリキャッシュ対象は `register.html`／`manifest.json`／アイコンのみで、これらを変えた時だけ `CACHE_VERSION` をバンプ
+- **キャッシュ戦略**：`spa.html` は同一オリジンの static として Service Worker が **stale-while-revalidate** で配信（2026-09-03〜。キャッシュを即返し、裏で最新を取得して次回に反映＝デプロイは開き直し1回分遅れて届く）。GAS/Drive 等の API は `NO_CACHE_PATTERNS` で絶対にキャッシュしない。プリキャッシュ対象は `manifest.json`／アイコンのみで、これらを変えた時だけ `CACHE_VERSION` をバンプ
 - **Google Apps Script**：API v7、deptパラメータで部門振り分け（production / project / sales / inventory / overtime / vehicle / daily / labor / attendance / drive / alcohol / forklift / cases / card / wb / qual / hr）。GASソースの正本は `Code.gs`（iCloud `♿️SEQUENCE LAB/`）。工数アーカイブは dept=labor の POST（archive/unarchive）で `labor_archived` を切替
 - **Google スプレッドシート**：データベース
 - **Google Drive**：製作図ファイル連携、フォルダID `16iDJrBWXdbIHq-aqJVgHZpA9tRGXMUwc`
