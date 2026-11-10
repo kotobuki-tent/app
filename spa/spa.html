@@ -2628,6 +2628,7 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
   #phoneTab{position:fixed;left:16px;right:16px;bottom:calc(10px + env(safe-area-inset-bottom,0px));height:62px;border-radius:31px;background:rgba(255,255,255,.78);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);box-shadow:0 8px 30px rgba(0,0,0,.12),inset 0 0 0 .5px rgba(255,255,255,.8);display:flex;align-items:center;justify-content:space-around;padding:0 6px;z-index:300}
   html.in-woff #phoneTab{bottom:22px}   /* LINE WORKS の中は下に余白があるので安全域を足さない（iller「上げすぎ」） */
   #phoneTab button{border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;font:400 10px/1 'Hiragino Sans','Noto Sans JP',sans-serif;color:var(--text-faint);width:60px;padding:0;cursor:pointer}
+  #phoneTab:has(button[data-key=inv]:not(.hidden)) button{width:52px}
   #phoneTab button.on{color:var(--accent)}
   #phoneTab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   #phoneTab button.on svg{stroke-width:2.2}
@@ -4803,6 +4804,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   <button data-key="ot" onclick="App.nav('ot')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>時間外</button>
   <button data-key="prod" onclick="App.nav('prod')"><svg viewBox="0 0 24 24"><path d="M3 21V11l6 3.5V11l6 3.5V8l6 4.5V21z"/><path d="M2.5 21h19"/></svg>生産</button>
   <button data-key="proj" onclick="App.nav('proj')"><svg viewBox="0 0 24 24"><path d="M2 11l10-5 10 5"/><path d="M2 11h20"/><path d="M2.5 11v9M21.5 11v9"/></svg>企画</button>
+  <button data-key="inv" class="hidden" onclick="App.nav('inv')"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>メンテ</button>
 </nav>
 <div class="loading-overlay hidden" id="loader"><div class="spin"></div><br>読み込み中...</div>
 <div class="toast" id="toast"></div>
@@ -4854,8 +4856,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-10 17:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1415;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-10 17:25';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1416;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -11591,7 +11593,7 @@ const App = {
   // ケータイの メンテナンス は企画制作部の人だけ（11/10 iller）。LINE WORKS の本人名を名簿（staff.dept）に当てる。本人が分からない端末（PC の細い窓など）は通す
   INV_PHONE_DEPT:'企画制作部', INV_PHONE_ALSO:['岸田平'], _invPh:null,   // ALSO＝部署が違っても見せる人（11/10 iller「俺も入れて」）
   invPhoneOk(){ const u=window.__woffUser; if(!u||!u.name) return true; return this._invPh===true; },
-  applyInvPhone(){ const c=document.querySelector('.portal-card[data-app="inv"]'); if(c) c.classList.toggle('ph-deny', !this.invPhoneOk()); },
+  applyInvPhone(){ const ok=this.invPhoneOk(); const c=document.querySelector('.portal-card[data-app="inv"]'); if(c) c.classList.toggle('ph-deny', !ok); const b=document.querySelector('#phoneTab button[data-key="inv"]'); if(b) b.classList.toggle('hidden', !ok); },   // 下のナビの「メンテ」も同じ人にだけ（11/10 iller「road to メンテがすげえ遠い」）
   checkInvPhone(){ const u=window.__woffUser; if(!u||!u.name){ this.applyInvPhone(); return; }
     const nz=x=>String(x||'').normalize('NFKC').replace(/[\s\u3000]/g,'').replace(/﨑/g,'崎').replace(/髙/g,'高').replace(/濵/g,'浜'); const me=nz(u.name);
     try{ const c=String(localStorage.getItem('inv_ph')||'').split('|'); if(c[0]===me) this._invPh=(c[1]==='1'); }catch(e){}   // 前回の答えで先に出す
