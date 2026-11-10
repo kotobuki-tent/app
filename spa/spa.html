@@ -4854,8 +4854,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-10 17:07';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1414;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-10 17:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1415;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -11589,14 +11589,14 @@ const App = {
   CASES_WOFF_ALLOW:['岸田平','岸田沙織','岸田博己','三好智依','牧田亮介','畑智之','森下達哉'],
   denied:[],
   // ケータイの メンテナンス は企画制作部の人だけ（11/10 iller）。LINE WORKS の本人名を名簿（staff.dept）に当てる。本人が分からない端末（PC の細い窓など）は通す
-  INV_PHONE_DEPT:'企画制作部', _invPh:null,
+  INV_PHONE_DEPT:'企画制作部', INV_PHONE_ALSO:['岸田平'], _invPh:null,   // ALSO＝部署が違っても見せる人（11/10 iller「俺も入れて」）
   invPhoneOk(){ const u=window.__woffUser; if(!u||!u.name) return true; return this._invPh===true; },
   applyInvPhone(){ const c=document.querySelector('.portal-card[data-app="inv"]'); if(c) c.classList.toggle('ph-deny', !this.invPhoneOk()); },
   checkInvPhone(){ const u=window.__woffUser; if(!u||!u.name){ this.applyInvPhone(); return; }
     const nz=x=>String(x||'').normalize('NFKC').replace(/[\s\u3000]/g,'').replace(/﨑/g,'崎').replace(/髙/g,'高').replace(/濵/g,'浜'); const me=nz(u.name);
     try{ const c=String(localStorage.getItem('inv_ph')||'').split('|'); if(c[0]===me) this._invPh=(c[1]==='1'); }catch(e){}   // 前回の答えで先に出す
     this.applyInvPhone();
-    fetch(API+'?dept=qual&action=staff').then(r=>r.json()).then(j=>{ if(!j||!j.success)return; const row=(j.data||[]).find(x=>nz(x.name)===me); this._invPh=!!(row&&String(row.dept||'').trim()===this.INV_PHONE_DEPT); try{ localStorage.setItem('inv_ph',me+'|'+(this._invPh?'1':'0')); }catch(e){} this.applyInvPhone(); }).catch(()=>{}); },
+    fetch(API+'?dept=qual&action=staff').then(r=>r.json()).then(j=>{ if(!j||!j.success)return; const row=(j.data||[]).find(x=>nz(x.name)===me); this._invPh=!!(row&&String(row.dept||'').trim()===this.INV_PHONE_DEPT)||this.INV_PHONE_ALSO.map(nz).indexOf(me)>=0; try{ localStorage.setItem('inv_ph',me+'|'+(this._invPh?'1':'0')); }catch(e){} this.applyInvPhone(); }).catch(()=>{}); },
   setWoffDenied(){ const u=window.__woffUser; if(!u||!u.name){ this.denied=[]; return; } const n=String(u.name).replace(/\s|　/g,''); this.denied=this.CASES_WOFF_ALLOW.indexOf(n)>=0?[]:['cases']; },
   PHONE_KEYS:['daily','ot','prod','proj','poreq','alcohol','forklift','inv'],   // ケータイ（幅 480 以下）で出す画面＝日報・時間外・生産・企画制作・発注依頼・アルコールチェック・リフト点検（10/28 iller）
   isPhone(){ return window.matchMedia('(max-width:480px)').matches; },
