@@ -2619,7 +2619,7 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
   .mt-card .mt-s{font-size:13px;color:var(--text-faint);margin-top:2px}
   .mt-card button{flex:0 0 auto;border:none;border-radius:10px;padding:9px 16px;font:500 15px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--accent-dim);color:var(--accent);cursor:pointer}
   .mt-empty{padding:28px 14px;text-align:center;color:var(--text-faint);font-size:15px}
-  body:has(#maintDoneBg.show) #phoneTab{display:none!important}   /* 済みの窓の間は下のナビを引っ込める（キャンセルに重なる） */
+  body:has(.mo-bg.show) #phoneTab{display:none!important}   /* 窓が開いている間は下のナビを引っ込める（窓の一番下のボタンに重なって押せなかった。11/10） */
   #prodTabs,#projTabs,#otTabs{display:none!important}   /* 10/29 iller「この『ボード』とか『工場ボード』いらないだろ」＝タブが 1 つしか残らないので帯ごと消す（resetSubTab が data-view を押す） */
   #view-daily .date-nav{flex-wrap:nowrap;gap:6px}#view-daily .date-nav button{padding:8px 8px;font-size:12px;white-space:nowrap;flex:0 0 auto}#view-daily .date-nav input[type=date]{flex:1 1 0;min-width:0;padding:7px 6px;font-size:16px}#view-daily .date-nav .date-label{display:none}   /* 10/29 日付の行を 1 行に（年月日の文字は日付の欄と二重なので消す） */
   /* ===== iOS 26 風（10/29 iller「それでいこう」）：下に浮いたナビ、大見出し＋灰の 1 行、札は 1 つの塊に細い線、ポータルの右に状態 ===== */
@@ -4856,8 +4856,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-10 17:25';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1416;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-10 18:46';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1417;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
