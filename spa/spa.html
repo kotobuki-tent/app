@@ -2601,8 +2601,8 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
 .mt-cards,.ph-t{display:none}
 /* ===== ケータイ（幅 480 以下、10/28 iller「ケータイで見るのに情報量多すぎ」）：出すのは 日報・時間外・生産（工場ボード）・企画制作（ボード）・発注依頼・アルコールチェック・リフト点検 の 7 つ。入口は LINE WORKS のリッチメニュー（日報・フルメニュー・時間外・生産部・アルコールチェック・企画制作部）。タブレット（480 より広い）は今まで通り ===== */
 @media(max-width:480px){
-  .portal-card:not([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift],[data-app=inv]){display:none!important}
-  .portal-grp:not(:has(.portal-card:is([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift],[data-app=inv]))){display:none!important}
+  .portal-card:not([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift],[data-app=inv]:not(.ph-deny)){display:none!important}
+  .portal-grp:not(:has(.portal-card:is([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift],[data-app=inv]:not(.ph-deny)))){display:none!important}
   #navCases,#navSales,#navPo,#navWb,#navCard,#navLabor,#navInv,#navVeh,#navQual{display:none!important}
   .nav-dd:has(#navLabor){display:none!important}
   #prodTabs .sub-tab[data-view=archive],#prodTabs .sub-tab[data-view=fabric],#prodTabs .staff-btn,#prodTabs .mny-btn,#prodTabs .slog-btn{display:none!important}
@@ -4854,8 +4854,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-10 17:03';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1413;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-10 17:07';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1414;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -11588,10 +11588,19 @@ const App = {
   // LINE WORKS（WOFF）から入った人のうち、案件画面を見られるのはこの名簿だけ（2026-09-28 iller）。PC（合言葉）は対象外＝従来どおり
   CASES_WOFF_ALLOW:['岸田平','岸田沙織','岸田博己','三好智依','牧田亮介','畑智之','森下達哉'],
   denied:[],
+  // ケータイの メンテナンス は企画制作部の人だけ（11/10 iller）。LINE WORKS の本人名を名簿（staff.dept）に当てる。本人が分からない端末（PC の細い窓など）は通す
+  INV_PHONE_DEPT:'企画制作部', _invPh:null,
+  invPhoneOk(){ const u=window.__woffUser; if(!u||!u.name) return true; return this._invPh===true; },
+  applyInvPhone(){ const c=document.querySelector('.portal-card[data-app="inv"]'); if(c) c.classList.toggle('ph-deny', !this.invPhoneOk()); },
+  checkInvPhone(){ const u=window.__woffUser; if(!u||!u.name){ this.applyInvPhone(); return; }
+    const nz=x=>String(x||'').normalize('NFKC').replace(/[\s\u3000]/g,'').replace(/﨑/g,'崎').replace(/髙/g,'高').replace(/濵/g,'浜'); const me=nz(u.name);
+    try{ const c=String(localStorage.getItem('inv_ph')||'').split('|'); if(c[0]===me) this._invPh=(c[1]==='1'); }catch(e){}   // 前回の答えで先に出す
+    this.applyInvPhone();
+    fetch(API+'?dept=qual&action=staff').then(r=>r.json()).then(j=>{ if(!j||!j.success)return; const row=(j.data||[]).find(x=>nz(x.name)===me); this._invPh=!!(row&&String(row.dept||'').trim()===this.INV_PHONE_DEPT); try{ localStorage.setItem('inv_ph',me+'|'+(this._invPh?'1':'0')); }catch(e){} this.applyInvPhone(); }).catch(()=>{}); },
   setWoffDenied(){ const u=window.__woffUser; if(!u||!u.name){ this.denied=[]; return; } const n=String(u.name).replace(/\s|　/g,''); this.denied=this.CASES_WOFF_ALLOW.indexOf(n)>=0?[]:['cases']; },
   PHONE_KEYS:['daily','ot','prod','proj','poreq','alcohol','forklift','inv'],   // ケータイ（幅 480 以下）で出す画面＝日報・時間外・生産・企画制作・発注依頼・アルコールチェック・リフト点検（10/28 iller）
   isPhone(){ return window.matchMedia('(max-width:480px)').matches; },
-  _allowed(key){ if(key==='portal')return true; if(this.denied.indexOf(key)>=0)return false; if(this.isPhone()&&this.mode!=='kiosk'&&this.PHONE_KEYS.indexOf(key)<0)return false; const r=this.reg(key); if(this.mode==='kiosk') return !!(r&&r.kiosk); return !r||!r.zone||this.allowedZones().indexOf(r.zone)>=0; },
+  _allowed(key){ if(key==='portal')return true; if(this.denied.indexOf(key)>=0)return false; if(this.isPhone()&&this.mode!=='kiosk'&&this.PHONE_KEYS.indexOf(key)<0)return false; if(key==='inv'&&this.isPhone()&&this.mode!=='kiosk'&&!this.invPhoneOk())return false; const r=this.reg(key); if(this.mode==='kiosk') return !!(r&&r.kiosk); return !r||!r.zone||this.allowedZones().indexOf(r.zone)>=0; },
   applyMode(){ const kiosk=this.mode==='kiosk', allow=this.allowedZones(); document.querySelectorAll('[data-zone]').forEach(b=>{ const show=kiosk?b.hasAttribute('data-kiosk'):allow.indexOf(b.getAttribute('data-zone'))>=0; b.classList.toggle('hidden',!show); }); this.denied.forEach(k=>{ const r=this.reg(k); if(!r)return; [$(r.nav), document.querySelector('.portal-card[data-app="'+k+'"]')].forEach(el=>{ if(el) el.classList.add('hidden'); }); }); document.querySelectorAll('.pm-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-m')===this.mode));
     const pg=document.querySelector('.portal-grid'); if(pg) pg.classList.toggle('mode-floor',this.mode==='floor'); // 現場モードだけ現場アイコンを使用頻度順に
     const inner=document.querySelector('.hdr-inner'); if(inner){ const kids=[...inner.children]; kids.forEach((el,i)=>{ if(!el.classList.contains('nav-div'))return; let has=false; for(let j=i+1;j<kids.length;j++){ const k=kids[j]; if(k.classList.contains('nav-div')||k.classList.contains('nav-spacer')||k.id==='refreshBtn')break; if(k.classList.contains('nav-link')&&!k.classList.contains('hidden')){has=true;break;} } el.classList.toggle('hidden',!has); }); } },
@@ -11728,6 +11737,7 @@ window.addEventListener('load', async ()=>{
   // LINE WORKS（WOFF）内＝スマホ個人利用なので端末モードは常にフル（ポータルのモード切替も出さない）
   if(document.documentElement.classList.contains('in-woff')) App.mode='full';
   App.setWoffDenied();   // WOFF の本人名で、案件を見られない人を決める
+  App.checkInvPhone();   // ケータイの メンテナンス は企画制作部だけ
   App.injectZones();
   App.injectNavIcons();
   App.applyMode();
