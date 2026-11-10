@@ -2598,15 +2598,28 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
 #v_gantt .days>div.today .dm{display:block;background:var(--accent-dim);color:var(--accent);padding:0 5px;line-height:19px}
 #v_gantt .days>div.mstart,#v_gantt .bg>div.mstart{border-left:1px solid var(--border)}
 @media(max-width:480px),(orientation:portrait) and (pointer:coarse){#v_gantt .days .dm{min-width:0;padding:0 2px;font-size:12px}}
+.mt-cards,.ph-t{display:none}
 /* ===== ケータイ（幅 480 以下、10/28 iller「ケータイで見るのに情報量多すぎ」）：出すのは 日報・時間外・生産（工場ボード）・企画制作（ボード）・発注依頼・アルコールチェック・リフト点検 の 7 つ。入口は LINE WORKS のリッチメニュー（日報・フルメニュー・時間外・生産部・アルコールチェック・企画制作部）。タブレット（480 より広い）は今まで通り ===== */
 @media(max-width:480px){
-  .portal-card:not([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift]){display:none!important}
-  .portal-grp:not(:has(.portal-card:is([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift]))){display:none!important}
+  .portal-card:not([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift],[data-app=inv]){display:none!important}
+  .portal-grp:not(:has(.portal-card:is([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift],[data-app=inv]))){display:none!important}
   #navCases,#navSales,#navPo,#navWb,#navCard,#navLabor,#navInv,#navVeh,#navQual{display:none!important}
   .nav-dd:has(#navLabor){display:none!important}
   #prodTabs .sub-tab[data-view=archive],#prodTabs .sub-tab[data-view=fabric],#prodTabs .staff-btn,#prodTabs .mny-btn,#prodTabs .slog-btn{display:none!important}
   #projTabs .sub-tab[data-view=gantt],#projTabs .sub-tab[data-view=projDone],#projTabs .mny-btn,#projTabs .slog-btn{display:none!important}
   #otTabs .sub-tab:nth-of-type(2){display:none!important}
+  /* 在庫はケータイではメンテだけ（11/10 iller「メンテが済んだらそれを記録するだけ」）＝帯・件数・表を隠して札と「済み」 */
+  #view-inv #invTabs,#view-inv #maintChips,#view-inv #maintChips+.fv-flt-mb,#view-inv #v_maint .tbl-wrap{display:none!important}
+  .ph-t{display:inline}.pc-t{display:none}
+  #view-inv .mt-cards{display:block;background:var(--surface);border-radius:14px;overflow:hidden}
+  .mt-card{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--border-light)}
+  .mt-card:last-child{border-bottom:none}
+  .mt-card .mt-b{flex:1;min-width:0}
+  .mt-card .mt-n{font-size:16px;color:var(--text);line-height:1.35}
+  .mt-card .mt-s{font-size:13px;color:var(--text-faint);margin-top:2px}
+  .mt-card button{flex:0 0 auto;border:none;border-radius:10px;padding:9px 16px;font:500 15px/1 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--accent-dim);color:var(--accent);cursor:pointer}
+  .mt-empty{padding:28px 14px;text-align:center;color:var(--text-faint);font-size:15px}
+  body:has(#maintDoneBg.show) #phoneTab{display:none!important}   /* 済みの窓の間は下のナビを引っ込める（キャンセルに重なる） */
   #prodTabs,#projTabs,#otTabs{display:none!important}   /* 10/29 iller「この『ボード』とか『工場ボード』いらないだろ」＝タブが 1 つしか残らないので帯ごと消す（resetSubTab が data-view を押す） */
   #view-daily .date-nav{flex-wrap:nowrap;gap:6px}#view-daily .date-nav button{padding:8px 8px;font-size:12px;white-space:nowrap;flex:0 0 auto}#view-daily .date-nav input[type=date]{flex:1 1 0;min-width:0;padding:7px 6px;font-size:16px}#view-daily .date-nav .date-label{display:none}   /* 10/29 日付の行を 1 行に（年月日の文字は日付の欄と二重なので消す） */
   /* ===== iOS 26 風（10/29 iller「それでいこう」）：下に浮いたナビ、大見出し＋灰の 1 行、札は 1 つの塊に細い線、ポータルの右に状態 ===== */
@@ -3467,7 +3480,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 
 <!-- ===== 在庫 section ===== -->
 <section id="view-inv" class="hidden">
-  <div class="scr-head"><h1>在庫管理</h1><input class="scr-search" id="invPcSearch" placeholder="品名・現場で検索"></div>
+  <div class="scr-head"><h1><span class="pc-t">在庫管理</span><span class="ph-t">メンテナンス</span></h1><input class="scr-search" id="invPcSearch" placeholder="品名・現場で検索"></div>
   <div class="sub-tabs" id="invTabs">
     <button class="sub-tab on" data-tab="gantt" onclick="Inv.switchTab('gantt')">在庫</button>
     <button class="sub-tab" data-tab="rentals" onclick="Inv.switchTab('rentals')">貸出/予約</button>
@@ -3509,6 +3522,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <!-- メンテ -->
     <div id="v_maint" class="hidden">
       <div class="fv-sum" id="maintChips"></div>
+      <div class="mt-cards" id="maintCards"></div>
       <div class="tbl-wrap">
         <table>
           <thead><tr><th class="rs-th" data-col="status" onclick="Inv.sortRentals('status')">ステータス <span class="arrow rs-arrow" data-col="status"></span></th><th class="rs-th" data-col="category" onclick="Inv.sortRentals('category')">カテゴリ <span class="arrow rs-arrow" data-col="category"></span></th><th class="rs-th" data-col="item_name" onclick="Inv.sortRentals('item_name')">商品名 <span class="arrow rs-arrow" data-col="item_name"></span></th><th class="rs-th" data-col="qty" onclick="Inv.sortRentals('qty')">数量 <span class="arrow rs-arrow" data-col="qty"></span></th><th class="rs-th" data-col="date_start" onclick="Inv.sortRentals('date_start')">開始日 <span class="arrow rs-arrow" data-col="date_start"></span></th><th class="rs-th" data-col="date_end" onclick="Inv.sortRentals('date_end')">終了日 <span class="arrow rs-arrow" data-col="date_end"></span></th><th class="rs-th" data-col="client_name" onclick="Inv.sortRentals('client_name')">案件/顧客 <span class="arrow rs-arrow" data-col="client_name"></span></th><th>備考</th><th>操作</th></tr></thead>
@@ -3591,6 +3605,20 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
   </div>
 
   <!-- 分けるモーダル：1行のうち N 個だけ別の状態にする（検品で 20 返却・2 メンテ・1 廃棄、のように割る） -->
+  <div class="mo-bg" id="maintDoneBg">
+    <div class="mo" style="max-width:420px">
+      <h3>メンテ済み</h3>
+      <input type="hidden" id="md_id">
+      <div id="md_info" style="font-size:15px;color:var(--text);margin-bottom:12px;line-height:1.6"></div>
+      <div class="mo-row">
+        <div class="mo-field"><label>数量</label><input id="md_qty" type="number" inputmode="numeric" min="1" value="1"></div>
+      </div>
+      <div class="mo-foot">
+        <button class="cancel" onclick="Inv.closeMaintDone()">キャンセル</button>
+        <button class="save" onclick="Inv.doMaintDone()">済み</button>
+      </div>
+    </div>
+  </div>
   <div class="mo-bg" id="splitMoBg">
     <div class="mo" style="max-width:480px">
       <h3>分割</h3>
@@ -4009,7 +4037,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       </div></div>
       <div class="portal-grp"><div class="portal-cap">台帳</div><div class="portal-rows">
         <a class="portal-card" data-app="labor" onclick="App.nav('labor')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M10 20V5M16 20V14"/><path d="M2.5 20.5h19"/></svg></div><div class="portal-card-body"><div class="portal-card-title">工数管理</div></div></a>
-        <a class="portal-card" data-app="inv" onclick="App.nav('inv')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div><div class="portal-card-body"><div class="portal-card-title">在庫管理</div></div></a>
+        <a class="portal-card" data-app="inv" onclick="App.nav('inv')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg></div><div class="portal-card-body"><div class="portal-card-title"><span class="pc-t">在庫管理</span><span class="ph-t">メンテナンス</span></div></div></a>
         <a class="portal-card" data-app="veh" onclick="App.nav('veh')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l2-5h12l2 5"/><rect x="2" y="13" width="20" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.5"/><circle cx="17" cy="18.5" r="1.5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">車両管理</div></div></a>
         <a class="portal-card" data-app="qual" onclick="App.nav('qual')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M9 13.5L7.5 21l4.5-2.5L16.5 21 15 13.5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">資格台帳</div></div></a>
       </div></div>
@@ -4826,8 +4854,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-10 16:56';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1412;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-10 17:03';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1413;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -7154,6 +7182,7 @@ const Inv = (function(){
     }
     if(maintStatusFilter)f=f.filter(r=>r.status===maintStatusFilter);
     f=applyRentalSort(f);updateRentalSortArrows();
+    {const mc=$('maintCards');if(mc)mc.innerHTML=f.length?f.map(r=>`<div class="mt-card"><div class="mt-b"><div class="mt-n">${esc(r.item_name)} × ${r.qty}</div><div class="mt-s">${esc(r.client_name||'')}</div></div><button type="button" onclick="Inv.maintDone('${r.id}')">済み</button></div>`).join(''):'<div class="mt-empty">メンテ中の商品はありません</div>';}   // ケータイの札（11/10 iller「メンテが済んだらそれを記録するだけ」）
     const tb=$('maint_tbody');
     if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">メンテ中の商品はありません</td></tr>';return}
     tb.innerHTML=f.map(r=>`<tr>
@@ -7308,6 +7337,21 @@ const Inv = (function(){
     setTimeout(()=>{$('xf_sp_qty').focus();$('xf_sp_qty').select()},50);
   }
   function closeSplitMo(){$('splitMoBg').classList.remove('show')}
+  function maintDone(id){
+    const r=rentals.find(x=>x.id===id);if(!r)return;
+    if(String(id).startsWith('tmp_')){toast('保存中です。しばらくしてから操作してください',false);return}
+    $('md_id').value=id;
+    $('md_info').innerHTML=`${esc(r.item_name)} × ${r.qty}<br><span style="color:var(--text-faint);font-size:13px">${esc(r.client_name||'')}</span>`;
+    const q=$('md_qty');q.value=Number(r.qty)||1;q.max=Number(r.qty)||1;
+    $('maintDoneBg').classList.add('show');
+  }
+  function closeMaintDone(){$('maintDoneBg').classList.remove('show')}
+  function doMaintDone(){
+    if(_busySplit)return;
+    const n=parseInt($('md_qty').value,10);if(!n||n<1){toast('個数を入力してください',false);return}
+    $('xf_sp_id').value=$('md_id').value;$('xf_sp_qty').value=$('md_qty').value;$('xf_sp_status').value='返却済';
+    closeMaintDone();doSplit();
+  }
   function doSplit(){
     if(_busySplit)return;
     const id=$('xf_sp_id').value;const r=rentals.find(x=>x.id===id);if(!r){closeSplitMo();return}
@@ -7464,7 +7508,7 @@ const Inv = (function(){
     switchTab,
     openSlog, closeSlog, clearSlog,
     sortItems, openItemMo, closeItemMo, editItem, saveItem, deleteItem,
-    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental, toDiscardList, unDiscard, renderDiscard, openSplit, closeSplitMo, doSplit,
+    renderRentals, openRentalMo, closeRentalMo, editRental, saveRental, deleteRental, discardRental, toDiscardList, unDiscard, renderDiscard, openSplit, closeSplitMo, doSplit, maintDone, closeMaintDone, doMaintDone,
     populateItemSelect, onProjectSelect, renderGantt, ganttMove, ganttToday, setGanttCat, ganttPick, renderMaint,
     setItemCatFilter, setMaintFilter, setRentalFilter, sortRentals,
     unifiedSearch
@@ -9711,8 +9755,8 @@ function resetSubTab(name){
   if(!tabsId)return;
   const container=document.getElementById(tabsId);
   if(!container)return;
-  const phoneDef={prod:'factory',proj:'board'}[name];   // ケータイは帯ごと隠すので、押す物を決め打ち（10/29）
-  const first=[...container.querySelectorAll('.sub-tab')].find(b=>b.offsetParent!==null)||(App.isPhone()&&phoneDef&&container.querySelector('.sub-tab[data-view='+phoneDef+']'))||container.querySelector('.sub-tab');   // 隠れているタブは飛ばす（ケータイ 10/28）
+  const phoneDef={prod:'factory',proj:'board',inv:'maint'}[name];   // ケータイは帯ごと隠すので、押す物を決め打ち（10/29）
+  const first=[...container.querySelectorAll('.sub-tab')].find(b=>b.offsetParent!==null)||(App.isPhone()&&phoneDef&&container.querySelector('.sub-tab[data-view='+phoneDef+'],.sub-tab[data-tab='+phoneDef+']'))||container.querySelector('.sub-tab');   // 隠れているタブは飛ばす（ケータイ 10/28）
   if(first)first.click();
 }
 
@@ -11545,7 +11589,7 @@ const App = {
   CASES_WOFF_ALLOW:['岸田平','岸田沙織','岸田博己','三好智依','牧田亮介','畑智之','森下達哉'],
   denied:[],
   setWoffDenied(){ const u=window.__woffUser; if(!u||!u.name){ this.denied=[]; return; } const n=String(u.name).replace(/\s|　/g,''); this.denied=this.CASES_WOFF_ALLOW.indexOf(n)>=0?[]:['cases']; },
-  PHONE_KEYS:['daily','ot','prod','proj','poreq','alcohol','forklift'],   // ケータイ（幅 480 以下）で出す画面＝日報・時間外・生産・企画制作・発注依頼・アルコールチェック・リフト点検（10/28 iller）
+  PHONE_KEYS:['daily','ot','prod','proj','poreq','alcohol','forklift','inv'],   // ケータイ（幅 480 以下）で出す画面＝日報・時間外・生産・企画制作・発注依頼・アルコールチェック・リフト点検（10/28 iller）
   isPhone(){ return window.matchMedia('(max-width:480px)').matches; },
   _allowed(key){ if(key==='portal')return true; if(this.denied.indexOf(key)>=0)return false; if(this.isPhone()&&this.mode!=='kiosk'&&this.PHONE_KEYS.indexOf(key)<0)return false; const r=this.reg(key); if(this.mode==='kiosk') return !!(r&&r.kiosk); return !r||!r.zone||this.allowedZones().indexOf(r.zone)>=0; },
   applyMode(){ const kiosk=this.mode==='kiosk', allow=this.allowedZones(); document.querySelectorAll('[data-zone]').forEach(b=>{ const show=kiosk?b.hasAttribute('data-kiosk'):allow.indexOf(b.getAttribute('data-zone'))>=0; b.classList.toggle('hidden',!show); }); this.denied.forEach(k=>{ const r=this.reg(k); if(!r)return; [$(r.nav), document.querySelector('.portal-card[data-app="'+k+'"]')].forEach(el=>{ if(el) el.classList.add('hidden'); }); }); document.querySelectorAll('.pm-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-m')===this.mode));
