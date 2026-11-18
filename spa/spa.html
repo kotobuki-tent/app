@@ -3908,6 +3908,10 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
         <!-- 入力フォーム -->
         <div id="addForm" class="add-form hidden">
           <div class="af-field">
+            <label>案件を検索</label>
+            <input type="search" id="afProjQ" oninput="Daily.onAfProjQ()" autocomplete="off">
+          </div>
+          <div class="af-field">
             <label>案件</label>
             <select id="afProj" onchange="Daily.onAfProjChange()"><option value="">選択</option></select>
           </div>
@@ -4856,8 +4860,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-16 14:53';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1420;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-18 15:23';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1421;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -8848,10 +8852,27 @@ const Daily = (function(){
     if(myDept==='企画制作部')h+=projGroup()+prodGroup();else h+=prodGroup()+projGroup();
     h+=salesGroup();
     if(caseProjects.length){h+='<optgroup label="見積中の案件">';caseProjects.slice().sort((a,b)=>a.project.localeCompare(b.project,'ja')).forEach(p=>{h+=`<option value="case:${esc(p.id)}">${esc(p.order_no?'#'+p.order_no+' ':'')}${esc(p.project)}</option>`});h+='</optgroup>'}   // 見積中は明細が無い＝案件そのものを選ぶ（2026-10-22 iller：見積の時間も案件の原価に）
+    afProjAllHtml=h;
+    applyAfProjQ();
+  }
+  // 案件の検索（2026-11-18 現場から「日報の案件を検索したい」）：上の欄の文字で、選択欄の中身そのものを当てはまる物だけに作り直す。
+  // option を隠すだけだと iPhone の回転式の選択では消えないので、作り直す。ひらがな／カタカナ・全角／半角・大文字／小文字は区別しない。
+  let afProjAllHtml='';
+  const afNorm=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)).replace(/\s+/g,'');
+  function applyAfProjQ(){
+    const sel=$('afProj');if(!sel)return;
     const cur=sel.value;   // 裏の取り直し（App.softRefresh→loadAll→render）で一覧を作り直しても、選んでいる案件を消さない（2026-10-14 生産部「選んだ案件が消える」）
-    sel.innerHTML=h;
+    sel.innerHTML=afProjAllHtml;
+    const q=afNorm(($('afProjQ')||{}).value);
+    if(q){
+      sel.querySelectorAll('optgroup').forEach(g=>{
+        g.querySelectorAll('option').forEach(o=>{if(o.value!==cur&&!afNorm(o.textContent).includes(q))o.remove()});
+        if(!g.querySelector('option'))g.remove();
+      });
+    }
     if(cur&&Array.from(sel.options).some(o=>o.value===cur))sel.value=cur;
   }
+  function onAfProjQ(){applyAfProjQ()}
   function buildAfWorkOptions(projType){
     const sel=$('afWork');
     if(!projType){sel.innerHTML='<option value="">先に案件を選ぶ</option>';sel.disabled=true;return}
@@ -8881,6 +8902,7 @@ const Daily = (function(){
     editingId=null;
     $('addForm').classList.remove('hidden');$('openAddBtn').classList.add('hidden');
     const saveBtn=$('writeView').querySelector('.af-save');if(saveBtn)saveBtn.textContent='追加';
+    if($('afProjQ').value){$('afProjQ').value='';applyAfProjQ()}
     $('afProj').value='';$('afProjCustom').value='';$('afProjCustomWrap').classList.add('hidden');
     buildAfWorkOptions(null);$('afWork').value='';$('afWorkCustom').value='';$('afWorkCustomWrap').classList.add('hidden');
     $('afMinutes').value='';
@@ -8892,6 +8914,7 @@ const Daily = (function(){
     editingId=id;
     $('addForm').classList.remove('hidden');$('openAddBtn').classList.add('hidden');
     const saveBtn=$('writeView').querySelector('.af-save');if(saveBtn)saveBtn.textContent='保存';
+    if($('afProjQ').value){$('afProjQ').value='';applyAfProjQ()}   // 絞ったままだと直す記録の案件が一覧に無いことがある
     if(entry.project_type==='other'){$('afProj').value='other';$('afProjCustomWrap').classList.remove('hidden');$('afProjCustom').value=entry.project_name||'';buildAfWorkOptions('other')}
     else{const prefix=entry.project_type==='production'?'prod':entry.project_type==='sales'?'sale':entry.project_type==='case'?'case':'proj';$('afProj').value=`${prefix}:${entry.project_id}`;$('afProjCustomWrap').classList.add('hidden');$('afProjCustom').value='';buildAfWorkOptions(prefix)}
     const work=entry.work||entry.action||'';const sel=$('afWork');
@@ -9066,7 +9089,7 @@ const Daily = (function(){
     todayState:()=>{ const w=(function(){try{return localStorage.getItem('daily_who')||''}catch(e){return ''}})(); if(!w)return ''; const d=new Date(), ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); return allReports.some(r=>String(r.employee_no)===String(w)&&String(r.date)===ds)?'記入済':'未記入'; },   // ポータルの右（10/29）
     loadAll, init,
     onWhoChange, onWriteDateChange, setWriteDateToday,
-    onAfProjChange, onAfWorkChange, openAddForm, closeAddForm,
+    onAfProjChange, onAfProjQ, onAfWorkChange, openAddForm, closeAddForm,
     editEntry, addOneEntry, delEntry,
     viewDateMove, viewDateToday, loadViewDate,
     markAbsent, unmarkAbsent, gotoEditFromView, unifiedSearch
