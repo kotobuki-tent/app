@@ -4885,8 +4885,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-19 13:32';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1424;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-19 14:05';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1425;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10793,7 +10793,8 @@ const Po = (function(){
     const person=e.person; if(!person){ toast('記入者を選択してください',true); return null; }
     const vendor=e.vendor.trim(); if(!vendor){ toast('仕入先を入力してください',true); return null; }
     const rows=e.items.filter(it=>String(it.name||'').trim()); if(!rows.length){ toast('品名を入力してください',true); return null; }
-    const cv=e.caseText.trim(); const cs=cv?caseOf(cv):null;   // 候補に無い文字はそのまま案件名（紐づけ無し）
+    const cv=e.caseText.trim(); if(!cv){ toast('案件を入力してください',true); return null; }   // 必須（11/19 発注の決まり：受注番号を必ず。在庫は「在庫」と書けば通る）
+    const cs=caseOf(cv);   // 候補に無い文字はそのまま案件名（紐づけ無し）
     const sender=String(e.sender||'').trim();
     return {dept:'po',action:'save',person,vendor,items:rows.map(it=>({name:it.name.trim(),qty:it.qty,unit:it.unit,price:it.price})),deadline:e.asap?'最短':(e.deadline||''),deliver_to:e.deliv==='別途'?e.deliver_to.trim():'弊社',note:e.note.trim(),case_id:cs?cs.id:'',case_name:cs?dispName(cs.client,cs.name):cv,order_no:cs?(cs.order_no||''):'',kind:'材料',sender}; }
   function eApply(p,body){ Object.assign(p,{person:body.person,vendor:body.vendor,items:body.items,deadline:body.deadline,deliver_to:body.deliver_to,note:body.note,case_id:body.case_id,case_name:body.case_name,order_no:body.order_no,sender:body.sender}); }
