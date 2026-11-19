@@ -4885,8 +4885,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-18 15:49';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1423;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-19 13:32';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1424;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -4931,6 +4931,17 @@ const DataCache=(function(){
     if(!_retok){ _retok=(async()=>{ try{ if(window.woff&&woff.isInClient&&woff.isInClient()){ const t=woff.getAccessToken(); if(t&&t!==window.__woffToken){ window.__woffToken=t; return true; } } }catch(e){} return false; })().finally(()=>{ setTimeout(()=>{_retok=null},5000); }); }
     return _retok;
   }
+  function reloadForTok(){
+    try{
+      if(!(window.woff&&woff.isInClient&&woff.isInClient()))return false;
+      const a=document.activeElement; if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return false;
+      if(document.querySelector('.mo-bg.show'))return false;
+      const last=Number(localStorage.getItem('tok_reload')||0); if(Date.now()-last<180000)return false;
+      localStorage.setItem('tok_reload',String(Date.now()));
+      if(!window.__tokReloading){ window.__tokReloading=true; location.reload(); }
+      return true;
+    }catch(e){ return false; }
+  }
   function decorate(u,o){
     const tok=window.__woffToken||''; let key=''; try{ key=localStorage.getItem('api_key')||''; }catch(e){}
     const mode=(typeof App!=='undefined'&&App.mode)||''; const c=cid+'-'+mode;
@@ -4956,6 +4967,9 @@ const DataCache=(function(){
           const txt=await res.clone().text(); const j=JSON.parse(txt);
           if(j&&j.success===false&&j.error==='auth'){
             if(j.reason==='expired'&&!retried&&await refreshTok()) return go(true);
+            // getAccessToken は古い札を返すだけで取り直しにならない（11/19）。LINE WORKS の中で期限切れなら、案内を出さずに 1 回だけ黙って読み直す
+            // （読み直すと woff.init が新しい札をもらう）。入力中・窓が開いている時と、3 分以内に読み直したばかりの時は今までどおり案内
+            if(j.reason==='expired'&&reloadForTok()) return res;
             DataCache.clear();
             gate(j.reason==='expired'?'expired':'none');
           }else if(ck&&!(j&&j.success===false)) DataCache.put(ck,txt);
