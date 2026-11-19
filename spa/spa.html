@@ -2619,8 +2619,8 @@ body:has(#view-portal:not(.hidden)) #refreshBtn{visibility:hidden}   /* ポー�
 .mt-cards,.ph-t{display:none}
 /* ===== ケータイ（幅 480 以下、10/28 iller「ケータイで見るのに情報量多すぎ」）：出すのは 日報・時間外・生産（工場ボード）・企画制作（ボード）・発注依頼・アルコールチェック・リフト点検 の 7 つ。入口は LINE WORKS のリッチメニュー（日報・フルメニュー・時間外・生産部・アルコールチェック・企画制作部）。タブレット（480 より広い）は今まで通り ===== */
 @media(max-width:480px){
-  .portal-card:not([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift],[data-app=inv]:not(.ph-deny)){display:none!important}
-  .portal-grp:not(:has(.portal-card:is([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=alcohol],[data-app=forklift],[data-app=inv]:not(.ph-deny)))){display:none!important}
+  .portal-card:not([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=claim],[data-app=alcohol],[data-app=forklift],[data-app=inv]:not(.ph-deny)){display:none!important}
+  .portal-grp:not(:has(.portal-card:is([data-app=daily],[data-app=ot],[data-app=prod],[data-app=proj],[data-app=poreq],[data-app=claim],[data-app=alcohol],[data-app=forklift],[data-app=inv]:not(.ph-deny)))){display:none!important}
   #navCases,#navSales,#navPo,#navWb,#navCard,#navLabor,#navInv,#navVeh,#navQual{display:none!important}
   .nav-dd:has(#navLabor){display:none!important}
   #prodTabs .sub-tab[data-view=archive],#prodTabs .sub-tab[data-view=fabric],#prodTabs .staff-btn,#prodTabs .mny-btn,#prodTabs .slog-btn{display:none!important}
@@ -2712,6 +2712,45 @@ input[type=checkbox].sw::after{content:'';position:absolute;top:2px;left:2px;wid
 input[type=checkbox].sw:checked{background:#34c759}
 input[type=checkbox].sw:checked::after{transform:translateX(16px)}
 input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
+/* クレーム（2026-11-19） */
+.cl-wrap{max-width:900px;margin:0 auto;padding:0 16px 120px}
+.cl-bar{display:flex;justify-content:flex-end;margin:4px 0 10px}
+.cl-new{background:var(--accent-dim);color:var(--accent);border:none;border-radius:8px;padding:10px 16px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
+.cl-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.cl-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.cl-card{background:var(--surface);border:1px solid var(--border-light);border-radius:12px;padding:12px 14px;cursor:pointer}
+.cl-card:hover{border-color:var(--border)}
+.cl-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;margin-bottom:4px}
+.cl-date{color:var(--text-dim)}
+.cl-client{font-weight:500}
+.cl-kind{background:var(--surface3);color:var(--text-dim);border-radius:999px;padding:3px 9px;font-size:12px}
+.cl-st{border-radius:999px;padding:3px 9px;font-size:12px;margin-left:auto}
+.cl-st.st-a{background:var(--orange-dim);color:var(--orange)}
+.cl-st.st-b{background:var(--accent-dim);color:var(--accent)}
+.cl-st.st-c{background:var(--green-dim);color:var(--green)}
+.cl-body{font-size:14px;line-height:1.55;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cl-sub{font-size:12px;color:var(--text-dim);margin-top:6px}
+.cl-late{color:var(--red)}
+.cl-empty{color:var(--text-dim);padding:30px 0;text-align:center}
+.cl-sec{border-top:1px solid var(--border-light);margin-top:16px;padding-top:12px}
+.cl-sec-hd{font-size:12px;font-weight:500;color:var(--text-dim);margin-bottom:8px}
+.cl-photos{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.cl-ph{position:relative;width:96px;height:96px;border-radius:8px;overflow:hidden;background:var(--surface3)}
+.cl-ph img{width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+.cl-ph button{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,.45);color:#fff;font-size:12px;cursor:pointer}
+.cl-add{display:inline-block;background:var(--accent-dim);color:var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer}
+.cl-note{background:var(--surface2);border-radius:8px;padding:8px 10px;margin-bottom:6px}
+.cl-note-h{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim)}
+.cl-note-h .act-btn{margin-left:auto;color:var(--text-faint)}
+.cl-note-t{font-size:14px;line-height:1.55;white-space:pre-wrap;margin-top:2px}
+.cl-note-new textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font:400 14px/1.4 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2)}
+.cl-note-row{display:flex;gap:8px;margin-top:6px}
+.cl-note-row select{flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);font-size:14px}
+.cl-note-btn{background:var(--accent-dim);color:var(--accent);border:none;border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer}
+#claimZoom{align-items:center;padding:16px}
+#claimZoom img{max-width:100%;max-height:92vh;border-radius:8px}
+#claimBg .mo-foot .left{margin-right:auto}
+@media(max-width:480px){ .cl-wrap{padding:0 12px 120px} .cl-ph{width:84px;height:84px} #view-claim .scr-search,#view-claim .cl-chips{display:none} }   /* ケータイは検索・タブの帯なし（10/29 の決まり） */
 </style>
 </head>
 <body>
@@ -2727,6 +2766,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
       <button class="nav-link" id="navProj" onclick="App.nav('proj')">企画制作</button>
       <button class="nav-link" id="navSales" onclick="App.nav('sales')">販売</button>
       <button class="nav-link" id="navPoReq" onclick="App.nav('poreq')">発注依頼</button>
+      <button class="nav-link" id="navClaim" onclick="App.nav('claim')">不適合</button>
       </div>
     </div>
     <button class="nav-link home-link on" id="navHome" onclick="App.nav('portal')"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</button>
@@ -4059,6 +4099,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
         <a class="portal-card" data-app="sales" onclick="App.nav('sales')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l7-7h7v7l-7 7z"/><circle cx="14.5" cy="9.5" r="1.3"/></svg></div><div class="portal-card-body"><div class="portal-card-title">販売管理</div></div></a>
         <a class="portal-card" data-app="poreq" onclick="App.nav('poreq')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 11v6M9 14h6"/></svg></div><div class="portal-card-body"><div class="portal-card-title">発注依頼</div></div><span class="portal-st hidden" data-st="poreq"></span></a>
         <a class="portal-card" data-app="po" onclick="App.nav('po')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">発注</div></div></a>
+        <a class="portal-card" data-app="claim" onclick="App.nav('claim')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 16.5h-19z"/><path d="M12 10v4"/><path d="M12 17.2v.1"/></svg></div><div class="portal-card-body"><div class="portal-card-title">不適合</div></div></a>
       </div></div>
       <div class="portal-grp"><div class="portal-cap">毎日</div><div class="portal-rows">
         <a class="portal-card" data-app="daily" onclick="App.nav('daily')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">日報</div></div><span class="portal-st hidden" data-st="daily"></span></a>
@@ -4101,6 +4142,13 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 </section>
 <!-- 発注書のモーダル（発注・発注依頼の両方から開く。section の外＝どちらの画面でも見える） -->
 <div class="mo-bg" id="findBg" onclick="if(event.target===this)Find.close()"><div class="mo find-mo"><input id="findInp" type="search" placeholder="案件名・得意先・番号" autocomplete="off" oninput="Find.input(this.value)" onkeydown="Find.key(event)"><div id="findList"></div></div></div>
+<!-- クレーム（2026-11-19）：全員で書いて考える -->
+<section id="view-claim" class="hidden">
+  <div class="scr-head"><h1>不適合</h1><input class="scr-search" id="claimSearch" placeholder="お客様・内容で検索" oninput="Claim.search(this.value)"></div>
+  <div class="cl-wrap"><div id="claimBody"><div class="cl-empty">読み込み中...</div></div></div>
+</section>
+<div class="mo-bg" id="claimBg"><div class="mo" style="max-width:720px"><h2 id="claimTitle">不適合</h2><div id="claimEdit"></div></div></div>
+<div class="mo-bg" id="claimZoom" onclick="this.classList.remove('show')"><img alt=""></div>
 <div class="mo-bg" id="poEditBg"><div class="mo" style="max-width:760px"><h2 id="poe_title">発注書</h2><div id="poEditBody"></div></div></div>
 
 <!-- ===== 予定ボード（ホワイトボード） section ===== -->
@@ -4885,8 +4933,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-19 14:05';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1425;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-19 15:19';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1426;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10893,6 +10941,157 @@ const PoReq = (function(){
 })();
 window.Po=Po;   // 発注書の別窓（window.opener）から markSent を呼ぶため。const は window に乗らない（2026-10-20）
 
+/* クレーム（2026-11-19 iller「クレーム案件を共有してみんなで考えて今後に活かす」「エクセルじゃなくてそのページで追加していきたい」）。
+   誰でも書く → 意見を足す → 対策（担当・期限）を決める → 対策済み（何をしたか）。誰がやったかは記録しない（報告者だけ）。
+   GAS dept=claim（Code.gs v150）。id は端末が作る（K…／N…）ので楽観更新の後の突き合わせは要らない。写真は端末で縮めて Drive へ。 */
+const Claim=(function(){
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const $=id=>document.getElementById(id);
+  const KINDS=['溶着・縫製','外注','図面・仕様','出荷・付属品','施工','怪我・事故','レンタル・検品','その他'];   // 11/19 iller「クレームというか不適合が出た案件すべて。現場での施工不良だったり怪我だったりも」
+  const STS=['考え中','対策決定','対策済み'];
+  const STC={'考え中':'st-a','対策決定':'st-b','対策済み':'st-c'};
+  let _list=[], _notes=[], _staff=[], _cases=[], _kind='', _st='', _busy=false, _edit=null;
+  const _pend={}, _pendN={}, _photo={}, _local={};   // _pend：保存したばかりの件（サーバに出るまで手元を優先）／_local：送ったばかりの写真（dataURL）
+  const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const today=()=>dateStr(new Date());
+  const md=v=>{ const m=String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})/); return m?`${+m[1]}/${+m[2]}/${+m[3]}`:esc(v); };
+  const md2=v=>{ const m=String(v||'').match(/^\d{4}-(\d{2})-(\d{2})/); return m?`${+m[1]}/${+m[2]}`:''; };
+  const norm=s=>String(s||'').replace(/[\s　]/g,'');
+  function me(){ let n=''; try{ n=localStorage.getItem('claim_me')||''; }catch(e){} const w=window.__woffUser&&window.__woffUser.name; if(w){ const hit=_staff.find(x=>norm(x)===norm(w)); if(hit) return hit; } return n; }
+  function keepMe(n){ try{ if(n) localStorage.setItem('claim_me',n); }catch(e){} }
+  function send(body){ Pending.touch(); fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)}); }
+  function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>{_busy=false},1500); return false; }
+  const live=()=>_cases.filter(c=>!(c.archived===true||c.archived==='true'||c.archived==='TRUE')&&c.status!=='見送り'&&c.status!=='中止');
+  const caseLabel=c=>(c.order_no?'#'+c.order_no+' ':'')+dispName(c.client,c.name);
+  function merge(rows){
+    const now=Date.now(), byId={}; rows.forEach(r=>{ byId[r.id]=r; });
+    Object.keys(_pend).forEach(id=>{ const p=_pend[id]; if(now-p.at>90000||(p.del&&!byId[id])||(!p.del&&byId[id]&&String(byId[id].updated_at||'')>=p.upd)){ delete _pend[id]; return; } if(p.del) delete byId[id]; else byId[id]=Object.assign({},byId[id]||{},p.row); });
+    return Object.values(byId);
+  }
+  function mergeN(rows){
+    const now=Date.now(), byId={}; rows.forEach(r=>{ byId[r.id]=r; });
+    Object.keys(_pendN).forEach(id=>{ const p=_pendN[id]; if(now-p.at>90000||(p.del?!byId[id]:!!byId[id])){ delete _pendN[id]; return; } if(p.del) delete byId[id]; else byId[id]=p.row; });
+    return Object.values(byId);
+  }
+  async function loadAll(){
+    try{
+      const [cl,st,cs]=await Promise.all([
+        fetch(API+'?dept=claim&action=list').then(r=>r.json()).catch(()=>({})),
+        fetch(API+'?dept=qual&action=staff').then(r=>r.json()).catch(()=>({})),
+        fetch(API+'?dept=cases&action=read').then(r=>r.json()).catch(()=>({}))]);
+      if(cl&&cl.success){ _list=merge(cl.claims||[]); _notes=mergeN(cl.notes||[]); }
+      if(st&&st.data) _staff=st.data.map(x=>x.name).filter(Boolean);
+      if(cs&&cs.data) _cases=cs.data;
+    }catch(e){}
+    Object.keys(_local).forEach(id=>{ const c=_list.find(x=>x.id===id); const n=c?String(c.photos||'').split(',').filter(Boolean).length:0; if(n>=(_local[id].base||0)+_local[id].urls.length||Date.now()-_local[id].at>120000) delete _local[id]; });
+    const a=document.activeElement; const typing=a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)&&a.closest('#view-claim');
+    if(!typing) render();
+  }
+  const photosOf=c=>String(c.photos||'').split(',').filter(Boolean);
+  const notesOf=id=>_notes.filter(n=>n.claim_id===id).sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')));
+  const body=c=>{ const t=String(c.content||''), ls=t.split('\n'); return ls.length>1&&c.client&&norm(ls[0])===norm(c.client)?ls.slice(1).join('\n'):t; };   // 1 行目がお客様の名前だけなら一覧では省く（Excel から入れた分）
+  const overdue=c=>c.status==='対策決定'&&c.due&&String(c.due).slice(0,10)<today();
+  function render(){
+    const el=$('claimBody'); if(!el)return;
+    const all=_list.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||String(b.created_at||'').localeCompare(String(a.created_at||'')));
+    const cnt=k=>all.filter(c=>c.kind===k).length, cntS=s=>all.filter(c=>c.status===s).length;
+    let h=`<div class="cl-bar"><button type="button" class="cl-new" onclick="Claim.newClaim()">＋ 不適合を書く</button></div>`;
+    h+=`<div class="cl-chips"><button type="button" class="sub-tab${_kind?'':' on'}" onclick="Claim.kind('')">すべて ${all.length}</button>${KINDS.filter(k=>cnt(k)).map(k=>`<button type="button" class="sub-tab${_kind===k?' on':''}" onclick="Claim.kind('${k}')">${k} ${cnt(k)}</button>`).join('')}</div>`;
+    h+=`<div class="cl-chips"><button type="button" class="sub-tab${_st?'':' on'}" onclick="Claim.st('')">すべて</button>${STS.map(s=>`<button type="button" class="sub-tab${_st===s?' on':''}" onclick="Claim.st('${s}')">${s} ${cntS(s)}</button>`).join('')}</div>`;
+    const rows=all.filter(c=>(!_kind||c.kind===_kind)&&(!_st||c.status===_st));
+    h+=rows.length?`<div class="cl-list">${rows.map(c=>{ const nn=notesOf(c.id).length, np=photosOf(c).length+((_local[c.id]||{}).urls||[]).length;
+      const sub=[nn?'意見 '+nn:'',np?'写真 '+np:'',c.status==='対策決定'&&(c.owner||c.due)?`<span class="${overdue(c)?'cl-late':''}">${esc(c.owner||'')}${c.due?'　'+md2(c.due)+' まで':''}</span>`:'',c.status==='対策済み'&&c.done_note?'対策 '+esc(String(c.done_note).split('\n')[0]):''].filter(Boolean).join('・');
+      const t=[c.client,c.case_name,c.kind,c.content,c.cause,c.fix,c.done_note,c.owner].join(' ');
+      return `<div class="cl-card" data-t="${esc(t)}" onclick="Claim.open('${esc(c.id)}')"><div class="cl-top"><span class="cl-date">${md(c.date)}</span>${c.client?`<span class="cl-client">${esc(c.client)}</span>`:''}<span class="cl-kind">${esc(c.kind||'')}</span><span class="cl-st ${STC[c.status]||''}">${esc(c.status||'')}</span></div><div class="cl-body">${esc(body(c))}</div>${sub?`<div class="cl-sub">${sub}</div>`:''}</div>`; }).join('')}</div>`:`<div class="cl-empty">ありません</div>`;
+    el.innerHTML=h; search($('claimSearch')?$('claimSearch').value:'');
+  }
+  function search(q){ q=norm(q).toLowerCase(); document.querySelectorAll('#claimBody .cl-card').forEach(c=>{ c.style.display=!q||norm(c.dataset.t).toLowerCase().indexOf(q)>=0?'':'none'; }); }
+  function kind(k){ _kind=k; render(); }
+  function st(s){ _st=s; render(); }
+  // ---- 窓 ----
+  function newClaim(){ _edit={id:uid('K'),isNew:true,date:today(),client:'',case_name:'',case_id:'',kind:'',content:'',cause:'',fix:'',owner:'',due:'',status:'考え中',done_note:'',reporter:me(),_q:[]}; draw(); $('claimBg').classList.add('show'); }
+  function open(id){ const c=_list.find(x=>x.id===id); if(!c)return; _edit=Object.assign({},c,{isNew:false,_q:[]}); draw(); $('claimBg').classList.add('show'); loadPhotos(); }
+  function close(){ $('claimBg').classList.remove('show'); _edit=null; render(); }
+  function keep(){ if(!_edit)return; ['date','client','case_name','kind','content','cause','fix','owner','due','status','done_note','reporter'].forEach(k=>{ const e=$('cle_'+k); if(e) _edit[k]=e.value; }); }
+  function draw(){
+    const e=_edit, f=(k,lab,html)=>`<div class="mo-field"><label>${lab}</label>${html}</div>`;
+    const sel=(k,opts,blank)=>`<select id="cle_${k}"${k==='status'?' onchange="Claim.stChg()"':''}>${blank?'<option value=""></option>':''}${opts.map(o=>`<option${o===e[k]?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
+    const staff=_staff.length?_staff:[];
+    let h=`<div class="mo-row pair">${f('date','日付',`<input type="date" id="cle_date" value="${esc(String(e.date||'').slice(0,10))}">`)}${f('kind','分類',sel('kind',KINDS,true))}</div>`;
+    h+=`<div class="mo-row pair">${f('client','お客様',`<input id="cle_client" value="${esc(e.client)}">`)}${f('case_name','案件',`<input id="cle_case_name" list="claimCaseList" value="${esc(e.case_name)}"><datalist id="claimCaseList">${live().map(c=>`<option value="${esc(caseLabel(c))}">`).join('')}</datalist>`)}</div>`;
+    h+=`<div class="mo-row full">${f('content','内容',`<textarea id="cle_content" rows="3">${esc(e.content)}</textarea>`)}</div>`;
+    h+=`<div class="mo-row full">${f('cause','原因',`<textarea id="cle_cause" rows="3">${esc(e.cause)}</textarea>`)}</div>`;
+    h+=`<div class="mo-row full">${f('fix','対策',`<textarea id="cle_fix" rows="3">${esc(e.fix)}</textarea>`)}</div>`;
+    h+=`<div class="mo-row pair">${f('owner','担当',sel('owner',staff,true))}${f('due','期限',`<input type="date" id="cle_due" value="${esc(String(e.due||'').slice(0,10))}">`)}</div>`;
+    h+=`<div class="mo-row pair">${f('status','状態',sel('status',STS,false))}${f('reporter','報告者',e.isNew?sel('reporter',staff,true):`<input id="cle_reporter" value="${esc(e.reporter)}" disabled>`)}</div>`;
+    h+=`<div class="mo-row full" id="cle_donebox"${e.status==='対策済み'?'':' style="display:none"'}>${f('done_note','対策でやったこと',`<textarea id="cle_done_note" rows="2">${esc(e.done_note)}</textarea>`)}</div>`;
+    h+=`<div class="cl-sec"><div class="cl-sec-hd">写真</div><div class="cl-photos" id="cle_photos"></div><label class="cl-add">写真を足す<input type="file" accept="image/*" multiple onchange="Claim.addPhotos(this)" hidden></label></div>`;
+    if(!e.isNew){
+      const ns=notesOf(e.id);
+      h+=`<div class="cl-sec"><div class="cl-sec-hd">意見 ${ns.length||''}</div>${ns.map(n=>`<div class="cl-note"><div class="cl-note-h">${esc(n.name||'')}<span>${md2(n.created_at)}</span><button type="button" class="act-btn" onclick="Claim.delNote('${esc(n.id)}')">消す</button></div><div class="cl-note-t">${esc(n.text||'')}</div></div>`).join('')}
+        <div class="cl-note-new"><textarea id="cle_note" rows="2"></textarea><div class="cl-note-row"><select id="cle_note_name"><option value=""></option>${staff.map(n=>`<option${n===me()?' selected':''}>${esc(n)}</option>`).join('')}</select><button type="button" class="cl-note-btn" onclick="Claim.addNote()">意見を書く</button></div></div></div>`;
+    }
+    h+=`<div class="mo-foot">${e.isNew?'':`<span class="left"><button type="button" class="cancel" onclick="Claim.del()">削除</button></span>`}<button type="button" class="cancel" onclick="Claim.close()">閉じる</button><button type="button" class="save" onclick="Claim.save()">${e.isNew?'書く':'保存'}</button></div>`;
+    $('claimTitle').textContent=e.isNew?'不適合を書く':'不適合';
+    $('claimEdit').innerHTML=h; drawPhotos();
+  }
+  function stChg(){ const v=$('cle_status').value; $('cle_donebox').style.display=v==='対策済み'?'':'none'; }
+  function save(){
+    if(!_edit||guard())return; keep(); const e=_edit;
+    if(!e.date){ toast('日付を入れてください',true); return; }
+    if(!e.kind){ toast('分類を選んでください',true); return; }
+    if(!String(e.content).trim()){ toast('内容を書いてください',true); return; }
+    if(e.isNew&&!e.reporter){ toast('報告者を選んでください',true); return; }
+    if(e.status!=='考え中'&&(!String(e.fix).trim()||!e.owner||!e.due)){ toast('対策・担当・期限を入れてください',true); return; }
+    if(e.status==='対策済み'&&!String(e.done_note).trim()){ toast('対策でやったことを書いてください',true); return; }
+    const cs=live().find(c=>caseLabel(c)===String(e.case_name).trim());
+    const now=new Date().toISOString();
+    const row={id:e.id,date:e.date,client:String(e.client).trim(),case_id:cs?cs.id:'',case_name:String(e.case_name).trim(),kind:e.kind,content:String(e.content).trim(),cause:String(e.cause).trim(),fix:String(e.fix).trim(),owner:e.owner||'',due:e.due||'',status:e.status,done_note:e.status==='対策済み'?String(e.done_note).trim():'',updated_at:now};
+    if(e.isNew){ row.reporter=e.reporter; row.created_at=now; row.photos=''; keepMe(e.reporter); }
+    send(Object.assign({dept:'claim',action:'save'},row));
+    _pend[e.id]={row,at:Date.now(),upd:now};
+    const i=_list.findIndex(x=>x.id===e.id); if(i>=0) _list[i]=Object.assign({},_list[i],row); else _list.push(row);
+    const q=e._q||[]; if(q.length){ setTimeout(()=>q.forEach(p=>send(p)),2500); }
+    toast(e.isNew?'書きました':'保存しました');
+    $('claimBg').classList.remove('show'); _edit=null; render();
+    setTimeout(loadAll,q.length?9000:6000);
+  }
+  function del(){
+    if(!_edit||guard())return; if(!confirm('この不適合を削除しますか？'))return;
+    const id=_edit.id; send({dept:'claim',action:'delete',id}); _pend[id]={del:true,at:Date.now()};
+    _list=_list.filter(x=>x.id!==id); $('claimBg').classList.remove('show'); _edit=null; render(); toast('削除しました'); setTimeout(loadAll,6000);
+  }
+  function addNote(){
+    if(!_edit||guard())return; keep();
+    const t=String($('cle_note').value||'').trim(), n=$('cle_note_name').value;
+    if(!t){ toast('意見を書いてください',true); return; } if(!n){ toast('名前を選んでください',true); return; }
+    keepMe(n); const row={id:uid('N'),claim_id:_edit.id,name:n,text:t,created_at:new Date().toISOString()};
+    send(Object.assign({dept:'claim',action:'note'},row)); _pendN[row.id]={row,at:Date.now()}; _notes.push(row); draw();
+  }
+  function delNote(id){ if(guard())return; if(!confirm('この意見を消しますか？'))return; keep(); send({dept:'claim',action:'delete_note',id}); _pendN[id]={del:true,at:Date.now()}; _notes=_notes.filter(n=>n.id!==id); draw(); }
+  // ---- 写真 ----
+  function shrink(file){ return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>{ const im=new Image(); im.onload=()=>{ const M=1600, s=Math.min(1,M/Math.max(im.width,im.height)); const cv=document.createElement('canvas'); cv.width=Math.round(im.width*s); cv.height=Math.round(im.height*s); cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height); res(cv.toDataURL('image/jpeg',0.82)); }; im.onerror=()=>res(null); im.src=fr.result; }; fr.onerror=()=>res(null); fr.readAsDataURL(file); }); }
+  async function addPhotos(inp){
+    if(!_edit)return; keep(); const files=[...(inp.files||[])]; inp.value=''; const e=_edit;
+    for(const f of files){ const url=await shrink(f); if(!url)continue;
+      const body={dept:'claim',action:'photo',claim_id:e.id,photo_id:uid('P'),mime:'image/jpeg',data:url.split(',')[1]};
+      if(!_local[e.id]) _local[e.id]={urls:[],at:Date.now(),base:e.isNew?0:photosOf(_list.find(x=>x.id===e.id)||{}).length};
+      _local[e.id].urls.push(url); _local[e.id].at=Date.now();
+      if(e.isNew) e._q.push(body); else send(body);
+    }
+    drawPhotos(); if(!e.isNew) setTimeout(loadAll,9000);
+  }
+  async function loadPhotos(){ const e=_edit; if(!e)return; for(const fid of photosOf(e)){ if(_photo[fid])continue; try{ const j=await (await fetch(API+'?dept=claim&action=photo&id='+encodeURIComponent(fid))).json(); if(j&&j.success) _photo[fid]='data:'+j.mime+';base64,'+j.data; }catch(err){} if(_edit===e) drawPhotos(); } }
+  function drawPhotos(){ const el=$('cle_photos'); if(!el||!_edit)return; const e=_edit;
+    const srv=photosOf(e).map(fid=>_photo[fid]?`<div class="cl-ph"><img src="${_photo[fid]}" onclick="Claim.zoom(this.src)"><button type="button" onclick="Claim.rmPhoto('${esc(fid)}')">✕</button></div>`:`<div class="cl-ph ld"></div>`);
+    const loc=((_local[e.id]||{}).urls||[]).map(u=>`<div class="cl-ph"><img src="${u}" onclick="Claim.zoom(this.src)"></div>`);
+    el.innerHTML=srv.concat(loc).join(''); }
+  function rmPhoto(fid){ if(!_edit||guard())return; if(!confirm('この写真を消しますか？'))return; keep(); send({dept:'claim',action:'remove_photo',claim_id:_edit.id,file_id:fid}); _edit.photos=photosOf(_edit).filter(x=>x!==fid).join(','); const c=_list.find(x=>x.id===_edit.id); if(c) c.photos=_edit.photos; drawPhotos(); }
+  function zoom(src){ const z=$('claimZoom'); z.querySelector('img').src=src; z.classList.add('show'); }
+  function init(){}
+  return { loadAll, render, init, search, kind, st, newClaim, open, close, save, del, stChg, addNote, delNote, addPhotos, rmPhoto, zoom };
+})();
+
 const Alc=(function(){
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const $=id=>document.getElementById(id);
@@ -11628,7 +11827,8 @@ const App = {
   REG:[
     {key:'cases',ns:()=>Cases,section:'view-cases',nav:'navCases',zone:'office'},
     {key:'poreq',ns:()=>PoReq,section:'view-poreq',nav:'navPoReq',zone:'shared'},   // 発注依頼（2026-10-23）：全員向け。書く＋自分の依頼の段
-    {key:'po',ns:()=>Po,section:'view-po',nav:'navPo',zone:'office'},   // 発注（2026-10-19）：事務所向け。依頼→発注書→発注済
+    {key:'po',ns:()=>Po,section:'view-po',nav:'navPo',zone:'office'},
+    {key:'claim',ns:()=>Claim,section:'view-claim',nav:'navClaim',zone:'shared'},   // クレーム（2026-11-19）：全員で書いて考える   // 発注（2026-10-19）：事務所向け。依頼→発注書→発注済
     {key:'prod', ns:()=>Prod, section:'view-prod', nav:'navProd',zone:'field'},
     {key:'proj', ns:()=>Proj, section:'view-proj', nav:'navProj',zone:'field'},
     {key:'inv',  ns:()=>Inv,  section:'view-inv',  nav:'navInv',zone:'office'},
@@ -11689,7 +11889,7 @@ const App = {
     this.applyInvPhone();
     fetch(API+'?dept=qual&action=staff').then(r=>r.json()).then(j=>{ if(!j||!j.success)return; const row=(j.data||[]).find(x=>nz(x.name)===me); this._invPh=!!(row&&String(row.dept||'').trim()===this.INV_PHONE_DEPT)||this.INV_PHONE_ALSO.map(nz).indexOf(me)>=0; try{ localStorage.setItem('inv_ph',me+'|'+(this._invPh?'1':'0')); }catch(e){} this.applyInvPhone(); }).catch(()=>{}); },
   setWoffDenied(){ const u=window.__woffUser; if(!u||!u.name){ this.denied=[]; return; } const n=String(u.name).replace(/\s|　/g,''); this.denied=this.CASES_WOFF_ALLOW.indexOf(n)>=0?[]:['cases']; },
-  PHONE_KEYS:['daily','ot','prod','proj','poreq','alcohol','forklift','inv'],   // ケータイ（幅 480 以下）で出す画面＝日報・時間外・生産・企画制作・発注依頼・アルコールチェック・リフト点検（10/28 iller）
+  PHONE_KEYS:['daily','ot','prod','proj','poreq','alcohol','forklift','inv','claim'],   // ケータイ（幅 480 以下）で出す画面＝日報・時間外・生産・企画制作・発注依頼・アルコールチェック・リフト点検（10/28 iller）
   isPhone(){ return window.matchMedia('(max-width:480px)').matches; },
   _allowed(key){ if(key==='portal')return true; if(this.denied.indexOf(key)>=0)return false; if(this.isPhone()&&this.mode!=='kiosk'&&this.PHONE_KEYS.indexOf(key)<0)return false; if(key==='inv'&&this.isPhone()&&this.mode!=='kiosk'&&!this.invPhoneOk())return false; const r=this.reg(key); if(this.mode==='kiosk') return !!(r&&r.kiosk); return !r||!r.zone||this.allowedZones().indexOf(r.zone)>=0; },
   applyMode(){ const kiosk=this.mode==='kiosk', allow=this.allowedZones(); document.querySelectorAll('[data-zone]').forEach(b=>{ const show=kiosk?b.hasAttribute('data-kiosk'):allow.indexOf(b.getAttribute('data-zone'))>=0; b.classList.toggle('hidden',!show); }); this.denied.forEach(k=>{ const r=this.reg(k); if(!r)return; [$(r.nav), document.querySelector('.portal-card[data-app="'+k+'"]')].forEach(el=>{ if(el) el.classList.add('hidden'); }); }); document.querySelectorAll('.pm-btn').forEach(b=>b.classList.toggle('on',b.getAttribute('data-m')===this.mode));
