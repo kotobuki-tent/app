@@ -2718,7 +2718,9 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 .cl-new{background:var(--accent-dim);color:var(--accent);border:none;border-radius:8px;padding:10px 16px;font:500 14px/1 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
 .cl-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .cl-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
-.cl-card{background:var(--surface);border:1px solid var(--border-light);border-radius:12px;padding:12px 14px;cursor:pointer}
+.cl-card{background:var(--surface);border:1px solid var(--border-light);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:row-reverse;gap:12px;align-items:flex-start}
+.cl-txt{flex:1;min-width:0}
+.cl-th{width:84px;height:84px;flex-shrink:0;border-radius:8px;background:var(--surface3) center/cover no-repeat}
 .cl-card:hover{border-color:var(--border)}
 .cl-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;margin-bottom:4px}
 .cl-date{color:var(--text-dim)}
@@ -2750,7 +2752,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 #claimZoom{align-items:center;padding:16px}
 #claimZoom img{max-width:100%;max-height:92vh;border-radius:8px}
 #claimBg .mo-foot .left{margin-right:auto}
-@media(max-width:480px){ .cl-wrap{padding:0 12px 120px} .cl-ph{width:84px;height:84px} #view-claim .scr-search,#view-claim .cl-chips{display:none} }   /* ケータイは検索・タブの帯なし（10/29 の決まり） */
+@media(max-width:480px){ .cl-wrap{padding:0 12px 120px} .cl-ph{width:84px;height:84px} .cl-th{width:64px;height:64px} #view-claim .scr-search,#view-claim .cl-chips{display:none} }   /* ケータイは検索・タブの帯なし（10/29 の決まり） */
 </style>
 </head>
 <body>
@@ -4933,8 +4935,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-19 15:27';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1427;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-19 15:39';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1428;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -11000,10 +11002,20 @@ const Claim=(function(){
     h+=`<div class="cl-chips"><button type="button" class="sub-tab${_st?'':' on'}" onclick="Claim.st('')">すべて</button>${STS.map(s=>`<button type="button" class="sub-tab${_st===s?' on':''}" onclick="Claim.st('${s}')">${s} ${cntS(s)}</button>`).join('')}</div>`;
     const rows=all.filter(c=>(!_kind||c.kind===_kind)&&(!_st||c.status===_st));
     h+=rows.length?`<div class="cl-list">${rows.map(c=>{ const nn=notesOf(c.id).length, np=photosOf(c).length+((_local[c.id]||{}).urls||[]).length;
-      const sub=[nn?'意見 '+nn:'',np?'写真 '+np:'',c.status==='対策決定'&&(c.owner||c.due)?`<span class="${overdue(c)?'cl-late':''}">${esc(c.owner||'')}${c.due?'　'+md2(c.due)+' まで':''}</span>`:'',c.status==='対策済み'&&c.done_note?'対策 '+esc(String(c.done_note).split('\n')[0]):''].filter(Boolean).join('・');
+      const sub=[nn?'意見 '+nn:'',np>1?'写真 '+np:'',c.status==='対策決定'&&(c.owner||c.due)?`<span class="${overdue(c)?'cl-late':''}">${esc(c.owner||'')}${c.due?'　'+md2(c.due)+' まで':''}</span>`:'',c.status==='対策済み'&&c.done_note?'対策 '+esc(String(c.done_note).split('\n')[0]):''].filter(Boolean).join('・');
       const t=[c.client,c.case_name,c.kind,c.content,c.cause,c.fix,c.done_note,c.owner].join(' ');
-      return `<div class="cl-card" data-t="${esc(t)}" onclick="Claim.open('${esc(c.id)}')"><div class="cl-top"><span class="cl-date">${md(c.date)}</span>${c.client?`<span class="cl-client">${esc(c.client)}</span>`:''}<span class="cl-kind">${esc(c.kind||'')}</span><span class="cl-st ${STC[c.status]||''}">${esc(c.status||'')}</span></div><div class="cl-body">${esc(body(c))}</div>${sub?`<div class="cl-sub">${sub}</div>`:''}</div>`; }).join('')}</div>`:`<div class="cl-empty">ありません</div>`;
-    el.innerHTML=h; search($('claimSearch')?$('claimSearch').value:'');
+      const ph=photosOf(c)[0], lp=((_local[c.id]||{}).urls||[])[0];
+      return `<div class="cl-card" data-t="${esc(t)}" onclick="Claim.open('${esc(c.id)}')">${ph||lp?`<div class="cl-th"${ph?` data-fid="${esc(ph)}"`:''}${!ph&&lp?` style="background-image:url(${lp})"`:''}></div>`:''}<div class="cl-txt"><div class="cl-top"><span class="cl-date">${md(c.date)}</span>${c.client?`<span class="cl-client">${esc(c.client)}</span>`:''}<span class="cl-kind">${esc(c.kind||'')}</span><span class="cl-st ${STC[c.status]||''}">${esc(c.status||'')}</span></div><div class="cl-body">${esc(body(c))}</div>${sub?`<div class="cl-sub">${sub}</div>`:''}</div></div>`; }).join('')}</div>`:`<div class="cl-empty">ありません</div>`;
+    el.innerHTML=h; search($('claimSearch')?$('claimSearch').value:''); thumbs();
+  }
+  // 一覧の小さい絵（11/19 iller「ここにサムネ出せるか」）：Drive のサムネイルを 3 本ずつ取って貼る。取った物は覚えておく
+  const _th={}, _thGo={};
+  async function thumbs(){
+    const els=[...document.querySelectorAll('#claimBody .cl-th[data-fid]')];
+    els.forEach(e=>{ const f=e.dataset.fid; if(_th[f]) e.style.backgroundImage=`url(${_th[f]})`; });
+    const need=[...new Set(els.map(e=>e.dataset.fid).filter(f=>!_th[f]&&!_thGo[f]))];
+    const one=async f=>{ _thGo[f]=1; try{ const j=await (await fetch(API+'?dept=claim&action=thumb&id='+encodeURIComponent(f))).json(); if(j&&j.success){ _th[f]='data:'+j.mime+';base64,'+j.data; document.querySelectorAll(`#claimBody .cl-th[data-fid="${f}"]`).forEach(e=>{ e.style.backgroundImage=`url(${_th[f]})`; }); } }catch(err){} delete _thGo[f]; };
+    for(let i=0;i<need.length;i+=3) await Promise.all(need.slice(i,i+3).map(one));
   }
   function search(q){ q=norm(q).toLowerCase(); document.querySelectorAll('#claimBody .cl-card').forEach(c=>{ c.style.display=!q||norm(c.dataset.t).toLowerCase().indexOf(q)>=0?'':'none'; }); }
   function kind(k){ _kind=k; render(); }
