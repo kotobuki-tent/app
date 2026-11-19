@@ -4935,8 +4935,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-19 15:39';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1428;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-19 15:41';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1429;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10951,6 +10951,7 @@ const Claim=(function(){
   const $=id=>document.getElementById(id);
   const KINDS=['溶着・縫製','外注','図面・仕様','出荷・付属品','施工','怪我・事故','レンタル・検品','その他'];   // 11/19 iller「クレームというか不適合が出た案件すべて。現場での施工不良だったり怪我だったりも」
   const STS=['考え中','対策決定','対策済み'];
+  const kinds=()=>{ const extra=[...new Set(_list.map(c=>String(c.kind||'').trim()).filter(k=>k&&KINDS.indexOf(k)<0))]; return KINDS.concat(extra); };   // 分類は自由記述も可（11/19 iller）。決まった分類の後ろに書かれた物を足す
   const STC={'考え中':'st-a','対策決定':'st-b','対策済み':'st-c'};
   let _list=[], _notes=[], _staff=[], _cases=[], _kind='', _st='', _busy=false, _edit=null;
   const _pend={}, _pendN={}, _photo={}, _local={};   // _pend：保存したばかりの件（サーバに出るまで手元を優先）／_local：送ったばかりの写真（dataURL）
@@ -10998,7 +10999,7 @@ const Claim=(function(){
     const all=_list.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||String(b.created_at||'').localeCompare(String(a.created_at||'')));
     const cnt=k=>all.filter(c=>c.kind===k).length, cntS=s=>all.filter(c=>c.status===s).length;
     let h=`<div class="cl-bar"><button type="button" class="cl-new" onclick="Claim.newClaim()">＋ 不適合を書く</button></div>`;
-    h+=`<div class="cl-chips"><button type="button" class="sub-tab${_kind?'':' on'}" onclick="Claim.kind('')">すべて ${all.length}</button>${KINDS.filter(k=>cnt(k)).map(k=>`<button type="button" class="sub-tab${_kind===k?' on':''}" onclick="Claim.kind('${k}')">${k} ${cnt(k)}</button>`).join('')}</div>`;
+    h+=`<div class="cl-chips"><button type="button" class="sub-tab${_kind?'':' on'}" onclick="Claim.kind('')">すべて ${all.length}</button>${kinds().filter(k=>cnt(k)).map(k=>`<button type="button" class="sub-tab${_kind===k?' on':''}" onclick="Claim.kind('${k}')">${k} ${cnt(k)}</button>`).join('')}</div>`;
     h+=`<div class="cl-chips"><button type="button" class="sub-tab${_st?'':' on'}" onclick="Claim.st('')">すべて</button>${STS.map(s=>`<button type="button" class="sub-tab${_st===s?' on':''}" onclick="Claim.st('${s}')">${s} ${cntS(s)}</button>`).join('')}</div>`;
     const rows=all.filter(c=>(!_kind||c.kind===_kind)&&(!_st||c.status===_st));
     h+=rows.length?`<div class="cl-list">${rows.map(c=>{ const nn=notesOf(c.id).length, np=photosOf(c).length+((_local[c.id]||{}).urls||[]).length;
@@ -11029,7 +11030,7 @@ const Claim=(function(){
     const e=_edit, f=(k,lab,html)=>`<div class="mo-field"><label>${lab}</label>${html}</div>`;
     const sel=(k,opts,blank)=>`<select id="cle_${k}"${k==='status'?' onchange="Claim.stChg()"':''}>${blank?'<option value=""></option>':''}${opts.map(o=>`<option${o===e[k]?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
     const staff=_staff.length?_staff:[];
-    let h=`<div class="mo-row pair">${f('date','日付',`<input type="date" id="cle_date" value="${esc(String(e.date||'').slice(0,10))}">`)}${f('kind','分類',sel('kind',KINDS,true))}</div>`;
+    let h=`<div class="mo-row pair">${f('date','日付',`<input type="date" id="cle_date" value="${esc(String(e.date||'').slice(0,10))}">`)}${f('kind','分類',`<input id="cle_kind" list="claimKindList" autocomplete="off" value="${esc(e.kind)}"><datalist id="claimKindList">${kinds().map(k=>`<option value="${esc(k)}">`).join('')}</datalist>`)}</div>`;
     h+=`<div class="mo-row pair">${f('client','お客様',`<input id="cle_client" value="${esc(e.client)}">`)}${f('case_name','案件',`<input id="cle_case_name" list="claimCaseList" value="${esc(e.case_name)}"><datalist id="claimCaseList">${live().map(c=>`<option value="${esc(caseLabel(c))}">`).join('')}</datalist>`)}</div>`;
     h+=`<div class="mo-row full">${f('content','内容',`<textarea id="cle_content" rows="3">${esc(e.content)}</textarea>`)}</div>`;
     h+=`<div class="mo-row full">${f('cause','原因',`<textarea id="cle_cause" rows="3">${esc(e.cause)}</textarea>`)}</div>`;
@@ -11040,8 +11041,8 @@ const Claim=(function(){
     h+=`<div class="cl-sec"><div class="cl-sec-hd">写真</div><div class="cl-photos" id="cle_photos"></div><label class="cl-add">写真を足す<input type="file" accept="image/*" multiple onchange="Claim.addPhotos(this)" hidden></label></div>`;
     if(!e.isNew){
       const ns=notesOf(e.id);
-      h+=`<div class="cl-sec"><div class="cl-sec-hd">意見 ${ns.length||''}</div>${ns.map(n=>`<div class="cl-note"><div class="cl-note-h">${esc(n.name||'')}<span>${md2(n.created_at)}</span><button type="button" class="act-btn" onclick="Claim.delNote('${esc(n.id)}')">消す</button></div><div class="cl-note-t">${esc(n.text||'')}</div></div>`).join('')}
-        <div class="cl-note-new"><textarea id="cle_note" rows="2"></textarea><div class="cl-note-row"><select id="cle_note_name"><option value=""></option>${staff.map(n=>`<option${n===me()?' selected':''}>${esc(n)}</option>`).join('')}</select><button type="button" class="cl-note-btn" onclick="Claim.addNote()">意見を書く</button></div></div></div>`;
+      h+=`<div class="cl-sec"><div class="cl-sec-hd">意見 ${ns.length||''}</div>${ns.map(n=>`<div class="cl-note"><div class="cl-note-h">${esc(n.name||'名前なし')}<span>${md2(n.created_at)}</span><button type="button" class="act-btn" onclick="Claim.delNote('${esc(n.id)}')">消す</button></div><div class="cl-note-t">${esc(n.text||'')}</div></div>`).join('')}
+        <div class="cl-note-new"><textarea id="cle_note" rows="2"></textarea><div class="cl-note-row"><select id="cle_note_name"><option value="">名前なし</option>${staff.map(n=>`<option>${esc(n)}</option>`).join('')}</select><button type="button" class="cl-note-btn" onclick="Claim.addNote()">意見を書く</button></div></div></div>`;
     }
     h+=`<div class="mo-foot">${e.isNew?'':`<span class="left"><button type="button" class="cancel" onclick="Claim.del()">削除</button></span>`}<button type="button" class="cancel" onclick="Claim.close()">閉じる</button><button type="button" class="save" onclick="Claim.save()">${e.isNew?'書く':'保存'}</button></div>`;
     $('claimTitle').textContent=e.isNew?'不適合を書く':'不適合';
@@ -11051,7 +11052,7 @@ const Claim=(function(){
   function save(){
     if(!_edit||guard())return; keep(); const e=_edit;
     if(!e.date){ toast('日付を入れてください',true); return; }
-    if(!e.kind){ toast('分類を選んでください',true); return; }
+    e.kind=String(e.kind||'').trim(); if(!e.kind){ toast('分類を入れてください',true); return; }
     if(!String(e.content).trim()){ toast('内容を書いてください',true); return; }
     if(e.isNew&&!e.reporter){ toast('報告者を選んでください',true); return; }
     if(e.status!=='考え中'&&(!String(e.fix).trim()||!e.owner||!e.due)){ toast('対策・担当・期限を入れてください',true); return; }
@@ -11076,8 +11077,8 @@ const Claim=(function(){
   function addNote(){
     if(!_edit||guard())return; keep();
     const t=String($('cle_note').value||'').trim(), n=$('cle_note_name').value;
-    if(!t){ toast('意見を書いてください',true); return; } if(!n){ toast('名前を選んでください',true); return; }
-    keepMe(n); const row={id:uid('N'),claim_id:_edit.id,name:n,text:t,created_at:new Date().toISOString()};
+    if(!t){ toast('意見を書いてください',true); return; }   // 名前は空でもよい（11/19 iller「意見は名無しでもいい」）
+    if(n) keepMe(n); const row={id:uid('N'),claim_id:_edit.id,name:n,text:t,created_at:new Date().toISOString()};
     send(Object.assign({dept:'claim',action:'note'},row)); _pendN[row.id]={row,at:Date.now()}; _notes.push(row); draw();
   }
   function delNote(id){ if(guard())return; if(!confirm('この意見を消しますか？'))return; keep(); send({dept:'claim',action:'delete_note',id}); _pendN[id]={del:true,at:Date.now()}; _notes=_notes.filter(n=>n.id!==id); draw(); }
