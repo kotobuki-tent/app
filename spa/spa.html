@@ -4973,8 +4973,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-24 17:12';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1441;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-24 17:18';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1442;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -11263,6 +11263,8 @@ const Est=(function(){
   }
   function close(){ $('estBg').classList.remove('show'); _edit=null; }
   // ---- 見積書（A4。売価の側だけ。原価は出さない）----
+  // 行が多ければ 2 枚・3 枚に続く（11/24 iller「二枚でも三枚でもいい」）：見出しの行は各ページに繰り返し、合計の箱は割らない、下に「1 / 3」。会社名は 1 枚目の右上（下に置くと最後のページに会社名だけがはみ出した）。
+  // @page の余白の箱を空で定義するとブラウザの既定の印字（日付・about:blank）が消える。#paper は印刷時 width:auto（210mm のままだと縮小されて刷られる）。
   function print(id){
     let e; if(id){ const x=_list.find(y=>String(y.id)===String(id)); if(!x)return; e={est_no:x.est_no,date:x.date,client:x.client,contact:x.contact,name:x.name,our_person:x.our_person,note:x.note,items:itemsOf(x)}; } else { if(!_edit)return; e=Object.assign({},read()); e.items=clean(e.items); }
     const w=window.open('','_blank'); if(!w){ toast('ポップアップがブロックされました。許可してもう一度押してください',true); return; }
@@ -11276,22 +11278,21 @@ const Est=(function(){
     for(;n<16;n++) rows+='<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
     const tax=Math.floor(tp*0.1);
     const html=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>御見積書 ${esc(e.client||'')}</title><style>
-@page{size:A4;margin:22mm}html{background:#fff}body{font-family:"Hiragino Mincho ProN",serif;font-size:10.5pt;line-height:1.25;color:#000;margin:0;background:#fff;color-scheme:light}
+@page{size:A4;margin:18mm 22mm 20mm;@top-left{content:""}@top-center{content:""}@top-right{content:""}@bottom-left{content:""}@bottom-right{content:""}@bottom-center{content:counter(page) " / " counter(pages);font-family:"Hiragino Mincho ProN",serif;font-size:9pt}}html{background:#fff}body{font-family:"Hiragino Mincho ProN",serif;font-size:10.5pt;line-height:1.25;color:#000;margin:0;background:#fff;color-scheme:light}
 h1{font-size:16pt;font-weight:bold;text-align:center;margin:0 0 6mm;letter-spacing:.5em}.row{display:flex;justify-content:space-between;align-items:flex-start}
-.to{font-size:13pt;border-bottom:1px solid #000;padding:0 2mm 2mm;min-width:80mm;margin-top:3mm}.meta{border-collapse:collapse;margin-right:1px}.meta td,.meta th{padding:2mm 3mm;border:1px solid #000;font-size:10pt}.meta th{background:#eee;font-weight:normal;white-space:nowrap}.meta td{min-width:42mm}
+.to{font-size:13pt;border-bottom:1px solid #000;padding:0 2mm 2mm;min-width:80mm;margin-top:3mm}.meta{border-collapse:collapse;margin:0 1px 0 auto}.meta td,.meta th{padding:1.5mm 3mm;border:1px solid #000;font-size:10pt}.meta th{background:#eee;font-weight:normal;white-space:nowrap}.meta td{min-width:42mm}
 .lead{margin:5mm 0 3mm}.case{margin-top:3mm;border:1px solid #000;padding:4mm 3mm;font-size:11pt;width:calc(100% - 1px);box-sizing:border-box}.sum{margin-top:3mm;font-size:13pt;border-bottom:1px solid #000;display:inline-block;padding:0 2mm 1.5mm;min-width:80mm}
-table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.items th{border:1px solid #000;background:#eee;font-weight:normal;font-size:10pt;padding:1.5mm 2mm}.items td{border:1px solid #000;font-size:10pt;padding:0 2mm;height:8.5mm}.items tr.sub td{background:#f6f6f6}
-.num{text-align:right}.c{text-align:center}.tot{border-collapse:collapse;margin:0 1px 0 auto}.tot td,.tot th{border:1px solid #000;border-top:none;font-size:10pt;padding:0 2mm;height:8.5mm}.tot th{background:#eee;font-weight:normal;white-space:nowrap;width:28mm}.tot td{width:36mm;text-align:right}
-.note{font-size:10pt;margin-top:5mm;white-space:pre-wrap}.foot{width:100%;margin-top:8mm;border-collapse:collapse}.co{font-size:10pt;line-height:1.5}.co .n{font-size:12pt;font-weight:bold}
+table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.items th{border:1px solid #000;background:#eee;font-weight:normal;font-size:10pt;padding:1.5mm 2mm}.items td{border:1px solid #000;font-size:10pt;padding:0 2mm;height:7.5mm}.items tr.sub td{background:#f6f6f6}.items tr{break-inside:avoid}.end{break-inside:avoid}
+.num{text-align:right}.c{text-align:center}.tot{border-collapse:collapse;margin:0 1px 0 auto}.tot td,.tot th{border:1px solid #000;border-top:none;font-size:10pt;padding:0 2mm;height:7.5mm}.tot th{background:#eee;font-weight:normal;white-space:nowrap;width:28mm}.tot td{width:36mm;text-align:right}
+.note{font-size:10pt;margin-top:5mm;white-space:pre-wrap}.co{font-size:9.5pt;line-height:1.5;margin-top:3mm;text-align:right}.co .n{font-size:12pt;font-weight:bold}
 .bar{position:fixed;top:0;left:0;right:0;background:#1c1c1e;color:#fff;padding:10px 16px;font:500 14px/1 -apple-system,'Hiragino Sans',sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between}.bar button{border:none;border-radius:8px;padding:8px 14px;font:500 14px/1 inherit;background:#fff;color:#1c1c1e;cursor:pointer}
-#paper{width:210mm;min-height:297mm;box-sizing:border-box;padding:22mm;background:#fff}@media print{.bar{display:none}#paper{padding:0;min-height:0}}@media screen{body{padding:60px 0 22mm;margin:0;background:#eee}#paper{margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
+#paper{width:210mm;min-height:297mm;box-sizing:border-box;padding:22mm;background:#fff}@media print{.bar{display:none}#paper{width:auto;padding:0;min-height:0}}@media screen{body{padding:60px 0 22mm;margin:0;background:#eee}#paper{margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
 </style></head><body><div class="bar"><span>御見積書　${esc(e.client||'')}</span><span><button onclick="window.print()">印刷</button></span></div>
-<div id="paper"><h1>御見積書</h1><div class="row"><div><div class="to">${esc(e.client||'')}　${e.contact?esc(e.contact)+'　様':'御中'}</div><p class="lead">下記のとおり御見積申し上げます。</p><div class="sum">合計金額　¥${yen(tp+tax)}（税込）</div></div><table class="meta"><tr><th>見積番号</th><td>${esc(e.est_no||'')}</td></tr><tr><th>見積日</th><td>${ds}</td></tr></table></div>
+<div id="paper"><h1>御見積書</h1><div class="row"><div><div class="to">${esc(e.client||'')}　${e.contact?esc(e.contact)+'　様':'御中'}</div><p class="lead">下記のとおり御見積申し上げます。</p><div class="sum">合計金額　¥${yen(tp+tax)}（税込）</div></div><div><table class="meta"><tr><th>見積番号</th><td>${esc(e.est_no||'')}</td></tr><tr><th>見積日</th><td>${ds}</td></tr></table><div class="co"><span class="n">有限会社寿テント</span><br>〒689-2102　鳥取県東伯郡北栄町国坂104-2<br>TEL 0858-36-2811　FAX 0858-36-2863${e.our_person?'<br>担当　'+esc(e.our_person):''}</div></div></div>
 <div class="case">件名　${esc(e.name||'')}</div>
 <table class="items"><colgroup><col style="width:34%"><col style="width:18%"><col style="width:9%"><col style="width:8%"><col style="width:14%"><col style="width:17%"></colgroup><thead><tr><th>品名</th><th>規格</th><th>数量</th><th>単位</th><th>単価</th><th>金額</th></tr></thead><tbody>${rows}</tbody></table>
-<table class="tot"><tr><th>小計</th><td>${yen(tp)}</td></tr><tr><th>消費税（10%）</th><td>${yen(tax)}</td></tr><tr><th>合計</th><td>${yen(tp+tax)}</td></tr></table>
-${e.note?`<div class="note">${esc(e.note)}</div>`:''}
-<table class="foot"><tr><td class="co" style="vertical-align:bottom"><span class="n">有限会社寿テント</span><br>〒689-2102　鳥取県東伯郡北栄町国坂104-2<br>TEL 0858-36-2811　FAX 0858-36-2863　mail kt-info@kototen.com</td><td class="co" style="text-align:right;vertical-align:bottom;white-space:nowrap">担当　${esc(e.our_person||'')}</td></tr></table></div></body></html>`;
+<div class="end"><table class="tot"><tr><th>小計</th><td>${yen(tp)}</td></tr><tr><th>消費税（10%）</th><td>${yen(tax)}</td></tr><tr><th>合計</th><td>${yen(tp+tax)}</td></tr></table>
+${e.note?`<div class="note">${esc(e.note)}</div>`:''}</div></div></body></html>`;
     w.document.open(); w.document.write(html); w.document.close();
   }
   function init(){}
