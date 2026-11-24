@@ -4936,8 +4936,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-24 13:27';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1436;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-24 14:03';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1437;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -5388,7 +5388,7 @@ const Prod = (function(){
   // ===== ステータス変更検知 =====
   function detectStatusChanges(){
     const curr={};
-    prodData.forEach(d=>{if(d.id&&String(d.id).indexOf('tmp_')!==0)curr[String(d.id)]={status:d.status||'',project:d.project||''}});
+    prodData.forEach(d=>{if(d.id&&String(d.id).indexOf('tmp_')!==0)curr[String(d.id)]={status:d.status||'',project:dispName(d.client,d.project)}});   // 履歴の名前も「得意先／案件名」（11/24）
     try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
     try{slogUnread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){slogUnread=0}
     let prev=null;
@@ -6035,7 +6035,7 @@ const Proj = (function(){
   // ===== ステータス変更検知 =====
   function detectStatusChanges(){
     const curr={};
-    projData.forEach(d=>{if(d.id&&String(d.id).indexOf('tmp_')!==0)curr[String(d.id)]={status:d.status||'',project:d.project||''}});
+    projData.forEach(d=>{if(d.id&&String(d.id).indexOf('tmp_')!==0)curr[String(d.id)]={status:d.status||'',project:dispName(d.client,d.project)}});
     try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
     try{slogUnread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){slogUnread=0}
     updateSlogBtn();
@@ -7008,6 +7008,8 @@ const Inv = (function(){
   let rentalSort={col:null,asc:true};   // 貸出/予約・メンテ・廃棄の3表で共通のソート（見出しクリック）
   let ganttStart=null, ganttDays=31, ganttCat='', ganttSel='';   // 在庫ガント（ganttSel=クリックで選んだ日＝その列の残を全品に出す）
   let projStatus={};   // 現場名→ステータス（見積中の予約＝仮押さえ）
+  let projClient={};   // 現場名→得意先。現場名は「得意先／現場名」で見せる（日報と同じ dispName。貸出の client_name＝現場名 は触らない。2026-11-24 iller「他のもやっといて」）
+  const rentName=n=>dispName(projClient[n]||'',n||'');
   // slog（inv独自：i付き変数・ILOG_KEY）
   const ILOG_KEY='inv_status_snapshot';
   const ILOG_LIST_KEY='inv_status_log';
@@ -7089,7 +7091,7 @@ const Inv = (function(){
   async function loadAll(){
     const cached=_getCache('inventory');
     if(cached){
-      items=cached.items||[];rentals=Norm.rent(cached.rentals||[]);projects=cached.projects||[];projStatus=cached.projStatus||{};
+      items=cached.items||[];rentals=Norm.rent(cached.rentals||[]);projects=cached.projects||[];projStatus=cached.projStatus||{};projClient=cached.projClient||{};
       populateCategoryFilters();
       populateProjectSelect();
       renderItems();renderRentals();renderMaint();renderGantt();
@@ -7105,12 +7107,12 @@ const Inv = (function(){
       items=Pending.apply('inventory','item',mergeWithTmp(inv||[],items,r=>String(r.category||'')+'|'+String(r.item_name||'')));
       rentals=Pending.apply('inventory','rental',mergeWithTmp(Norm.rent(rnt||[]),rentals,r=>String(r.item_name||'')+'|'+String(r.date_start||'')+'|'+String(r.client_name||'')));
       projects=prj||[];
-      if(pst&&Array.isArray(pst.data)){projStatus={};pst.data.forEach(p=>{if(p.project)projStatus[p.project]=p.status})}
+      if(pst&&Array.isArray(pst.data)){projStatus={};projClient={};const amb={};pst.data.forEach(p=>{if(p.project){projStatus[p.project]=p.status;if(p.client){if(projClient[p.project]&&projClient[p.project]!==p.client)amb[p.project]=1;projClient[p.project]=p.client}}});Object.keys(amb).forEach(n=>delete projClient[n])}   // 同じ現場名が別の得意先にもある時は得意先を付けない（貸出は現場名でしか繋がっていない＝違う得意先を出さない）
       populateCategoryFilters();
       populateProjectSelect();
       renderItems();renderRentals();renderMaint();renderGantt();
       detectInvChanges();updateSlogBtn();
-      _setCache('inventory',{items:items,rentals:rentals,projects:projects,projStatus:projStatus});
+      _setCache('inventory',{items:items,rentals:rentals,projects:projects,projStatus:projStatus,projClient:projClient});
     }catch(e){
       toast('データ取得に失敗: '+e.message,false);
     }
@@ -7144,7 +7146,8 @@ const Inv = (function(){
   }
   function populateProjectSelect(){
     const sel=$('xf_r_project');if(!sel)return;
-    sel.innerHTML='<option value="">案件を選択</option>'+projects.map(p=>`<option value="${esc(p.project||p.client||'')}">${esc(p.project||p.client||'')}</option>`).join('');
+    // GAS（inventory projects）は {name} で返す。p.project を読んでいて一覧が全部空だったのを直した（11/24）。値は現場名のまま、見せる名前だけ「得意先／現場名」
+    sel.innerHTML='<option value="">案件を選択</option>'+projects.map(p=>p.name||p.project||'').filter(Boolean).map(n=>`<option value="${esc(n)}">${esc(rentName(n))}</option>`).join('');
   }
   function onProjectSelect(){if($('xf_r_project').value)$('xf_r_client').value=$('xf_r_project').value}
 
@@ -7278,7 +7281,7 @@ const Inv = (function(){
     }
     if(maintStatusFilter)f=f.filter(r=>r.status===maintStatusFilter);
     f=applyRentalSort(f);updateRentalSortArrows();
-    {const mc=$('maintCards');if(mc)mc.innerHTML=f.length?f.map(r=>`<div class="mt-card"><div class="mt-b"><div class="mt-n">${esc(r.item_name)} × ${r.qty}</div><div class="mt-s">${esc(r.client_name||'')}</div></div><button type="button" onclick="Inv.maintDone('${r.id}')">済み</button></div>`).join(''):'<div class="mt-empty">メンテ中の商品はありません</div>';}   // ケータイの札（11/10 iller「メンテが済んだらそれを記録するだけ」）
+    {const mc=$('maintCards');if(mc)mc.innerHTML=f.length?f.map(r=>`<div class="mt-card"><div class="mt-b"><div class="mt-n">${esc(r.item_name)} × ${r.qty}</div><div class="mt-s">${esc(rentName(r.client_name))}</div></div><button type="button" onclick="Inv.maintDone('${r.id}')">済み</button></div>`).join(''):'<div class="mt-empty">メンテ中の商品はありません</div>';}   // ケータイの札（11/10 iller「メンテが済んだらそれを記録するだけ」）
     const tb=$('maint_tbody');
     if(!f.length){tb.innerHTML='<tr><td colspan="9" class="empty-msg">メンテ中の商品はありません</td></tr>';return}
     tb.innerHTML=f.map(r=>`<tr>
@@ -7288,7 +7291,7 @@ const Inv = (function(){
       <td>${r.qty}</td>
       <td>${dateJP(r.date_start)}</td>
       <td>${dateJP(r.date_end)}</td>
-      <td>${esc(r.client_name)}</td>
+      <td>${esc(rentName(r.client_name))}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
       <td><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu">
         <a class="edit-link" onclick="Inv.openSplit('${r.id}')">分割</a>
@@ -7310,7 +7313,7 @@ const Inv = (function(){
       <td>${r.qty}</td>
       <td>${dateJP(r.date_start)}</td>
       <td>${dateJP(r.date_end)}</td>
-      <td>${esc(r.client_name)}</td>
+      <td>${esc(rentName(r.client_name))}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
       <td><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu">
         <a class="edit-link" onclick="Inv.unDiscard('${r.id}')">戻す</a>
@@ -7351,7 +7354,7 @@ const Inv = (function(){
       <td>${r.qty}</td>
       <td>${dateJP(r.date_start)}</td>
       <td>${dateJP(r.date_end)}</td>
-      <td>${esc(r.client_name)}</td>
+      <td>${esc(rentName(r.client_name))}</td>
       <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${esc(r.notes)}</td>
       <td><div class="row-more"><button type="button" class="row-btn" title="操作" onclick="RowMenu.open(this)">⋯</button><div class="row-menu">
         <a class="edit-link" onclick="Inv.openSplit('${r.id}')">分割</a>
@@ -7426,7 +7429,7 @@ const Inv = (function(){
     const r=rentals.find(x=>x.id===id);if(!r)return;
     if(String(id).startsWith('tmp_')){toast('保存中です。しばらくしてから操作してください',false);return}
     $('xf_sp_id').value=id;
-    $('xf_sp_info').innerHTML=`<b>${esc(r.item_name)}</b> × ${r.qty}　<span class="st st-${esc(r.status)}">${esc(r.status)}</span><br>${esc(r.client_name||'')}　${dateJP(r.date_start)}〜${dateJP(r.date_end)}`;
+    $('xf_sp_info').innerHTML=`<b>${esc(r.item_name)}</b> × ${r.qty}　<span class="st st-${esc(r.status)}">${esc(r.status)}</span><br>${esc(rentName(r.client_name))}　${dateJP(r.date_start)}〜${dateJP(r.date_end)}`;
     $('xf_sp_qty').value=1;$('xf_sp_qty').max=Number(r.qty)||1;
     $('xf_sp_status').value=(r.status==='メンテ中'||r.status==='貸出中')?'返却済':'メンテ中';
     $('splitMoBg').classList.add('show');
@@ -7437,7 +7440,7 @@ const Inv = (function(){
     const r=rentals.find(x=>x.id===id);if(!r)return;
     if(String(id).startsWith('tmp_')){toast('保存中です。しばらくしてから操作してください',false);return}
     $('md_id').value=id;
-    $('md_info').innerHTML=`${esc(r.item_name)} × ${r.qty}<br><span style="color:var(--text-faint);font-size:13px">${esc(r.client_name||'')}</span>`;
+    $('md_info').innerHTML=`${esc(r.item_name)} × ${r.qty}<br><span style="color:var(--text-faint);font-size:13px">${esc(rentName(r.client_name))}</span>`;
     const q=$('md_qty');q.value=Number(r.qty)||1;q.max=Number(r.qty)||1;
     $('maintDoneBg').classList.add('show');
   }
@@ -7468,7 +7471,7 @@ const Inv = (function(){
       fireAndForget({action:'save_rental',...nr});
       toast(`${r.item_name}：${n} を${st}へ、${total-n} は${r.status}のまま`);
     }
-    _setCache('inventory',{items:items,rentals:rentals,projects:projects,projStatus:projStatus});
+    _setCache('inventory',{items:items,rentals:rentals,projects:projects,projStatus:projStatus,projClient:projClient});
     closeSplitMo();renderRentals();renderMaint();renderGantt();renderDiscard();
     setTimeout(loadAll,8000);
   }
@@ -7580,7 +7583,7 @@ const Inv = (function(){
         const s=Math.max(0,dstr.indexOf(st)<0?(st<dstr[0]?0:N):dstr.indexOf(st));
         const bad=en<st;let e=bad?s:dstr.indexOf(en);if(e<0)e=en>dstr[N-1]?N-1:0;if(e<s)e=s;
         const l=s/N*100,w=(e-s+1)/N*100;
-        h+=`<div class="bar ${gtBarCls(r)}${bad?' bad':''}" style="left:${l}%;width:${w}%;top:${3+r._lane*22}px" title="${esc((r.client_name||'')+' '+r.qty+' '+st+'〜'+en+' '+r.status+(bad?'　※返却日が貸出日より前':''))}" onclick="Inv.editRental('${esc(String(r.id))}')">${r.qty} ${esc(r.client_name||'')}</div>`});
+        h+=`<div class="bar ${gtBarCls(r)}${bad?' bad':''}" style="left:${l}%;width:${w}%;top:${3+r._lane*22}px" title="${esc(rentName(r.client_name)+' '+r.qty+' '+st+'〜'+en+' '+r.status+(bad?'　※返却日が貸出日より前':''))}" onclick="Inv.editRental('${esc(String(r.id))}')">${r.qty} ${esc(r.client_name||'')}</div>`});
       const use=dstr.map(ds=>{let u=0;rows.forEach(r=>{const st=String(r.date_start||'').slice(0,10),en=String(r.date_end||'').slice(0,10);if((st<=ds&&en>=ds)||(gtOverdue(r)&&ds>en))u+=Number(r.qty)||0});return u});
       // 残は「変わり目」だけ出す（出ている数が前日と違う日・翌日と違う日・今日）。同じ数が続く間は空けて帯を主役に
       h+=`<div class="free" style="grid-template-columns:${grid}">`+use.map((u,i)=>{const f=tot-u;if(!tot||u===0)return'<div></div>';const show=(i===0||use[i-1]!==u)||(i===N-1||use[i+1]!==u)||dstr[i]===t||dstr[i]===ganttSel;return `<div class="${f<=0?'zero':f<=Math.ceil(tot*0.3)?'low':''}${dstr[i]===ganttSel?' sel':''}" title="出 ${u} ／ 保有 ${tot} ／ 残 ${f}">${show?f:''}</div>`}).join('')+'</div></div>';
@@ -8189,7 +8192,7 @@ const Sales = (function(){
   // ===== ステータスログ（slogBg→salesSlogBg / slogList→salesSlogList） =====
   function detectStatusChanges(){
     const curr={};
-    allEntries.forEach(d=>{if(d.id&&String(d.id).indexOf('s_')!==0)curr[String(d.id)]={status:d.status||'',project:d.project||''}});
+    allEntries.forEach(d=>{if(d.id&&String(d.id).indexOf('s_')!==0)curr[String(d.id)]={status:d.status||'',project:dispName(d.client,d.project)}});
     try{slog=JSON.parse(localStorage.getItem(SLOG_LIST_KEY)||'[]')}catch(e){slog=[]}
     try{slogUnread=parseInt(localStorage.getItem(SLOG_UNREAD_KEY)||'0',10)||0}catch(e){slogUnread=0}
     updateSlogBtn();
@@ -8718,7 +8721,7 @@ const Labor = (function(){
       if(isLaborArc){if(!isLA(j))return false}
       else if(isArchive){if(j.status!=='出荷済'||isLA(j))return false}
       else{if(j.status==='出荷済'||isLA(j))return false;if(stFilter&&j.status!==stFilter)return false}
-      if(!NZHit(j.project+' '+j.order_no+' '+j.estimate_no,kw))return false;
+      if(!NZHit(j.project+' '+(j.client||'')+' '+j.order_no+' '+j.estimate_no,kw))return false;
       return true;
     });
     const stOrder=isArchive?stOrderArchive:stOrderActive;
@@ -8774,7 +8777,7 @@ const Labor = (function(){
   function showDetail(id){
     const job=allJobs.find(x=>String(x.id)===String(id));if(!job)return;detailId=id;
     const no=job.order_no||job.estimate_no;
-    $('dmTitle').textContent=(no?'#'+no+' ':'')+job.project;
+    $('dmTitle').textContent=(no?'#'+no+' ':'')+dispName(job.client,job.project);
     $('dmSub').innerHTML=`<span class="st-badge st-${esc(job.status)}">${esc(job.status)}</span>${job.deadline?' 　納期 '+esc(job.deadline):''}`;
     let h=`<div class="mb-total"><div class="tt-label">延べ工数</div><div class="tt-val">${fmtMin(job.total_minutes)}<small>${job.people_count||0}人が関与</small></div></div>`;
     if(job.by_employee&&job.by_employee.length){
