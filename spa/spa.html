@@ -4973,8 +4973,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-24 16:51';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1439;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-24 17:10';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1440;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -11205,7 +11205,7 @@ const Est=(function(){
     const staff=_staff.slice(); if(e.our_person&&staff.indexOf(e.our_person)<0) staff.unshift(e.our_person);
     let h=`<div class="mo-row">${f('得意先',`<input id="este_client" list="estClientList" autocomplete="off" value="${esc(e.client)}"><datalist id="estClientList">${clients.map(c=>`<option value="${esc(c)}">`).join('')}</datalist>`,'f7')}${f('窓口',`<input id="este_contact" value="${esc(e.contact)}">`,'f3')}</div>`;
     h+=`<div class="mo-row">${f('案件名',`<input id="este_name" value="${esc(e.name)}">`,'f7')}${f('担当',`<select id="este_person"><option value=""></option>${staff.map(s=>`<option${s===e.our_person?' selected':''}>${esc(s)}</option>`).join('')}</select>`)}${f('日付',`<input type="date" id="este_date" value="${esc(e.date)}">`)}</div>`;
-    h+=`<div class="est-scroll"><table class="est-rows"><colgroup><col style="width:24%"><col style="width:11%"><col style="width:7%"><col style="width:6%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:8%"><col style="width:4%"></colgroup><thead><tr><th>品名</th><th>規格</th><th class="n">数量</th><th>単位</th><th class="n">原価単価</th><th class="n">原価金額</th><th class="n">売価単価</th><th class="n">売価金額</th><th class="n">粗利率</th><th></th></tr></thead><tbody id="estRows"></tbody></table></div>`;
+    h+=`<div class="est-scroll"><table class="est-rows"><colgroup><col style="width:24%"><col style="width:11%"><col style="width:7%"><col style="width:6%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:8%"><col style="width:4%"></colgroup><thead><tr><th>品名</th><th>規格</th><th class="n">数量</th><th>単位</th><th class="n">原価単価</th><th class="n">原価金額</th><th class="n">売価単価</th><th class="n">売価金額</th><th class="n">粗利率 %</th><th></th></tr></thead><tbody id="estRows"></tbody></table></div>`;
     h+=`<div class="est-ctl"><button type="button" class="est-b" onclick="Est.add('row')">行を足す</button><button type="button" class="est-b" onclick="Est.add('sub')">小計を足す</button><span class="est-fill"><label for="este_rate">粗利率</label><input id="este_rate" type="number" min="0" max="90" step="1" value="35"><span>%</span><button type="button" class="est-b ac" onclick="Est.fill()">売価を入れる</button></span></div>`;
     h+=`<div class="est-tot"><div><span>原価</span><b id="estT_c"></b></div><div><span>売価</span><b id="estT_p"></b></div><div><span>粗利</span><b id="estT_g"></b></div><div><span>粗利率</span><b id="estT_r"></b></div></div>`;
     h+=`<div class="mo-row full">${f('備考',`<textarea id="este_note" rows="2">${esc(e.note)}</textarea>`)}</div>`;
@@ -11219,7 +11219,7 @@ const Est=(function(){
     its.forEach((r,i)=>{
       if(r.t==='sub'){ h+=`<tr class="sub"><td colspan="5">小計</td><td class="n" id="estS_c${i}"></td><td></td><td class="n" id="estS_p${i}"></td><td class="n est-r" id="estS_r${i}"></td><td class="n"><button type="button" class="est-x" aria-label="この小計を外す" onclick="Est.rm(${i})">×</button></td></tr>`; return; }
       const v=k=>num(r[k])?String(num(r[k])):'';
-      h+=`<tr><td><input value="${esc(r.n)}" oninput="Est.set(${i},'n',this.value)"></td><td><input value="${esc(r.s)}" oninput="Est.set(${i},'s',this.value)"></td><td><input class="n" inputmode="decimal" value="${v('q')}" oninput="Est.set(${i},'q',this.value)"></td><td><input value="${esc(r.u)}" oninput="Est.set(${i},'u',this.value)"></td><td><input class="n" inputmode="numeric" value="${v('c')}" oninput="Est.set(${i},'c',this.value)"></td><td class="n" id="estR_c${i}"></td><td><input class="n" inputmode="numeric" value="${v('p')}" oninput="Est.set(${i},'p',this.value)"></td><td class="n" id="estR_p${i}"></td><td class="n est-r" id="estR_r${i}"></td><td class="n"><button type="button" class="est-x" aria-label="この行を消す" onclick="Est.rm(${i})">×</button></td></tr>`;
+      h+=`<tr><td><input value="${esc(r.n)}" oninput="Est.set(${i},'n',this.value)"></td><td><input value="${esc(r.s)}" oninput="Est.set(${i},'s',this.value)"></td><td><input class="n" inputmode="decimal" value="${v('q')}" oninput="Est.set(${i},'q',this.value)"></td><td><input value="${esc(r.u)}" oninput="Est.set(${i},'u',this.value)"></td><td><input class="n" inputmode="numeric" value="${v('c')}" oninput="Est.set(${i},'c',this.value)"></td><td class="n" id="estR_c${i}"></td><td><input class="n" inputmode="numeric" value="${v('p')}" oninput="Est.set(${i},'p',this.value)"></td><td class="n" id="estR_p${i}"></td><td><input class="n est-r" id="estR_r${i}" inputmode="decimal" aria-label="粗利率" oninput="Est.setRate(${i},this.value)" onblur="Est.recalc()"></td><td class="n"><button type="button" class="est-x" aria-label="この行を消す" onclick="Est.rm(${i})">×</button></td></tr>`;
     });
     $('estRows').innerHTML=h; calc();
     if(focus!=null){ const tr=$('estRows').children[focus]; const inp=tr&&tr.querySelector('input'); if(inp)inp.focus(); }
@@ -11229,11 +11229,15 @@ const Est=(function(){
     _edit.items.forEach((r,i)=>{
       if(r.t==='sub'){ put('estS_c'+i,yen(sc)); put('estS_p'+i,sp?yen(sp):''); put('estS_r'+i,rate(sc,sp),rcls(sc,sp)); sc=0; sp=0; return; }
       const c=num(r.q)*num(r.c), p=num(r.q)*num(r.p); sc+=c; sp+=p; tc+=c; tp+=p;
-      put('estR_c'+i,c?yen(c):''); put('estR_p'+i,p?yen(p):''); put('estR_r'+i,rate(c,p),rcls(c,p));
+      put('estR_c'+i,c?yen(c):''); put('estR_p'+i,p?yen(p):'');
+      const ri=$('estR_r'+i); if(ri){ if(document.activeElement!==ri) ri.value=p>0?(Math.round((p-c)/p*1000)/10).toFixed(1):''; ri.className='n est-r '+rcls(c,p); }   // 打っている最中の率の欄は書き換えない
     });
     put('estT_c','¥'+yen(tc)); put('estT_p',tp?'¥'+yen(tp):''); put('estT_g',tp?'¥'+yen(tp-tc):''); const r=$('estT_r'); if(r){ r.textContent=rate(tc,tp); r.className='est-r '+rcls(tc,tp); }
   }
   function set(i,k,v){ const r=_edit.items[i]; if(!r||r.t==='sub')return; r[k]=(k==='q'||k==='c'||k==='p')?num(v):v; if(k==='q'||k==='c'||k==='p') calc(); }
+  // 行ごとの粗利率（11/24 iller「項目毎に粗利率を変えられないのか。材料だけはきっちりもらうけど労務費をなんとか頑張って抑えるとか」）：率を打つとその行の売価単価が決まる（10 円単位に切り上げ）。売価単価を打てば率が付いてくる
+  function setRate(i,v){ const r=_edit.items[i]; if(!r||r.t==='sub')return; const x=parseFloat(String(v).replace(/[%％\s]/g,'')); if(!isFinite(x)||x<0||x>=100||!num(r.c))return; r.p=Math.ceil(num(r.c)/(1-x/100)/10)*10; const tr=$('estRows').children[i], pi=tr&&tr.querySelectorAll('input')[5]; if(pi)pi.value=String(r.p); calc(); }
+  function recalc(){ if(_edit) calc(); }
   function add(t){ _edit.items.push(t==='sub'?{t:'sub'}:{t:'row',n:'',s:'',q:1,u:'',c:0,p:0}); drawRows(t==='sub'?null:_edit.items.length-1); }
   function rm(i){ _edit.items.splice(i,1); if(!_edit.items.some(r=>r.t!=='sub')) _edit.items.push({t:'row',n:'',s:'',q:1,u:'',c:0,p:0}); drawRows(); }
   function fill(){ const el=$('este_rate'), r=parseFloat(el.value); if(!isFinite(r)||r<0||r>=100){ toast('粗利率を 0〜99 で入れてください',true); return; } _edit.items.forEach(x=>{ if(x.t!=='sub'&&num(x.c)) x.p=Math.ceil(num(x.c)/(1-r/100)/10)*10; }); drawRows(); }   // 10 円単位に切り上げ
@@ -11290,7 +11294,7 @@ ${e.note?`<div class="note">${esc(e.note)}</div>`:''}
     w.document.open(); w.document.write(html); w.document.close();
   }
   function init(){}
-  return {loadAll,render,init,search,newEst,edit,close,save,del,add,rm,set,fill,print};
+  return {loadAll,render,init,search,newEst,edit,close,save,del,add,rm,set,setRate,recalc,fill,print};
 })();
 
 const Alc=(function(){
