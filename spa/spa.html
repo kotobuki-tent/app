@@ -2775,6 +2775,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
     <button class="nav-link home-link on" id="navHome" onclick="App.nav('portal')"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><path d="M12 3L3 11h2v9h5v-6h4v6h5v-9h2L12 3z"/></svg>HOME</button>
     <div class="nav-zone nav-right">
       <div class="nav-seg">
+      <button class="nav-link" id="navEst" onclick="App.nav('est')">原価計算</button>
       <button class="nav-link" id="navPo" onclick="App.nav('po')">発注</button>
       <button class="nav-link" id="navCases" onclick="App.nav('cases')">案件</button>
       <button class="nav-link" id="navWb" onclick="App.nav('wb')">予定ボード</button>
@@ -4103,6 +4104,7 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
         <a class="portal-card" data-app="poreq" onclick="App.nav('poreq')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 11v6M9 14h6"/></svg></div><div class="portal-card-body"><div class="portal-card-title">発注依頼</div></div><span class="portal-st hidden" data-st="poreq"></span></a>
         <a class="portal-card" data-app="po" onclick="App.nav('po')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">発注</div></div></a>
         <a class="portal-card" data-app="claim" onclick="App.nav('claim')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 16.5h-19z"/><path d="M12 10v4"/><path d="M12 17.2v.1"/></svg></div><div class="portal-card-body"><div class="portal-card-title">不適合</div></div></a>
+        <a class="portal-card" data-app="est" onclick="App.nav('est')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 7.5h7"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></svg></div><div class="portal-card-body"><div class="portal-card-title">原価計算</div></div></a>
       </div></div>
       <div class="portal-grp"><div class="portal-cap">毎日</div><div class="portal-rows">
         <a class="portal-card" data-app="daily" onclick="App.nav('daily')"><div class="portal-card-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div class="portal-card-body"><div class="portal-card-title">日報</div></div><span class="portal-st hidden" data-st="daily"></span></a>
@@ -4152,6 +4154,42 @@ input[type=checkbox].sw:disabled{opacity:.45;cursor:default}
 </section>
 <div class="mo-bg" id="claimBg"><div class="mo" style="max-width:720px"><h2 id="claimTitle">不適合</h2><div id="claimEdit"></div></div></div>
 <div class="mo-bg" id="claimZoom" onclick="this.classList.remove('show')"><img alt=""></div>
+<section id="view-est" class="hidden">
+<style>
+#view-est .est-wrap{padding:14px 16px 120px}
+#view-est .est-new{margin-left:12px;background:var(--accent-dim);color:var(--accent);border:none;border-radius:9px;padding:9px 16px;font:500 14px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
+#view-est .est-empty{color:var(--text-faint);padding:40px 0;text-align:center}
+.est-tbl{width:100%;border-collapse:collapse;background:var(--surface);border-radius:12px;overflow:hidden;font-size:14px}
+.est-tbl th{text-align:left;font-weight:400;font-size:12px;color:var(--text-dim);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.est-tbl td{padding:11px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.est-tbl td.wrap{white-space:normal}
+.est-tbl tbody tr{cursor:pointer}.est-tbl tbody tr:hover{background:var(--surface2)}
+.est-tbl .n,.est-rows .n{text-align:right;font-variant-numeric:tabular-nums}
+.est-r.bad,.est-rows tr.sub td.est-r.bad{color:var(--red)}.est-r.mid,.est-rows tr.sub td.est-r.mid{color:var(--orange)}.est-r.ok,.est-rows tr.sub td.est-r.ok{color:var(--green)}
+.est-b{background:var(--surface2);color:var(--text);border:none;border-radius:8px;padding:8px 14px;font:400 13px/1.2 'Hiragino Sans','Noto Sans JP',sans-serif;cursor:pointer}
+.est-b.ac{background:var(--accent-dim);color:var(--accent)}
+#estBg .mo{max-width:1180px}
+#estBg .est-scroll{overflow-x:auto;margin:4px 0 10px}
+.est-rows{width:100%;min-width:900px;border-collapse:collapse;table-layout:fixed;font-size:14px}
+.est-rows th{text-align:left;font-weight:400;font-size:12px;color:var(--text-dim);padding:6px 4px;border-bottom:1px solid var(--border)}
+.est-rows td{padding:3px 4px;border-bottom:1px solid var(--border)}
+.est-rows input{width:100%;box-sizing:border-box;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text)}
+.est-rows input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.est-rows tr.sub td{background:var(--surface2);color:var(--text-dim);padding:8px 8px}
+.est-x{background:none;border:none;color:var(--text-faint);font-size:16px;line-height:1;cursor:pointer;padding:4px 6px}
+.est-x:hover{color:var(--red)}
+.est-ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.est-fill{margin-left:auto;display:flex;gap:6px;align-items:center;color:var(--text-dim);font-size:13px}
+.est-fill input{width:64px;text-align:right;padding:7px 8px;border:1px solid var(--border);border-radius:7px;font:400 14px/1.3 'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--surface2)}
+.est-tot{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.est-tot>div{background:var(--surface2);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.est-tot span{font-size:12px;color:var(--text-dim)}
+.est-tot b{font-size:19px;font-weight:500;text-align:right;font-variant-numeric:tabular-nums;min-height:24px}
+</style>
+  <div class="scr-head"><h1>原価計算</h1><input class="scr-search" id="estSearch" oninput="Est.search(this.value)"><button type="button" class="est-new" onclick="Est.newEst()">新しく作る</button></div>
+  <div class="est-wrap"><div id="estBody"><div class="est-empty">読み込み中...</div></div></div>
+</section>
+<div class="mo-bg" id="estBg"><div class="mo"><h2 id="estTitle">原価計算</h2><div id="estEdit"></div></div></div>
 <div class="mo-bg" id="poEditBg"><div class="mo" style="max-width:760px"><h2 id="poe_title">発注書</h2><div id="poEditBody"></div></div></div>
 
 <!-- ===== 予定ボード（ホワイトボード） section ===== -->
@@ -4936,8 +4974,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-24 14:03';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1437;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-24 16:08';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1438;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -11114,6 +11152,148 @@ const Claim=(function(){
   return { loadAll, render, init, search, kind, st, newClaim, open, close, save, del, stChg, addNote, delNote, addPhotos, rmPhoto, zoom };
 })();
 
+// ===== 原価計算（見積の積算）dept=est（2026-11-24、GAS v156）=====
+// iller「みつも朗をなくして楽一だけにして、二度手間をなくして、業務管理アプリと連携させたい」。みつも朗でやっていた原価計算をここに持つ：
+// 明細ごとに 原価単価×数量 を積み、小計を挟み、売価は後から（粗利率を決めて一度に入れられる）。保存すると見積中の案件が 1 件できる（GAS 側）。
+// 見積書は売価の側だけを A4 に出す（原価は出ない）。id は SPA が作る（E…）＝突き合わせ不要。見積番号 KM-0001 と case_id は GAS が振る。
+const Est=(function(){
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const $=id=>document.getElementById(id);
+  let _list=[], _staff=[], _busy=false, _edit=null;
+  const _pend={};
+  const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const yen=v=>Math.round(Number(v)||0).toLocaleString('ja-JP');
+  const num=v=>{ const n=parseFloat(String(v==null?'':v).replace(/[,，\s]/g,'')); return isFinite(n)&&n>0?n:0; };
+  const rate=(c,s)=>s>0?(Math.round((s-c)/s*1000)/10).toFixed(1)+'%':'';
+  const rcls=(c,s)=>{ if(!(s>0))return ''; const r=(s-c)/s*100; return r<30?'bad':r<35?'mid':'ok'; };   // 採算の画面と同じ線（損益ゼロ 29%／目標 35%）
+  const itemsOf=e=>{ let a=e&&e.items; if(typeof a==='string'){ try{ a=JSON.parse(a); }catch(x){ a=[]; } } return Array.isArray(a)?a:[]; };
+  const tot=items=>{ let c=0,p=0; items.forEach(r=>{ if(r.t!=='sub'){ c+=num(r.q)*num(r.c); p+=num(r.q)*num(r.p); } }); return {c:Math.round(c),p:Math.round(p)}; };
+  const md=v=>{ const m=String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})/); return m?`${+m[1]}/${+m[2]}/${+m[3]}`:''; };
+  function send(body){ Pending.touch(); fetch(API,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)}); }
+  function guard(){ if(_busy)return true; _busy=true; setTimeout(()=>{_busy=false},1500); return false; }
+  function merge(rows){
+    const now=Date.now(), byId={}; rows.forEach(r=>{ byId[r.id]=r; });
+    Object.keys(_pend).forEach(id=>{ const p=_pend[id]; if(now-p.at>90000||(p.del&&!byId[id])||(!p.del&&byId[id]&&String(byId[id].updated_at||'')>=p.upd)){ delete _pend[id]; return; } if(p.del) delete byId[id]; else byId[id]=Object.assign({},byId[id]||{},p.row); });
+    return Object.values(byId);
+  }
+  async function loadAll(){
+    try{
+      const [es,st]=await Promise.all([
+        fetch(API+'?dept=est&action=list').then(r=>r.json()).catch(()=>({})),
+        fetch(API+'?dept=qual&action=staff').then(r=>r.json()).catch(()=>({}))]);
+      if(es&&es.success) _list=merge(es.estimates||[]);
+      if(st&&st.data) _staff=st.data.map(x=>x.name).filter(Boolean);
+    }catch(e){}
+    render();
+  }
+  function render(){
+    const el=$('estBody'); if(!el)return;
+    const rows=_list.slice().sort((a,b)=>String(b.updated_at||b.created_at||'').localeCompare(String(a.updated_at||a.created_at||'')));
+    if(!rows.length){ el.innerHTML='<div class="est-empty">まだありません</div>'; return; }
+    let h='<table class="est-tbl"><thead><tr><th>見積番号</th><th>得意先／案件名</th><th>担当</th><th>日付</th><th class="n">原価</th><th class="n">売価</th><th class="n">粗利</th><th class="n">粗利率</th><th></th></tr></thead><tbody>';
+    rows.forEach(e=>{ const t=tot(itemsOf(e));
+      h+=`<tr data-t="${esc([e.est_no,e.client,e.contact,e.name,e.our_person].join(' '))}" onclick="Est.edit('${esc(e.id)}')"><td>${esc(e.est_no||'')}</td><td class="wrap">${esc(dispName(e.client,e.name)||'')}</td><td>${esc(e.our_person||'')}</td><td>${md(e.date)}</td><td class="n">${yen(t.c)}</td><td class="n">${t.p?yen(t.p):''}</td><td class="n">${t.p?yen(t.p-t.c):''}</td><td class="n est-r ${rcls(t.c,t.p)}">${rate(t.c,t.p)}</td><td class="n">${e.est_no?`<button type="button" class="est-b" onclick="event.stopPropagation();Est.print('${esc(e.id)}')">見積書</button>`:''}</td></tr>`; });
+    el.innerHTML=h+'</tbody></table>';
+    const q=$('estSearch'); if(q&&q.value) search(q.value);
+  }
+  function search(q){ const ks=NZQ(q); document.querySelectorAll('#estBody tbody tr').forEach(tr=>{ const t=NZ(tr.dataset.t); tr.style.display=ks.every(k=>t.indexOf(k)>=0)?'':'none'; }); }
+  // ---- 編集の窓 ----
+  function newEst(){ _edit={id:uid('E'),isNew:true,date:dateStr(new Date()),client:'',contact:'',name:'',our_person:'',note:'',items:[{t:'row',n:'',s:'',q:1,u:'',c:0,p:0},{t:'row',n:'',s:'',q:1,u:'',c:0,p:0},{t:'row',n:'',s:'',q:1,u:'',c:0,p:0}]}; open(); }
+  function edit(id){ const e=_list.find(x=>String(x.id)===String(id)); if(!e)return; _edit={id:e.id,isNew:false,est_no:e.est_no||'',date:String(e.date||'').slice(0,10),client:e.client||'',contact:e.contact||'',name:e.name||'',our_person:e.our_person||'',note:e.note||'',items:itemsOf(e).map(r=>Object.assign({},r))}; if(!_edit.items.length)_edit.items.push({t:'row',n:'',s:'',q:1,u:'',c:0,p:0}); open(); }
+  function open(){
+    const e=_edit, f=(lab,html,cls)=>`<div class="mo-field${cls?' '+cls:''}"><label>${lab}</label>${html}</div>`;
+    const clients=[...new Set(_list.map(x=>String(x.client||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));
+    const staff=_staff.slice(); if(e.our_person&&staff.indexOf(e.our_person)<0) staff.unshift(e.our_person);
+    let h=`<div class="mo-row">${f('得意先',`<input id="este_client" list="estClientList" autocomplete="off" value="${esc(e.client)}"><datalist id="estClientList">${clients.map(c=>`<option value="${esc(c)}">`).join('')}</datalist>`,'f7')}${f('窓口',`<input id="este_contact" value="${esc(e.contact)}">`,'f3')}</div>`;
+    h+=`<div class="mo-row">${f('案件名',`<input id="este_name" value="${esc(e.name)}">`,'f7')}${f('担当',`<select id="este_person"><option value=""></option>${staff.map(s=>`<option${s===e.our_person?' selected':''}>${esc(s)}</option>`).join('')}</select>`)}${f('日付',`<input type="date" id="este_date" value="${esc(e.date)}">`)}</div>`;
+    h+=`<div class="est-scroll"><table class="est-rows"><colgroup><col style="width:24%"><col style="width:11%"><col style="width:7%"><col style="width:6%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:8%"><col style="width:4%"></colgroup><thead><tr><th>品名</th><th>規格</th><th class="n">数量</th><th>単位</th><th class="n">原価単価</th><th class="n">原価金額</th><th class="n">売価単価</th><th class="n">売価金額</th><th class="n">粗利率</th><th></th></tr></thead><tbody id="estRows"></tbody></table></div>`;
+    h+=`<div class="est-ctl"><button type="button" class="est-b" onclick="Est.add('row')">行を足す</button><button type="button" class="est-b" onclick="Est.add('sub')">小計を足す</button><span class="est-fill"><label for="este_rate">粗利率</label><input id="este_rate" type="number" min="0" max="90" step="1" value="35"><span>%</span><button type="button" class="est-b ac" onclick="Est.fill()">売価を入れる</button></span></div>`;
+    h+=`<div class="est-tot"><div><span>原価</span><b id="estT_c"></b></div><div><span>売価</span><b id="estT_p"></b></div><div><span>粗利</span><b id="estT_g"></b></div><div><span>粗利率</span><b id="estT_r"></b></div></div>`;
+    h+=`<div class="mo-row full">${f('備考',`<textarea id="este_note" rows="2">${esc(e.note)}</textarea>`)}</div>`;
+    h+=`<div class="mo-foot">${e.isNew?'':'<button type="button" class="del-btn" style="margin-right:auto" onclick="Est.del()">削除</button>'}<button type="button" class="cancel" onclick="Est.close()">閉じる</button>${e.est_no?'<button type="button" class="cancel" onclick="Est.print()">見積書</button>':''}<button type="button" class="save" onclick="Est.save()">保存</button></div>`;
+    $('estTitle').textContent='原価計算'+(e.est_no?'　'+e.est_no:'');
+    $('estEdit').innerHTML=h; drawRows(); $('estBg').classList.add('show');
+    if(e.isNew) setTimeout(()=>{ const c=$('este_client'); if(c)c.focus(); },60);
+  }
+  function drawRows(focus){
+    const its=_edit.items; let h='';
+    its.forEach((r,i)=>{
+      if(r.t==='sub'){ h+=`<tr class="sub"><td colspan="5">小計</td><td class="n" id="estS_c${i}"></td><td></td><td class="n" id="estS_p${i}"></td><td class="n est-r" id="estS_r${i}"></td><td class="n"><button type="button" class="est-x" aria-label="この小計を外す" onclick="Est.rm(${i})">×</button></td></tr>`; return; }
+      const v=k=>num(r[k])?String(num(r[k])):'';
+      h+=`<tr><td><input value="${esc(r.n)}" oninput="Est.set(${i},'n',this.value)"></td><td><input value="${esc(r.s)}" oninput="Est.set(${i},'s',this.value)"></td><td><input class="n" inputmode="decimal" value="${v('q')}" oninput="Est.set(${i},'q',this.value)"></td><td><input value="${esc(r.u)}" oninput="Est.set(${i},'u',this.value)"></td><td><input class="n" inputmode="numeric" value="${v('c')}" oninput="Est.set(${i},'c',this.value)"></td><td class="n" id="estR_c${i}"></td><td><input class="n" inputmode="numeric" value="${v('p')}" oninput="Est.set(${i},'p',this.value)"></td><td class="n" id="estR_p${i}"></td><td class="n est-r" id="estR_r${i}"></td><td class="n"><button type="button" class="est-x" aria-label="この行を消す" onclick="Est.rm(${i})">×</button></td></tr>`;
+    });
+    $('estRows').innerHTML=h; calc();
+    if(focus!=null){ const tr=$('estRows').children[focus]; const inp=tr&&tr.querySelector('input'); if(inp)inp.focus(); }
+  }
+  function calc(){
+    let sc=0,sp=0,tc=0,tp=0; const put=(id,t,cl)=>{ const el=$(id); if(!el)return; el.textContent=t; if(cl!==undefined) el.className='n est-r '+cl; };
+    _edit.items.forEach((r,i)=>{
+      if(r.t==='sub'){ put('estS_c'+i,yen(sc)); put('estS_p'+i,sp?yen(sp):''); put('estS_r'+i,rate(sc,sp),rcls(sc,sp)); sc=0; sp=0; return; }
+      const c=num(r.q)*num(r.c), p=num(r.q)*num(r.p); sc+=c; sp+=p; tc+=c; tp+=p;
+      put('estR_c'+i,c?yen(c):''); put('estR_p'+i,p?yen(p):''); put('estR_r'+i,rate(c,p),rcls(c,p));
+    });
+    put('estT_c','¥'+yen(tc)); put('estT_p',tp?'¥'+yen(tp):''); put('estT_g',tp?'¥'+yen(tp-tc):''); const r=$('estT_r'); if(r){ r.textContent=rate(tc,tp); r.className='est-r '+rcls(tc,tp); }
+  }
+  function set(i,k,v){ const r=_edit.items[i]; if(!r||r.t==='sub')return; r[k]=(k==='q'||k==='c'||k==='p')?num(v):v; if(k==='q'||k==='c'||k==='p') calc(); }
+  function add(t){ _edit.items.push(t==='sub'?{t:'sub'}:{t:'row',n:'',s:'',q:1,u:'',c:0,p:0}); drawRows(t==='sub'?null:_edit.items.length-1); }
+  function rm(i){ _edit.items.splice(i,1); if(!_edit.items.some(r=>r.t!=='sub')) _edit.items.push({t:'row',n:'',s:'',q:1,u:'',c:0,p:0}); drawRows(); }
+  function fill(){ const el=$('este_rate'), r=parseFloat(el.value); if(!isFinite(r)||r<0||r>=100){ toast('粗利率を 0〜99 で入れてください',true); return; } _edit.items.forEach(x=>{ if(x.t!=='sub'&&num(x.c)) x.p=Math.ceil(num(x.c)/(1-r/100)/10)*10; }); drawRows(); }   // 10 円単位に切り上げ
+  function read(){ const e=_edit, g=id=>{ const el=$(id); return el?String(el.value||'').trim():''; }; e.client=g('este_client'); e.contact=g('este_contact'); e.name=g('este_name'); e.our_person=g('este_person'); e.date=g('este_date'); e.note=g('este_note'); return e; }
+  const clean=items=>items.filter(r=>r.t==='sub'||String(r.n||'').trim()||String(r.s||'').trim()||num(r.c)||num(r.p)).map(r=>r.t==='sub'?{t:'sub'}:{t:'row',n:String(r.n||'').trim(),s:String(r.s||'').trim(),q:num(r.q),u:String(r.u||'').trim(),c:num(r.c),p:num(r.p)});
+  function save(){
+    if(!_edit)return; const e=read();
+    if(!e.client&&!e.name){ toast('得意先か案件名を入れてください',true); return; }
+    if(guard())return;
+    const items=clean(e.items), t=tot(items), now=new Date().toISOString();
+    const row={id:e.id,date:e.date,client:e.client,contact:e.contact,name:e.name,our_person:e.our_person,note:e.note,items:JSON.stringify(items),cost_total:String(t.c),price_total:String(t.p),updated_at:now};
+    _pend[e.id]={at:Date.now(),upd:now,row};
+    const i=_list.findIndex(x=>String(x.id)===String(e.id)); if(i>=0) _list[i]=Object.assign({},_list[i],row); else _list.push(Object.assign({created_at:now},row));
+    send({dept:'est',action:'save',id:e.id,date:e.date,client:e.client,contact:e.contact,name:e.name,our_person:e.our_person,note:e.note,items});
+    close(); render(); toast('保存しました');
+    setTimeout(loadAll,4000); setTimeout(loadAll,12000);   // 見積番号と案件は GAS が付ける
+  }
+  function del(){
+    if(!_edit||_edit.isNew)return; if(!confirm('この原価計算を消します。案件は残ります。')) return; if(guard())return;
+    const id=_edit.id; _pend[id]={at:Date.now(),del:true}; _list=_list.filter(x=>String(x.id)!==String(id));
+    send({dept:'est',action:'delete',id}); close(); render(); toast('消しました'); setTimeout(loadAll,4000);
+  }
+  function close(){ $('estBg').classList.remove('show'); _edit=null; }
+  // ---- 見積書（A4。売価の側だけ。原価は出さない）----
+  function print(id){
+    let e; if(id){ const x=_list.find(y=>String(y.id)===String(id)); if(!x)return; e={est_no:x.est_no,date:x.date,client:x.client,contact:x.contact,name:x.name,our_person:x.our_person,note:x.note,items:itemsOf(x)}; } else { if(!_edit)return; e=Object.assign({},read()); e.items=clean(e.items); }
+    const w=window.open('','_blank'); if(!w){ toast('ポップアップがブロックされました。許可してもう一度押してください',true); return; }
+    const dm=String(e.date||'').match(/^(\d{4})-(\d{2})-(\d{2})/), ds=dm?`${+dm[1]} 年 ${+dm[2]} 月 ${+dm[3]} 日`:'';
+    let sp=0,tp=0,rows='',n=0;
+    e.items.forEach(r=>{
+      if(r.t==='sub'){ rows+=`<tr class="sub"><td colspan="5">小計</td><td class="num">${yen(sp)}</td></tr>`; sp=0; n++; return; }
+      const p=num(r.q)*num(r.p); sp+=p; tp+=p; n++;
+      rows+=`<tr><td>${esc(r.n||'')}</td><td>${esc(r.s||'')}</td><td class="num">${num(r.q)?esc(num(r.q)):''}</td><td class="c">${esc(r.u||'')}</td><td class="num">${num(r.p)?yen(num(r.p)):''}</td><td class="num">${p?yen(p):''}</td></tr>`;
+    });
+    for(;n<16;n++) rows+='<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+    const tax=Math.floor(tp*0.1);
+    const html=`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>御見積書 ${esc(e.client||'')}</title><style>
+@page{size:A4;margin:22mm}html{background:#fff}body{font-family:"Hiragino Mincho ProN",serif;font-size:10.5pt;line-height:1.25;color:#000;margin:0;background:#fff;color-scheme:light}
+h1{font-size:16pt;font-weight:bold;text-align:center;margin:0 0 6mm;letter-spacing:.5em}.row{display:flex;justify-content:space-between;align-items:flex-start}
+.to{font-size:13pt;border-bottom:1px solid #000;padding:0 2mm 2mm;min-width:80mm;margin-top:3mm}.meta{border-collapse:collapse;margin-right:1px}.meta td,.meta th{padding:2mm 3mm;border:1px solid #000;font-size:10pt}.meta th{background:#eee;font-weight:normal;white-space:nowrap}.meta td{min-width:42mm}
+.lead{margin:5mm 0 3mm}.case{margin-top:3mm;border:1px solid #000;padding:4mm 3mm;font-size:11pt;width:calc(100% - 1px);box-sizing:border-box}.sum{margin-top:3mm;font-size:13pt;border-bottom:1px solid #000;display:inline-block;padding:0 2mm 1.5mm;min-width:80mm}
+table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.items th{border:1px solid #000;background:#eee;font-weight:normal;font-size:10pt;padding:1.5mm 2mm}.items td{border:1px solid #000;font-size:10pt;padding:0 2mm;height:8.5mm}.items tr.sub td{background:#f6f6f6}
+.num{text-align:right}.c{text-align:center}.tot{border-collapse:collapse;margin:0 1px 0 auto}.tot td,.tot th{border:1px solid #000;border-top:none;font-size:10pt;padding:0 2mm;height:8.5mm}.tot th{background:#eee;font-weight:normal;white-space:nowrap;width:28mm}.tot td{width:36mm;text-align:right}
+.note{font-size:10pt;margin-top:5mm;white-space:pre-wrap}.foot{width:100%;margin-top:8mm;border-collapse:collapse}.co{font-size:10pt;line-height:1.5}.co .n{font-size:12pt;font-weight:bold}
+.bar{position:fixed;top:0;left:0;right:0;background:#1c1c1e;color:#fff;padding:10px 16px;font:500 14px/1 -apple-system,'Hiragino Sans',sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between}.bar button{border:none;border-radius:8px;padding:8px 14px;font:500 14px/1 inherit;background:#fff;color:#1c1c1e;cursor:pointer}
+#paper{width:210mm;min-height:297mm;box-sizing:border-box;padding:22mm;background:#fff}@media print{.bar{display:none}#paper{padding:0;min-height:0}}@media screen{body{padding:60px 0 22mm;margin:0;background:#eee}#paper{margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
+</style></head><body><div class="bar"><span>御見積書　${esc(e.client||'')}</span><span><button onclick="window.print()">印刷</button></span></div>
+<div id="paper"><h1>御見積書</h1><div class="row"><div><div class="to">${esc(e.client||'')}　${e.contact?esc(e.contact)+'　様':'御中'}</div><p class="lead">下記のとおり御見積申し上げます。</p><div class="sum">合計金額　¥${yen(tp+tax)}（税込）</div></div><table class="meta"><tr><th>見積番号</th><td>${esc(e.est_no||'')}</td></tr><tr><th>見積日</th><td>${ds}</td></tr></table></div>
+<div class="case">件名　${esc(e.name||'')}</div>
+<table class="items"><colgroup><col style="width:34%"><col style="width:18%"><col style="width:9%"><col style="width:8%"><col style="width:14%"><col style="width:17%"></colgroup><thead><tr><th>品名</th><th>規格</th><th>数量</th><th>単位</th><th>単価</th><th>金額</th></tr></thead><tbody>${rows}</tbody></table>
+<table class="tot"><tr><th>小計</th><td>${yen(tp)}</td></tr><tr><th>消費税（10%）</th><td>${yen(tax)}</td></tr><tr><th>合計</th><td>${yen(tp+tax)}</td></tr></table>
+${e.note?`<div class="note">${esc(e.note)}</div>`:''}
+<table class="foot"><tr><td class="co" style="vertical-align:bottom"><span class="n">有限会社寿テント</span><br>〒689-2102　鳥取県東伯郡北栄町国坂104-2<br>TEL 0858-36-2811　FAX 0858-36-2863　mail kt-info@kototen.com</td><td class="co" style="text-align:right;vertical-align:bottom;white-space:nowrap">担当　${esc(e.our_person||'')}</td></tr></table></div></body></html>`;
+    w.document.open(); w.document.write(html); w.document.close();
+  }
+  function init(){}
+  return {loadAll,render,init,search,newEst,edit,close,save,del,add,rm,set,fill,print};
+})();
+
 const Alc=(function(){
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 const $=id=>document.getElementById(id);
@@ -11849,6 +12029,7 @@ const App = {
   REG:[
     {key:'cases',ns:()=>Cases,section:'view-cases',nav:'navCases',zone:'office'},
     {key:'poreq',ns:()=>PoReq,section:'view-poreq',nav:'navPoReq',zone:'shared'},   // 発注依頼（2026-10-23）：全員向け。書く＋自分の依頼の段
+    {key:'est',ns:()=>Est,section:'view-est',nav:'navEst',zone:'office'},   // 原価計算（2026-11-24）：見積の積算。保存すると見積中の案件ができる
     {key:'po',ns:()=>Po,section:'view-po',nav:'navPo',zone:'office'},
     {key:'claim',ns:()=>Claim,section:'view-claim',nav:'navClaim',zone:'shared'},   // クレーム（2026-11-19）：全員で書いて考える   // 発注（2026-10-19）：事務所向け。依頼→発注書→発注済
     {key:'prod', ns:()=>Prod, section:'view-prod', nav:'navProd',zone:'field'},
