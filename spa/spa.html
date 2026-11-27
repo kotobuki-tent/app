@@ -4973,8 +4973,8 @@ async function woffBoot(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
   }
 }
-const APP_VER='2026-11-24 17:18';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
-const APP_BUILD=1442;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
+const APP_VER='2026-11-27 17:34';   // ← コミット時に .git/hooks/pre-commit が自動で書き換える（手で触らない）
+const APP_BUILD=1443;   // ← 同じくフックが書く通し番号（コミット数）。画面には「Ver. 1071」と出す（10/15 iller「版じゃなくて Ver.」）。新版の検知は APP_VER（日時）のまま
 try{ document.addEventListener('DOMContentLoaded',()=>{ const t='Ver. '+APP_BUILD, tt=APP_VER+' のコミット'; const v=document.getElementById('appVer'); if(v){v.textContent=t;v.title=tt;} const pv=document.getElementById('portalVer'); if(pv){pv.textContent=t;pv.title=tt;} }); }catch(e){}   // ポータルの足元にも版（10/15 iller「社名はいらない、そこにバージョン情報」）
 const API='https://script.google.com/macros/s/AKfycbwD5F1rJcdg7pl1lnVXzyY0vttcO88z-YKUZWG3eLIT0DNMhFZw8jXbJoKW6wCIKEC7/exec';
 /* 前回のデータの即表示（2026-10-05 iller「開くたびに待たされるとノロいアプリに見える」）。
@@ -10940,7 +10940,7 @@ table.items{border-collapse:collapse;width:calc(100% - 1px);margin-top:6mm}.item
 #paper{width:210mm;min-height:297mm;box-sizing:border-box;padding:22mm;background:#fff}@media print{.bar{display:none}#paper{padding:0;min-height:0}}@media screen{body{padding:60px 0 22mm;margin:0;background:#eee}#paper{margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.15)}}
 </style></head><body><div class="bar"><span>発注書　${esc(p.vendor||'')}</span><span class="ctl"><button onclick="window.print()">印刷</button><button id="pdfBtn" onclick="toPdf()">PDF</button>${p.status==='発注書'?`<button class="go" onclick="(function(){var o=window.opener||window.parent;var r=o&&o.Po?o.Po.markSent('${esc(p.id)}'):'none';if(r==='ok'){window.close();}else if(r!=='busy'){alert(r);}})()">発注した</button>`:''}</span></div>
 <div id="paper"><h1>発注書</h1><div class="row"><div class="to">${esc(p.vendor||'')}　御中</div><table class="meta"><tr><th>注文番号</th><td>${esc(poNo(p))}</td></tr><tr><th>発注日</th><td>${ds}</td></tr></table></div>
-<p class="lead">下記のとおり発注します。</p><div class="case"><span><b>件名</b>　${esc(p.case_name||'')}</span><span><b>担当</b>　${esc(p.person||'')}</span></div>
+<p class="lead">下記のとおり発注します。</p><div class="case"><span><b>担当</b>　${esc(p.person||'')}</span></div>
 <table class="items"><tr><th style="width:8mm">No</th><th>品名・品番・仕様</th><th style="width:16mm">数量</th><th style="width:12mm">単位</th><th style="width:24mm">単価</th><th style="width:28mm">金額（税抜）</th></tr>${rows}<tr><td colspan="5" class="num">合計（税抜）</td><td class="num">${n(total(p))} 円</td></tr></table>
 <table class="cond"><tr><th>納期</th><td style="white-space:nowrap">${esc(dl)}</td><th>納品先</th><td>${esc(p.deliver_to||'弊社')}</td></tr><tr><th>支払</th><td colspan="3">20 日締め／翌月 15 日払い</td></tr><tr><th>備考</th><td colspan="3" style="height:12mm">${esc(p.note||'')}</td></tr></table>
 <p class="note">納品書・請求書に上記の<b>注文番号</b>をご記載いただけますと幸いです。</p>
